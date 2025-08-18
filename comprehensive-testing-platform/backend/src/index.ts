@@ -13,7 +13,6 @@ import { testRoutes } from "./routes/tests";
 import { blogRoutes } from "./routes/blog";
 import { feedbackRoutes } from "./routes/feedback";
 import { analyticsRoutes } from "./routes/analytics";
-import { systemRoutes } from "./routes/system";
 import { homepageRoutes } from "./routes/homepage";
 import { searchRoutes } from "./routes/search";
 import { cookiesRoutes } from "./routes/cookies";
@@ -101,25 +100,36 @@ app.use("*", async (c, next) => {
 // 错误处理中间件
 app.onError(errorHandler);
 
-// 系统健康检查和管理端点
-app.route("/api/system", systemRoutes);
-
-// 调试端点 - 检查环境变量
-app.get("/debug/env", async (c) => {
-  return c.json({
+// 根路径 - 欢迎页面
+app.get("/", (c) => {
+  const response: APIResponse = {
     success: true,
     data: {
-      hasDB: !!c.env.DB,
-      hasKV: !!c.env.KV,
-      hasBUCKET: !!c.env?.['BUCKET'],
-      environment: c.env.ENVIRONMENT,
-      envKeys: Object.keys(c.env),
+      message: "欢迎使用综合测试平台 API",
+      version: "1.0.0",
+      environment: c.env.ENVIRONMENT || "staging",
+      timestamp: new Date().toISOString(),
+      endpoints: {
+        health: "/health",
+        api: "/api",
+        tests: "/api/tests",
+        blog: "/api/blog",
+        feedback: "/api/feedback",
+        analytics: "/api/analytics",
+        homepage: "/api/homepage",
+        search: "/api/search",
+        cookies: "/api/cookies",
+        system: "/api/system",
+      },
     },
     timestamp: new Date().toISOString(),
-  });
+    requestId: (c.get("requestId") as string) || "",
+  };
+  
+  return c.json(response);
 });
 
-// 增强的健康检查端点
+// 健康检查端点
 app.get("/health", async (c) => {
   try {
     const dbService = c.get("dbService");

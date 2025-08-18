@@ -5,7 +5,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// .wrangler/tmp/bundle-f56PAZ/checked-fetch.js
+// .wrangler/tmp/bundle-i0jPun/checked-fetch.js
 var urls = /* @__PURE__ */ new Set();
 function checkURL(request, init) {
   const url = request instanceof URL ? request : new URL(
@@ -7991,262 +7991,6 @@ analyticsRoutes.get("/popular-tests", async (c) => {
   }
 });
 
-// src/routes/system/index.ts
-var systemRoutes = new Hono2();
-systemRoutes.get("/health", async (c) => {
-  try {
-    const dbService = c.get("dbService");
-    const healthCheck = await dbService.healthCheck();
-    const response = {
-      success: true,
-      data: {
-        status: healthCheck.status,
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        environment: c.env?.["ENVIRONMENT"],
-        version: "1.0.0",
-        services: {
-          database: healthCheck.status,
-          cache: "healthy",
-          // 简化版本
-          storage: "healthy"
-          // 简化版本
-        }
-      },
-      message: "System health check completed",
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
-    };
-    return c.json(response, healthCheck.status === "healthy" ? 200 : 503);
-  } catch (error) {
-    throw new ModuleError(
-      "System health check failed",
-      ERROR_CODES.DATABASE_ERROR,
-      503
-    );
-  }
-});
-systemRoutes.get("/health/database", async (c) => {
-  try {
-    const dbService = c.get("dbService");
-    const healthCheck = await dbService.healthCheck();
-    const response = {
-      success: true,
-      data: healthCheck,
-      message: "Database health check completed",
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
-    };
-    return c.json(response, healthCheck.status === "healthy" ? 200 : 503);
-  } catch (error) {
-    throw new ModuleError(
-      "Database health check failed",
-      ERROR_CODES.DATABASE_ERROR,
-      503
-    );
-  }
-});
-systemRoutes.get(
-  "/stats",
-  rateLimiter(10, 6e4),
-  // 每分钟最多10次请求
-  async (c) => {
-    try {
-      const dbService = c.get("dbService");
-      const stats = await dbService.getStatistics();
-      const response = {
-        success: true,
-        data: stats,
-        message: "System statistics retrieved successfully",
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        requestId: c.get("requestId")
-      };
-      return c.json(response);
-    } catch (error) {
-      throw new ModuleError(
-        "Failed to retrieve system statistics",
-        ERROR_CODES.DATABASE_ERROR,
-        500
-      );
-    }
-  }
-);
-systemRoutes.get("/migrations", async (c) => {
-  try {
-    const response = {
-      success: true,
-      data: {
-        status: "up_to_date",
-        lastMigration: "005_module_indexes",
-        pendingMigrations: []
-      },
-      message: "Migration status retrieved successfully",
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
-    };
-    return c.json(response);
-  } catch (error) {
-    throw new ModuleError(
-      "Failed to retrieve migration status",
-      ERROR_CODES.DATABASE_ERROR,
-      500
-    );
-  }
-});
-systemRoutes.get("/health/cache", async (c) => {
-  try {
-    if (!c.env) {
-      return c.json({
-        success: false,
-        error: "\u73AF\u5883\u914D\u7F6E\u4E0D\u53EF\u7528"
-      }, 500);
-    }
-    const testKey = "health_check_cache";
-    const testValue = { timestamp: Date.now() };
-    await c.env["KV"].put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
-    const retrieved = await c.env["KV"].get(testKey);
-    await c.env["KV"].delete(testKey);
-    const isHealthy = retrieved !== null;
-    const response = {
-      success: true,
-      data: {
-        status: isHealthy ? "healthy" : "unhealthy",
-        latency: 0,
-        // 简化版本
-        details: {
-          connection: isHealthy,
-          readWrite: isHealthy
-        }
-      },
-      message: "Cache health check completed",
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
-    };
-    return c.json(response, isHealthy ? 200 : 503);
-  } catch (error) {
-    const response = {
-      success: false,
-      error: "Cache health check failed",
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
-    };
-    return c.json(response, 503);
-  }
-});
-systemRoutes.get("/config", async (c) => {
-  try {
-    const response = {
-      success: true,
-      data: {
-        environment: c.env?.["ENVIRONMENT"],
-        version: "1.0.0",
-        features: {
-          analytics: true,
-          feedback: true,
-          caching: true,
-          rateLimiting: true
-        },
-        limits: {
-          maxRequestSize: "10MB",
-          rateLimitRequests: 100,
-          rateLimitWindow: "1 hour",
-          cacheDefaultTTL: "1 hour"
-        }
-      },
-      message: "System configuration retrieved successfully",
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
-    };
-    return c.json(response);
-  } catch (error) {
-    throw new ModuleError(
-      "Failed to retrieve system configuration",
-      ERROR_CODES.DATABASE_ERROR,
-      500
-    );
-  }
-});
-systemRoutes.post(
-  "/cleanup",
-  rateLimiter(1, 36e5),
-  // 每小时最多1次
-  async (c) => {
-    try {
-      const dbService = c.get("dbService");
-      const result = await dbService.cleanupExpiredData();
-      const response = {
-        success: true,
-        data: result,
-        message: "Data cleanup completed successfully",
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        requestId: c.get("requestId")
-      };
-      return c.json(response);
-    } catch (error) {
-      throw new ModuleError(
-        "Failed to cleanup expired data",
-        ERROR_CODES.DATABASE_ERROR,
-        500
-      );
-    }
-  }
-);
-systemRoutes.post(
-  "/backup",
-  rateLimiter(1, 36e5),
-  // 每小时最多1次
-  async (c) => {
-    try {
-      const dbService = c.get("dbService");
-      const backup = await dbService.createBackup();
-      const response = {
-        success: true,
-        data: backup,
-        message: "Database backup created successfully",
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        requestId: c.get("requestId")
-      };
-      return c.json(response);
-    } catch (error) {
-      throw new ModuleError(
-        "Failed to create database backup",
-        ERROR_CODES.DATABASE_ERROR,
-        500
-      );
-    }
-  }
-);
-systemRoutes.get("/info", async (c) => {
-  try {
-    const response = {
-      success: true,
-      data: {
-        name: "\u7EFC\u5408\u6D4B\u8BD5\u5E73\u53F0 API",
-        version: "1.0.0",
-        description: "\u4E13\u4E1A\u7684\u5FC3\u7406\u6D4B\u8BD5\u3001\u5360\u661F\u5206\u6790\u3001\u5854\u7F57\u5360\u535C\u7B49\u5728\u7EBF\u6D4B\u8BD5\u670D\u52A1",
-        uptime: "N/A",
-        // Cloudflare Workers不支持process.uptime
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        environment: c.env?.["ENVIRONMENT"],
-        runtime: "Cloudflare Workers",
-        framework: "Hono.js",
-        database: "Cloudflare D1",
-        cache: "Cloudflare KV",
-        storage: "Cloudflare R2"
-      },
-      message: "System information retrieved successfully",
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
-    };
-    return c.json(response);
-  } catch (error) {
-    throw new ModuleError(
-      "Failed to retrieve system information",
-      ERROR_CODES.DATABASE_ERROR,
-      500
-    );
-  }
-});
-
 // src/models/BaseModel.ts
 var BaseModel = class {
   static {
@@ -11846,19 +11590,31 @@ app.use("*", async (c, next) => {
   await next();
 });
 app.onError(errorHandler2);
-app.route("/api/system", systemRoutes);
-app.get("/debug/env", async (c) => {
-  return c.json({
+app.get("/", (c) => {
+  const response = {
     success: true,
     data: {
-      hasDB: !!c.env.DB,
-      hasKV: !!c.env.KV,
-      hasBUCKET: !!c.env?.["BUCKET"],
-      environment: c.env.ENVIRONMENT,
-      envKeys: Object.keys(c.env)
+      message: "\u6B22\u8FCE\u4F7F\u7528\u7EFC\u5408\u6D4B\u8BD5\u5E73\u53F0 API",
+      version: "1.0.0",
+      environment: c.env.ENVIRONMENT || "staging",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      endpoints: {
+        health: "/health",
+        api: "/api",
+        tests: "/api/tests",
+        blog: "/api/blog",
+        feedback: "/api/feedback",
+        analytics: "/api/analytics",
+        homepage: "/api/homepage",
+        search: "/api/search",
+        cookies: "/api/cookies",
+        system: "/api/system"
+      }
     },
-    timestamp: (/* @__PURE__ */ new Date()).toISOString()
-  });
+    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    requestId: c.get("requestId") || ""
+  };
+  return c.json(response);
 });
 app.get("/health", async (c) => {
   try {
@@ -11989,7 +11745,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// .wrangler/tmp/bundle-f56PAZ/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-i0jPun/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -12021,7 +11777,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// .wrangler/tmp/bundle-f56PAZ/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-i0jPun/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

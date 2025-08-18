@@ -13,5 +13,5 @@ CDN_BASE_URL = "https://cdn.getyourluck.com"
 
 [env.preview.vars]
 NODE_ENV = "staging"
-API_BASE_URL = "https://staging-api.getyourluck.com"
+API_BASE_URL = "https://getyourluck-backend-staging.cyberlina.workers.dev"
 CDN_BASE_URL = "https://staging-cdn.getyourluck.com"
