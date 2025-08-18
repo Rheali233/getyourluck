@@ -4,8 +4,8 @@
  */
 import { BaseModel } from './BaseModel';
 export class HomepageModuleModel extends BaseModel {
-    constructor(db) {
-        super(db);
+    constructor(env) {
+        super(env, 'homepage_modules');
     }
     /**
      * 获取所有活跃的测试模块
@@ -86,18 +86,17 @@ export class HomepageModuleModel extends BaseModel {
      */
     async getModulesStats() {
         try {
-            const result = await this.db
-                .prepare(`
-          SELECT 
-            COUNT(*) as total_modules,
-            SUM(test_count) as total_tests,
-            AVG(rating) as average_rating,
-            GROUP_CONCAT(DISTINCT theme) as themes
-          FROM homepage_modules 
-          WHERE is_active = 1
-        `)
+            // 分别查询统计信息，避免SQLite兼容性问题
+            const countResult = await this.db
+                .prepare('SELECT COUNT(*) as total_modules FROM homepage_modules WHERE is_active = 1')
                 .first();
-            if (!result) {
+            const sumResult = await this.db
+                .prepare('SELECT SUM(test_count) as total_tests, AVG(rating) as average_rating FROM homepage_modules WHERE is_active = 1')
+                .first();
+            const themesResult = await this.db
+                .prepare('SELECT DISTINCT theme FROM homepage_modules WHERE is_active = 1')
+                .all();
+            if (!countResult || !sumResult) {
                 return {
                     totalModules: 0,
                     totalTests: 0,
@@ -106,10 +105,10 @@ export class HomepageModuleModel extends BaseModel {
                 };
             }
             return {
-                totalModules: result.total_modules,
-                totalTests: result.total_tests || 0,
-                averageRating: result.average_rating || 0,
-                activeThemes: result.themes?.split(',') || [],
+                totalModules: countResult.total_modules,
+                totalTests: sumResult.total_tests || 0,
+                averageRating: sumResult.average_rating || 0,
+                activeThemes: themesResult.results?.map((row) => row.theme) || [],
             };
         }
         catch (error) {

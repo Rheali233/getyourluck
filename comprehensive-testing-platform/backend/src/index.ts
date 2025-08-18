@@ -33,7 +33,7 @@ export interface Env {
 
 
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono<AppContext>();
 
 // 安全头中间件
 app.use("*", secureHeaders({
@@ -54,15 +54,16 @@ app.use("*", cors({
       "https://*.cloudflare.com",
     ];
     
-    if (!origin) return true; // 允许无origin的请求（如Postman）
+    if (!origin) return origin; // 允许无origin的请求（如Postman），返回null/undefined表示允许
     
-    return allowedOrigins.some(allowed => {
+    const allowed = allowedOrigins.some(allowed => {
       if (allowed.includes("*")) {
         const pattern = allowed.replace("*", ".*");
         return new RegExp(pattern).test(origin);
       }
       return allowed === origin;
     });
+    return allowed ? origin : null;
   },
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
   allowHeaders: [
@@ -110,7 +111,7 @@ app.get("/debug/env", async (c) => {
     data: {
       hasDB: !!c.env.DB,
       hasKV: !!c.env.KV,
-      hasBUCKET: !!c.env.BUCKET,
+      hasBUCKET: !!c.env?.['BUCKET'],
       environment: c.env.ENVIRONMENT,
       envKeys: Object.keys(c.env),
     },
@@ -138,7 +139,7 @@ app.get("/health", async (c) => {
         },
       },
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: (c.get("requestId") as string) || "",
     };
 
     return c.json(response, healthCheck.status === "healthy" ? 200 : 503);
@@ -147,7 +148,7 @@ app.get("/health", async (c) => {
       success: false,
       error: "Health check failed",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: (c.get("requestId") as string) || "",
     };
     
     return c.json(response, 503);
@@ -188,7 +189,7 @@ app.get("/api", (c) => {
       documentation: "https://docs.example.com/api",
     },
     timestamp: new Date().toISOString(),
-    requestId: c.get("requestId"),
+    requestId: (c.get("requestId") as string) || "",
   };
   
   return c.json(response);
@@ -201,7 +202,7 @@ app.notFound((c) => {
     error: "Not Found",
     message: "The requested resource was not found",
     timestamp: new Date().toISOString(),
-    requestId: c.get("requestId"),
+    requestId: (c.get("requestId") as string) || "",
   };
   
   return c.json(response, 404);
@@ -214,7 +215,7 @@ app.all("*", (c) => {
     error: "Method Not Allowed",
     message: `Method ${c.req.method} is not allowed for this endpoint`,
     timestamp: new Date().toISOString(),
-    requestId: c.get("requestId"),
+    requestId: (c.get("requestId") as string) || "",
   };
   
   return c.json(response, 405);

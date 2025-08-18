@@ -3,17 +3,12 @@
  * 遵循统一开发标准的数据模型规范
  */
 
-import { BaseModel } from './BaseModel';
 import type { HomepageModule } from '../../../shared/types/homepage';
+import { BaseModel } from './BaseModel';
 
 export class HomepageModuleModel extends BaseModel {
   constructor(env: any) {
     super(env, 'homepage_modules');
-  }
-  
-  // 重写db属性，确保使用正确的数据库连接
-  protected get db(): D1Database {
-    return this.env.DB;
   }
 
   /**
@@ -126,9 +121,9 @@ export class HomepageModuleModel extends BaseModel {
       }
 
       return {
-        totalModules: countResult.total_modules as number,
-        totalTests: sumResult.total_tests as number || 0,
-        averageRating: sumResult.average_rating as number || 0,
+        totalModules: (countResult as any)['total_modules'] as number,
+        totalTests: (sumResult as any)['total_tests'] as number || 0,
+        averageRating: (sumResult as any)['average_rating'] as number || 0,
         activeThemes: themesResult.results?.map((row: any) => row.theme as string) || [],
       };
     } catch (error) {
@@ -146,7 +141,7 @@ export class HomepageModuleModel extends BaseModel {
       name: row.name as string,
       description: row.description as string,
       icon: row.icon as string,
-      theme: row.theme as string,
+      theme: (row as any)['theme'] as 'psychology' | 'astrology' | 'tarot' | 'career' | 'learning' | 'relationship' | 'numerology',
       testCount: row.test_count as number,
       rating: row.rating as number,
       isActive: Boolean(row.is_active),

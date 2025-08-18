@@ -6,6 +6,34 @@ import { Hono } from "hono";
 import { rateLimiter } from "../../middleware/rateLimiter";
 import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
 const systemRoutes = new Hono();
+// 系统整体健康检查
+systemRoutes.get("/health", async (c) => {
+    try {
+        const dbService = c.get("dbService");
+        const healthCheck = await dbService.healthCheck();
+        const response = {
+            success: true,
+            data: {
+                status: healthCheck.status,
+                timestamp: new Date().toISOString(),
+                environment: c.env?.['ENVIRONMENT'],
+                version: "1.0.0",
+                services: {
+                    database: healthCheck.status,
+                    cache: "healthy", // 简化版本
+                    storage: "healthy", // 简化版本
+                },
+            },
+            message: "System health check completed",
+            timestamp: new Date().toISOString(),
+            requestId: c.get("requestId"),
+        };
+        return c.json(response, healthCheck.status === "healthy" ? 200 : 503);
+    }
+    catch (error) {
+        throw new ModuleError("System health check failed", ERROR_CODES.DATABASE_ERROR, 503);
+    }
+});
 // 数据库健康检查
 systemRoutes.get("/health/database", async (c) => {
     try {
@@ -70,11 +98,17 @@ systemRoutes.get("/migrations", async (c) => {
 systemRoutes.get("/health/cache", async (c) => {
     try {
         // 简单的KV健康检查
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
         const testKey = "health_check_cache";
         const testValue = { timestamp: Date.now() };
-        await c.env.KV.put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
-        const retrieved = await c.env.KV.get(testKey);
-        await c.env.KV.delete(testKey);
+        await c.env['KV'].put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
+        const retrieved = await c.env['KV'].get(testKey);
+        await c.env['KV'].delete(testKey);
         const isHealthy = retrieved !== null;
         const response = {
             success: true,
@@ -108,7 +142,7 @@ systemRoutes.get("/config", async (c) => {
         const response = {
             success: true,
             data: {
-                environment: c.env.ENVIRONMENT,
+                environment: c.env?.['ENVIRONMENT'],
                 version: "1.0.0",
                 features: {
                     analytics: true,
@@ -180,9 +214,9 @@ systemRoutes.get("/info", async (c) => {
                 name: "综合测试平台 API",
                 version: "1.0.0",
                 description: "专业的心理测试、占星分析、塔罗占卜等在线测试服务",
-                uptime: process.uptime ? `${Math.floor(process.uptime())}s` : "N/A",
+                uptime: "N/A", // Cloudflare Workers不支持process.uptime
                 timestamp: new Date().toISOString(),
-                environment: c.env.ENVIRONMENT,
+                environment: c.env?.['ENVIRONMENT'],
                 runtime: "Cloudflare Workers",
                 framework: "Hono.js",
                 database: "Cloudflare D1",

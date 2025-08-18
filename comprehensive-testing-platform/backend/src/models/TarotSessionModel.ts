@@ -159,8 +159,8 @@ export class TarotSessionModel extends BaseModel {
       spreadType: row.spread_type as "single" | "three_card" | "celtic_cross" | "relationship" | "career",
       cardsDrawn: JSON.parse(row.cards_drawn as string) as TarotCard[],
       cardPositions: row.card_positions ? JSON.parse(row.card_positions as string) : undefined,
-      interpretationTheme: row.interpretation_theme as string || undefined,
-      questionCategory: row.question_category as "love" | "career" | "finance" | "health" | "spiritual" | "general" || undefined,
+      interpretationTheme: (row.interpretation_theme as string) ?? "",
+      questionCategory: (row.question_category as "love" | "career" | "finance" | "health" | "spiritual" | "general") ?? "general",
       createdAt: new Date(row.created_at as string),
     };
   }

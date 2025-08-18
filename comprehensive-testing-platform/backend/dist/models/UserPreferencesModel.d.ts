@@ -25,7 +25,7 @@ export interface CookiesConsentData {
     timestamp: Date;
 }
 export declare class UserPreferencesModel extends BaseModel {
-    constructor(db: D1Database);
+    constructor(env: any);
     /**
      * 创建或更新用户偏好设置
      */

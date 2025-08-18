@@ -3,15 +3,27 @@
  * 遵循统一开发标准的数据访问层规范
  */
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors';
-import { generateUUID, formatDate } from '../../../shared/utils';
+// 本地实现通用工具，避免对shared/utils直接编译依赖
 export class BaseModel {
     db;
     kv;
     tableName;
     constructor(env, tableName) {
+        if (!env.DB) {
+            throw new ModuleError('Database connection not available', ERROR_CODES.DATABASE_ERROR, 500);
+        }
+        if (!env.KV) {
+            throw new ModuleError('KV storage not available', ERROR_CODES.DATABASE_ERROR, 500);
+        }
         this.db = env.DB;
         this.kv = env.KV;
         this.tableName = tableName;
+    }
+    /**
+     * 获取数据库连接
+     */
+    get database() {
+        return this.db;
     }
     /**
      * 执行数据库查询
@@ -112,13 +124,16 @@ export class BaseModel {
      * 生成新的ID
      */
     generateId() {
-        return generateUUID();
+        // 使用Web Crypto生成UUID
+        return globalThis.crypto?.randomUUID
+            ? globalThis.crypto.randomUUID()
+            : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
     }
     /**
      * 格式化时间戳
      */
     formatTimestamp(date) {
-        return formatDate(date || new Date());
+        return (date || new Date()).toISOString();
     }
     /**
      * 验证必填字段
@@ -128,6 +143,20 @@ export class BaseModel {
         if (missing.length > 0) {
             throw new ModuleError(`Missing required fields: ${missing.join(', ')}`, ERROR_CODES.VALIDATION_ERROR, 400);
         }
+    }
+    /**
+     * 通用错误构造器
+     */
+    createError(message, code = 'DATABASE_ERROR', status = 500) {
+        return new ModuleError(message, ERROR_CODES[code], status);
+    }
+    /**
+     * 通用统计条目数量
+     */
+    async count(whereClause = '', params = []) {
+        const where = whereClause ? ` WHERE ${whereClause} ` : '';
+        const result = await this.executeQueryFirst(`SELECT COUNT(*) as count FROM ${this.tableName}${where}`, params);
+        return result?.count || 0;
     }
 }
 //# sourceMappingURL=BaseModel.js.map

@@ -29,7 +29,7 @@ export interface SearchResult {
     searchCount: number;
 }
 export declare class SearchIndexModel extends BaseModel {
-    constructor(db: D1Database);
+    constructor(env: any);
     /**
      * 搜索内容
      */

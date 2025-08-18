@@ -11,13 +11,13 @@ const homepageRoutes = new Hono();
 homepageRoutes.get("/config", async (c) => {
     try {
         const dbService = c.get("dbService");
-        const configModel = new HomepageConfigModel(dbService.db);
+        const configModel = new HomepageConfigModel(dbService.env);
         const configs = await configModel.getAllPublicConfigs();
         return c.json({
             success: true,
             data: configs,
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         });
     }
     catch (error) {
@@ -26,7 +26,7 @@ homepageRoutes.get("/config", async (c) => {
             success: false,
             error: "获取首页配置失败",
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         }, 500);
     }
 });
@@ -34,13 +34,13 @@ homepageRoutes.get("/config", async (c) => {
 homepageRoutes.get("/modules", async (c) => {
     try {
         const dbService = c.get("dbService");
-        const moduleModel = new HomepageModuleModel(dbService.db);
+        const moduleModel = new HomepageModuleModel(dbService.env);
         const modules = await moduleModel.getAllActiveModules();
         return c.json({
             success: true,
             data: modules,
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         });
     }
     catch (error) {
@@ -49,7 +49,7 @@ homepageRoutes.get("/modules", async (c) => {
             success: false,
             error: "获取测试模块列表失败",
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         }, 500);
     }
 });
@@ -58,13 +58,13 @@ homepageRoutes.get("/modules/:theme", async (c) => {
     try {
         const theme = c.req.param("theme");
         const dbService = c.get("dbService");
-        const moduleModel = new HomepageModuleModel(dbService.db);
+        const moduleModel = new HomepageModuleModel(dbService.env);
         const modules = await moduleModel.getModulesByTheme(theme);
         return c.json({
             success: true,
             data: modules,
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         });
     }
     catch (error) {
@@ -73,7 +73,7 @@ homepageRoutes.get("/modules/:theme", async (c) => {
             success: false,
             error: "获取测试模块失败",
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         }, 500);
     }
 });
@@ -81,13 +81,16 @@ homepageRoutes.get("/modules/:theme", async (c) => {
 homepageRoutes.get("/stats", async (c) => {
     try {
         const dbService = c.get("dbService");
-        const moduleModel = new HomepageModuleModel(dbService.db);
+        // 直接测试数据库查询
+        const testQuery = await dbService.db.prepare("SELECT COUNT(*) as count FROM homepage_modules").first();
+        console.log("Test query result:", testQuery);
+        const moduleModel = new HomepageModuleModel(dbService.env);
         const stats = await moduleModel.getModulesStats();
         return c.json({
             success: true,
             data: stats,
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         });
     }
     catch (error) {
@@ -96,7 +99,7 @@ homepageRoutes.get("/stats", async (c) => {
             success: false,
             error: "获取统计数据失败",
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         }, 500);
     }
 });
@@ -110,26 +113,28 @@ homepageRoutes.post("/analytics", async (c) => {
                 success: false,
                 error: "缺少必要参数",
                 timestamp: new Date().toISOString(),
-                requestId: c.get("requestId"),
+                requestId: c.get("requestId") || "",
             }, 400);
         }
         const dbService = c.get("dbService");
         const analyticsModel = new AnalyticsEventModel(dbService.db);
         // 记录事件
-        await analyticsModel.createEvent({
+        await analyticsModel.create({
             eventType: `homepage_${eventType}`,
-            eventData: JSON.stringify(eventData || {}),
+            eventData: {
+                ...eventData,
+                pageUrl,
+                referrer,
+            },
             sessionId,
-            pageUrl,
-            referrer,
-            userAgent: c.req.header("User-Agent"),
-            ipAddress: c.req.header("CF-Connecting-IP"),
+            userAgent: c.req.header("User-Agent") || "",
+            ipAddress: c.req.header("CF-Connecting-IP") || "",
         });
         return c.json({
             success: true,
             message: "事件记录成功",
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         });
     }
     catch (error) {
@@ -138,7 +143,7 @@ homepageRoutes.post("/analytics", async (c) => {
             success: false,
             error: "记录事件失败",
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         }, 500);
     }
 });
@@ -154,14 +159,14 @@ homepageRoutes.get("/config/:key", async (c) => {
                 success: false,
                 error: "配置不存在",
                 timestamp: new Date().toISOString(),
-                requestId: c.get("requestId"),
+                requestId: c.get("requestId") || "",
             }, 404);
         }
         return c.json({
             success: true,
             data: config,
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         });
     }
     catch (error) {
@@ -170,7 +175,7 @@ homepageRoutes.get("/config/:key", async (c) => {
             success: false,
             error: "获取配置失败",
             timestamp: new Date().toISOString(),
-            requestId: c.get("requestId"),
+            requestId: c.get("requestId") || "",
         }, 500);
     }
 });

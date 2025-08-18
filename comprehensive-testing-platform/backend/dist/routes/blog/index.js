@@ -10,7 +10,6 @@ const blogRoutes = new Hono();
 blogRoutes.get("/articles", async (c) => {
     const page = parseInt(c.req.query("page") || "1");
     const limit = parseInt(c.req.query("limit") || "10");
-    const category = c.req.query("category");
     try {
         // TODO: 从数据库获取博客文章列表
         const response = {
@@ -26,7 +25,7 @@ blogRoutes.get("/articles", async (c) => {
             },
             message: "Blog articles retrieved successfully",
             timestamp: new Date().toISOString(),
-            requestId: c.req.header("X-Request-ID"),
+            requestId: c.get("requestId") || "",
         };
         return c.json(response);
     }
@@ -44,7 +43,7 @@ blogRoutes.get("/articles/:id", async (c) => {
             data: null,
             message: `Blog article ${id} retrieved successfully`,
             timestamp: new Date().toISOString(),
-            requestId: c.req.header("X-Request-ID"),
+            requestId: c.get("requestId") || "",
         };
         return c.json(response);
     }
@@ -62,7 +61,7 @@ async (c) => {
             success: true,
             message: `View count updated for article ${id}`,
             timestamp: new Date().toISOString(),
-            requestId: c.req.header("X-Request-ID"),
+            requestId: c.get("requestId") || "",
         };
         return c.json(response);
     }

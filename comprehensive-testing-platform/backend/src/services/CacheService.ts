@@ -130,7 +130,7 @@ export class CacheService {
   /**
    * 清空命名空间下的所有缓存
    */
-  async clearNamespace(namespace: string): Promise<boolean> {
+  async clearNamespace(_namespace: string): Promise<boolean> {
     try {
       // 注意：Cloudflare KV不支持直接清空命名空间
       // 这里需要维护一个键列表或使用其他策略
@@ -283,7 +283,7 @@ export class CacheService {
   /**
    * 根据标签删除缓存
    */
-  async deleteByTag(tag: string, namespace?: string): Promise<boolean> {
+  async deleteByTag(_tag: string, _namespace?: string): Promise<boolean> {
     try {
       // 注意：Cloudflare KV不支持复杂的标签查询
       // 这里需要维护一个标签索引

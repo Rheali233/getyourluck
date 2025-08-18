@@ -5,7 +5,7 @@
 
 import type { Env } from '../index'
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
-import { generateUUID, formatDate } from '../../../shared/utils'
+// 本地实现通用工具，避免对shared/utils直接编译依赖
 
 export abstract class BaseModel {
   protected db: D1Database
@@ -13,6 +13,13 @@ export abstract class BaseModel {
   protected tableName: string
 
   constructor(env: Env, tableName: string) {
+    if (!env.DB) {
+      throw new ModuleError('Database connection not available', ERROR_CODES.DATABASE_ERROR, 500)
+    }
+    if (!env.KV) {
+      throw new ModuleError('KV storage not available', ERROR_CODES.DATABASE_ERROR, 500)
+    }
+    
     this.db = env.DB
     this.kv = env.KV
     this.tableName = tableName
@@ -164,14 +171,17 @@ export abstract class BaseModel {
    * 生成新的ID
    */
   protected generateId(): string {
-    return generateUUID()
+    // 使用Web Crypto生成UUID
+    return (globalThis as any).crypto?.randomUUID
+      ? (globalThis as any).crypto.randomUUID()
+      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
   }
 
   /**
    * 格式化时间戳
    */
   protected formatTimestamp(date?: Date): string {
-    return formatDate(date || new Date())
+    return (date || new Date()).toISOString()
   }
 
   /**
@@ -187,5 +197,21 @@ export abstract class BaseModel {
         400
       )
     }
+  }
+
+  /**
+   * 通用错误构造器
+   */
+  protected createError(message: string, code: keyof typeof ERROR_CODES = 'DATABASE_ERROR', status: number = 500): ModuleError {
+    return new ModuleError(message, ERROR_CODES[code], status)
+  }
+
+  /**
+   * 通用统计条目数量
+   */
+  public async count(whereClause: string = '', params: any[] = []): Promise<number> {
+    const where = whereClause ? ` WHERE ${whereClause} ` : ''
+    const result = await this.executeQueryFirst<{ count: number }>(`SELECT COUNT(*) as count FROM ${this.tableName}${where}`, params)
+    return result?.count || 0
   }
 }

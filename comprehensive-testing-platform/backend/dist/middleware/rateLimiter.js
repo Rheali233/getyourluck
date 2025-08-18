@@ -6,11 +6,16 @@ import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 export const rateLimiter = (requests, windowMs) => {
     return async (c, next) => {
         const ip = c.req.header("CF-Connecting-IP") ||
-            c.req.header("X-Forwarded-For") ||
+            c.req.header("X-Forwarded-IP") ||
             "unknown";
         const key = `rate_limit:${ip}`;
         const windowSeconds = Math.floor(windowMs / 1000);
         try {
+            // 检查KV是否可用
+            if (!c.env.KV) {
+                console.warn("KV not available, skipping rate limiting");
+                return next();
+            }
             const current = await c.env.KV.get(key);
             const count = current ? parseInt(current) : 0;
             if (count >= requests) {

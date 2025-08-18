@@ -181,7 +181,7 @@ export class CareerSessionModel extends BaseModel {
       id: row.id as string,
       testSessionId: row.test_session_id as string,
       testSubtype: row.test_subtype as "holland" | "career_values" | "skills_assessment",
-      hollandCode: row.holland_code as string || undefined,
+      hollandCode: (row.holland_code as string) ?? "",
       interestScores: row.interest_scores ? JSON.parse(row.interest_scores as string) : undefined,
       valuesRanking: row.values_ranking ? JSON.parse(row.values_ranking as string) : undefined,
       skillsProfile: row.skills_profile ? JSON.parse(row.skills_profile as string) : undefined,

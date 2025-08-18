@@ -6,6 +6,9 @@ import { ModuleError, ERROR_CODES } from '../../../shared/types/errors';
 export class MigrationRunner {
     db;
     constructor(env) {
+        if (!env.DB) {
+            throw new ModuleError('Database connection not available', ERROR_CODES.DATABASE_ERROR, 500);
+        }
         this.db = env.DB;
     }
     /**

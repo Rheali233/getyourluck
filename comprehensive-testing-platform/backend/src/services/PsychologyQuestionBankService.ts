@@ -52,7 +52,7 @@ export class PsychologyQuestionBankService {
 
   constructor(env: Env) {
     this.questionBankModel = new PsychologyQuestionBankModel(env);
-    this.cache = env.KV;
+    this.cache = env.KV!;
   }
 
   // ==================== 题库分类管理 ====================
@@ -240,7 +240,7 @@ export class PsychologyQuestionBankService {
    */
   async getQuestionsByParams(params: QuestionBankQueryParams): Promise<PsychologyQuestionData[]> {
     try {
-      const { categoryCode, dimension, domain, language, limit = 50, offset = 0 } = params;
+      const { categoryCode, dimension, language, limit = 50, offset = 0 } = params;
       
       let questions: PsychologyQuestionData[] = [];
       

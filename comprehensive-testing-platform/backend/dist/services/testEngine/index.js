@@ -32,19 +32,13 @@ export class TestEngineService {
         this.dbService = dbService;
         this.cacheService = cacheService;
     }
-    /**
-     * 获取所有测试类型
-     * @param activeOnly 是否只获取激活的测试类型
-     * @returns 测试类型列表
-     */
     async getTestTypes(activeOnly = true) {
         try {
-            const testTypes = await this.dbService.testTypes.findAll();
-            // 过滤激活的类型
+            const testTypes = await this.dbService.testTypes.getAllActive();
             const filteredTypes = activeOnly
-                ? testTypes.filter(type => type.isActive)
+                ? testTypes.filter((type) => type.isActive)
                 : testTypes;
-            return filteredTypes.map(type => ({
+            return filteredTypes.map((type) => ({
                 id: type.id,
                 name: type.name || '',
                 description: type.description || '',
@@ -57,11 +51,6 @@ export class TestEngineService {
             throw new ModuleError("Failed to retrieve test types", ERROR_CODES.DATABASE_ERROR, 500);
         }
     }
-    /**
-     * 获取测试配置
-     * @param testType 测试类型
-     * @returns 测试配置
-     */
     async getTestConfig(testType) {
         try {
             const config = await this.dbService.testTypes.findById(testType);
@@ -139,7 +128,7 @@ export class TestEngineService {
                 testTypeId: sessionData.testTypeId,
                 answers: sessionData.answersData,
                 result: sessionData.resultData,
-                userAgent: sessionData.userAgent || null,
+                userAgent: sessionData.userAgent || undefined,
                 ipAddress: sessionData.ipAddressHash,
                 sessionDuration: sessionData.sessionDuration || 0
             });

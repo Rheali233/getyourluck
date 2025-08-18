@@ -9,6 +9,10 @@ export declare abstract class BaseModel {
     protected tableName: string;
     constructor(env: Env, tableName: string);
     /**
+     * 获取数据库连接
+     */
+    protected get database(): D1Database;
+    /**
      * 执行数据库查询
      */
     protected executeQuery<T = any>(query: string, params?: any[]): Promise<T[]>;

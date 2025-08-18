@@ -4,7 +4,13 @@
  */
 import { BaseModel } from './BaseModel';
 import { CACHE_KEYS, DB_TABLES } from '../../../shared/constants';
-import { hashString } from '../../../shared/utils';
+async function hashString(input) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 export class TestSessionModel extends BaseModel {
     constructor(env) {
         super(env, DB_TABLES.TEST_SESSIONS);

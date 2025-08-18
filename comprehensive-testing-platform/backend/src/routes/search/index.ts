@@ -6,7 +6,7 @@
 import { Hono } from "hono";
 import { SearchIndexModel } from "../../models/SearchIndexModel";
 import { AnalyticsEventModel } from "../../models/AnalyticsEventModel";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 
 const searchRoutes = new Hono<AppContext>();
 
@@ -42,8 +42,8 @@ searchRoutes.get("/", async (c) => {
         resultCount: results.length,
         limit,
       },
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP"),
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || "",
     });
 
     // 记录搜索关键词
@@ -60,7 +60,7 @@ searchRoutes.get("/", async (c) => {
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId"),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("搜索失败:", error);
     console.error("错误详情:", {
       message: error.message,
@@ -169,7 +169,7 @@ searchRoutes.get("/stats", async (c) => {
     const stats = {
       totalSearches: totalSearches?.count as number || 0,
       totalKeywords: totalKeywords?.count as number || 0,
-      recentSearches: recentSearches.results?.map(row => ({
+      recentSearches: recentSearches.results?.map((row: any) => ({
         data: JSON.parse(row.event_data as string),
         timestamp: row.timestamp,
       })) || [],
@@ -215,16 +215,15 @@ searchRoutes.post("/click", async (c) => {
     await searchModel.incrementSearchCount(searchIndexId);
 
     // 记录点击事件
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: "search_result_click",
-      eventData: JSON.stringify({
+      eventData: {
         searchIndexId,
         resultType,
         resultId,
-      }),
-      pageUrl: c.req.url,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP"),
+      },
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || "",
     });
 
     return c.json({

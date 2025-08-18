@@ -111,9 +111,9 @@ export class SearchIndexModel extends BaseModel {
 
       return result.results?.map((row, index) => ({
         id: `suggestion_${index}`,
-        text: row.title as string,
-        type: row.content_type as 'test' | 'blog' | 'category',
-        relevance: row.relevance_score as number,
+        text: row['title'] as string,
+        type: row['content_type'] as 'test' | 'blog' | 'category',
+        relevance: row['relevance_score'] as number,
       })) || [];
     } catch (error) {
       console.error('获取搜索建议失败:', error);
@@ -137,7 +137,7 @@ export class SearchIndexModel extends BaseModel {
         .bind(language, limit)
         .all();
 
-      return result.results?.map(row => row.keyword as string) || [];
+      return result.results?.map((row: any) => row['keyword'] as string) || [];
     } catch (error) {
       console.error('获取热门关键词失败:', error);
       throw new Error('获取热门关键词失败');
@@ -283,15 +283,15 @@ export class SearchIndexModel extends BaseModel {
   /**
    * 将数据库行映射为SearchResult对象
    */
-  private mapDatabaseRowToSearchResult(row: any): SearchResult {
-    return {
-      id: row.id as string,
-      contentType: row.content_type as string,
-      contentId: row.content_id as string,
-      title: row.title as string,
-      description: row.description as string,
-      relevanceScore: row.relevance_score as number,
-      searchCount: row.search_count as number,
-    };
-  }
+  // private mapDatabaseRowToSearchResult(row: any): SearchResult { // 未使用，暂时注释
+  //   return {
+  //     id: row.id as string,
+  //     contentType: row.content_type as string,
+  //     contentId: row.content_id as string,
+  //     title: row.title as string,
+  //     description: row.description as string,
+  //     relevanceScore: row.relevance_score as number,
+  //     searchCount: row.search_count as number,
+  //   };
+  // }
 }

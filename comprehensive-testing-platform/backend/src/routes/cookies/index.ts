@@ -6,7 +6,7 @@
 import { Hono } from "hono";
 import { UserPreferencesModel } from "../../models/UserPreferencesModel";
 import { AnalyticsEventModel } from "../../models/AnalyticsEventModel";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 
 const cookiesRoutes = new Hono<AppContext>();
 
@@ -86,17 +86,16 @@ cookiesRoutes.post("/consent", async (c) => {
     });
 
     // 记录同意事件
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: "cookies_consent_updated",
-      eventData: JSON.stringify({
+      eventData: {
         sessionId,
         cookiesConsent,
         analyticsConsent: analyticsConsent || false,
         marketingConsent: marketingConsent || false,
-      }),
-      pageUrl: c.req.url,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP"),
+      },
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || "",
     });
 
     return c.json({
@@ -276,15 +275,14 @@ cookiesRoutes.post("/withdraw/:sessionId", async (c) => {
     });
 
     // 记录撤回事件
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: "cookies_consent_withdrawn",
-      eventData: JSON.stringify({
+      eventData: {
         sessionId,
         timestamp: new Date().toISOString(),
-      }),
-      pageUrl: c.req.url,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP"),
+      },
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || "",
     });
 
     return c.json({

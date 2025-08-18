@@ -4,8 +4,8 @@
  */
 import { BaseModel } from './BaseModel';
 export class HomepageConfigModel extends BaseModel {
-    constructor(db) {
-        super(db);
+    constructor(env) {
+        super(env, 'homepage_config');
     }
     /**
      * 获取所有公开配置

@@ -8,6 +8,7 @@ export declare class DatabaseService {
     private env;
     private dbManager;
     private migrationRunner;
+    get db(): D1Database;
     testTypes: TestTypeModel;
     testSessions: TestSessionModel;
     blogArticles: BlogArticleModel;

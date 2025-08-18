@@ -32,7 +32,9 @@ export const requestValidator = async (c: Context, next: Next): Promise<void> =>
         requestId: c.req.header("X-Request-ID") || crypto.randomUUID(),
       };
       
-      return c.json(response, error.statusCode);
+      c.status(error.statusCode);
+      await c.json(response);
+      return;
     }
     
     // 未知错误
@@ -43,7 +45,9 @@ export const requestValidator = async (c: Context, next: Next): Promise<void> =>
       requestId: c.req.header("X-Request-ID") || crypto.randomUUID(),
     };
     
-    return c.json(response, 400);
+    c.status(400);
+    await c.json(response);
+    return;
   }
 };
 
@@ -130,7 +134,8 @@ async function validateContentType(c: Context): Promise<void> {
       "multipart/form-data",
     ];
     
-    const baseType = contentType.split(";")[0].trim();
+    const ct = contentType || "";
+    const baseType = ct.includes(";") ? (ct.split(";")[0] || "").trim() : ct.trim();
     if (!supportedTypes.includes(baseType)) {
       throw new ModuleError(
         `Unsupported Content-Type: ${baseType}`,

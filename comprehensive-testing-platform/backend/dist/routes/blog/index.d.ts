@@ -3,9 +3,7 @@
  * 遵循统一开发标准的API路由规范
  */
 import { Hono } from "hono";
-import type { Env } from "../../index";
-declare const blogRoutes: Hono<{
-    Bindings: Env;
-}, {}, "/">;
+import type { AppContext } from "../../types/env";
+declare const blogRoutes: Hono<AppContext, {}, "/">;
 export { blogRoutes };
 //# sourceMappingURL=index.d.ts.map

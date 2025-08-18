@@ -11,7 +11,7 @@ cookiesRoutes.get("/consent/:sessionId", async (c) => {
     try {
         const sessionId = c.req.param("sessionId");
         const dbService = c.get("dbService");
-        const preferencesModel = new UserPreferencesModel(dbService.db);
+        const preferencesModel = new UserPreferencesModel(dbService.env);
         const preferences = await preferencesModel.getPreferencesBySessionId(sessionId);
         if (!preferences) {
             return c.json({
@@ -64,8 +64,8 @@ cookiesRoutes.post("/consent", async (c) => {
             }, 400);
         }
         const dbService = c.get("dbService");
-        const preferencesModel = new UserPreferencesModel(dbService.db);
-        const analyticsModel = new AnalyticsEventModel(dbService.db);
+        const preferencesModel = new UserPreferencesModel(dbService.env);
+        const analyticsModel = new AnalyticsEventModel(dbService.env);
         // 更新同意状态
         await preferencesModel.updateCookiesConsent(sessionId, {
             sessionId,
@@ -75,17 +75,16 @@ cookiesRoutes.post("/consent", async (c) => {
             timestamp: new Date(),
         });
         // 记录同意事件
-        await analyticsModel.createEvent({
+        await analyticsModel.create({
             eventType: "cookies_consent_updated",
-            eventData: JSON.stringify({
+            eventData: {
                 sessionId,
                 cookiesConsent,
                 analyticsConsent: analyticsConsent || false,
                 marketingConsent: marketingConsent || false,
-            }),
-            pageUrl: c.req.url,
-            userAgent: c.req.header("User-Agent"),
-            ipAddress: c.req.header("CF-Connecting-IP"),
+            },
+            userAgent: c.req.header("User-Agent") || "",
+            ipAddress: c.req.header("CF-Connecting-IP") || "",
         });
         return c.json({
             success: true,
@@ -109,7 +108,7 @@ cookiesRoutes.get("/preferences/:sessionId", async (c) => {
     try {
         const sessionId = c.req.param("sessionId");
         const dbService = c.get("dbService");
-        const preferencesModel = new UserPreferencesModel(dbService.db);
+        const preferencesModel = new UserPreferencesModel(dbService.env);
         const preferences = await preferencesModel.getPreferencesBySessionId(sessionId);
         if (!preferences) {
             return c.json({
@@ -143,7 +142,7 @@ cookiesRoutes.put("/preferences/:sessionId", async (c) => {
         const body = await c.req.json();
         const { language, theme, notificationEnabled, searchHistoryEnabled, personalizedContent } = body;
         const dbService = c.get("dbService");
-        const preferencesModel = new UserPreferencesModel(dbService.db);
+        const preferencesModel = new UserPreferencesModel(dbService.env);
         // 获取现有偏好设置
         const existingPreferences = await preferencesModel.getPreferencesBySessionId(sessionId);
         if (!existingPreferences) {
@@ -185,7 +184,7 @@ cookiesRoutes.put("/preferences/:sessionId", async (c) => {
 cookiesRoutes.get("/stats", async (c) => {
     try {
         const dbService = c.get("dbService");
-        const preferencesModel = new UserPreferencesModel(dbService.db);
+        const preferencesModel = new UserPreferencesModel(dbService.env);
         const stats = await preferencesModel.getCookiesConsentStats();
         return c.json({
             success: true,
@@ -210,7 +209,7 @@ cookiesRoutes.post("/cleanup", async (c) => {
         const body = await c.req.json();
         const { daysOld = 365 } = body;
         const dbService = c.get("dbService");
-        const preferencesModel = new UserPreferencesModel(dbService.db);
+        const preferencesModel = new UserPreferencesModel(dbService.env);
         const deletedCount = await preferencesModel.cleanupExpiredPreferences(daysOld);
         return c.json({
             success: true,
@@ -237,8 +236,8 @@ cookiesRoutes.post("/withdraw/:sessionId", async (c) => {
     try {
         const sessionId = c.req.param("sessionId");
         const dbService = c.get("dbService");
-        const preferencesModel = new UserPreferencesModel(dbService.db);
-        const analyticsModel = new AnalyticsEventModel(dbService.db);
+        const preferencesModel = new UserPreferencesModel(dbService.env);
+        const analyticsModel = new AnalyticsEventModel(dbService.env);
         // 撤回所有同意
         await preferencesModel.updateCookiesConsent(sessionId, {
             sessionId,
@@ -248,15 +247,14 @@ cookiesRoutes.post("/withdraw/:sessionId", async (c) => {
             timestamp: new Date(),
         });
         // 记录撤回事件
-        await analyticsModel.createEvent({
+        await analyticsModel.create({
             eventType: "cookies_consent_withdrawn",
-            eventData: JSON.stringify({
+            eventData: {
                 sessionId,
                 timestamp: new Date().toISOString(),
-            }),
-            pageUrl: c.req.url,
-            userAgent: c.req.header("User-Agent"),
-            ipAddress: c.req.header("CF-Connecting-IP"),
+            },
+            userAgent: c.req.header("User-Agent") || "",
+            ipAddress: c.req.header("CF-Connecting-IP") || "",
         });
         return c.json({
             success: true,

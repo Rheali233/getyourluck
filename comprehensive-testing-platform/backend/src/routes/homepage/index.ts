@@ -7,7 +7,7 @@ import { Hono } from "hono";
 import { HomepageModuleModel } from "../../models/HomepageModuleModel";
 import { HomepageConfigModel } from "../../models/HomepageConfigModel";
 import { AnalyticsEventModel } from "../../models/AnalyticsEventModel";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 
 const homepageRoutes = new Hono<AppContext>();
 
@@ -23,7 +23,7 @@ homepageRoutes.get("/config", async (c) => {
       success: true,
       data: configs,
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     });
   } catch (error) {
     console.error("获取首页配置失败:", error);
@@ -31,7 +31,7 @@ homepageRoutes.get("/config", async (c) => {
       success: false,
       error: "获取首页配置失败",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     }, 500);
   }
 });
@@ -48,7 +48,7 @@ homepageRoutes.get("/modules", async (c) => {
       success: true,
       data: modules,
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     });
   } catch (error) {
     console.error("获取测试模块列表失败:", error);
@@ -56,7 +56,7 @@ homepageRoutes.get("/modules", async (c) => {
       success: false,
       error: "获取测试模块列表失败",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     }, 500);
   }
 });
@@ -74,7 +74,7 @@ homepageRoutes.get("/modules/:theme", async (c) => {
       success: true,
       data: modules,
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     });
   } catch (error) {
     console.error(`获取${c.req.param("theme")}主题测试模块失败:`, error);
@@ -82,7 +82,7 @@ homepageRoutes.get("/modules/:theme", async (c) => {
       success: false,
       error: "获取测试模块失败",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     }, 500);
   }
 });
@@ -104,7 +104,7 @@ homepageRoutes.get("/stats", async (c) => {
       success: true,
       data: stats,
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     });
   } catch (error) {
     console.error("获取首页统计数据失败:", error);
@@ -112,7 +112,7 @@ homepageRoutes.get("/stats", async (c) => {
       success: false,
       error: "获取统计数据失败",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     }, 500);
   }
 });
@@ -128,7 +128,7 @@ homepageRoutes.post("/analytics", async (c) => {
         success: false,
         error: "缺少必要参数",
         timestamp: new Date().toISOString(),
-        requestId: c.get("requestId"),
+        requestId: c.get("requestId") || "",
       }, 400);
     }
     
@@ -136,21 +136,23 @@ homepageRoutes.post("/analytics", async (c) => {
     const analyticsModel = new AnalyticsEventModel(dbService.db);
     
     // 记录事件
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: `homepage_${eventType}`,
-      eventData: JSON.stringify(eventData || {}),
+      eventData: {
+        ...eventData,
+        pageUrl,
+        referrer,
+      },
       sessionId,
-      pageUrl,
-      referrer,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP"),
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || "",
     });
     
     return c.json({
       success: true,
       message: "事件记录成功",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     });
   } catch (error) {
     console.error("记录用户行为事件失败:", error);
@@ -158,7 +160,7 @@ homepageRoutes.post("/analytics", async (c) => {
       success: false,
       error: "记录事件失败",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     }, 500);
   }
 });
@@ -177,7 +179,7 @@ homepageRoutes.get("/config/:key", async (c) => {
         success: false,
         error: "配置不存在",
         timestamp: new Date().toISOString(),
-        requestId: c.get("requestId"),
+        requestId: c.get("requestId") || "",
       }, 404);
     }
     
@@ -185,7 +187,7 @@ homepageRoutes.get("/config/:key", async (c) => {
       success: true,
       data: config,
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     });
   } catch (error) {
     console.error(`获取配置${c.req.param("key")}失败:`, error);
@@ -193,7 +195,7 @@ homepageRoutes.get("/config/:key", async (c) => {
       success: false,
       error: "获取配置失败",
       timestamp: new Date().toISOString(),
-      requestId: c.get("requestId"),
+      requestId: c.get("requestId") || "",
     }, 500);
   }
 });

@@ -4,7 +4,7 @@
  */
 
 import { BaseModel } from './BaseModel';
-import type { UserPreferences } from '../../../shared/types/homepage';
+// import type { UserPreferences } from '../../../shared/types/homepage'; // 未使用，暂时注释
 
 export interface UserPreferencesData {
   id: string;
@@ -149,10 +149,10 @@ export class UserPreferencesModel extends BaseModel {
         };
       }
 
-      const totalUsers = result.total_users as number;
-      const cookiesConsent = result.cookies_consent as number || 0;
-      const analyticsConsent = result.analytics_consent as number || 0;
-      const marketingConsent = result.marketing_consent as number || 0;
+      const totalUsers = result['total_users'] as number;
+      const cookiesConsent = result['cookies_consent'] as number || 0;
+      const analyticsConsent = result['analytics_consent'] as number || 0;
+      const marketingConsent = result['marketing_consent'] as number || 0;
 
       return {
         totalUsers,

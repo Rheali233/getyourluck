@@ -188,6 +188,6 @@ export class UserFeedbackModel extends BaseModel {
     // 清除统计缓存
     await this.deleteCache('feedback_stats')
 
-    return result.changes || 0
+    return (result as any).changes || 0
   }
 }

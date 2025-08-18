@@ -45,7 +45,7 @@ const validateWithSchema = (schema) => {
         try {
             const body = await c.req.json();
             schema.parse(body);
-            await next();
+            return next();
         }
         catch (error) {
             if (error instanceof z.ZodError) {
@@ -70,7 +70,7 @@ export const validateTestSubmission = async (c, next) => {
     try {
         const body = await c.req.json();
         testSubmissionSchema.parse(body);
-        await next();
+        return next();
     }
     catch (error) {
         if (error instanceof z.ZodError) {
@@ -80,16 +80,25 @@ export const validateTestSubmission = async (c, next) => {
     }
 };
 export const validateFeedback = async (c, next) => {
+    console.log("validateFeedback middleware called");
     try {
+        // 尝试解析JSON
         const body = await c.req.json();
-        feedbackSchema.parse(body);
+        // 基本验证：检查必要字段
+        if (!body || typeof body !== 'object') {
+            throw new ModuleError("Invalid request body format", ERROR_CODES.VALIDATION_ERROR, 400);
+        }
+        if (!body.feedback || !['like', 'dislike'].includes(body.feedback)) {
+            throw new ModuleError("Feedback must be 'like' or 'dislike'", ERROR_CODES.VALIDATION_ERROR, 400);
+        }
         await next();
     }
     catch (error) {
-        if (error instanceof z.ZodError) {
-            throw new ModuleError("Invalid feedback data", ERROR_CODES.VALIDATION_ERROR, 400, error.errors);
+        if (error instanceof ModuleError) {
+            throw error;
         }
-        throw error;
+        // JSON解析错误
+        throw new ModuleError("Invalid JSON format", ERROR_CODES.VALIDATION_ERROR, 400);
     }
 };
 export const validateAnalyticsEvent = async (c, next) => {
@@ -109,7 +118,7 @@ export const validateBlogArticle = async (c, next) => {
     try {
         const body = await c.req.json();
         blogArticleSchema.parse(body);
-        await next();
+        return next();
     }
     catch (error) {
         if (error instanceof z.ZodError) {

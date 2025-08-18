@@ -35,10 +35,10 @@ export class HomepageConfigModel extends BaseModel {
       
       result.results?.forEach((row) => {
         try {
-          configs[row.key as string] = JSON.parse(row.value as string);
+          configs[(row as any)['key'] as string] = JSON.parse((row as any)['value'] as string);
         } catch (error) {
-          console.warn(`解析配置${row.key}失败:`, error);
-          configs[row.key as string] = row.value;
+          console.warn(`解析配置${(row as any)['key']}失败:`, error);
+          configs[(row as any)['key'] as string] = (row as any)['value'];
         }
       });
 
@@ -64,10 +64,10 @@ export class HomepageConfigModel extends BaseModel {
       }
 
       try {
-        return JSON.parse(result.value as string);
+        return JSON.parse((result as any)['value'] as string);
       } catch (error) {
         console.warn(`解析配置${key}失败:`, error);
-        return result.value;
+        return (result as any)['value'];
       }
     } catch (error) {
       console.error(`获取配置${key}失败:`, error);

@@ -34,11 +34,11 @@ export { SearchIndexModel } from "./SearchIndexModel";
 export { UserPreferencesModel } from "./UserPreferencesModel";
 
 // 类型导出
-export type { TestTypeData, CreateTestTypeData } from "./TestTypeModel";
-export type { TestSessionData, CreateTestSessionData } from "./TestSessionModel";
-export type { BlogArticleData, CreateBlogArticleData } from "./BlogArticleModel";
-export type { UserFeedbackData, CreateUserFeedbackData } from "./UserFeedbackModel";
-export type { AnalyticsEventData, CreateAnalyticsEventData } from "./AnalyticsEventModel";
+export type { TestType, CreateTestTypeData } from "./TestTypeModel";
+export type { TestSession, CreateTestSessionData } from "./TestSessionModel";
+export type { BlogArticle, CreateBlogArticleData } from "./BlogArticleModel";
+export type { UserFeedback, CreateUserFeedbackData } from "./UserFeedbackModel";
+export type { AnalyticsEvent, CreateAnalyticsEventData } from "./AnalyticsEventModel";
 
 export type { PsychologySessionData, CreatePsychologySessionData } from "./PsychologySessionModel";
 export type { 

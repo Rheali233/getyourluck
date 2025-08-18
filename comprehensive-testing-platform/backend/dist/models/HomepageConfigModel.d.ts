@@ -11,7 +11,7 @@ export interface HomepageConfigData {
     updatedAt: Date;
 }
 export declare class HomepageConfigModel extends BaseModel {
-    constructor(db: D1Database);
+    constructor(env: any);
     /**
      * 获取所有公开配置
      */

@@ -18,15 +18,7 @@ const testSubmissionSchema = z.object({
   }).optional(),
 });
 
-// 反馈数据验证模式
-const feedbackSchema = z.object({
-  sessionId: z.string().uuid("Invalid session ID format"),
-  feedback: z.enum(["like", "dislike"], {
-    errorMap: () => ({ message: "Feedback must be 'like' or 'dislike'" }),
-  }),
-  comment: z.string().max(500, "Comment too long").optional(),
-  rating: z.number().min(1).max(5).optional(),
-});
+// 反馈数据验证模式 - 已移除，未使用
 
 // 分析事件验证模式
 const analyticsEventSchema = z.object({
@@ -46,27 +38,8 @@ const blogArticleSchema = z.object({
 });
 
 /**
- * 通用验证函数
+ * 通用验证函数 - 已移除，未使用
  */
-const validateWithSchema = (schema: z.ZodType<any>) => {
-  return async (c: Context<AppContext>, next: Next) => {
-    try {
-      const body = await c.req.json();
-      schema.parse(body);
-      return next();
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        throw new ModuleError(
-          "Validation error",
-          ERROR_CODES.VALIDATION_ERROR,
-          400,
-          error.errors
-        );
-      }
-      throw error;
-    }
-  };
-};
 
 /**
  * 分页参数验证

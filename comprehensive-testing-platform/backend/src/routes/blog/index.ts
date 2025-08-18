@@ -4,19 +4,17 @@
  */
 
 import { Hono } from "hono";
-import type { Env } from "../../index";
-import { validateBlogArticle } from "../../middleware/validation";
+import type { AppContext } from "../../types/env";
 import { rateLimiter } from "../../middleware/rateLimiter";
 import type { APIResponse, PaginatedResponse } from "../../../../shared/types/apiResponse";
 import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
 
-const blogRoutes = new Hono<{ Bindings: Env }>();
+const blogRoutes = new Hono<AppContext>();
 
 // 获取博客文章列表（分页）
 blogRoutes.get("/articles", async (c) => {
   const page = parseInt(c.req.query("page") || "1");
   const limit = parseInt(c.req.query("limit") || "10");
-  const category = c.req.query("category");
 
   try {
     // TODO: 从数据库获取博客文章列表
@@ -33,7 +31,7 @@ blogRoutes.get("/articles", async (c) => {
       },
       message: "Blog articles retrieved successfully",
       timestamp: new Date().toISOString(),
-      requestId: c.req.header("X-Request-ID"),
+      requestId: c.get("requestId") || "",
     };
 
     return c.json(response);
@@ -57,7 +55,7 @@ blogRoutes.get("/articles/:id", async (c) => {
       data: null,
       message: `Blog article ${id} retrieved successfully`,
       timestamp: new Date().toISOString(),
-      requestId: c.req.header("X-Request-ID"),
+      requestId: c.get("requestId") || "",
     };
 
     return c.json(response);
@@ -82,7 +80,7 @@ blogRoutes.post("/articles/:id/view",
         success: true,
         message: `View count updated for article ${id}`,
         timestamp: new Date().toISOString(),
-        requestId: c.req.header("X-Request-ID"),
+        requestId: c.get("requestId") || "",
       };
 
       return c.json(response);

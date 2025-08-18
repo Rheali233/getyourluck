@@ -2,10 +2,10 @@
  * 首页模块数据模型
  * 遵循统一开发标准的数据模型规范
  */
-import { BaseModel } from './BaseModel';
 import type { HomepageModule } from '../../../shared/types/homepage';
+import { BaseModel } from './BaseModel';
 export declare class HomepageModuleModel extends BaseModel {
-    constructor(db: D1Database);
+    constructor(env: any);
     /**
      * 获取所有活跃的测试模块
      */

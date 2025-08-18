@@ -34,8 +34,8 @@ export class PerformanceMonitor {
             query,
             executionTime,
             rowCount,
-            tableName,
-            indexUsed
+            tableName: tableName || "",
+            indexUsed: indexUsed || "",
         };
         // 找到对应的请求指标并添加数据库查询信息
         const requestMetrics = this.metrics.find(m => m.requestId === requestId);
@@ -82,10 +82,10 @@ export class PerformanceMonitor {
      */
     recordError(requestId, type, message, stack) {
         const errorMetrics = {
-            type,
+            type: type,
             message,
-            stack,
-            timestamp: new Date().toISOString()
+            stack: stack || "",
+            timestamp: new Date().toISOString(),
         };
         // 找到对应的请求指标并添加错误信息
         const requestMetrics = this.metrics.find(m => m.requestId === requestId);

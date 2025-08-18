@@ -5,7 +5,7 @@
 
 import { Hono } from "hono";
 import type { Context } from "hono";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 import { validateTestSubmission } from "../../middleware/validation";
 import { rateLimiter } from "../../middleware/rateLimiter";
 import { ValidationService } from "../../services/ValidationService";

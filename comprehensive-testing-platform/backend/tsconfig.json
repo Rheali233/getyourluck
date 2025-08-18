@@ -6,7 +6,7 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "allowJs": true,
+    "allowJs": false,
     "checkJs": false,
     "strict": true,
     "noImplicitAny": true,
@@ -20,28 +20,35 @@
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationMap": true,
+    "declaration": false,
+    "declarationMap": false,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../",
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["./*"],
-      "@/types/*": ["./types/*"],
-      "@/utils/*": ["./utils/*"],
-      "@/services/*": ["./services/*"],
-      "@/models/*": ["./models/*"],
-      "@/middleware/*": ["./middleware/*"]
+      "@/*": ["./src/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/models/*": ["./src/models/*"],
+      "@/middleware/*": ["./src/middleware/*"],
+      "shared/*": ["../shared/*"]
     },
     "types": ["@cloudflare/workers-types", "jest"]
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../shared/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "../shared/types/componentInterfaces.ts",
+    "../shared/**/*.d.ts",
+    "../shared/**/*.js",
+    "../shared/**/*.js.map",
+    "../shared/**/*.d.ts.map"
   ]
 }

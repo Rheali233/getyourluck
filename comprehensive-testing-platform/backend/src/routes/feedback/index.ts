@@ -5,7 +5,7 @@
 
 import { Hono } from "hono";
 import type { Context } from "hono";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 import { validateFeedback } from "../../middleware/validation";
 import { rateLimiter } from "../../middleware/rateLimiter";
 import { ValidationService } from "../../services/ValidationService";
@@ -167,7 +167,7 @@ feedbackRoutes.get("/comments", async (c: Context<AppContext>) => {
     const page = parseInt(c.req.query("page") || "1");
     
     // 验证分页参数
-    ValidationService.validatePagination(page, limit, 50);
+    ValidationService.validatePagination({ page, limit: Math.min(limit, 50) });
     
     // 获取评论
     const comments = await dbService.userFeedback.getComments(limit);

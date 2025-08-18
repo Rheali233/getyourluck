@@ -3,7 +3,7 @@
  * 遵循统一开发标准的GDPR合规Cookies管理
  */
 import { Hono } from "hono";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 declare const cookiesRoutes: Hono<AppContext, {}, "/">;
 export { cookiesRoutes };
 //# sourceMappingURL=index.d.ts.map

@@ -212,9 +212,9 @@ export class NumerologySessionModel extends BaseModel {
       try {
         const chart = JSON.parse(row.numerology_chart as string) as NumerologyChart;
         if (chart.karmicDebtNumbers) {
-          chart.karmicDebtNumbers.forEach(number => {
-            if (karmicDebtCounts.hasOwnProperty(number)) {
-              karmicDebtCounts[number]++;
+          chart.karmicDebtNumbers.forEach((number) => {
+            if (Object.prototype.hasOwnProperty.call(karmicDebtCounts, number)) {
+              karmicDebtCounts[number] = (karmicDebtCounts[number] || 0) + 1;
             }
           });
         }

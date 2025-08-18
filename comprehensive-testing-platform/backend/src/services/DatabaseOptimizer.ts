@@ -107,12 +107,12 @@ export class DatabaseOptimizer {
       const indexes: IndexInfo[] = [];
 
       for (const row of result.results || []) {
-        const indexSql = row.indexSql as string;
+        const indexSql = row['indexSql'] as string;
         const columns = this.extractIndexColumns(indexSql);
         
         indexes.push({
           tableName,
-          indexName: row.indexName as string,
+          indexName: row['indexName'] as string,
           columns,
           isUnique: indexSql.includes('UNIQUE'),
           cardinality: 0 // SQLite不提供基数信息
@@ -133,7 +133,7 @@ export class DatabaseOptimizer {
     const match = indexSql.match(/\(([^)]+)\)/);
     if (!match) return [];
     
-    return match[1].split(',').map(col => col.trim());
+    return (match[1] || '').split(',').map(col => col.trim());
   }
 
   /**
@@ -188,7 +188,7 @@ export class DatabaseOptimizer {
     try {
       // 获取行数
       const countResult = await this.db.prepare(`SELECT COUNT(*) as count FROM ${tableName}`).first();
-      const rowCount = countResult?.count as number || 0;
+      const rowCount = countResult?.['count'] as number || 0;
 
       // 获取表大小（估算）
       const sizeResult = await this.db.prepare(`
@@ -196,7 +196,7 @@ export class DatabaseOptimizer {
         FROM sqlite_dbpage 
         WHERE pgno > 1
       `).first();
-      const tableSize = sizeResult?.size as number || 0;
+      const tableSize = sizeResult?.['size'] as number || 0;
 
       // 获取索引信息
       const indexes = await this.getTableIndexes(tableName);
@@ -220,7 +220,7 @@ export class DatabaseOptimizer {
    * 生成表优化建议
    */
   private generateTableRecommendations(
-    tableName: string, 
+    _tableName: string, 
     rowCount: number, 
     indexes: IndexInfo[]
   ): string[] {
@@ -252,12 +252,12 @@ export class DatabaseOptimizer {
   /**
    * 优化查询
    */
-  async optimizeQuery(originalQuery: string, params: any[] = []): Promise<{
+  async optimizeQuery(originalQuery: string, _params: any[] = []): Promise<{
     optimizedQuery: string;
     explanation: string[];
     estimatedImprovement: number;
   }> {
-    const analysis = await this.analyzeQuery(originalQuery, params);
+    // const analysis = await this.analyzeQuery(originalQuery, params); // 未使用，暂时注释
     const optimizations: string[] = [];
     let estimatedImprovement = 0;
 
@@ -331,7 +331,11 @@ export class DatabaseOptimizer {
     return {
       totalOptimizations,
       totalEstimatedImprovement: Math.round(totalEstimatedImprovement / queries.length),
-      queryOptimizations
+      queryOptimizations: queryOptimizations.map(q => ({
+        query: q.optimizedQuery,
+        optimizations: q.explanation,
+        estimatedImprovement: q.estimatedImprovement
+      }))
     };
   }
 
@@ -349,13 +353,13 @@ export class DatabaseOptimizer {
       const tablesResult = await this.db.prepare(`
         SELECT COUNT(*) as count FROM sqlite_master WHERE type = 'table'
       `).first();
-      const totalTables = tablesResult?.count as number || 0;
+      const totalTables = tablesResult?.['count'] as number || 0;
 
       // 获取索引数量
       const indexesResult = await this.db.prepare(`
         SELECT COUNT(*) as count FROM sqlite_master WHERE type = 'index'
       `).first();
-      const totalIndexes = indexesResult?.count as number || 0;
+      const totalIndexes = indexesResult?.['count'] as number || 0;
 
       // 计算优化分数
       const optimizationScore = Math.min(100, Math.round((totalIndexes / totalTables) * 50 + 50));

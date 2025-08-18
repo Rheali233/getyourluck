@@ -10,8 +10,9 @@ import { ContentFilterService, ContentFilterCategory } from "../../services/Cont
 import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
 const feedbackRoutes = new Hono();
 // 提交用户反馈
-feedbackRoutes.post("/", rateLimiter(5, 60000), // 每分钟最多5次反馈提交
-validateFeedback, async (c) => {
+feedbackRoutes.post("/", rateLimiter(5, 60000), // 恢复速率限制
+validateFeedback, // 验证中间件
+async (c) => {
     try {
         const feedbackData = await c.req.json();
         const dbService = c.get("dbService");

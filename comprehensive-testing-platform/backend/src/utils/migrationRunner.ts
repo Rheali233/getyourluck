@@ -17,7 +17,10 @@ export class MigrationRunner {
   private db: D1Database
 
   constructor(env: Env) {
-    this.db = env.DB
+    if (!env.DB) {
+      throw new ModuleError('Database connection not available', ERROR_CODES.DATABASE_ERROR, 500)
+    }
+    this.db = env.DB as D1Database
   }
 
   /**

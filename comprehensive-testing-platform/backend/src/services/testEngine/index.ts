@@ -38,21 +38,13 @@ export class TestEngineService {
     this.cacheService = cacheService;
   }
 
-  /**
-   * 获取所有测试类型
-   * @param activeOnly 是否只获取激活的测试类型
-   * @returns 测试类型列表
-   */
-  async getTestTypes(activeOnly: boolean = true): Promise<TestConfig[]> {
+  async getTestTypes(activeOnly: boolean = true): Promise<any[]> {
     try {
-      const testTypes = await this.dbService.testTypes.findAll();
-      
-      // 过滤激活的类型
+      const testTypes = await this.dbService.testTypes.getAllActive();
       const filteredTypes = activeOnly 
-        ? testTypes.filter(type => type.isActive) 
+        ? testTypes.filter((type: any) => type.isActive) 
         : testTypes;
-      
-      return filteredTypes.map(type => ({
+      return filteredTypes.map((type: any) => ({
         id: type.id,
         name: type.name || '',
         description: type.description || '',
@@ -69,15 +61,9 @@ export class TestEngineService {
     }
   }
 
-  /**
-   * 获取测试配置
-   * @param testType 测试类型
-   * @returns 测试配置
-   */
-  async getTestConfig(testType: string): Promise<TestConfig> {
+  async getTestConfig(testType: string): Promise<any> {
     try {
       const config = await this.dbService.testTypes.findById(testType);
-      
       if (!config) {
         throw new ModuleError(
           `Test type '${testType}' not found`,
@@ -85,7 +71,6 @@ export class TestEngineService {
           404
         );
       }
-
       return {
         id: config.id,
         name: config.name || '',
@@ -179,14 +164,21 @@ export class TestEngineService {
     sessionDuration?: number;
   }): Promise<string> {
     try {
-      return await this.dbService.testSessions.create({
+      const sessionDataToCreate: any = {
         testTypeId: sessionData.testTypeId,
         answers: sessionData.answersData,
         result: sessionData.resultData,
-        userAgent: sessionData.userAgent || null,
-        ipAddress: sessionData.ipAddressHash,
         sessionDuration: sessionData.sessionDuration || 0
-      });
+      };
+
+      if (sessionData.userAgent) {
+        sessionDataToCreate.userAgent = sessionData.userAgent;
+      }
+      if (sessionData.ipAddressHash) {
+        sessionDataToCreate.ipAddress = sessionData.ipAddressHash;
+      }
+
+      return await this.dbService.testSessions.create(sessionDataToCreate);
     } catch (error) {
       throw new ModuleError(
         "Failed to save test session",

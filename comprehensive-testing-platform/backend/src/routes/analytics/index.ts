@@ -5,11 +5,11 @@
 
 import { Hono } from "hono";
 import type { Context } from "hono";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 import { rateLimiter } from "../../middleware/rateLimiter";
 import { validateAnalyticsEvent } from "../../middleware/validation";
 import { ValidationService } from "../../services/ValidationService";
-import type { APIResponse, PaginatedResponse } from "../../../../shared/types/apiResponse";
+import type { APIResponse } from "../../../../shared/types/apiResponse";
 import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
 
 const analyticsRoutes = new Hono<AppContext>();
@@ -88,7 +88,7 @@ analyticsRoutes.post("/events/batch",
       const ipAddress = c.req.header("CF-Connecting-IP") || "";
       const userAgent = c.req.header("User-Agent") || "";
       
-      const eventsToCreate = events.map(event => ({
+      const eventsToCreate = events.map((event: any) => ({
         eventType: event.eventType,
         eventData: event.data,
         sessionId: event.sessionId,
@@ -240,7 +240,7 @@ analyticsRoutes.get("/stats/:eventType", async (c: Context<AppContext>) => {
       success: true,
       data: {
         eventType,
-        totalEvents: dailyStats.reduce((sum, day) => sum + day.count, 0),
+        totalEvents: dailyStats.reduce((sum: number, day: any) => sum + day.count, 0),
         dailyStats,
         recentEvents,
         timeRange,
@@ -353,12 +353,12 @@ analyticsRoutes.get("/popular-tests", async (c: Context<AppContext>) => {
     );
     
     // 过滤只保留测试开始事件
-    const testEvents = popularTests.filter(event => 
+    const testEvents = popularTests.filter((event: any) => 
       event.eventType.startsWith('test_started_')
     );
     
     // 获取热门测试的详情
-    const testTypesPromises = testEvents.map(async event => {
+    const testTypesPromises = testEvents.map(async (event: any) => {
       const testType = event.eventType.replace('test_started_', '');
       try {
         return await dbService.testTypes.findById(testType);
@@ -373,7 +373,7 @@ analyticsRoutes.get("/popular-tests", async (c: Context<AppContext>) => {
     const response: APIResponse = {
       success: true,
       data: {
-        popularTests: testEvents.map((event, index) => ({
+        popularTests: testEvents.map((event: any, index: number) => ({
           testType: event.eventType.replace('test_started_', ''),
           count: event.count,
           percentage: event.percentage,

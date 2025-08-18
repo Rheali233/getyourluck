@@ -276,19 +276,24 @@ export class CacheKeyGenerator {
     
     let params: Record<string, any> | undefined;
     if (paramParts.length > 0) {
-      params = {};
-      paramParts[0].split(',').forEach(param => {
-        const [key, value] = param.split('=');
-        params![key] = value;
-      });
+      const first = paramParts[0] || '';
+      if (first) {
+        first.split(',').forEach(part => {
+          const [k, v] = part.split('=');
+          if (k) {
+            if (!params) params = {};
+            params[k] = v ?? '';
+          }
+        });
+      }
     }
     
     return {
-      version,
-      partition,
-      type,
-      identifier,
-      params
+      version: version || '',
+      partition: partition || '',
+      type: type || '',
+      identifier: identifier || '',
+      ...(params && { params })
     };
   }
 }

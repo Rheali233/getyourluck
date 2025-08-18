@@ -4,7 +4,7 @@
  */
 
 import type { Env } from '../index'
-import { MigrationRunner, type Migration } from './migrationRunner'
+import { MigrationRunner } from './migrationRunner'
 import { migrations } from './migrations'
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
 
@@ -51,6 +51,9 @@ export class DatabaseManager {
   }> {
     try {
       // 测试数据库连接
+      if (!this.env.DB) {
+        throw new Error('Database connection not available');
+      }
       const connectionTest = await this.env.DB.prepare('SELECT 1 as test').first()
       const connectionHealthy = connectionTest !== null
 
@@ -104,6 +107,9 @@ export class DatabaseManager {
     totalRows: number
   }> {
     try {
+      if (!this.env.DB) {
+        throw new Error('Database connection not available');
+      }
       const tablesResult = await this.env.DB.prepare(`
         SELECT name FROM sqlite_master 
         WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'migrations'
@@ -119,6 +125,9 @@ export class DatabaseManager {
 
       for (const table of tablesResult.results as Array<{ name: string }>) {
         try {
+          if (!this.env.DB) {
+            throw new Error('Database connection not available');
+          }
           const countResult = await this.env.DB.prepare(`SELECT COUNT(*) as count FROM ${table.name}`).first()
           const rowCount = (countResult as any)?.count || 0
           
@@ -181,12 +190,15 @@ export class DatabaseManager {
         cutoffDate.setDate(cutoffDate.getDate() - expiredSessions)
         const cutoffTimestamp = cutoffDate.toISOString()
 
+        if (!this.env.DB) {
+          throw new Error('Database connection not available');
+        }
         const sessionResult = await this.env.DB
           .prepare('DELETE FROM test_sessions WHERE created_at < ?')
           .bind(cutoffTimestamp)
           .run()
 
-        sessionsDeleted = sessionResult.changes || 0
+        sessionsDeleted = (sessionResult as any).changes || 0
       }
 
       // 清理过期的用户反馈
@@ -195,12 +207,15 @@ export class DatabaseManager {
         cutoffDate.setDate(cutoffDate.getDate() - expiredFeedback)
         const cutoffTimestamp = cutoffDate.toISOString()
 
+        if (!this.env.DB) {
+          throw new Error('Database connection not available');
+        }
         const feedbackResult = await this.env.DB
           .prepare('DELETE FROM user_feedback WHERE created_at < ?')
           .bind(cutoffTimestamp)
           .run()
 
-        feedbackDeleted = feedbackResult.changes || 0
+        feedbackDeleted = (feedbackResult as any).changes || 0
       }
 
       // 清理过期的分析事件
@@ -209,12 +224,15 @@ export class DatabaseManager {
         cutoffDate.setDate(cutoffDate.getDate() - expiredEvents)
         const cutoffTimestamp = cutoffDate.toISOString()
 
+        if (!this.env.DB) {
+          throw new Error('Database connection not available');
+        }
         const eventsResult = await this.env.DB
           .prepare('DELETE FROM analytics_events WHERE timestamp < ?')
           .bind(cutoffTimestamp)
           .run()
 
-        eventsDeleted = eventsResult.changes || 0
+        eventsDeleted = (eventsResult as any).changes || 0
       }
 
       console.log(`Database cleanup completed: ${sessionsDeleted} sessions, ${feedbackDeleted} feedback, ${eventsDeleted} events deleted`)
@@ -246,6 +264,9 @@ export class DatabaseManager {
 
       for (const table of tables) {
         try {
+          if (!this.env.DB) {
+            throw new Error('Database connection not available');
+          }
           const result = await this.env.DB.prepare(`SELECT * FROM ${table}`).all()
           
           if (result.success && result.results.length > 0) {

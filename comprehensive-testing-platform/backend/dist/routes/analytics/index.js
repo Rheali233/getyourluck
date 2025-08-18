@@ -9,8 +9,9 @@ import { ValidationService } from "../../services/ValidationService";
 import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
 const analyticsRoutes = new Hono();
 // 记录分析事件
-analyticsRoutes.post("/events", rateLimiter(100, 60000), // 每分钟最多100次事件记录
-validateAnalyticsEvent, async (c) => {
+analyticsRoutes.post("/events", rateLimiter(100, 60000), // 恢复速率限制
+validateAnalyticsEvent, // 恢复验证
+async (c) => {
     try {
         const eventData = await c.req.json();
         const dbService = c.get("dbService");
@@ -42,7 +43,7 @@ validateAnalyticsEvent, async (c) => {
     }
 });
 // 批量记录分析事件
-analyticsRoutes.post("/events/batch", rateLimiter(20, 60000), // 每分钟最多20次批量事件记录
+analyticsRoutes.post("/events/batch", rateLimiter(20, 60000), // 恢复速率限制
 async (c) => {
     try {
         const { events } = await c.req.json();
@@ -59,7 +60,7 @@ async (c) => {
         // 准备批量事件数据
         const ipAddress = c.req.header("CF-Connecting-IP") || "";
         const userAgent = c.req.header("User-Agent") || "";
-        const eventsToCreate = events.map(event => ({
+        const eventsToCreate = events.map((event) => ({
             eventType: event.eventType,
             eventData: event.data,
             sessionId: event.sessionId,
@@ -257,7 +258,7 @@ analyticsRoutes.get("/popular-tests", async (c) => {
         // 获取热门测试类型（分析test_started事件）
         const popularTests = await dbService.analyticsEvents.getEventStats(startDate, endDate, 10);
         // 过滤只保留测试开始事件
-        const testEvents = popularTests.filter(event => event.eventType.startsWith('test_started_'));
+        const testEvents = popularTests.filter((event) => event.eventType.startsWith('test_started_'));
         // 获取热门测试的详情
         const testTypesPromises = testEvents.map(async (event) => {
             const testType = event.eventType.replace('test_started_', '');

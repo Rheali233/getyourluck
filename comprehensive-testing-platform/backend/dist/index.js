@@ -64,9 +64,10 @@ app.use("*", requestValidator);
 app.use("*", async (c, next) => {
     // 生成请求ID
     const requestId = c.req.header("X-Request-ID") || crypto.randomUUID();
-    c.set("requestId", requestId);
-    // 初始化数据库服务
+    // 初始化数据库服务 - 使用Cloudflare D1
     const dbService = new DatabaseService(c.env);
+    // 设置上下文变量
+    c.set("requestId", requestId);
     c.set("dbService", dbService);
     await next();
 });
@@ -74,6 +75,20 @@ app.use("*", async (c, next) => {
 app.onError(errorHandler);
 // 系统健康检查和管理端点
 app.route("/api/system", systemRoutes);
+// 调试端点 - 检查环境变量
+app.get("/debug/env", async (c) => {
+    return c.json({
+        success: true,
+        data: {
+            hasDB: !!c.env.DB,
+            hasKV: !!c.env.KV,
+            hasBUCKET: !!c.env.BUCKET,
+            environment: c.env.ENVIRONMENT,
+            envKeys: Object.keys(c.env),
+        },
+        timestamp: new Date().toISOString(),
+    });
+});
 // 增强的健康检查端点
 app.get("/health", async (c) => {
     try {
@@ -115,8 +130,8 @@ app.route("/api/analytics", analyticsRoutes);
 app.route("/api/homepage", homepageRoutes);
 app.route("/api/search", searchRoutes);
 app.route("/api/cookies", cookiesRoutes);
-app.route("/api/recommendations", recommendationsRoutes);
-app.route("/api/seo", seoRoutes);
+// app.route("/api/recommendations", recommendationsRoutes); // 暂时注释，未定义
+// app.route("/api/seo", seoRoutes); // 暂时注释，未定义
 // API版本信息
 app.get("/api", (c) => {
     const response = {
@@ -133,8 +148,8 @@ app.get("/api", (c) => {
                 homepage: "/api/homepage",
                 search: "/api/search",
                 cookies: "/api/cookies",
-                recommendations: "/api/recommendations",
-                seo: "/api/seo",
+                // recommendations: "/api/recommendations", // 暂时注释
+                // seo: "/api/seo", // 暂时注释
                 system: "/api/system",
             },
             documentation: "https://docs.example.com/api",

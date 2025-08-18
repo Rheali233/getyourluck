@@ -100,9 +100,9 @@ export class PerformanceMonitor {
       query,
       executionTime,
       rowCount,
-      tableName,
-      indexUsed
-    };
+      tableName: tableName || "",
+      indexUsed: indexUsed || "",
+    }
 
     // 找到对应的请求指标并添加数据库查询信息
     const requestMetrics = this.metrics.find(m => m.requestId === requestId);
@@ -166,11 +166,11 @@ export class PerformanceMonitor {
     stack?: string
   ): void {
     const errorMetrics: ErrorMetrics = {
-      type,
+      type: type,
       message,
-      stack,
-      timestamp: new Date().toISOString()
-    };
+      stack: stack || "",
+      timestamp: new Date().toISOString(),
+    }
 
     // 找到对应的请求指标并添加错误信息
     const requestMetrics = this.metrics.find(m => m.requestId === requestId);
@@ -251,7 +251,7 @@ export class PerformanceMonitor {
    */
   async performHealthCheck(): Promise<SystemHealth> {
     const checks: HealthCheck[] = [];
-    const startTime = Date.now();
+    // const startTime = Date.now(); // 未使用，暂时注释
 
     // 执行所有健康检查
     for (const [name, checkFn] of this.healthChecks) {
@@ -273,7 +273,7 @@ export class PerformanceMonitor {
 
     // 计算整体健康状态
     const totalChecks = checks.length;
-    const passedChecks = checks.filter(c => c.status === 'pass').length;
+    // const passedChecks = checks.filter(c => c.status === 'pass').length; // 未使用，暂时注释
     const failedChecks = checks.filter(c => c.status === 'fail').length;
     const warningChecks = checks.filter(c => c.status === 'warn').length;
 
@@ -363,7 +363,7 @@ performanceMonitor.addHealthCheck('system', async () => {
   const startTime = Date.now();
   
   // 检查内存使用
-  const memoryUsage = process.memoryUsage?.()?.heapUsed || 0;
+  const memoryUsage = 0; // Cloudflare Workers不支持process.memoryUsage
   const memoryStatus = memoryUsage < 100 * 1024 * 1024 ? 'pass' : 'warn';
   
   return {

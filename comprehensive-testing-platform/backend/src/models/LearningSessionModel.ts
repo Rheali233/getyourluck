@@ -140,11 +140,11 @@ export class LearningSessionModel extends BaseModel {
       .first();
 
     return {
-      average: Math.round((results?.avg_score as number || 0) * 100) / 100,
-      median: medianResult?.cognitive_score as number || 0,
-      min: results?.min_score as number || 0,
-      max: results?.max_score as number || 0,
-      count: results?.count as number || 0,
+              average: Math.round((results?.['avg_score'] as number || 0) * 100) / 100,
+        median: medianResult?.['cognitive_score'] as number || 0,
+        min: results?.['min_score'] as number || 0,
+        max: results?.['max_score'] as number || 0,
+        count: results?.['count'] as number || 0,
     };
   }
 
@@ -180,9 +180,9 @@ export class LearningSessionModel extends BaseModel {
       id: row.id as string,
       testSessionId: row.test_session_id as string,
       testSubtype: row.test_subtype as "vark" | "raven" | "learning_strategies",
-      learningStyle: row.learning_style as "visual" | "auditory" | "reading" | "kinesthetic" | "multimodal" || undefined,
-      cognitiveScore: row.cognitive_score as number || undefined,
-      percentileRank: row.percentile_rank as number || undefined,
+      learningStyle: (row.learning_style as "visual" | "auditory" | "reading" | "kinesthetic" | "multimodal") ?? "visual",
+      cognitiveScore: (row.cognitive_score as number) ?? 0,
+      percentileRank: (row.percentile_rank as number) ?? 0,
       learningPreferences: row.learning_preferences ? JSON.parse(row.learning_preferences as string) : undefined,
       strategyRecommendations: row.strategy_recommendations ? JSON.parse(row.strategy_recommendations as string) : undefined,
       createdAt: new Date(row.created_at as string),

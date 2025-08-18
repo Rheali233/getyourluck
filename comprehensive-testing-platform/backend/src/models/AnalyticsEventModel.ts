@@ -6,7 +6,14 @@
 import { BaseModel } from './BaseModel'
 import type { Env } from '../index'
 import { DB_TABLES } from '../../../shared/constants'
-import { hashString } from '../../../shared/utils'
+
+async function hashString(input: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(input)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
 
 export interface AnalyticsEvent {
   id: string
@@ -259,7 +266,7 @@ export class AnalyticsEventModel extends BaseModel {
     const query = `DELETE FROM ${this.tableName} WHERE timestamp < ?`
     const result = await this.executeRun(query, [cutoffTimestamp])
 
-    return result.changes || 0
+    return (result as any).changes || 0
   }
 
   /**
@@ -300,6 +307,6 @@ export class AnalyticsEventModel extends BaseModel {
     `
 
     const result = await this.executeRun(query, params)
-    return result.changes || 0
+    return (result as any).changes || 0
   }
 }

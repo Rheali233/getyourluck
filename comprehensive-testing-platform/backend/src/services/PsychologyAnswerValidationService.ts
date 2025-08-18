@@ -3,11 +3,11 @@
  * 遵循统一开发标准的服务层规范
  */
 
-import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
+// import { ModuleError, ERROR_CODES } from "../../../shared/types/errors"; // 未使用，暂时注释
 import type { 
   PsychologyAnswerData,
   CreatePsychologyAnswerData,
-  AnswerValidationRule,
+  // AnswerValidationRule, // 未使用，暂时注释
   AnswerValidationResult,
   AnswerFormatOptions,
   AnswerExportData,
@@ -89,7 +89,7 @@ export class PsychologyAnswerValidationService {
     data: any, 
     errors: string[], 
     warnings: string[], 
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     // 维度验证
     const validDimensions = ['E/I', 'S/N', 'T/F', 'J/P'];
@@ -134,7 +134,7 @@ export class PsychologyAnswerValidationService {
     data: any, 
     errors: string[], 
     warnings: string[], 
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     // 维度验证
     const validDimensions = [
@@ -169,7 +169,7 @@ export class PsychologyAnswerValidationService {
     // 自杀想法特殊处理
     if (data.dimension === 'suicidal_thoughts' && data.score > 0) {
       warnings.push('检测到自杀想法相关症状，建议寻求专业帮助');
-      suggestions.push('请考虑联系心理健康专业人士或拨打心理援助热线');
+      _suggestions.push('请考虑联系心理健康专业人士或拨打心理援助热线');
     }
   }
 
@@ -180,7 +180,7 @@ export class PsychologyAnswerValidationService {
     data: any, 
     errors: string[], 
     warnings: string[], 
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     // 维度验证
     const validDimensions = [
@@ -214,7 +214,7 @@ export class PsychologyAnswerValidationService {
     data: any, 
     errors: string[], 
     warnings: string[], 
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     // 领域验证
     const validDomains = [
@@ -251,7 +251,7 @@ export class PsychologyAnswerValidationService {
    */
   private validateMetadata(
     metadata: Record<string, any>, 
-    errors: string[], 
+    _errors: string[], 
     warnings: string[]
   ): void {
     // 检查元数据大小
@@ -299,43 +299,43 @@ export class PsychologyAnswerValidationService {
 
     // 根据选项添加字段
     if (options.includeTimestamps) {
-      formatted.timestamp = data.timestamp.toISOString();
+      formatted["timestamp"] = (data as any)["timestamp"].toISOString();
     }
 
-    if (options.includeMetadata && data["metadata"]) {
-      formatted.metadata = data["metadata"];
+    if (options.includeMetadata && (data as any)["metadata"]) {
+      formatted["metadata"] = (data as any)["metadata"];
     }
 
     // 根据测试类型添加特定字段
     switch (data.testType) {
       case 'mbti':
-        formatted.dimension = (data as MbtiAnswerData)["dimension"];
-        formatted.preference = (data as MbtiAnswerData)["preference"];
-        formatted.confidence = (data as MbtiAnswerData)["confidence"];
+        formatted["dimension"] = (data as MbtiAnswerData)["dimension"];
+        formatted["preference"] = (data as MbtiAnswerData)["preference"];
+        formatted["confidence"] = (data as MbtiAnswerData)["confidence"];
         break;
       case 'phq9':
-        formatted.dimension = (data as Phq9AnswerData)["dimension"];
-        formatted.score = (data as Phq9AnswerData)["score"];
-        formatted.severity = (data as Phq9AnswerData)["severity"];
+        formatted["dimension"] = (data as Phq9AnswerData)["dimension"];
+        formatted["score"] = (data as Phq9AnswerData)["score"];
+        formatted["severity"] = (data as Phq9AnswerData)["severity"];
         if ((data as Phq9AnswerData)["symptomDescription"]) {
-          formatted.symptomDescription = (data as Phq9AnswerData)["symptomDescription"];
+          formatted["symptomDescription"] = (data as Phq9AnswerData)["symptomDescription"];
         }
         break;
       case 'eq':
-        formatted.dimension = (data as EqAnswerData)["dimension"];
-        formatted.score = (data as EqAnswerData)["score"];
-        formatted.confidence = (data as EqAnswerData)["confidence"];
+        formatted["dimension"] = (data as EqAnswerData)["dimension"];
+        formatted["score"] = (data as EqAnswerData)["score"];
+        formatted["confidence"] = (data as EqAnswerData)["confidence"];
         if ((data as EqAnswerData)["reflection"]) {
-          formatted.reflection = (data as EqAnswerData)["reflection"];
+          formatted["reflection"] = (data as EqAnswerData)["reflection"];
         }
         break;
       case 'happiness':
-        formatted.domain = (data as HappinessAnswerData)["domain"];
-        formatted.score = (data as HappinessAnswerData)["score"];
-        formatted.satisfaction = (data as HappinessAnswerData)["satisfaction"];
-        formatted.importance = (data as HappinessAnswerData)["importance"];
+        formatted["domain"] = (data as HappinessAnswerData)["domain"];
+        formatted["score"] = (data as HappinessAnswerData)["score"];
+        formatted["satisfaction"] = (data as HappinessAnswerData)["satisfaction"];
+        formatted["importance"] = (data as HappinessAnswerData)["importance"];
         if ((data as HappinessAnswerData)["improvement"]) {
-          formatted.improvement = (data as HappinessAnswerData)["improvement"];
+          formatted["improvement"] = (data as HappinessAnswerData)["improvement"];
         }
         break;
     }
@@ -360,19 +360,19 @@ export class PsychologyAnswerValidationService {
     };
 
     if (options.includeTimestamps) {
-      formatted.startTime = session.startTime.toISOString();
-      if (session.endTime) {
-        formatted.endTime = session.endTime.toISOString();
+      formatted["startTime"] = (session as any)["startTime"].toISOString();
+      if ((session as any)["endTime"]) {
+        formatted["endTime"] = (session as any)["endTime"].toISOString();
       }
     }
 
     if (options.includeCalculations) {
-      formatted.averageResponseTime = this.calculateAverageResponseTime(session.answers);
-      formatted.completionRate = this.calculateCompletionRate(session.answers);
+      formatted["averageResponseTime"] = this.calculateAverageResponseTime((session as any)["answers"]);
+      formatted["completionRate"] = this.calculateCompletionRate((session as any)["answers"]);
     }
 
-    if (options.includeMetadata && session.metadata) {
-      formatted.metadata = session.metadata;
+    if (options.includeMetadata && (session as any)["metadata"]) {
+      formatted["metadata"] = (session as any)["metadata"];
     }
 
     return formatted;
@@ -433,15 +433,15 @@ export class PsychologyAnswerValidationService {
       testType,
       exportTime,
       format: options.format,
-      data: answers.map(answer => this.formatAnswerData(answer, options)),
+      data: answers.map(answer => this.formatAnswerData(answer, options)) as any,
       summary: {
         totalQuestions,
         answeredQuestions,
         completionRate,
-        averageScore,
+        averageScore: averageScore || 0,
         totalTime
       },
-      metadata: options.includeMetadata ? { exportOptions: options } : undefined
+      metadata: options.includeMetadata ? { exportOptions: options } : {}
     };
   }
 

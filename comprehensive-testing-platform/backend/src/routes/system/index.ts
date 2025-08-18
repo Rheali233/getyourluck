@@ -4,7 +4,7 @@
  */
 
 import { Hono } from "hono";
-import type { AppContext } from "../../index";
+import type { AppContext } from "../../types/env";
 import { rateLimiter } from "../../middleware/rateLimiter";
 import type { APIResponse } from "../../../../shared/types/apiResponse";
 import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
@@ -22,7 +22,7 @@ systemRoutes.get("/health", async (c) => {
       data: {
         status: healthCheck.status,
         timestamp: new Date().toISOString(),
-        environment: c.env.ENVIRONMENT || "local",
+        environment: c.env?.['ENVIRONMENT'],
         version: "1.0.0",
         services: {
           database: healthCheck.status,
@@ -99,7 +99,7 @@ systemRoutes.get("/stats",
 // 数据库迁移状态
 systemRoutes.get("/migrations", async (c) => {
   try {
-    const dbService = c.get("dbService");
+    // const dbService = c.get("dbService"); // 未使用，暂时注释
     // 这里应该调用迁移服务获取状态
     // 简化版本，返回基本信息
     
@@ -129,12 +129,19 @@ systemRoutes.get("/migrations", async (c) => {
 systemRoutes.get("/health/cache", async (c) => {
   try {
     // 简单的KV健康检查
+    if (!c.env) {
+      return c.json({ 
+        success: false, 
+        error: '环境配置不可用' 
+      }, 500);
+    }
+
     const testKey = "health_check_cache";
     const testValue = { timestamp: Date.now() };
     
-    await c.env.KV.put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
-    const retrieved = await c.env.KV.get(testKey);
-    await c.env.KV.delete(testKey);
+    await c.env['KV'].put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
+    const retrieved = await c.env['KV'].get(testKey);
+    await c.env['KV'].delete(testKey);
     
     const isHealthy = retrieved !== null;
     
@@ -172,7 +179,7 @@ systemRoutes.get("/config", async (c) => {
     const response: APIResponse = {
       success: true,
       data: {
-        environment: c.env.ENVIRONMENT,
+        environment: c.env?.['ENVIRONMENT'],
         version: "1.0.0",
         features: {
           analytics: true,
@@ -265,9 +272,9 @@ systemRoutes.get("/info", async (c) => {
         name: "综合测试平台 API",
         version: "1.0.0",
         description: "专业的心理测试、占星分析、塔罗占卜等在线测试服务",
-        uptime: process.uptime ? `${Math.floor(process.uptime())}s` : "N/A",
+        uptime: "N/A", // Cloudflare Workers不支持process.uptime
         timestamp: new Date().toISOString(),
-        environment: c.env.ENVIRONMENT,
+        environment: c.env?.['ENVIRONMENT'],
         runtime: "Cloudflare Workers",
         framework: "Hono.js",
         database: "Cloudflare D1",

@@ -5,7 +5,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// .wrangler/tmp/bundle-3ADJIl/checked-fetch.js
+// .wrangler/tmp/bundle-wOR9Qr/checked-fetch.js
 var urls = /* @__PURE__ */ new Set();
 function checkURL(request, init) {
   const url = request instanceof URL ? request : new URL(
@@ -2021,46 +2021,17 @@ var AppError = class extends Error {
     this.statusCode = statusCode;
     this.code = code;
     this.isOperational = isOperational;
-    Error.captureStackTrace(this, this.constructor);
   }
 };
-var ERROR_CODES = {
-  // 通用错误 (1000-1999)
-  UNKNOWN_ERROR: "UNKNOWN_ERROR",
-  VALIDATION_ERROR: "VALIDATION_ERROR",
-  INTERNAL_ERROR: "INTERNAL_ERROR",
-  // 认证授权错误 (2000-2999)
-  AUTHENTICATION_FAILED: "AUTHENTICATION_FAILED",
-  AUTHORIZATION_DENIED: "AUTHORIZATION_DENIED",
-  TOKEN_EXPIRED: "TOKEN_EXPIRED",
-  INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
-  // 数据错误 (3000-3999)
-  DATA_NOT_FOUND: "DATA_NOT_FOUND",
-  DATA_CONFLICT: "DATA_CONFLICT",
-  DATA_INVALID: "DATA_INVALID",
-  DATABASE_ERROR: "DATABASE_ERROR",
-  // 业务逻辑错误 (4000-4999)
-  BUSINESS_RULE_VIOLATION: "BUSINESS_RULE_VIOLATION",
-  INVALID_OPERATION: "INVALID_OPERATION",
-  RESOURCE_EXHAUSTED: "RESOURCE_EXHAUSTED",
-  // 外部服务错误 (5000-5999)
-  EXTERNAL_SERVICE_ERROR: "EXTERNAL_SERVICE_ERROR",
-  NETWORK_ERROR: "NETWORK_ERROR",
-  TIMEOUT_ERROR: "TIMEOUT_ERROR"
-};
-var errorHandler2 = /* @__PURE__ */ __name(async (err, c, next) => {
-  try {
-    await next();
-  } catch (error) {
-    return handleError(error, c);
-  }
+var errorHandler2 = /* @__PURE__ */ __name((err, c) => {
+  return handleError(err, c);
 }, "errorHandler");
 function handleError(error, c) {
   logError(error, c);
-  const errorResponse = formatErrorResponse(error);
-  c.status(errorResponse.statusCode);
+  const { body, status } = formatErrorResponse(error);
+  c.status(status);
   c.header("Content-Type", "application/json");
-  return c.json(errorResponse);
+  return c.json(body);
 }
 __name(handleError, "handleError");
 function logError(error, c) {
@@ -2095,44 +2066,41 @@ __name(logError, "logError");
 function formatErrorResponse(error) {
   if (error instanceof AppError) {
     return {
-      success: false,
-      error: error.message,
-      code: error.code || ERROR_CODES.UNKNOWN_ERROR,
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: "unknown"
+      status: error.statusCode,
+      body: {
+        success: false,
+        error: error.message,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        requestId: "unknown"
+      }
     };
   }
   if (error instanceof Error) {
     return {
-      success: false,
-      error: error.message,
-      code: ERROR_CODES.UNKNOWN_ERROR,
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: "unknown"
+      status: 500,
+      body: {
+        success: false,
+        error: error.message,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        requestId: "unknown"
+      }
     };
   }
   return {
-    success: false,
-    error: "An unexpected error occurred",
-    code: ERROR_CODES.UNKNOWN_ERROR,
-    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-    requestId: "unknown"
+    status: 500,
+    body: {
+      success: false,
+      error: "An unexpected error occurred",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      requestId: "unknown"
+    }
   };
 }
 __name(formatErrorResponse, "formatErrorResponse");
-async function sendErrorToMonitoring(errorLog) {
+async function sendErrorToMonitoring(_errorLog) {
   try {
-    if (process.env.ERROR_MONITORING_ENDPOINT) {
-      await fetch(process.env.ERROR_MONITORING_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(errorLog)
-      });
-    }
-  } catch (monitoringError) {
-    console.error("Failed to send error to monitoring:", monitoringError);
+    return;
+  } catch (e) {
   }
 }
 __name(sendErrorToMonitoring, "sendErrorToMonitoring");
@@ -2150,7 +2118,7 @@ var ModuleError = class extends Error {
     __name(this, "ModuleError");
   }
 };
-var ERROR_CODES2 = {
+var ERROR_CODES = {
   VALIDATION_ERROR: "VALIDATION_ERROR",
   NETWORK_ERROR: "NETWORK_ERROR",
   TEST_NOT_FOUND: "TEST_NOT_FOUND",
@@ -6528,7 +6496,7 @@ var ValidationService = class {
       if (error instanceof external_exports.ZodError) {
         throw new ModuleError(
           "Invalid test submission data",
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400,
           error.errors
         );
@@ -6546,7 +6514,7 @@ var ValidationService = class {
       if (error instanceof external_exports.ZodError) {
         throw new ModuleError(
           "Invalid feedback data",
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400,
           error.errors
         );
@@ -6564,7 +6532,7 @@ var ValidationService = class {
       if (error instanceof external_exports.ZodError) {
         throw new ModuleError(
           "Invalid blog article data",
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400,
           error.errors
         );
@@ -6582,7 +6550,7 @@ var ValidationService = class {
       if (error instanceof external_exports.ZodError) {
         throw new ModuleError(
           "Invalid analytics event data",
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400,
           error.errors
         );
@@ -6599,7 +6567,7 @@ var ValidationService = class {
       if (!schema) {
         throw new ModuleError(
           `Unknown module: ${module}`,
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400
         );
       }
@@ -6608,7 +6576,7 @@ var ValidationService = class {
       if (error instanceof external_exports.ZodError) {
         throw new ModuleError(
           `Invalid ${module} session data`,
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400,
           error.errors
         );
@@ -6626,7 +6594,7 @@ var ValidationService = class {
       if (error instanceof external_exports.ZodError) {
         throw new ModuleError(
           "Invalid UUID format",
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400,
           error.errors
         );
@@ -6648,7 +6616,7 @@ var ValidationService = class {
       if (error instanceof external_exports.ZodError) {
         throw new ModuleError(
           "Invalid pagination parameters",
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400,
           error.errors
         );
@@ -6663,7 +6631,7 @@ var ValidationService = class {
     if (typeof input !== "string") {
       throw new ModuleError(
         "Input must be a string",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400
       );
     }
@@ -6704,7 +6672,9 @@ var requestValidator = /* @__PURE__ */ __name(async (c, next) => {
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
         requestId: c.req.header("X-Request-ID") || crypto.randomUUID()
       };
-      return c.json(response2, error.statusCode);
+      c.status(error.statusCode);
+      await c.json(response2);
+      return;
     }
     const response = {
       success: false,
@@ -6712,7 +6682,9 @@ var requestValidator = /* @__PURE__ */ __name(async (c, next) => {
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
       requestId: c.req.header("X-Request-ID") || crypto.randomUUID()
     };
-    return c.json(response, 400);
+    c.status(400);
+    await c.json(response);
+    return;
   }
 }, "requestValidator");
 async function validateHeaders(c) {
@@ -6722,7 +6694,7 @@ async function validateHeaders(c) {
     if (!headers[header]) {
       throw new ModuleError(
         `Missing required header: ${header}`,
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400
       );
     }
@@ -6731,7 +6703,7 @@ async function validateHeaders(c) {
   if (authHeader && !isValidAuthHeader(authHeader)) {
     throw new ModuleError(
       "Invalid Authorization header format",
-      ERROR_CODES2.UNAUTHORIZED,
+      ERROR_CODES.UNAUTHORIZED,
       401
     );
   }
@@ -6739,7 +6711,7 @@ async function validateHeaders(c) {
   if (requestId && !isValidUUID(requestId)) {
     throw new ModuleError(
       "Invalid X-Request-ID format, must be a valid UUID",
-      ERROR_CODES2.VALIDATION_ERROR,
+      ERROR_CODES.VALIDATION_ERROR,
       400
     );
   }
@@ -6753,7 +6725,7 @@ async function validateRequestSize(c) {
     if (size > maxSize) {
       throw new ModuleError(
         "Request body too large",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         413
       );
     }
@@ -6767,7 +6739,7 @@ async function validateContentType(c) {
     if (!contentType) {
       throw new ModuleError(
         "Content-Type header is required for this method",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400
       );
     }
@@ -6776,11 +6748,12 @@ async function validateContentType(c) {
       "application/x-www-form-urlencoded",
       "multipart/form-data"
     ];
-    const baseType = contentType.split(";")[0].trim();
+    const ct = contentType || "";
+    const baseType = ct.includes(";") ? (ct.split(";")[0] || "").trim() : ct.trim();
     if (!supportedTypes.includes(baseType)) {
       throw new ModuleError(
         `Unsupported Content-Type: ${baseType}`,
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         415
       );
     }
@@ -6792,7 +6765,7 @@ function validateUserAgent(c) {
   if (userAgent && !ValidationService.validateUserAgent(userAgent)) {
     throw new ModuleError(
       "Invalid User-Agent header",
-      ERROR_CODES2.VALIDATION_ERROR,
+      ERROR_CODES.VALIDATION_ERROR,
       400
     );
   }
@@ -6822,14 +6795,6 @@ var testSubmissionSchema = external_exports.object({
     timestamp: external_exports.string().optional()
   }).optional()
 });
-var feedbackSchema = external_exports.object({
-  sessionId: external_exports.string().uuid("Invalid session ID format"),
-  feedback: external_exports.enum(["like", "dislike"], {
-    errorMap: /* @__PURE__ */ __name(() => ({ message: "Feedback must be 'like' or 'dislike'" }), "errorMap")
-  }),
-  comment: external_exports.string().max(500, "Comment too long").optional(),
-  rating: external_exports.number().min(1).max(5).optional()
-});
 var analyticsEventSchema = external_exports.object({
   eventType: external_exports.string().min(1, "Event type is required"),
   data: external_exports.any().optional(),
@@ -6852,7 +6817,7 @@ var validateTestSubmission = /* @__PURE__ */ __name(async (c, next) => {
     if (error instanceof external_exports.ZodError) {
       throw new ModuleError(
         "Invalid test submission data",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400,
         error.errors
       );
@@ -6867,14 +6832,14 @@ var validateFeedback = /* @__PURE__ */ __name(async (c, next) => {
     if (!body || typeof body !== "object") {
       throw new ModuleError(
         "Invalid request body format",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400
       );
     }
     if (!body.feedback || !["like", "dislike"].includes(body.feedback)) {
       throw new ModuleError(
         "Feedback must be 'like' or 'dislike'",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400
       );
     }
@@ -6885,7 +6850,7 @@ var validateFeedback = /* @__PURE__ */ __name(async (c, next) => {
     }
     throw new ModuleError(
       "Invalid JSON format",
-      ERROR_CODES2.VALIDATION_ERROR,
+      ERROR_CODES.VALIDATION_ERROR,
       400
     );
   }
@@ -6899,7 +6864,7 @@ var validateAnalyticsEvent = /* @__PURE__ */ __name(async (c, next) => {
     if (error instanceof external_exports.ZodError) {
       throw new ModuleError(
         "Invalid analytics event data",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400,
         error.errors
       );
@@ -6924,7 +6889,7 @@ var rateLimiter = /* @__PURE__ */ __name((requests, windowMs) => {
       if (count >= requests) {
         throw new ModuleError(
           "Too many requests, please try again later",
-          ERROR_CODES2.RATE_LIMITED,
+          ERROR_CODES.RATE_LIMITED,
           429
         );
       }
@@ -6958,14 +6923,9 @@ var TestEngineService = class {
     this.dbService = dbService;
     this.cacheService = cacheService;
   }
-  /**
-   * 获取所有测试类型
-   * @param activeOnly 是否只获取激活的测试类型
-   * @returns 测试类型列表
-   */
   async getTestTypes(activeOnly = true) {
     try {
-      const testTypes = await this.dbService.testTypes.findAll();
+      const testTypes = await this.dbService.testTypes.getAllActive();
       const filteredTypes = activeOnly ? testTypes.filter((type) => type.isActive) : testTypes;
       return filteredTypes.map((type) => ({
         id: type.id,
@@ -6978,23 +6938,18 @@ var TestEngineService = class {
     } catch (error) {
       throw new ModuleError(
         "Failed to retrieve test types",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
   }
-  /**
-   * 获取测试配置
-   * @param testType 测试类型
-   * @returns 测试配置
-   */
   async getTestConfig(testType) {
     try {
       const config = await this.dbService.testTypes.findById(testType);
       if (!config) {
         throw new ModuleError(
           `Test type '${testType}' not found`,
-          ERROR_CODES2.TEST_NOT_FOUND,
+          ERROR_CODES.TEST_NOT_FOUND,
           404
         );
       }
@@ -7012,7 +6967,7 @@ var TestEngineService = class {
       }
       throw new ModuleError(
         `Failed to retrieve test configuration for: ${testType}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -7033,7 +6988,7 @@ var TestEngineService = class {
       if (!session) {
         throw new ModuleError(
           `Test session '${sessionId}' not found`,
-          ERROR_CODES2.TEST_NOT_FOUND,
+          ERROR_CODES.TEST_NOT_FOUND,
           404
         );
       }
@@ -7054,7 +7009,7 @@ var TestEngineService = class {
       }
       throw new ModuleError(
         `Failed to retrieve result for session: ${sessionId}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -7066,18 +7021,23 @@ var TestEngineService = class {
    */
   async saveTestSession(sessionData) {
     try {
-      return await this.dbService.testSessions.create({
+      const sessionDataToCreate = {
         testTypeId: sessionData.testTypeId,
         answers: sessionData.answersData,
         result: sessionData.resultData,
-        userAgent: sessionData.userAgent || null,
-        ipAddress: sessionData.ipAddressHash,
         sessionDuration: sessionData.sessionDuration || 0
-      });
+      };
+      if (sessionData.userAgent) {
+        sessionDataToCreate.userAgent = sessionData.userAgent;
+      }
+      if (sessionData.ipAddressHash) {
+        sessionDataToCreate.ipAddress = sessionData.ipAddressHash;
+      }
+      return await this.dbService.testSessions.create(sessionDataToCreate);
     } catch (error) {
       throw new ModuleError(
         "Failed to save test session",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -7106,7 +7066,7 @@ testRoutes.get("/", async (c) => {
     }
     throw new ModuleError(
       "Failed to retrieve test types",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7133,7 +7093,7 @@ testRoutes.get("/:testType", async (c) => {
     }
     throw new ModuleError(
       `Failed to retrieve test configuration for: ${testType}`,
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7170,7 +7130,7 @@ testRoutes.get("/:testType/questions", async (c) => {
     }
     throw new ModuleError(
       `Failed to retrieve questions for test type: ${testType}`,
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7220,7 +7180,7 @@ testRoutes.post(
       }
       throw new ModuleError(
         "Failed to process test submission",
-        ERROR_CODES2.CALCULATION_ERROR,
+        ERROR_CODES.CALCULATION_ERROR,
         500
       );
     }
@@ -7248,7 +7208,7 @@ testRoutes.get("/results/:sessionId", async (c) => {
     }
     throw new ModuleError(
       `Failed to retrieve result for session: ${sessionId}`,
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7279,7 +7239,7 @@ testRoutes.get("/stats/:testType", async (c) => {
     }
     throw new ModuleError(
       `Failed to retrieve statistics for test type: ${testType}`,
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7298,7 +7258,6 @@ var blogRoutes = new Hono2();
 blogRoutes.get("/articles", async (c) => {
   const page = parseInt(c.req.query("page") || "1");
   const limit = parseInt(c.req.query("limit") || "10");
-  const category = c.req.query("category");
   try {
     const response = {
       success: true,
@@ -7313,13 +7272,13 @@ blogRoutes.get("/articles", async (c) => {
       },
       message: "Blog articles retrieved successfully",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.req.header("X-Request-ID")
+      requestId: c.get("requestId") || ""
     };
     return c.json(response);
   } catch (error) {
     throw new ModuleError(
       "Failed to retrieve blog articles",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7332,13 +7291,13 @@ blogRoutes.get("/articles/:id", async (c) => {
       data: null,
       message: `Blog article ${id} retrieved successfully`,
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.req.header("X-Request-ID")
+      requestId: c.get("requestId") || ""
     };
     return c.json(response);
   } catch (error) {
     throw new ModuleError(
       `Failed to retrieve blog article: ${id}`,
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       404
     );
   }
@@ -7354,13 +7313,13 @@ blogRoutes.post(
         success: true,
         message: `View count updated for article ${id}`,
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        requestId: c.req.header("X-Request-ID")
+        requestId: c.get("requestId") || ""
       };
       return c.json(response);
     } catch (error) {
       throw new ModuleError(
         `Failed to update view count for article: ${id}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -7502,7 +7461,7 @@ var ContentFilterService = class {
     if (!strictResult.isClean) {
       throw new ModuleError(
         "Content contains inappropriate material",
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400,
         {
           categories: strictResult.detectedCategories,
@@ -7547,7 +7506,7 @@ feedbackRoutes.post(
         if (!session) {
           throw new ModuleError(
             `Session ID '${feedbackData.sessionId}' not found`,
-            ERROR_CODES2.VALIDATION_ERROR,
+            ERROR_CODES.VALIDATION_ERROR,
             404
           );
         }
@@ -7600,7 +7559,7 @@ feedbackRoutes.post(
       }
       throw new ModuleError(
         "Failed to submit feedback",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -7646,7 +7605,7 @@ feedbackRoutes.get("/stats", async (c) => {
     }
     throw new ModuleError(
       "Failed to retrieve feedback statistics",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7656,7 +7615,7 @@ feedbackRoutes.get("/comments", async (c) => {
     const dbService = c.get("dbService");
     const limit = parseInt(c.req.query("limit") || "20");
     const page = parseInt(c.req.query("page") || "1");
-    ValidationService.validatePagination(page, limit, 50);
+    ValidationService.validatePagination({ page, limit: Math.min(limit, 50) });
     const comments = await dbService.userFeedback.getComments(limit);
     const stats = await dbService.userFeedback.getStats();
     const response = {
@@ -7681,7 +7640,7 @@ feedbackRoutes.get("/comments", async (c) => {
     }
     throw new ModuleError(
       "Failed to retrieve feedback comments",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7706,7 +7665,7 @@ feedbackRoutes.get("/session/:sessionId", async (c) => {
     }
     throw new ModuleError(
       "Failed to retrieve session feedback",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7748,7 +7707,7 @@ analyticsRoutes.post(
       }
       throw new ModuleError(
         "Failed to record analytics event",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -7765,7 +7724,7 @@ analyticsRoutes.post(
       if (!Array.isArray(events) || events.length === 0) {
         throw new ModuleError(
           "Invalid batch events data",
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400
         );
       }
@@ -7773,7 +7732,7 @@ analyticsRoutes.post(
         if (!event.eventType) {
           throw new ModuleError(
             "Each event must have an eventType",
-            ERROR_CODES2.VALIDATION_ERROR,
+            ERROR_CODES.VALIDATION_ERROR,
             400
           );
         }
@@ -7805,7 +7764,7 @@ analyticsRoutes.post(
       }
       throw new ModuleError(
         "Failed to record batch analytics events",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -7829,7 +7788,7 @@ analyticsRoutes.get("/stats", async (c) => {
       } else {
         throw new ModuleError(
           `Invalid time range: ${timeRange}`,
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400
         );
       }
@@ -7857,7 +7816,7 @@ analyticsRoutes.get("/stats", async (c) => {
     }
     throw new ModuleError(
       "Failed to retrieve analytics statistics",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7882,7 +7841,7 @@ analyticsRoutes.get("/stats/:eventType", async (c) => {
       } else {
         throw new ModuleError(
           `Invalid time range: ${timeRange}`,
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400
         );
       }
@@ -7917,7 +7876,7 @@ analyticsRoutes.get("/stats/:eventType", async (c) => {
     }
     throw new ModuleError(
       `Failed to retrieve statistics for event type: ${eventType}`,
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7932,7 +7891,7 @@ analyticsRoutes.get("/sessions/:sessionId", async (c) => {
     if (!events.length) {
       throw new ModuleError(
         `No events found for session ID: ${sessionId}`,
-        ERROR_CODES2.NOT_FOUND,
+        ERROR_CODES.NOT_FOUND,
         404
       );
     }
@@ -7957,7 +7916,7 @@ analyticsRoutes.get("/sessions/:sessionId", async (c) => {
     }
     throw new ModuleError(
       `Failed to retrieve user journey for session: ${sessionId}`,
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -7980,7 +7939,7 @@ analyticsRoutes.get("/popular-tests", async (c) => {
       } else {
         throw new ModuleError(
           `Invalid time range: ${timeRange}`,
-          ERROR_CODES2.VALIDATION_ERROR,
+          ERROR_CODES.VALIDATION_ERROR,
           400
         );
       }
@@ -8026,7 +7985,7 @@ analyticsRoutes.get("/popular-tests", async (c) => {
     }
     throw new ModuleError(
       "Failed to retrieve popular tests",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -8043,7 +8002,7 @@ systemRoutes.get("/health", async (c) => {
       data: {
         status: healthCheck.status,
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        environment: c.env.ENVIRONMENT || "local",
+        environment: c.env?.["ENVIRONMENT"],
         version: "1.0.0",
         services: {
           database: healthCheck.status,
@@ -8061,7 +8020,7 @@ systemRoutes.get("/health", async (c) => {
   } catch (error) {
     throw new ModuleError(
       "System health check failed",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       503
     );
   }
@@ -8081,7 +8040,7 @@ systemRoutes.get("/health/database", async (c) => {
   } catch (error) {
     throw new ModuleError(
       "Database health check failed",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       503
     );
   }
@@ -8105,7 +8064,7 @@ systemRoutes.get(
     } catch (error) {
       throw new ModuleError(
         "Failed to retrieve system statistics",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -8113,7 +8072,6 @@ systemRoutes.get(
 );
 systemRoutes.get("/migrations", async (c) => {
   try {
-    const dbService = c.get("dbService");
     const response = {
       success: true,
       data: {
@@ -8129,18 +8087,24 @@ systemRoutes.get("/migrations", async (c) => {
   } catch (error) {
     throw new ModuleError(
       "Failed to retrieve migration status",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
 });
 systemRoutes.get("/health/cache", async (c) => {
   try {
+    if (!c.env) {
+      return c.json({
+        success: false,
+        error: "\u73AF\u5883\u914D\u7F6E\u4E0D\u53EF\u7528"
+      }, 500);
+    }
     const testKey = "health_check_cache";
     const testValue = { timestamp: Date.now() };
-    await c.env.KV.put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
-    const retrieved = await c.env.KV.get(testKey);
-    await c.env.KV.delete(testKey);
+    await c.env["KV"].put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
+    const retrieved = await c.env["KV"].get(testKey);
+    await c.env["KV"].delete(testKey);
     const isHealthy = retrieved !== null;
     const response = {
       success: true,
@@ -8173,7 +8137,7 @@ systemRoutes.get("/config", async (c) => {
     const response = {
       success: true,
       data: {
-        environment: c.env.ENVIRONMENT,
+        environment: c.env?.["ENVIRONMENT"],
         version: "1.0.0",
         features: {
           analytics: true,
@@ -8196,7 +8160,7 @@ systemRoutes.get("/config", async (c) => {
   } catch (error) {
     throw new ModuleError(
       "Failed to retrieve system configuration",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
@@ -8220,7 +8184,7 @@ systemRoutes.post(
     } catch (error) {
       throw new ModuleError(
         "Failed to cleanup expired data",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -8245,7 +8209,7 @@ systemRoutes.post(
     } catch (error) {
       throw new ModuleError(
         "Failed to create database backup",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -8259,9 +8223,10 @@ systemRoutes.get("/info", async (c) => {
         name: "\u7EFC\u5408\u6D4B\u8BD5\u5E73\u53F0 API",
         version: "1.0.0",
         description: "\u4E13\u4E1A\u7684\u5FC3\u7406\u6D4B\u8BD5\u3001\u5360\u661F\u5206\u6790\u3001\u5854\u7F57\u5360\u535C\u7B49\u5728\u7EBF\u6D4B\u8BD5\u670D\u52A1",
-        uptime: process.uptime ? `${Math.floor(process.uptime())}s` : "N/A",
+        uptime: "N/A",
+        // Cloudflare Workers不支持process.uptime
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        environment: c.env.ENVIRONMENT,
+        environment: c.env?.["ENVIRONMENT"],
         runtime: "Cloudflare Workers",
         framework: "Hono.js",
         database: "Cloudflare D1",
@@ -8276,30 +8241,11 @@ systemRoutes.get("/info", async (c) => {
   } catch (error) {
     throw new ModuleError(
       "Failed to retrieve system information",
-      ERROR_CODES2.DATABASE_ERROR,
+      ERROR_CODES.DATABASE_ERROR,
       500
     );
   }
 });
-
-// ../shared/utils/index.ts
-function generateUUID() {
-  return crypto.randomUUID();
-}
-__name(generateUUID, "generateUUID");
-function formatDate(date) {
-  const d = typeof date === "string" ? new Date(date) : date;
-  return d.toISOString();
-}
-__name(formatDate, "formatDate");
-async function hashString(input) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(input);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-__name(hashString, "hashString");
 
 // src/models/BaseModel.ts
 var BaseModel = class {
@@ -8310,6 +8256,12 @@ var BaseModel = class {
   kv;
   tableName;
   constructor(env, tableName) {
+    if (!env.DB) {
+      throw new ModuleError("Database connection not available", ERROR_CODES.DATABASE_ERROR, 500);
+    }
+    if (!env.KV) {
+      throw new ModuleError("KV storage not available", ERROR_CODES.DATABASE_ERROR, 500);
+    }
     this.db = env.DB;
     this.kv = env.KV;
     this.tableName = tableName;
@@ -8330,7 +8282,7 @@ var BaseModel = class {
       if (!result.success) {
         throw new ModuleError(
           `Database query failed: ${result.error}`,
-          ERROR_CODES2.DATABASE_ERROR,
+          ERROR_CODES.DATABASE_ERROR,
           500
         );
       }
@@ -8341,7 +8293,7 @@ var BaseModel = class {
       }
       throw new ModuleError(
         `Database operation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -8357,7 +8309,7 @@ var BaseModel = class {
     } catch (error) {
       throw new ModuleError(
         `Database query failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -8372,7 +8324,7 @@ var BaseModel = class {
       if (!result.success) {
         throw new ModuleError(
           `Database operation failed: ${result.error}`,
-          ERROR_CODES2.DATABASE_ERROR,
+          ERROR_CODES.DATABASE_ERROR,
           500
         );
       }
@@ -8383,7 +8335,7 @@ var BaseModel = class {
       }
       throw new ModuleError(
         `Database operation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -8426,13 +8378,13 @@ var BaseModel = class {
    * 生成新的ID
    */
   generateId() {
-    return generateUUID();
+    return globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
   }
   /**
    * 格式化时间戳
    */
   formatTimestamp(date) {
-    return formatDate(date || /* @__PURE__ */ new Date());
+    return (date || /* @__PURE__ */ new Date()).toISOString();
   }
   /**
    * 验证必填字段
@@ -8442,10 +8394,24 @@ var BaseModel = class {
     if (missing.length > 0) {
       throw new ModuleError(
         `Missing required fields: ${missing.join(", ")}`,
-        ERROR_CODES2.VALIDATION_ERROR,
+        ERROR_CODES.VALIDATION_ERROR,
         400
       );
     }
+  }
+  /**
+   * 通用错误构造器
+   */
+  createError(message, code = "DATABASE_ERROR", status = 500) {
+    return new ModuleError(message, ERROR_CODES[code], status);
+  }
+  /**
+   * 通用统计条目数量
+   */
+  async count(whereClause = "", params = []) {
+    const where = whereClause ? ` WHERE ${whereClause} ` : "";
+    const result = await this.executeQueryFirst(`SELECT COUNT(*) as count FROM ${this.tableName}${where}`, params);
+    return result?.count || 0;
   }
 };
 
@@ -8456,10 +8422,6 @@ var HomepageModuleModel = class extends BaseModel {
   }
   constructor(env) {
     super(env, "homepage_modules");
-  }
-  // 重写db属性，确保使用正确的数据库连接
-  get db() {
-    return this.env.DB;
   }
   /**
    * 获取所有活跃的测试模块
@@ -8537,9 +8499,9 @@ var HomepageModuleModel = class extends BaseModel {
         };
       }
       return {
-        totalModules: countResult.total_modules,
-        totalTests: sumResult.total_tests || 0,
-        averageRating: sumResult.average_rating || 0,
+        totalModules: countResult["total_modules"],
+        totalTests: sumResult["total_tests"] || 0,
+        averageRating: sumResult["average_rating"] || 0,
         activeThemes: themesResult.results?.map((row) => row.theme) || []
       };
     } catch (error) {
@@ -8556,7 +8518,7 @@ var HomepageModuleModel = class extends BaseModel {
       name: row.name,
       description: row.description,
       icon: row.icon,
-      theme: row.theme,
+      theme: row["theme"],
       testCount: row.test_count,
       rating: row.rating,
       isActive: Boolean(row.is_active),
@@ -8591,10 +8553,10 @@ var HomepageConfigModel = class extends BaseModel {
       const configs = {};
       result.results?.forEach((row) => {
         try {
-          configs[row.key] = JSON.parse(row.value);
+          configs[row["key"]] = JSON.parse(row["value"]);
         } catch (error) {
-          console.warn(`\u89E3\u6790\u914D\u7F6E${row.key}\u5931\u8D25:`, error);
-          configs[row.key] = row.value;
+          console.warn(`\u89E3\u6790\u914D\u7F6E${row["key"]}\u5931\u8D25:`, error);
+          configs[row["key"]] = row["value"];
         }
       });
       return configs;
@@ -8613,10 +8575,10 @@ var HomepageConfigModel = class extends BaseModel {
         return null;
       }
       try {
-        return JSON.parse(result.value);
+        return JSON.parse(result["value"]);
       } catch (error) {
         console.warn(`\u89E3\u6790\u914D\u7F6E${key}\u5931\u8D25:`, error);
-        return result.value;
+        return result["value"];
       }
     } catch (error) {
       console.error(`\u83B7\u53D6\u914D\u7F6E${key}\u5931\u8D25:`, error);
@@ -8715,6 +8677,14 @@ var DB_TABLES = {
 };
 
 // src/models/AnalyticsEventModel.ts
+async function hashString(input) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+__name(hashString, "hashString");
 var AnalyticsEventModel = class extends BaseModel {
   static {
     __name(this, "AnalyticsEventModel");
@@ -8927,7 +8897,7 @@ homepageRoutes.get("/config", async (c) => {
       success: true,
       data: configs,
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     });
   } catch (error) {
     console.error("\u83B7\u53D6\u9996\u9875\u914D\u7F6E\u5931\u8D25:", error);
@@ -8935,7 +8905,7 @@ homepageRoutes.get("/config", async (c) => {
       success: false,
       error: "\u83B7\u53D6\u9996\u9875\u914D\u7F6E\u5931\u8D25",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     }, 500);
   }
 });
@@ -8948,7 +8918,7 @@ homepageRoutes.get("/modules", async (c) => {
       success: true,
       data: modules,
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     });
   } catch (error) {
     console.error("\u83B7\u53D6\u6D4B\u8BD5\u6A21\u5757\u5217\u8868\u5931\u8D25:", error);
@@ -8956,7 +8926,7 @@ homepageRoutes.get("/modules", async (c) => {
       success: false,
       error: "\u83B7\u53D6\u6D4B\u8BD5\u6A21\u5757\u5217\u8868\u5931\u8D25",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     }, 500);
   }
 });
@@ -8970,7 +8940,7 @@ homepageRoutes.get("/modules/:theme", async (c) => {
       success: true,
       data: modules,
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     });
   } catch (error) {
     console.error(`\u83B7\u53D6${c.req.param("theme")}\u4E3B\u9898\u6D4B\u8BD5\u6A21\u5757\u5931\u8D25:`, error);
@@ -8978,7 +8948,7 @@ homepageRoutes.get("/modules/:theme", async (c) => {
       success: false,
       error: "\u83B7\u53D6\u6D4B\u8BD5\u6A21\u5757\u5931\u8D25",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     }, 500);
   }
 });
@@ -8993,7 +8963,7 @@ homepageRoutes.get("/stats", async (c) => {
       success: true,
       data: stats,
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     });
   } catch (error) {
     console.error("\u83B7\u53D6\u9996\u9875\u7EDF\u8BA1\u6570\u636E\u5931\u8D25:", error);
@@ -9001,7 +8971,7 @@ homepageRoutes.get("/stats", async (c) => {
       success: false,
       error: "\u83B7\u53D6\u7EDF\u8BA1\u6570\u636E\u5931\u8D25",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     }, 500);
   }
 });
@@ -9014,25 +8984,27 @@ homepageRoutes.post("/analytics", async (c) => {
         success: false,
         error: "\u7F3A\u5C11\u5FC5\u8981\u53C2\u6570",
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        requestId: c.get("requestId")
+        requestId: c.get("requestId") || ""
       }, 400);
     }
     const dbService = c.get("dbService");
     const analyticsModel = new AnalyticsEventModel(dbService.db);
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: `homepage_${eventType}`,
-      eventData: JSON.stringify(eventData || {}),
+      eventData: {
+        ...eventData,
+        pageUrl,
+        referrer
+      },
       sessionId,
-      pageUrl,
-      referrer,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP")
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || ""
     });
     return c.json({
       success: true,
       message: "\u4E8B\u4EF6\u8BB0\u5F55\u6210\u529F",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     });
   } catch (error) {
     console.error("\u8BB0\u5F55\u7528\u6237\u884C\u4E3A\u4E8B\u4EF6\u5931\u8D25:", error);
@@ -9040,7 +9012,7 @@ homepageRoutes.post("/analytics", async (c) => {
       success: false,
       error: "\u8BB0\u5F55\u4E8B\u4EF6\u5931\u8D25",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     }, 500);
   }
 });
@@ -9055,14 +9027,14 @@ homepageRoutes.get("/config/:key", async (c) => {
         success: false,
         error: "\u914D\u7F6E\u4E0D\u5B58\u5728",
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        requestId: c.get("requestId")
+        requestId: c.get("requestId") || ""
       }, 404);
     }
     return c.json({
       success: true,
       data: config,
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     });
   } catch (error) {
     console.error(`\u83B7\u53D6\u914D\u7F6E${c.req.param("key")}\u5931\u8D25:`, error);
@@ -9070,7 +9042,7 @@ homepageRoutes.get("/config/:key", async (c) => {
       success: false,
       error: "\u83B7\u53D6\u914D\u7F6E\u5931\u8D25",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     }, 500);
   }
 });
@@ -9139,9 +9111,9 @@ var SearchIndexModel = class extends BaseModel {
       ).all();
       return result.results?.map((row, index) => ({
         id: `suggestion_${index}`,
-        text: row.title,
-        type: row.content_type,
-        relevance: row.relevance_score
+        text: row["title"],
+        type: row["content_type"],
+        relevance: row["relevance_score"]
       })) || [];
     } catch (error) {
       console.error("\u83B7\u53D6\u641C\u7D22\u5EFA\u8BAE\u5931\u8D25:", error);
@@ -9160,7 +9132,7 @@ var SearchIndexModel = class extends BaseModel {
           ORDER BY search_count DESC 
           LIMIT ?
         `).bind(language, limit).all();
-      return result.results?.map((row) => row.keyword) || [];
+      return result.results?.map((row) => row["keyword"]) || [];
     } catch (error) {
       console.error("\u83B7\u53D6\u70ED\u95E8\u5173\u952E\u8BCD\u5931\u8D25:", error);
       throw new Error("\u83B7\u53D6\u70ED\u95E8\u5173\u952E\u8BCD\u5931\u8D25");
@@ -9279,17 +9251,17 @@ var SearchIndexModel = class extends BaseModel {
   /**
    * 将数据库行映射为SearchResult对象
    */
-  mapDatabaseRowToSearchResult(row) {
-    return {
-      id: row.id,
-      contentType: row.content_type,
-      contentId: row.content_id,
-      title: row.title,
-      description: row.description,
-      relevanceScore: row.relevance_score,
-      searchCount: row.search_count
-    };
-  }
+  // private mapDatabaseRowToSearchResult(row: any): SearchResult { // 未使用，暂时注释
+  //   return {
+  //     id: row.id as string,
+  //     contentType: row.content_type as string,
+  //     contentId: row.content_id as string,
+  //     title: row.title as string,
+  //     description: row.description as string,
+  //     relevanceScore: row.relevance_score as number,
+  //     searchCount: row.search_count as number,
+  //   };
+  // }
 };
 
 // src/routes/search/index.ts
@@ -9319,8 +9291,8 @@ searchRoutes.get("/", async (c) => {
         resultCount: results.length,
         limit
       },
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP")
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || ""
     });
     await searchModel.recordSearchKeyword(query.trim(), language);
     return c.json({
@@ -9456,16 +9428,15 @@ searchRoutes.post("/click", async (c) => {
     const searchModel = new SearchIndexModel(dbService.env);
     const analyticsModel = new AnalyticsEventModel(dbService.env);
     await searchModel.incrementSearchCount(searchIndexId);
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: "search_result_click",
-      eventData: JSON.stringify({
+      eventData: {
         searchIndexId,
         resultType,
         resultId
-      }),
-      pageUrl: c.req.url,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP")
+      },
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || ""
     });
     return c.json({
       success: true,
@@ -9582,10 +9553,10 @@ var UserPreferencesModel = class extends BaseModel {
           consentRate: 0
         };
       }
-      const totalUsers = result.total_users;
-      const cookiesConsent = result.cookies_consent || 0;
-      const analyticsConsent = result.analytics_consent || 0;
-      const marketingConsent = result.marketing_consent || 0;
+      const totalUsers = result["total_users"];
+      const cookiesConsent = result["cookies_consent"] || 0;
+      const analyticsConsent = result["analytics_consent"] || 0;
+      const marketingConsent = result["marketing_consent"] || 0;
       return {
         totalUsers,
         cookiesConsent,
@@ -9728,17 +9699,16 @@ cookiesRoutes.post("/consent", async (c) => {
       marketingConsent: marketingConsent || false,
       timestamp: /* @__PURE__ */ new Date()
     });
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: "cookies_consent_updated",
-      eventData: JSON.stringify({
+      eventData: {
         sessionId,
         cookiesConsent,
         analyticsConsent: analyticsConsent || false,
         marketingConsent: marketingConsent || false
-      }),
-      pageUrl: c.req.url,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP")
+      },
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || ""
     });
     return c.json({
       success: true,
@@ -9887,15 +9857,14 @@ cookiesRoutes.post("/withdraw/:sessionId", async (c) => {
       marketingConsent: false,
       timestamp: /* @__PURE__ */ new Date()
     });
-    await analyticsModel.createEvent({
+    await analyticsModel.create({
       eventType: "cookies_consent_withdrawn",
-      eventData: JSON.stringify({
+      eventData: {
         sessionId,
         timestamp: (/* @__PURE__ */ new Date()).toISOString()
-      }),
-      pageUrl: c.req.url,
-      userAgent: c.req.header("User-Agent"),
-      ipAddress: c.req.header("CF-Connecting-IP")
+      },
+      userAgent: c.req.header("User-Agent") || "",
+      ipAddress: c.req.header("CF-Connecting-IP") || ""
     });
     return c.json({
       success: true,
@@ -9921,6 +9890,9 @@ var MigrationRunner = class {
   }
   db;
   constructor(env) {
+    if (!env.DB) {
+      throw new ModuleError("Database connection not available", ERROR_CODES.DATABASE_ERROR, 500);
+    }
     this.db = env.DB;
   }
   /**
@@ -9942,7 +9914,7 @@ var MigrationRunner = class {
     } catch (error) {
       throw new ModuleError(
         `Failed to initialize migration table: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -9960,7 +9932,7 @@ var MigrationRunner = class {
     } catch (error) {
       throw new ModuleError(
         `Failed to get applied migrations: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -9982,7 +9954,7 @@ var MigrationRunner = class {
     } catch (error) {
       throw new ModuleError(
         `Failed to apply migration ${migration.id}: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -9990,11 +9962,11 @@ var MigrationRunner = class {
   /**
    * 运行所有待应用的迁移
    */
-  async runMigrations(migrations2) {
+  async runMigrations(migrations) {
     try {
       await this.initMigrationTable();
       const appliedMigrations = await this.getAppliedMigrations();
-      const pendingMigrations = migrations2.filter(
+      const pendingMigrations = migrations.filter(
         (migration) => !appliedMigrations.includes(migration.id)
       );
       if (pendingMigrations.length === 0) {
@@ -10012,7 +9984,7 @@ var MigrationRunner = class {
       }
       throw new ModuleError(
         `Migration runner failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -10020,484 +9992,21 @@ var MigrationRunner = class {
   /**
    * 获取迁移状态
    */
-  async getMigrationStatus(migrations2) {
+  async getMigrationStatus(migrations) {
     try {
       await this.initMigrationTable();
       const appliedMigrationIds = await this.getAppliedMigrations();
-      const applied = migrations2.filter(
+      const applied = migrations.filter(
         (migration) => appliedMigrationIds.includes(migration.id)
       );
-      const pending = migrations2.filter(
+      const pending = migrations.filter(
         (migration) => !appliedMigrationIds.includes(migration.id)
       );
       return { applied, pending };
     } catch (error) {
       throw new ModuleError(
         `Failed to get migration status: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
-        500
-      );
-    }
-  }
-};
-
-// src/utils/migrations.ts
-var migrations = [
-  {
-    id: "001_initial_schema",
-    name: "Create initial database schema",
-    sql: `
-      -- \u6D4B\u8BD5\u7C7B\u578B\u8868
-      CREATE TABLE IF NOT EXISTS test_types (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        category TEXT NOT NULL,
-        description TEXT,
-        config_data TEXT NOT NULL,
-        is_active BOOLEAN DEFAULT 1,
-        sort_order INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-
-      -- \u6D4B\u8BD5\u4F1A\u8BDD\u8868
-      CREATE TABLE IF NOT EXISTS test_sessions (
-        id TEXT PRIMARY KEY,
-        test_type_id TEXT NOT NULL,
-        answers_data TEXT NOT NULL,
-        result_data TEXT NOT NULL,
-        user_agent TEXT,
-        ip_address_hash TEXT,
-        session_duration INTEGER,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_type_id) REFERENCES test_types(id)
-      );
-
-      -- \u7528\u6237\u53CD\u9988\u8868
-      CREATE TABLE IF NOT EXISTS user_feedback (
-        id TEXT PRIMARY KEY,
-        session_id TEXT,
-        feedback_type TEXT NOT NULL,
-        content TEXT,
-        rating INTEGER,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u535A\u5BA2\u6587\u7AE0\u8868
-      CREATE TABLE IF NOT EXISTS blog_articles (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        excerpt TEXT,
-        category TEXT,
-        tags_data TEXT,
-        view_count INTEGER DEFAULT 0,
-        like_count INTEGER DEFAULT 0,
-        is_published BOOLEAN DEFAULT 0,
-        is_featured BOOLEAN DEFAULT 0,
-        published_at DATETIME,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-
-      -- \u5206\u6790\u4E8B\u4EF6\u8868
-      CREATE TABLE IF NOT EXISTS analytics_events (
-        id TEXT PRIMARY KEY,
-        event_type TEXT NOT NULL,
-        event_data TEXT,
-        session_id TEXT,
-        ip_address_hash TEXT,
-        user_agent TEXT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u7CFB\u7EDF\u914D\u7F6E\u8868
-      CREATE TABLE IF NOT EXISTS sys_configs (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL,
-        description TEXT,
-        is_public BOOLEAN DEFAULT 0,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-    `
-  },
-  {
-    id: "002_create_indexes",
-    name: "Create database indexes for performance",
-    sql: `
-      -- \u6D4B\u8BD5\u4F1A\u8BDD\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_test_sessions_test_type ON test_sessions(test_type_id);
-      CREATE INDEX IF NOT EXISTS idx_test_sessions_created_at ON test_sessions(created_at);
-      
-      -- \u7528\u6237\u53CD\u9988\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_user_feedback_session_id ON user_feedback(session_id);
-      CREATE INDEX IF NOT EXISTS idx_user_feedback_type ON user_feedback(feedback_type);
-      
-      -- \u535A\u5BA2\u6587\u7AE0\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_blog_articles_published ON blog_articles(is_published, published_at);
-      CREATE INDEX IF NOT EXISTS idx_blog_articles_category ON blog_articles(category);
-      CREATE INDEX IF NOT EXISTS idx_blog_articles_featured ON blog_articles(is_featured);
-      
-      -- \u5206\u6790\u4E8B\u4EF6\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_analytics_events_type ON analytics_events(event_type);
-      CREATE INDEX IF NOT EXISTS idx_analytics_events_timestamp ON analytics_events(timestamp);
-      CREATE INDEX IF NOT EXISTS idx_analytics_events_session ON analytics_events(session_id);
-      
-      -- \u7CFB\u7EDF\u914D\u7F6E\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_sys_configs_public ON sys_configs(is_public);
-    `
-  },
-  {
-    id: "003_insert_default_data",
-    name: "Insert default system data",
-    sql: `
-      -- \u63D2\u5165\u9ED8\u8BA4\u7CFB\u7EDF\u914D\u7F6E
-      INSERT OR IGNORE INTO sys_configs (key, value, description, is_public) VALUES
-      ('site_name', '\u7EFC\u5408\u6D4B\u8BD5\u5E73\u53F0', '\u7F51\u7AD9\u540D\u79F0', 1),
-      ('site_description', '\u4E13\u4E1A\u7684\u5FC3\u7406\u6D4B\u8BD5\u3001\u5360\u661F\u5206\u6790\u3001\u5854\u7F57\u5360\u535C\u7B49\u5728\u7EBF\u6D4B\u8BD5\u670D\u52A1', '\u7F51\u7AD9\u63CF\u8FF0', 1),
-      ('max_test_duration', '3600', '\u6D4B\u8BD5\u6700\u5927\u65F6\u957F\uFF08\u79D2\uFF09', 0),
-      ('cache_ttl', '3600', '\u7F13\u5B58\u8FC7\u671F\u65F6\u95F4\uFF08\u79D2\uFF09', 0),
-      ('analytics_enabled', 'true', '\u662F\u5426\u542F\u7528\u5206\u6790\u7EDF\u8BA1', 0);
-
-      -- \u63D2\u5165\u9ED8\u8BA4\u6D4B\u8BD5\u7C7B\u578B\uFF08\u793A\u4F8B\u6570\u636E\uFF09
-      INSERT OR IGNORE INTO test_types (id, name, category, description, config_data, is_active, sort_order) VALUES
-      ('psychology-mbti', 'MBTI\u6027\u683C\u6D4B\u8BD5', 'psychology', '\u57FA\u4E8E\u8363\u683C\u5FC3\u7406\u7C7B\u578B\u7406\u8BBA\u7684\u6027\u683C\u6D4B\u8BD5', '{"questionCount": 20, "scoringType": "mbti", "timeLimit": 1800}', 1, 1),
-      ('astrology-basic', '\u57FA\u7840\u661F\u5EA7\u5206\u6790', 'astrology', '\u6839\u636E\u51FA\u751F\u4FE1\u606F\u8FDB\u884C\u57FA\u7840\u661F\u5EA7\u5206\u6790', '{"questionCount": 10, "scoringType": "astrology", "timeLimit": 900}', 1, 2),
-      ('tarot-love', '\u7231\u60C5\u5854\u7F57\u5360\u535C', 'tarot', '\u5173\u4E8E\u7231\u60C5\u548C\u611F\u60C5\u7684\u5854\u7F57\u724C\u5360\u535C', '{"questionCount": 5, "scoringType": "tarot", "timeLimit": 600}', 1, 3);
-    `
-  },
-  {
-    id: "004_module_specific_tables",
-    name: "Create module-specific session tables",
-    sql: `
-      -- \u5FC3\u7406\u6D4B\u8BD5\u6A21\u5757\u4E13\u7528\u8868
-      CREATE TABLE IF NOT EXISTS psychology_sessions (
-        id TEXT PRIMARY KEY,
-        test_session_id TEXT NOT NULL,
-        test_subtype TEXT NOT NULL,
-        personality_type TEXT,
-        dimension_scores TEXT,
-        risk_level TEXT,
-        happiness_domains TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u5360\u661F\u5206\u6790\u6A21\u5757\u4E13\u7528\u8868
-      CREATE TABLE IF NOT EXISTS astrology_sessions (
-        id TEXT PRIMARY KEY,
-        test_session_id TEXT NOT NULL,
-        birth_date DATE NOT NULL,
-        birth_time TIME,
-        birth_location TEXT,
-        sun_sign TEXT NOT NULL,
-        moon_sign TEXT,
-        rising_sign TEXT,
-        planetary_positions TEXT,
-        house_positions TEXT,
-        aspects TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u5854\u7F57\u724C\u6A21\u5757\u4E13\u7528\u8868
-      CREATE TABLE IF NOT EXISTS tarot_sessions (
-        id TEXT PRIMARY KEY,
-        test_session_id TEXT NOT NULL,
-        spread_type TEXT NOT NULL,
-        cards_drawn TEXT NOT NULL,
-        card_positions TEXT,
-        interpretation_theme TEXT,
-        question_category TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u804C\u4E1A\u53D1\u5C55\u6A21\u5757\u4E13\u7528\u8868
-      CREATE TABLE IF NOT EXISTS career_sessions (
-        id TEXT PRIMARY KEY,
-        test_session_id TEXT NOT NULL,
-        test_subtype TEXT NOT NULL,
-        holland_code TEXT,
-        interest_scores TEXT,
-        values_ranking TEXT,
-        skills_profile TEXT,
-        career_matches TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u5B66\u4E60\u80FD\u529B\u6A21\u5757\u4E13\u7528\u8868
-      CREATE TABLE IF NOT EXISTS learning_sessions (
-        id TEXT PRIMARY KEY,
-        test_session_id TEXT NOT NULL,
-        test_subtype TEXT NOT NULL,
-        learning_style TEXT,
-        cognitive_score INTEGER,
-        percentile_rank INTEGER,
-        learning_preferences TEXT,
-        strategy_recommendations TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u60C5\u611F\u5173\u7CFB\u6A21\u5757\u4E13\u7528\u8868
-      CREATE TABLE IF NOT EXISTS relationship_sessions (
-        id TEXT PRIMARY KEY,
-        test_session_id TEXT NOT NULL,
-        test_subtype TEXT NOT NULL,
-        primary_love_language TEXT,
-        secondary_love_language TEXT,
-        attachment_style TEXT,
-        relationship_skills TEXT,
-        communication_style TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_session_id) REFERENCES test_sessions(id)
-      );
-
-      -- \u547D\u7406\u5206\u6790\u6A21\u5757\u4E13\u7528\u8868
-      CREATE TABLE IF NOT EXISTS numerology_sessions (
-        id TEXT PRIMARY KEY,
-        test_session_id TEXT NOT NULL,
-        birth_date DATE NOT NULL,
-        full_name TEXT NOT NULL,
-        life_path_number INTEGER,
-        destiny_number INTEGER,
-        soul_urge_number INTEGER,
-        personality_number INTEGER,
-        birth_day_number INTEGER,
-        numerology_chart TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (test_session_id) REFERENCES test_sessions(id)
-      );
-    `
-  },
-  {
-    id: "005_module_indexes",
-    name: "Create indexes for module-specific tables",
-    sql: `
-      -- \u5FC3\u7406\u6D4B\u8BD5\u6A21\u5757\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_psychology_sessions_test_session ON psychology_sessions(test_session_id);
-      CREATE INDEX IF NOT EXISTS idx_psychology_sessions_subtype ON psychology_sessions(test_subtype);
-      CREATE INDEX IF NOT EXISTS idx_psychology_sessions_personality_type ON psychology_sessions(personality_type);
-
-      -- \u5360\u661F\u5206\u6790\u6A21\u5757\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_astrology_sessions_test_session ON astrology_sessions(test_session_id);
-      CREATE INDEX IF NOT EXISTS idx_astrology_sessions_sun_sign ON astrology_sessions(sun_sign);
-      CREATE INDEX IF NOT EXISTS idx_astrology_sessions_birth_date ON astrology_sessions(birth_date);
-
-      -- \u5854\u7F57\u724C\u6A21\u5757\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_tarot_sessions_test_session ON tarot_sessions(test_session_id);
-      CREATE INDEX IF NOT EXISTS idx_tarot_sessions_spread_type ON tarot_sessions(spread_type);
-      CREATE INDEX IF NOT EXISTS idx_tarot_sessions_question_category ON tarot_sessions(question_category);
-
-      -- \u804C\u4E1A\u53D1\u5C55\u6A21\u5757\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_career_sessions_test_session ON career_sessions(test_session_id);
-      CREATE INDEX IF NOT EXISTS idx_career_sessions_subtype ON career_sessions(test_subtype);
-      CREATE INDEX IF NOT EXISTS idx_career_sessions_holland_code ON career_sessions(holland_code);
-
-      -- \u5B66\u4E60\u80FD\u529B\u6A21\u5757\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_learning_sessions_test_session ON learning_sessions(test_session_id);
-      CREATE INDEX IF NOT EXISTS idx_learning_sessions_subtype ON learning_sessions(test_subtype);
-      CREATE INDEX IF NOT EXISTS idx_learning_sessions_learning_style ON learning_sessions(learning_style);
-
-      -- \u60C5\u611F\u5173\u7CFB\u6A21\u5757\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_relationship_sessions_test_session ON relationship_sessions(test_session_id);
-      CREATE INDEX IF NOT EXISTS idx_relationship_sessions_subtype ON relationship_sessions(test_subtype);
-      CREATE INDEX IF NOT EXISTS idx_relationship_sessions_attachment_style ON relationship_sessions(attachment_style);
-
-      -- \u547D\u7406\u5206\u6790\u6A21\u5757\u7D22\u5F15
-      CREATE INDEX IF NOT EXISTS idx_numerology_sessions_test_session ON numerology_sessions(test_session_id);
-      CREATE INDEX IF NOT EXISTS idx_numerology_sessions_birth_date ON numerology_sessions(birth_date);
-      CREATE INDEX IF NOT EXISTS idx_numerology_sessions_life_path ON numerology_sessions(life_path_number);
-    `
-  }
-];
-
-// src/utils/databaseManager.ts
-var DatabaseManager = class {
-  static {
-    __name(this, "DatabaseManager");
-  }
-  env;
-  migrationRunner;
-  constructor(env) {
-    this.env = env;
-    this.migrationRunner = new MigrationRunner(env);
-  }
-  /**
-   * 初始化数据库
-   */
-  async initialize() {
-    try {
-      console.log("Initializing database...");
-      await this.migrationRunner.runMigrations(migrations);
-      console.log("Database initialized successfully");
-    } catch (error) {
-      console.error("Database initialization failed:", error);
-      throw new ModuleError(
-        `Database initialization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
-        500
-      );
-    }
-  }
-  /**
-   * 检查数据库健康状态
-   */
-  async healthCheck() {
-    try {
-      const connectionTest = await this.env.DB.prepare("SELECT 1 as test").first();
-      const connectionHealthy = connectionTest !== null;
-      const migrationStatus = await this.migrationRunner.getMigrationStatus(migrations);
-      const migrationsHealthy = migrationStatus.pending.length === 0;
-      const tablesResult = await this.env.DB.prepare(`
-        SELECT name FROM sqlite_master 
-        WHERE type='table' AND name NOT LIKE 'sqlite_%'
-        ORDER BY name
-      `).all();
-      const tables = tablesResult.success ? tablesResult.results.map((row) => row.name) : [];
-      const isHealthy = connectionHealthy && migrationsHealthy && tables.length > 0;
-      return {
-        status: isHealthy ? "healthy" : "unhealthy",
-        details: {
-          connection: connectionHealthy,
-          migrations: migrationsHealthy,
-          tables
-        }
-      };
-    } catch (error) {
-      console.error("Database health check failed:", error);
-      return {
-        status: "unhealthy",
-        details: {
-          connection: false,
-          migrations: false,
-          tables: []
-        }
-      };
-    }
-  }
-  /**
-   * 获取数据库统计信息
-   */
-  async getStats() {
-    try {
-      const tablesResult = await this.env.DB.prepare(`
-        SELECT name FROM sqlite_master 
-        WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != 'migrations'
-        ORDER BY name
-      `).all();
-      if (!tablesResult.success) {
-        throw new Error("Failed to get table list");
-      }
-      const tables = [];
-      let totalRows = 0;
-      for (const table of tablesResult.results) {
-        try {
-          const countResult = await this.env.DB.prepare(`SELECT COUNT(*) as count FROM ${table.name}`).first();
-          const rowCount = countResult?.count || 0;
-          tables.push({
-            name: table.name,
-            rowCount,
-            size: "N/A"
-            // SQLite doesn't provide easy table size info
-          });
-          totalRows += rowCount;
-        } catch (error) {
-          console.warn(`Failed to get stats for table ${table.name}:`, error);
-          tables.push({
-            name: table.name,
-            rowCount: 0,
-            size: "Error"
-          });
-        }
-      }
-      return {
-        tables,
-        totalRows
-      };
-    } catch (error) {
-      throw new ModuleError(
-        `Failed to get database stats: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
-        500
-      );
-    }
-  }
-  /**
-   * 执行数据库清理
-   */
-  async cleanup(options = {}) {
-    try {
-      const {
-        expiredSessions = 90,
-        expiredFeedback = 365,
-        expiredEvents = 90
-      } = options;
-      let sessionsDeleted = 0;
-      let feedbackDeleted = 0;
-      let eventsDeleted = 0;
-      if (expiredSessions > 0) {
-        const cutoffDate = /* @__PURE__ */ new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - expiredSessions);
-        const cutoffTimestamp = cutoffDate.toISOString();
-        const sessionResult = await this.env.DB.prepare("DELETE FROM test_sessions WHERE created_at < ?").bind(cutoffTimestamp).run();
-        sessionsDeleted = sessionResult.changes || 0;
-      }
-      if (expiredFeedback > 0) {
-        const cutoffDate = /* @__PURE__ */ new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - expiredFeedback);
-        const cutoffTimestamp = cutoffDate.toISOString();
-        const feedbackResult = await this.env.DB.prepare("DELETE FROM user_feedback WHERE created_at < ?").bind(cutoffTimestamp).run();
-        feedbackDeleted = feedbackResult.changes || 0;
-      }
-      if (expiredEvents > 0) {
-        const cutoffDate = /* @__PURE__ */ new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - expiredEvents);
-        const cutoffTimestamp = cutoffDate.toISOString();
-        const eventsResult = await this.env.DB.prepare("DELETE FROM analytics_events WHERE timestamp < ?").bind(cutoffTimestamp).run();
-        eventsDeleted = eventsResult.changes || 0;
-      }
-      console.log(`Database cleanup completed: ${sessionsDeleted} sessions, ${feedbackDeleted} feedback, ${eventsDeleted} events deleted`);
-      return {
-        sessionsDeleted,
-        feedbackDeleted,
-        eventsDeleted
-      };
-    } catch (error) {
-      throw new ModuleError(
-        `Database cleanup failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
-        500
-      );
-    }
-  }
-  /**
-   * 备份数据库（导出为SQL）
-   */
-  async backup() {
-    try {
-      const tables = ["test_types", "test_sessions", "user_feedback", "blog_articles", "analytics_events", "sys_configs"];
-      const backupSQL = [];
-      for (const table of tables) {
-        try {
-          const result = await this.env.DB.prepare(`SELECT * FROM ${table}`).all();
-          if (result.success && result.results.length > 0) {
-            backupSQL.push(`-- Backup for table: ${table}`);
-            backupSQL.push(`-- ${result.results.length} rows in ${table}`);
-          }
-        } catch (error) {
-          console.warn(`Failed to backup table ${table}:`, error);
-        }
-      }
-      return backupSQL.join("\n");
-    } catch (error) {
-      throw new ModuleError(
-        `Database backup failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500
       );
     }
@@ -10680,6 +10189,14 @@ var TestTypeModel = class extends BaseModel {
 };
 
 // src/models/TestSessionModel.ts
+async function hashString2(input) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+__name(hashString2, "hashString");
 var TestSessionModel = class extends BaseModel {
   static {
     __name(this, "TestSessionModel");
@@ -10694,7 +10211,7 @@ var TestSessionModel = class extends BaseModel {
     this.validateRequired(sessionData, ["testTypeId", "answers", "result"]);
     const id = this.generateId();
     const now = this.formatTimestamp();
-    const ipAddressHash = sessionData.ipAddress ? await hashString(sessionData.ipAddress) : null;
+    const ipAddressHash = sessionData.ipAddress ? await hashString2(sessionData.ipAddress) : null;
     const query = `
       INSERT INTO ${this.tableName} (
         id, test_type_id, answers_data, result_data,
@@ -11275,7 +10792,7 @@ var PsychologySessionModel = class extends BaseModel {
   async getStatsBySubtype(subtype) {
     const totalResult = await this.db.prepare("SELECT COUNT(*) as total FROM psychology_sessions WHERE test_subtype = ?").bind(subtype).first();
     const stats = {
-      totalSessions: totalResult?.total || 0
+      totalSessions: totalResult?.["total"] || 0
     };
     if (subtype === "mbti") {
       const typeDistribution = await this.db.prepare(`
@@ -11297,9 +10814,9 @@ var PsychologySessionModel = class extends BaseModel {
       id: row.id,
       testSessionId: row.test_session_id,
       testSubtype: row.test_subtype,
-      personalityType: row.personality_type || void 0,
+      personalityType: row.personality_type ?? "",
       dimensionScores: row.dimension_scores ? JSON.parse(row.dimension_scores) : void 0,
-      riskLevel: row.risk_level || void 0,
+      riskLevel: row.risk_level ?? "minimal",
       happinessDomains: row.happiness_domains ? JSON.parse(row.happiness_domains) : void 0,
       createdAt: new Date(row.created_at)
     };
@@ -11382,11 +10899,11 @@ var AstrologySessionModel = class extends BaseModel {
       id: row.id,
       testSessionId: row.test_session_id,
       birthDate: new Date(row.birth_date),
-      birthTime: row.birth_time || void 0,
-      birthLocation: row.birth_location || void 0,
+      birthTime: row.birth_time ?? "",
+      birthLocation: row.birth_location ?? "",
       sunSign: row.sun_sign,
-      moonSign: row.moon_sign || void 0,
-      risingSign: row.rising_sign || void 0,
+      moonSign: row.moon_sign ?? "",
+      risingSign: row.rising_sign ?? "",
       planetaryPositions: row.planetary_positions ? JSON.parse(row.planetary_positions) : void 0,
       housePositions: row.house_positions ? JSON.parse(row.house_positions) : void 0,
       aspects: row.aspects ? JSON.parse(row.aspects) : void 0,
@@ -11481,8 +10998,8 @@ var TarotSessionModel = class extends BaseModel {
       spreadType: row.spread_type,
       cardsDrawn: JSON.parse(row.cards_drawn),
       cardPositions: row.card_positions ? JSON.parse(row.card_positions) : void 0,
-      interpretationTheme: row.interpretation_theme || void 0,
-      questionCategory: row.question_category || void 0,
+      interpretationTheme: row.interpretation_theme ?? "",
+      questionCategory: row.question_category ?? "general",
       createdAt: new Date(row.created_at)
     };
   }
@@ -11588,7 +11105,7 @@ var CareerSessionModel = class extends BaseModel {
       id: row.id,
       testSessionId: row.test_session_id,
       testSubtype: row.test_subtype,
-      hollandCode: row.holland_code || void 0,
+      hollandCode: row.holland_code ?? "",
       interestScores: row.interest_scores ? JSON.parse(row.interest_scores) : void 0,
       valuesRanking: row.values_ranking ? JSON.parse(row.values_ranking) : void 0,
       skillsProfile: row.skills_profile ? JSON.parse(row.skills_profile) : void 0,
@@ -11677,11 +11194,11 @@ var LearningSessionModel = class extends BaseModel {
         )
       `).first();
     return {
-      average: Math.round((results?.avg_score || 0) * 100) / 100,
-      median: medianResult?.cognitive_score || 0,
-      min: results?.min_score || 0,
-      max: results?.max_score || 0,
-      count: results?.count || 0
+      average: Math.round((results?.["avg_score"] || 0) * 100) / 100,
+      median: medianResult?.["cognitive_score"] || 0,
+      min: results?.["min_score"] || 0,
+      max: results?.["max_score"] || 0,
+      count: results?.["count"] || 0
     };
   }
   async getPercentileDistribution() {
@@ -11711,9 +11228,9 @@ var LearningSessionModel = class extends BaseModel {
       id: row.id,
       testSessionId: row.test_session_id,
       testSubtype: row.test_subtype,
-      learningStyle: row.learning_style || void 0,
-      cognitiveScore: row.cognitive_score || void 0,
-      percentileRank: row.percentile_rank || void 0,
+      learningStyle: row.learning_style ?? "visual",
+      cognitiveScore: row.cognitive_score ?? 0,
+      percentileRank: row.percentile_rank ?? 0,
       learningPreferences: row.learning_preferences ? JSON.parse(row.learning_preferences) : void 0,
       strategyRecommendations: row.strategy_recommendations ? JSON.parse(row.strategy_recommendations) : void 0,
       createdAt: new Date(row.created_at)
@@ -11987,8 +11504,8 @@ var NumerologySessionModel = class extends BaseModel {
         const chart = JSON.parse(row.numerology_chart);
         if (chart.karmicDebtNumbers) {
           chart.karmicDebtNumbers.forEach((number) => {
-            if (karmicDebtCounts.hasOwnProperty(number)) {
-              karmicDebtCounts[number]++;
+            if (Object.prototype.hasOwnProperty.call(karmicDebtCounts, number)) {
+              karmicDebtCounts[number] = (karmicDebtCounts[number] || 0) + 1;
             }
           });
         }
@@ -12033,7 +11550,6 @@ var NumerologySessionModel = class extends BaseModel {
 var DatabaseService = class {
   constructor(env) {
     this.env = env;
-    this.dbManager = new DatabaseManager(env);
     this.migrationRunner = new MigrationRunner(env);
     this.testTypes = new TestTypeModel(env);
     this.testSessions = new TestSessionModel(env);
@@ -12051,10 +11567,13 @@ var DatabaseService = class {
   static {
     __name(this, "DatabaseService");
   }
-  dbManager;
+  // private dbManager: DatabaseManager; // 未使用，暂时注释
   migrationRunner;
   // 暴露数据库连接供路由使用
   get db() {
+    if (!this.env.DB) {
+      throw new Error("Database connection not available");
+    }
     return this.env.DB;
   }
   // 模型实例
@@ -12076,13 +11595,13 @@ var DatabaseService = class {
    */
   async initialize() {
     try {
-      await this.migrationRunner.runMigrations();
+      await this.migrationRunner.runMigrations([]);
       console.log("Database initialized successfully");
     } catch (error) {
       console.error("Database initialization failed:", error);
       throw new ModuleError(
         "Failed to initialize database",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500,
         error
       );
@@ -12093,15 +11612,15 @@ var DatabaseService = class {
    */
   async healthCheck() {
     try {
-      const connectionTest = await this.env.DB.prepare("SELECT 1").first();
+      const connectionTest = await this.db.prepare("SELECT 1").first();
       const connectionHealthy = connectionTest !== null;
       const migrationsHealthy = true;
-      const tablesResult = await this.env.DB.prepare(`
+      const tablesResult = await this.db.prepare(`
         SELECT name FROM sqlite_master 
         WHERE type='table' AND name NOT LIKE 'sqlite_%'
         ORDER BY name
       `).all();
-      const tables = tablesResult.success ? tablesResult.results.map((row) => row.name) : [];
+      const tables = (tablesResult.success ? tablesResult.results : []).map((row) => row.name);
       const requiredTables = [
         "test_types",
         "test_sessions",
@@ -12195,7 +11714,7 @@ var DatabaseService = class {
       console.error("Failed to get database statistics:", error);
       throw new ModuleError(
         "Failed to retrieve database statistics",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500,
         error
       );
@@ -12209,11 +11728,11 @@ var DatabaseService = class {
       const cutoffDate = /* @__PURE__ */ new Date();
       cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
       const cutoffISO = cutoffDate.toISOString();
-      const deletedSessions = await this.env.DB.prepare("DELETE FROM test_sessions WHERE created_at < ?").bind(cutoffISO).run();
-      const deletedEvents = await this.env.DB.prepare("DELETE FROM analytics_events WHERE timestamp < ?").bind(cutoffISO).run();
+      const deletedSessions = await this.db.prepare("DELETE FROM test_sessions WHERE created_at < ?").bind(cutoffISO).run();
+      const deletedEvents = await this.db.prepare("DELETE FROM analytics_events WHERE timestamp < ?").bind(cutoffISO).run();
       const feedbackCutoff = /* @__PURE__ */ new Date();
       feedbackCutoff.setDate(feedbackCutoff.getDate() - 30);
-      const deletedFeedback = await this.env.DB.prepare("DELETE FROM user_feedback WHERE created_at < ?").bind(feedbackCutoff.toISOString()).run();
+      const deletedFeedback = await this.db.prepare("DELETE FROM user_feedback WHERE created_at < ?").bind(feedbackCutoff.toISOString()).run();
       return {
         deletedSessions: deletedSessions.changes || 0,
         deletedEvents: deletedEvents.changes || 0,
@@ -12223,7 +11742,7 @@ var DatabaseService = class {
       console.error("Failed to cleanup expired data:", error);
       throw new ModuleError(
         "Failed to cleanup expired data",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500,
         error
       );
@@ -12247,7 +11766,7 @@ var DatabaseService = class {
       console.error("Failed to create backup:", error);
       throw new ModuleError(
         "Failed to create database backup",
-        ERROR_CODES2.DATABASE_ERROR,
+        ERROR_CODES.DATABASE_ERROR,
         500,
         error
       );
@@ -12257,21 +11776,28 @@ var DatabaseService = class {
   async getRecentTestsCount(hours) {
     const cutoffDate = /* @__PURE__ */ new Date();
     cutoffDate.setHours(cutoffDate.getHours() - hours);
-    const result = await this.env.DB.prepare("SELECT COUNT(*) as count FROM test_sessions WHERE created_at > ?").bind(cutoffDate.toISOString()).first();
-    return result?.count || 0;
+    const result = await this.db.prepare("SELECT COUNT(*) as count FROM test_sessions WHERE created_at > ?").bind(cutoffDate.toISOString()).first();
+    return result?.["count"] || 0;
   }
   async getRecentFeedbackCount(hours) {
     const cutoffDate = /* @__PURE__ */ new Date();
     cutoffDate.setHours(cutoffDate.getHours() - hours);
-    const result = await this.env.DB.prepare("SELECT COUNT(*) as count FROM user_feedback WHERE created_at > ?").bind(cutoffDate.toISOString()).first();
-    return result?.count || 0;
+    const result = await this.db.prepare("SELECT COUNT(*) as count FROM user_feedback WHERE created_at > ?").bind(cutoffDate.toISOString()).first();
+    return result?.["count"] || 0;
   }
   async getRecentArticlesCount(days) {
     const cutoffDate = /* @__PURE__ */ new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
-    const result = await this.env.DB.prepare("SELECT COUNT(*) as count FROM blog_articles WHERE created_at > ?").bind(cutoffDate.toISOString()).first();
-    return result?.count || 0;
+    const result = await this.db.prepare("SELECT COUNT(*) as count FROM blog_articles WHERE created_at > ?").bind(cutoffDate.toISOString()).first();
+    return result?.["count"] || 0;
   }
+  // 提供最小化count实现，供统计使用 - 未使用，暂时注释
+  // private async countTable(_tableName: string): Promise<number> {
+  //   const result = await this.db
+  //     .prepare(`SELECT COUNT(*) as count FROM ${_tableName}`)
+  //     .first();
+  //   return (result?.['count'] as number) || 0;
+  // }
 };
 
 // src/index.ts
@@ -12291,14 +11817,15 @@ app.use("*", cors({
       "https://*.pages.dev",
       "https://*.cloudflare.com"
     ];
-    if (!origin) return true;
-    return allowedOrigins.some((allowed) => {
-      if (allowed.includes("*")) {
-        const pattern = allowed.replace("*", ".*");
+    if (!origin) return origin;
+    const allowed = allowedOrigins.some((allowed2) => {
+      if (allowed2.includes("*")) {
+        const pattern = allowed2.replace("*", ".*");
         return new RegExp(pattern).test(origin);
       }
-      return allowed === origin;
+      return allowed2 === origin;
     });
+    return allowed ? origin : null;
   }, "origin"),
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
   allowHeaders: [
@@ -12329,7 +11856,7 @@ app.get("/debug/env", async (c) => {
     data: {
       hasDB: !!c.env.DB,
       hasKV: !!c.env.KV,
-      hasBUCKET: !!c.env.BUCKET,
+      hasBUCKET: !!c.env?.["BUCKET"],
       environment: c.env.ENVIRONMENT,
       envKeys: Object.keys(c.env)
     },
@@ -12356,7 +11883,7 @@ app.get("/health", async (c) => {
         }
       },
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     };
     return c.json(response, healthCheck.status === "healthy" ? 200 : 503);
   } catch (error) {
@@ -12364,7 +11891,7 @@ app.get("/health", async (c) => {
       success: false,
       error: "Health check failed",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      requestId: c.get("requestId")
+      requestId: c.get("requestId") || ""
     };
     return c.json(response, 503);
   }
@@ -12398,7 +11925,7 @@ app.get("/api", (c) => {
       documentation: "https://docs.example.com/api"
     },
     timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-    requestId: c.get("requestId")
+    requestId: c.get("requestId") || ""
   };
   return c.json(response);
 });
@@ -12408,7 +11935,7 @@ app.notFound((c) => {
     error: "Not Found",
     message: "The requested resource was not found",
     timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-    requestId: c.get("requestId")
+    requestId: c.get("requestId") || ""
   };
   return c.json(response, 404);
 });
@@ -12418,7 +11945,7 @@ app.all("*", (c) => {
     error: "Method Not Allowed",
     message: `Method ${c.req.method} is not allowed for this endpoint`,
     timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-    requestId: c.get("requestId")
+    requestId: c.get("requestId") || ""
   };
   return c.json(response, 405);
 });
@@ -12465,7 +11992,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// .wrangler/tmp/bundle-3ADJIl/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-wOR9Qr/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -12497,7 +12024,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// .wrangler/tmp/bundle-3ADJIl/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-wOR9Qr/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

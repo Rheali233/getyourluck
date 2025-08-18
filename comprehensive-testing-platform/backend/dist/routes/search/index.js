@@ -21,22 +21,21 @@ searchRoutes.get("/", async (c) => {
             }, 400);
         }
         const dbService = c.get("dbService");
-        const searchModel = new SearchIndexModel(dbService.db);
-        const analyticsModel = new AnalyticsEventModel(dbService.db);
+        const searchModel = new SearchIndexModel(dbService.env);
+        const analyticsModel = new AnalyticsEventModel(dbService.env);
         // 执行搜索
         const results = await searchModel.search(query.trim(), language, limit);
         // 记录搜索事件
-        await analyticsModel.createEvent({
+        await analyticsModel.create({
             eventType: "search_query",
-            eventData: JSON.stringify({
+            eventData: {
                 query: query.trim(),
                 language,
                 resultCount: results.length,
                 limit,
-            }),
-            pageUrl: c.req.url,
-            userAgent: c.req.header("User-Agent"),
-            ipAddress: c.req.header("CF-Connecting-IP"),
+            },
+            userAgent: c.req.header("User-Agent") || "",
+            ipAddress: c.req.header("CF-Connecting-IP") || "",
         });
         // 记录搜索关键词
         await searchModel.recordSearchKeyword(query.trim(), language);
@@ -54,6 +53,11 @@ searchRoutes.get("/", async (c) => {
     }
     catch (error) {
         console.error("搜索失败:", error);
+        console.error("错误详情:", {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
         return c.json({
             success: false,
             error: "搜索失败",
@@ -77,7 +81,7 @@ searchRoutes.get("/suggestions", async (c) => {
             });
         }
         const dbService = c.get("dbService");
-        const searchModel = new SearchIndexModel(dbService.db);
+        const searchModel = new SearchIndexModel(dbService.env);
         const suggestions = await searchModel.getSearchSuggestions(query.trim(), language, limit);
         return c.json({
             success: true,
@@ -102,7 +106,7 @@ searchRoutes.get("/popular", async (c) => {
         const language = c.req.query("lang") || "zh-CN";
         const limit = parseInt(c.req.query("limit") || "10");
         const dbService = c.get("dbService");
-        const searchModel = new SearchIndexModel(dbService.db);
+        const searchModel = new SearchIndexModel(dbService.env);
         const keywords = await searchModel.getPopularKeywords(language, limit);
         return c.json({
             success: true,
@@ -144,7 +148,7 @@ searchRoutes.get("/stats", async (c) => {
         const stats = {
             totalSearches: totalSearches?.count || 0,
             totalKeywords: totalKeywords?.count || 0,
-            recentSearches: recentSearches.results?.map(row => ({
+            recentSearches: recentSearches.results?.map((row) => ({
                 data: JSON.parse(row.event_data),
                 timestamp: row.timestamp,
             })) || [],
@@ -180,21 +184,20 @@ searchRoutes.post("/click", async (c) => {
             }, 400);
         }
         const dbService = c.get("dbService");
-        const searchModel = new SearchIndexModel(dbService.db);
-        const analyticsModel = new AnalyticsEventModel(dbService.db);
+        const searchModel = new SearchIndexModel(dbService.env);
+        const analyticsModel = new AnalyticsEventModel(dbService.env);
         // 增加搜索次数
         await searchModel.incrementSearchCount(searchIndexId);
         // 记录点击事件
-        await analyticsModel.createEvent({
+        await analyticsModel.create({
             eventType: "search_result_click",
-            eventData: JSON.stringify({
+            eventData: {
                 searchIndexId,
                 resultType,
                 resultId,
-            }),
-            pageUrl: c.req.url,
-            userAgent: c.req.header("User-Agent"),
-            ipAddress: c.req.header("CF-Connecting-IP"),
+            },
+            userAgent: c.req.header("User-Agent") || "",
+            ipAddress: c.req.header("CF-Connecting-IP") || "",
         });
         return c.json({
             success: true,

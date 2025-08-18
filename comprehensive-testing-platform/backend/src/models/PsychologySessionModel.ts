@@ -93,7 +93,7 @@ export class PsychologySessionModel extends BaseModel {
       .first();
 
     const stats = {
-      totalSessions: (totalResult?.total as number) || 0,
+              totalSessions: (totalResult?.['total'] as number) || 0,
     };
 
     if (subtype === "mbti") {
@@ -123,9 +123,9 @@ export class PsychologySessionModel extends BaseModel {
       id: row.id as string,
       testSessionId: row.test_session_id as string,
       testSubtype: row.test_subtype as "mbti" | "big_five" | "phq9" | "happiness",
-      personalityType: row.personality_type as string || undefined,
+      personalityType: (row.personality_type as string) ?? "",
       dimensionScores: row.dimension_scores ? JSON.parse(row.dimension_scores as string) : undefined,
-      riskLevel: row.risk_level as "minimal" | "mild" | "moderate" | "moderately_severe" | "severe" || undefined,
+      riskLevel: (row.risk_level as "minimal" | "mild" | "moderate" | "moderately_severe" | "severe") ?? "minimal",
       happinessDomains: row.happiness_domains ? JSON.parse(row.happiness_domains as string) : undefined,
       createdAt: new Date(row.created_at as string),
     };

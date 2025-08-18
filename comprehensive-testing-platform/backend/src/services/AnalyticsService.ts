@@ -436,7 +436,7 @@ export class AnalyticsService {
         WHERE timestamp < ?
       `).bind(cutoffDate.toISOString()).run();
 
-      return result.changes || 0;
+      return (result as any).changes || 0;
     } catch (error) {
       console.error('清理过期分析数据失败:', error);
       return 0;

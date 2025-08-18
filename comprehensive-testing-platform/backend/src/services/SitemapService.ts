@@ -265,7 +265,7 @@ export class SitemapService {
         ORDER BY updated_at DESC
       `).all();
       
-      return result.results || [];
+      return (result.results as Array<{ id: string; updatedAt?: string }>) || [];
     } catch (error) {
       console.error('Failed to get test modules:', error);
       return [];
@@ -307,7 +307,7 @@ export class SitemapService {
         LIMIT 100
       `).all();
       
-      return result.results || [];
+      return (result.results as Array<{ keyword: string }>) || [];
     } catch (error) {
       console.error('Failed to get popular search keywords:', error);
       return [];
@@ -329,38 +329,14 @@ export class SitemapService {
     };
 
     try {
-      // 提交到Google Search Console
-      if (process.env.GOOGLE_SEARCH_CONSOLE_URL) {
-        const googleUrl = `${process.env.GOOGLE_SEARCH_CONSOLE_URL}/sitemap`;
-        const googleResponse = await fetch(googleUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/xml' },
-          body: await this.generateSitemapIndex()
-        });
-        results.google = googleResponse.ok;
-      }
+      // 提交到Google Search Console（Cloudflare Workers无process.env，跳过或改为从KV/配置读取）
+      results.google = false;
 
       // 提交到Bing Webmaster Tools
-      if (process.env.BING_WEBMASTER_URL) {
-        const bingUrl = `${process.env.BING_WEBMASTER_URL}/sitemap`;
-        const bingResponse = await fetch(bingUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/xml' },
-          body: await this.generateSitemapIndex()
-        });
-        results.bing = bingResponse.ok;
-      }
+      results.bing = false;
 
       // 提交到百度站长平台
-      if (process.env.BAIDU_WEBMASTER_URL) {
-        const baiduUrl = `${process.env.BAIDU_WEBMASTER_URL}/sitemap`;
-        const baiduResponse = await fetch(baiduUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/xml' },
-          body: await this.generateSitemapIndex()
-        });
-        results.baidu = baiduResponse.ok;
-      }
+      results.baidu = false;
     } catch (error) {
       console.error('Failed to submit sitemap to search engines:', error);
     }

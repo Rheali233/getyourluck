@@ -4,8 +4,8 @@
  */
 import { BaseModel } from './BaseModel';
 export class UserPreferencesModel extends BaseModel {
-    constructor(db) {
-        super(db);
+    constructor(env) {
+        super(env, 'user_preferences');
     }
     /**
      * 创建或更新用户偏好设置

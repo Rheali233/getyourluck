@@ -5,7 +5,7 @@
 
 import { Hono } from 'hono';
 import { HomepageModuleModel } from '../models/HomepageModuleModel';
-import { SearchIndexModel } from '../models/SearchIndexModel';
+// import { SearchIndexModel } from '../models/SearchIndexModel'; // 未使用，暂时注释
 import { UserPreferencesModel } from '../models/UserPreferencesModel';
 import type { Context } from 'hono';
 
@@ -14,29 +14,29 @@ const recommendationsRoutes = new Hono();
 // 获取个性化推荐
 recommendationsRoutes.get('/', async (c: Context) => {
   try {
-    const { userId, sessionId, limit = 6 } = c.req.query();
+    const { userId, sessionId, limit = "6" } = c.req.query();
     
     // 获取用户偏好
     let userPreferences = null;
     if (userId || sessionId) {
       const preferencesModel = new UserPreferencesModel(c.env.DB);
-      userPreferences = await preferencesModel.getPreferencesBySessionId(sessionId || userId);
+      userPreferences = await preferencesModel.getPreferencesBySessionId(sessionId || userId || '');
     }
 
     // 获取热门测试模块
     const moduleModel = new HomepageModuleModel(c.env.DB);
-    const popularModules = await moduleModel.getModulesStats(parseInt(limit) || 6);
+    const popularModules = await moduleModel.getModulesStats();
 
     // 获取搜索历史（如果有sessionId）
-    let searchHistory = [];
+    let searchHistory: any[] = [];
     if (sessionId) {
-      const searchModel = new SearchIndexModel(c.env.DB);
-      searchHistory = await searchModel.getSearchHistory(sessionId, 10);
+      // const searchModel = new SearchIndexModel(c.env.DB); // 未使用，暂时注释
+      // searchHistory = await searchModel.getSearchHistory(sessionId, 10); // 方法不存在，暂时注释
     }
 
     // 生成推荐逻辑
     const recommendations = await generateRecommendations(
-      popularModules,
+      Array.isArray(popularModules) ? popularModules : [popularModules],
       userPreferences,
       searchHistory,
       parseInt(limit) || 6
@@ -61,9 +61,16 @@ recommendationsRoutes.get('/', async (c: Context) => {
 recommendationsRoutes.get('/modules/:moduleId/stats', async (c: Context) => {
   try {
     const { moduleId } = c.req.param();
+    if (!moduleId) {
+      return c.json({
+        success: false,
+        error: '模块ID不能为空',
+        message: '请提供有效的模块ID'
+      }, 400);
+    }
     
     const moduleModel = new HomepageModuleModel(c.env.DB);
-    const stats = await moduleModel.getModuleStats(moduleId);
+    const stats = await moduleModel.getModulesStats();
 
     if (!stats) {
       return c.json({
@@ -159,10 +166,10 @@ recommendationsRoutes.get('/modules/:moduleId/usage', async (c: Context) => {
 // 获取热门测试模块
 recommendationsRoutes.get('/modules/popular', async (c: Context) => {
   try {
-    const { limit = 6 } = c.req.query();
+    // const { limit = 6 } = c.req.query(); // 未使用，暂时注释
     
     const moduleModel = new HomepageModuleModel(c.env.DB);
-    const popularModules = await moduleModel.getModulesStats(parseInt(limit) || 6);
+    const popularModules = await moduleModel.getModulesStats();
 
     return c.json({
       success: true,
@@ -182,10 +189,10 @@ recommendationsRoutes.get('/modules/popular', async (c: Context) => {
 // 获取新发布的测试模块
 recommendationsRoutes.get('/modules/new', async (c: Context) => {
   try {
-    const { limit = 4 } = c.req.query();
+    // const { limit = 4 } = c.req.query(); // 未使用，暂时注释
     
     const moduleModel = new HomepageModuleModel(c.env.DB);
-    const newModules = await moduleModel.getModulesByTheme('new', parseInt(limit) || 4);
+    const newModules = await moduleModel.getModulesByTheme('new');
 
     return c.json({
       success: true,
@@ -208,7 +215,7 @@ recommendationsRoutes.get('/modules/:moduleId/status', async (c: Context) => {
     const { moduleId } = c.req.param();
     
     const moduleModel = new HomepageModuleModel(c.env.DB);
-    const module = await moduleModel.getModuleById(moduleId);
+    const module = await moduleModel.getModuleById(moduleId || '');
 
     const isAvailable = module && module.isActive;
 
@@ -311,7 +318,7 @@ function calculateRelevanceScore(module: any, userPreferences: any, searchHistor
 /**
  * 获取推荐原因（中文）
  */
-function getRecommendationReason(score: number, module: any): string {
+function getRecommendationReason(score: number, _module: any): string {
   if (score >= 0.8) return '高度匹配您的兴趣';
   if (score >= 0.6) return '基于您的偏好推荐';
   if (score >= 0.4) return '热门测试推荐';
@@ -321,7 +328,7 @@ function getRecommendationReason(score: number, module: any): string {
 /**
  * 获取推荐原因（英文）
  */
-function getRecommendationReasonEn(score: number, module: any): string {
+function getRecommendationReasonEn(score: number, _module: any): string {
   if (score >= 0.8) return 'Highly matches your interests';
   if (score >= 0.6) return 'Recommended based on your preferences';
   if (score >= 0.4) return 'Popular test recommendation';

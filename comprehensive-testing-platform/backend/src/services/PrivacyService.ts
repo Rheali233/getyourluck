@@ -173,7 +173,7 @@ export class PrivacyService {
   /**
    * 匿名化用户数据
    */
-  async anonymizeUserData(sessionId: string, options: AnonymizationOptions = {}): Promise<void> {
+  async anonymizeUserData(sessionId: string, options: Partial<AnonymizationOptions> = {}): Promise<void> {
     try {
       const defaultOptions: AnonymizationOptions = {
         hashPersonalData: true,
@@ -403,7 +403,7 @@ export class PrivacyService {
         DELETE FROM user_consents 
         WHERE expires_at IS NOT NULL AND expires_at < ?
       `).bind(new Date().toISOString()).run();
-      deletedRecords += expiredConsents.changes || 0;
+      deletedRecords += (expiredConsents as any).changes || 0;
 
       // 匿名化过期的搜索历史
       const expiredSearches = await this.db.prepare(`

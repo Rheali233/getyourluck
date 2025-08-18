@@ -17,10 +17,11 @@ export interface Env {
 
 // 应用上下文接口 - 使用Hono的Context类型
 export interface AppContext {
-  Bindings: Env;
+  Bindings: Env & { [key: string]: any };
   Variables: {
     requestId: string;
     dbService: any;
+    cacheService: any;
   };
 }
 

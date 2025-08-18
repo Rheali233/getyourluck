@@ -3,5 +3,8 @@
  * 遵循统一开发标准的安全规范
  */
 import type { Context, Next } from "hono";
-export declare const rateLimiter: (requests: number, windowMs: number) => (c: Context, next: Next) => Promise<void>;
+import type { Env } from "../index";
+export declare const rateLimiter: (requests: number, windowMs: number) => (c: Context<{
+    Bindings: Env;
+}>, next: Next) => Promise<void>;
 //# sourceMappingURL=rateLimiter.d.ts.map

@@ -3,14 +3,14 @@
  * 负责捕获、记录和处理应用中的各种错误
  */
 
-import { Context, Next } from 'hono';
+import { Context } from 'hono';
 import type { APIResponse } from '../../../shared/types/apiResponse';
 
 // 自定义错误类型
 export class AppError extends Error {
   public statusCode: number;
   public isOperational: boolean;
-  public code?: string;
+  public code: string | undefined;
 
   constructor(message: string, statusCode: number = 500, code?: string, isOperational: boolean = true) {
     super(message);
@@ -18,7 +18,7 @@ export class AppError extends Error {
     this.code = code;
     this.isOperational = isOperational;
 
-    Error.captureStackTrace(this, this.constructor);
+    // Workers 环境无需captureStackTrace
   }
 }
 
@@ -89,12 +89,8 @@ export const ERROR_CODES = {
 } as const;
 
 // 错误处理中间件
-export const errorHandler = async (err: Error, c: Context, next: Next) => {
-  try {
-    await next();
-  } catch (error) {
-    return handleError(error, c);
-  }
+export const errorHandler = (err: unknown, c: Context) => {
+  return handleError(err, c);
 };
 
 // 错误处理函数
@@ -103,14 +99,12 @@ export function handleError(error: unknown, c: Context) {
   logError(error, c);
 
   // 格式化错误响应
-  const errorResponse = formatErrorResponse(error);
-
-  // 设置响应头
-  c.status(errorResponse.statusCode);
+  const { body, status } = formatErrorResponse(error);
+  c.status(status);
   c.header('Content-Type', 'application/json');
 
   // 返回错误响应
-  return c.json(errorResponse);
+  return c.json(body);
 }
 
 // 记录错误
@@ -150,53 +144,50 @@ function logError(error: unknown, c: Context) {
 }
 
 // 格式化错误响应
-function formatErrorResponse(error: unknown): APIResponse {
+function formatErrorResponse(error: unknown): { body: APIResponse; status: number } {
   if (error instanceof AppError) {
     return {
-      success: false,
-      error: error.message,
-      code: error.code || ERROR_CODES.UNKNOWN_ERROR,
-      timestamp: new Date().toISOString(),
-      requestId: 'unknown'
+      status: error.statusCode,
+      body: {
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: 'unknown'
+      }
     };
   }
 
   if (error instanceof Error) {
     return {
-      success: false,
-      error: error.message,
-      code: ERROR_CODES.UNKNOWN_ERROR,
-      timestamp: new Date().toISOString(),
-      requestId: 'unknown'
+      status: 500,
+      body: {
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        requestId: 'unknown'
+      }
     };
   }
 
   // 未知错误类型
   return {
-    success: false,
-    error: 'An unexpected error occurred',
-    code: ERROR_CODES.UNKNOWN_ERROR,
-    timestamp: new Date().toISOString(),
-    requestId: 'unknown'
+    status: 500,
+    body: {
+      success: false,
+      error: 'An unexpected error occurred',
+      timestamp: new Date().toISOString(),
+      requestId: 'unknown'
+    }
   };
 }
 
 // 发送错误到监控系统
-async function sendErrorToMonitoring(errorLog: any) {
+async function sendErrorToMonitoring(_errorLog: any) {
   try {
-    // 这里可以集成第三方监控服务，如Sentry、LogRocket等
-    // 暂时只是记录到控制台
-    if (process.env.ERROR_MONITORING_ENDPOINT) {
-      await fetch(process.env.ERROR_MONITORING_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(errorLog)
-      });
-    }
-  } catch (monitoringError) {
-    console.error('Failed to send error to monitoring:', monitoringError);
+    // 无法使用process.env，在Workers中应通过Env注入；此处跳过外部上报
+    return;
+  } catch (e) {
+    // no-op
   }
 }
 
@@ -246,5 +237,4 @@ export function handleNetworkError(error: any): AppError {
   return new AppError('网络错误', 503, ERROR_CODES.NETWORK_ERROR);
 }
 
-// 导出错误类型
-export type { AppError, ValidationError, AuthenticationError, AuthorizationError, NotFoundError, ConflictError, RateLimitError };
+// 类型已在上方导出class，无需重复导出type别名

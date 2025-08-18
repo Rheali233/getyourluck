@@ -6,8 +6,8 @@
 import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 import type { 
   MbtiAnswerData,
-  CreateMbtiAnswerData,
-  AnswerSessionData
+  // CreateMbtiAnswerData, // 未使用，暂时注释
+  // AnswerSessionData // 未使用，暂时注释
 } from "../types/psychology/AnswerData";
 
 // MBTI维度得分结果接口
@@ -265,13 +265,13 @@ export class MbtiAnswerProcessingService {
       const timeInSeconds = answer.responseTime / 1000;
       
       if (timeInSeconds < 10) {
-        distribution["fast"]++;
+        distribution["fast"] = (distribution["fast"] || 0) + 1;
       } else if (timeInSeconds < 30) {
-        distribution["normal"]++;
+        distribution["normal"] = (distribution["normal"] || 0) + 1;
       } else if (timeInSeconds < 60) {
-        distribution["slow"]++;
+        distribution["slow"] = (distribution["slow"] || 0) + 1;
       } else {
-        distribution["very_slow"]++;
+        distribution["very_slow"] = (distribution["very_slow"] || 0) + 1;
       }
     }
 
@@ -303,7 +303,7 @@ export class MbtiAnswerProcessingService {
     // 检查同一维度的答题一致性
     const dimensionGroups = this.groupAnswersByDimension(answers);
     
-    for (const [dimension, dimensionAnswers] of Object.entries(dimensionGroups)) {
+    for (const [_dimension, dimensionAnswers] of Object.entries(dimensionGroups)) {
       if (dimensionAnswers.length < 2) continue;
 
       const preferences = dimensionAnswers.map(answer => answer.preference);
@@ -484,7 +484,7 @@ export class MbtiAnswerProcessingService {
     const answerDimensions = answers.map(answer => answer.dimension);
     
     for (const dimension of requiredDimensions) {
-      if (!answerDimensions.includes(dimension)) {
+      if (!answerDimensions.includes(dimension as any)) {
         return false;
       }
     }

@@ -15,7 +15,13 @@ securityRoutes.post('/privacy/consent', async (c) => {
                 error: '缺少必要参数'
             }, 400);
         }
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         await privacyService.recordUserConsent({
             sessionId,
             consentType: consentType,
@@ -47,7 +53,13 @@ securityRoutes.get('/privacy/consent/:sessionId/:consentType', async (c) => {
                 error: '缺少必要参数'
             }, 400);
         }
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         const hasConsent = await privacyService.getUserConsent(sessionId, consentType);
         return c.json({
             success: true,
@@ -72,7 +84,13 @@ securityRoutes.get('/privacy/gdpr-compliance/:sessionId', async (c) => {
                 error: '缺少sessionId参数'
             }, 400);
         }
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         const compliance = await privacyService.checkGdprCompliance(sessionId);
         return c.json({
             success: true,
@@ -97,7 +115,13 @@ securityRoutes.get('/privacy/report/:sessionId', async (c) => {
                 error: '缺少sessionId参数'
             }, 400);
         }
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         const report = await privacyService.getPrivacyReport(sessionId);
         return c.json({
             success: true,
@@ -122,7 +146,13 @@ securityRoutes.get('/privacy/export/:sessionId', async (c) => {
                 error: '缺少sessionId参数'
             }, 400);
         }
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         const userData = await privacyService.exportUserData(sessionId);
         return c.json({
             success: true,
@@ -147,7 +177,13 @@ securityRoutes.delete('/privacy/forget/:sessionId', async (c) => {
                 error: '缺少sessionId参数'
             }, 400);
         }
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         await privacyService.implementRightToBeForgotten(sessionId);
         return c.json({
             success: true,
@@ -173,7 +209,13 @@ securityRoutes.post('/privacy/anonymize/:sessionId', async (c) => {
                 error: '缺少sessionId参数'
             }, 400);
         }
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         await privacyService.anonymizeUserData(sessionId, options);
         return c.json({
             success: true,
@@ -191,7 +233,13 @@ securityRoutes.post('/privacy/anonymize/:sessionId', async (c) => {
 // 清理过期数据
 securityRoutes.post('/privacy/cleanup', async (c) => {
     try {
-        const privacyService = new PrivacyService(c.env.DB);
+        if (!c.env) {
+            return c.json({
+                success: false,
+                error: '环境配置不可用'
+            }, 500);
+        }
+        const privacyService = new PrivacyService(c.env['DB']);
         const result = await privacyService.cleanupExpiredData();
         return c.json({
             success: true,
