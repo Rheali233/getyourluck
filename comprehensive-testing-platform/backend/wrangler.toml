@@ -1,0 +1,123 @@
+name = "getyourluck-backend"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "getyourluck-backend-prod"
+route = "api.getyourluck.com/*"
+zone_id = "your-zone-id"
+
+[env.staging]
+name = "getyourluck-backend-staging"
+route = "staging-api.getyourluck.com/*"
+zone_id = "your-zone-id"
+
+[env.development]
+name = "getyourluck-backend-dev"
+route = "dev-api.getyourluck.com/*"
+zone_id = "your-zone-id"
+
+# D1数据库配置
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "getyourluck-prod"
+database_id = "your-production-database-id"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "getyourluck-staging"
+database_id = "your-staging-database-id"
+
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "getyourluck-dev"
+database_id = "your-development-database-id"
+
+# 本地开发D1数据库配置
+[[d1_databases]]
+binding = "DB"
+database_name = "getyourluck-local"
+database_id = "a9f563cf-ce1b-46f8-adfe-38d58c7686a0"
+
+# KV存储配置
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "your-production-kv-id"
+preview_id = "your-production-kv-preview-id"
+
+[[env.staging.kv_namespaces]]
+binding = "CACHE"
+id = "your-staging-kv-id"
+preview_id = "your-staging-kv-preview-id"
+
+[[env.development.kv_namespaces]]
+binding = "CACHE"
+id = "your-development-kv-id"
+preview_id = "your-development-kv-preview-id"
+
+# R2存储配置
+[[env.production.r2_buckets]]
+binding = "STORAGE"
+bucket_name = "getyourluck-prod-storage"
+
+[[env.staging.r2_buckets]]
+binding = "STORAGE"
+bucket_name = "getyourluck-staging-storage"
+
+[[env.development.r2_buckets]]
+binding = "STORAGE"
+bucket_name = "getyourluck-dev-storage"
+
+# 环境变量
+[env.production.vars]
+NODE_ENV = "production"
+LOG_LEVEL = "info"
+ENABLE_ANALYTICS = "true"
+ENABLE_CACHE = "true"
+CACHE_TTL = "3600"
+MAX_REQUEST_SIZE = "1048576"
+RATE_LIMIT_WINDOW = "60000"
+RATE_LIMIT_MAX = "100"
+
+[env.staging.vars]
+NODE_ENV = "staging"
+LOG_LEVEL = "debug"
+ENABLE_ANALYTICS = "true"
+ENABLE_CACHE = "true"
+CACHE_TTL = "1800"
+MAX_REQUEST_SIZE = "1048576"
+RATE_LIMIT_WINDOW = "60000"
+RATE_LIMIT_MAX = "200"
+
+[env.development.vars]
+NODE_ENV = "development"
+LOG_LEVEL = "debug"
+ENABLE_ANALYTICS = "false"
+ENABLE_CACHE = "false"
+CACHE_TTL = "300"
+MAX_REQUEST_SIZE = "2097152"
+RATE_LIMIT_WINDOW = "60000"
+RATE_LIMIT_MAX = "1000"
+
+# 构建配置
+[build]
+command = "npm run build"
+watch_dir = "src"
+
+# 部署配置
+[deploy]
+upload.format = "service-worker"
+
+# 性能配置
+[env.production.performance]
+cpu = "high"
+memory = "high"
+
+[env.staging.performance]
+cpu = "medium"
+memory = "medium"
+
+[env.development.performance]
+cpu = "low"
+memory = "low"

@@ -1,0 +1,71 @@
+{
+  "homepage": {
+    "hero": {
+      "title": "Comprehensive Testing Platform",
+      "subtitle": "Professional psychological testing, astrology analysis, tarot divination and more online testing services",
+      "description": "Discover yourself through scientific testing methods, get personalized insights and guidance",
+      "startTest": "Start Testing",
+      "learnMore": "Learn More",
+      "features": "Professional • Scientific • Personalized • Secure"
+    },
+    "testModules": {
+      "title": "Test Categories",
+      "subtitle": "Choose from our comprehensive range of professional tests",
+      "psychology": {
+        "name": "Psychological Tests",
+        "description": "Professional psychological assessment tools to help understand yourself",
+        "icon": "🧠",
+        "features": ["Professional Scales", "Instant Analysis", "Detailed Reports"]
+      },
+      "astrology": {
+        "name": "Astrology Analysis",
+        "description": "Personalized analysis and predictions based on zodiac signs",
+        "icon": "⭐",
+        "features": ["Zodiac Reading", "Fortune Prediction", "Personality Analysis"]
+      },
+      "tarot": {
+        "name": "Tarot Divination",
+        "description": "Mysterious tarot card interpretation and guidance",
+        "icon": "🔮",
+        "features": ["Tarot Reading", "Question Answering", "Future Guidance"]
+      },
+      "career": {
+        "name": "Career Tests",
+        "description": "Career orientation and ability assessment",
+        "icon": "💼",
+        "features": ["Career Matching", "Ability Assessment", "Development Advice"]
+      }
+    },
+    "search": {
+      "placeholder": "Search for tests, articles, or topics...",
+      "button": "Search",
+      "popular": "Popular Searches",
+      "recent": "Recent Searches",
+      "suggestions": "Search Suggestions"
+    },
+    "cookies": {
+      "title": "Cookie Preferences",
+      "description": "We use cookies to enhance your experience and analyze site usage",
+      "acceptAll": "Accept All",
+      "rejectNonEssential": "Reject Non-Essential",
+      "customize": "Customize Settings",
+      "necessary": "Necessary",
+      "analytics": "Analytics",
+      "marketing": "Marketing",
+      "thirdParty": "Third Party",
+      "saveSettings": "Save Settings",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "footer": {
+      "description": "Professional online testing platform providing psychological, astrology, and personality assessments",
+      "quickLinks": "Quick Links",
+      "support": "Support",
+      "legal": "Legal",
+      "newsletter": "Newsletter",
+      "subscribe": "Subscribe",
+      "email": "Email Address",
+      "copyright": "© 2024 Comprehensive Testing Platform. All rights reserved.",
+      "disclaimer": "Test results are for reference only and should not replace professional advice."
+    }
+  }
+}

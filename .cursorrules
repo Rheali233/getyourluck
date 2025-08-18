@@ -1,0 +1,225 @@
+# 综合测试平台 AI 助手开发指导规则
+
+## 🎯 项目概述
+
+这是一个基于 Cloudflare 全栈架构的现代化在线测试平台，提供心理测试、占星分析、塔罗占卜等多种测试服务。项目采用模块化架构，严格遵循统一开发标准。
+
+## 🏗️ 技术栈约束
+
+### 前端技术栈
+- **框架**: React.js 18+ (函数组件 + Hooks)
+- **语言**: TypeScript (严格模式)
+- **样式**: Tailwind CSS + 自定义设计系统
+- **构建**: Vite
+- **状态管理**: Zustand
+- **路由**: React Router v6
+- **测试**: Vitest + React Testing Library
+
+### 后端技术栈
+- **运行环境**: Cloudflare Workers
+- **框架**: Hono.js
+- **语言**: TypeScript
+- **数据库**: Cloudflare D1 (SQLite)
+- **缓存**: Cloudflare KV
+- **存储**: Cloudflare R2
+
+### 禁止使用的技术
+- ❌ 不使用 Next.js、Nuxt.js 等 SSR 框架
+- ❌ 不使用 Redux、MobX 等状态管理库
+- ❌ 不使用 Material-UI、Ant Design 等 UI 组件库
+- ❌ 不使用 Express、Koa 等 Node.js 框架
+
+## 📋 开发原则
+
+### 架构一致性
+- ✅ 严格遵循现有模块化架构
+- ✅ 所有新功能必须集成到现有模块中
+- ✅ 不得创建新的架构模式或设计模式
+- ✅ 必须使用现有的共享类型和接口
+
+### 代码质量
+- ✅ 所有代码必须有完整的 TypeScript 类型定义
+- ✅ 必须实现错误边界和错误处理
+- ✅ 必须包含必要的代码注释
+- ✅ 必须遵循项目的 ESLint 和 Prettier 配置
+
+### 性能要求
+- ✅ 页面首屏加载时间 < 2秒
+- ✅ API 响应时间 < 1秒
+- ✅ 必须实现组件懒加载
+- ✅ 必须优化图片和静态资源
+
+## 🎨 UI/UX 设计原则
+
+### 设计系统
+- ✅ 使用预定义的设计令牌 (DESIGN_TOKENS)
+- ✅ 遵循模块主题系统 (constellation, psychology, tarot, mbti, career)
+- ✅ 使用统一的组件库和样式类
+- ✅ 支持深色/浅色主题切换
+
+### 响应式设计
+- ✅ 移动端优先的设计理念
+- ✅ 支持断点: mobile (640px), tablet (768px), desktop (1024px), large (1280px)
+- ✅ 使用 Tailwind CSS 响应式类名
+- ✅ 确保所有组件在不同屏幕尺寸下正常工作
+
+### 可访问性
+- ✅ 符合 WCAG 2.1 AA 级别标准
+- ✅ 所有交互元素必须有键盘导航支持
+- ✅ 提供适当的 ARIA 标签
+- ✅ 支持屏幕阅读器
+
+## 🔧 开发规范
+
+### 组件开发
+```typescript
+// 必须遵循的组件结构
+interface ComponentProps extends BaseComponentProps {
+  // 组件特定属性
+}
+
+export const Component: React.FC<ComponentProps> = ({ className, testId, ...props }) => {
+  return (
+    <div className={cn("component-base", className)} data-testid={testId}>
+      {/* 组件内容 */}
+    </div>
+  );
+};
+```
+
+### 状态管理
+```typescript
+// 必须使用 Zustand 和统一接口
+interface ModuleState extends BaseModuleState {
+  // 模块特定状态
+}
+
+interface ModuleActions extends BaseModuleActions {
+  // 模块特定操作
+}
+
+export const useModuleStore = create<ModuleState & ModuleActions>((set, get) => ({
+  // 实现
+}));
+```
+
+### API 开发
+```typescript
+// 必须使用统一的响应格式
+interface APIResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+  timestamp: string;
+  requestId?: string;
+}
+```
+
+### 数据库操作
+```typescript
+// 必须使用统一的数据模型
+export class DataModel extends BaseModel {
+  constructor(db: D1Database) {
+    super(db);
+  }
+  
+  // 实现 CRUD 操作
+}
+```
+
+## 🚫 禁止行为
+
+### 架构变更
+- ❌ 不得修改现有的项目结构
+- ❌ 不得创建新的技术栈或框架
+- ❌ 不得改变现有的模块划分
+- ❌ 不得修改核心接口定义
+
+### 功能扩展
+- ❌ 不得添加文档中未明确要求的功能
+- ❌ 不得创建新的测试类型（除非在需求文档中）
+- ❌ 不得添加新的页面路由（除非在任务清单中）
+- ❌ 不得修改现有的业务逻辑
+
+### 数据使用
+- ❌ 不得使用虚拟数据或测试数据
+- ❌ 不得硬编码任何业务数据
+- ❌ 不得使用 Lorem ipsum 等占位文本
+- ❌ 不得创建模拟的 API 响应
+
+## ✅ 必须遵循的规范
+
+### 文件命名
+- 组件文件: PascalCase (如 `QuestionCard.tsx`)
+- 工具文件: camelCase (如 `apiClient.ts`)
+- 常量文件: UPPER_SNAKE_CASE (如 `API_ENDPOINTS.ts`)
+- 类型文件: PascalCase (如 `TestTypes.ts`)
+
+### 目录结构
+```
+src/
+├── components/          # 组件库
+│   ├── common/         # 通用组件
+│   ├── test/           # 测试相关组件
+│   └── specialized/    # 特殊组件
+├── modules/             # 功能模块
+│   ├── psychology/     # 心理测试模块
+│   ├── astrology/      # 占星模块
+│   └── ...
+├── pages/               # 页面组件
+├── stores/              # 状态管理
+├── services/            # API 服务
+├── types/               # 类型定义
+└── utils/               # 工具函数
+```
+
+### 导入导出
+```typescript
+// 必须使用统一的导出方式
+export { Component } from './Component';
+export type { ComponentProps } from './types';
+
+// 模块索引文件必须存在
+// modules/psychology/index.ts
+```
+
+## 🎯 AI 助手行为指导
+
+### 代码生成
+- 优先使用现有的组件和工具
+- 生成符合项目风格的代码
+- 包含完整的类型定义
+- 添加必要的错误处理
+
+### 问题解决
+- 首先检查现有代码和文档
+- 使用项目已有的解决方案
+- 不得引入外部依赖（除非明确要求）
+- 优先修复而非重构
+
+### 建议提供
+- 基于项目现有架构提供建议
+- 考虑性能和可维护性
+- 确保建议符合项目规范
+- 提供具体的实现方案
+
+## 📚 参考文档
+
+在提供帮助前，必须参考以下文档：
+- `.kiro/specs/comprehensive-testing-platform/development-guide.md` - 开发规范
+- `.kiro/specs/comprehensive-testing-platform/ui.md` - UI 设计规范
+- `.kiro/specs/comprehensive-testing-platform/design.md` - 整体设计
+- `.kiro/specs/comprehensive-testing-platform/tasks.md` - 任务清单
+
+## ⚠️ 重要提醒
+
+1. **严格遵循现有架构** - 不得偏离项目的设计原则
+2. **使用现有组件库** - 不得创建新的组件库或设计系统
+3. **保持代码一致性** - 所有代码必须符合项目的编码规范
+4. **优先现有解决方案** - 不得引入新的技术或方法
+5. **文档驱动开发** - 所有功能必须基于需求文档实现
+
+---
+
+**注意**: 本文件是 AI 助手的强制性指导原则，任何违反都可能导致代码不符合项目要求。请严格遵循每一项规范！
