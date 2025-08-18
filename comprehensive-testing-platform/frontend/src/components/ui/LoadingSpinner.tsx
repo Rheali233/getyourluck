@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import type { LoadingProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
+import type { LoadingProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
 
 /**
  * 加载旋转器组件

@@ -5,6 +5,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
+import { cn } from '@/utils/classNames';
 
 export interface UserBehaviorTrackerProps extends BaseComponentProps {
   sessionId?: string;
@@ -54,12 +55,7 @@ export interface PerformanceMetrics {
 export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
   className,
   testId = 'user-behavior-tracker',
-  sessionId,
-  userId,
-  pageType,
-  autoTrack = true,
-  onDataCollected,
-  ...props
+  onDataCollected
 }) => {
   const startTime = useRef<number>(Date.now());
   const scrollDepth = useRef<number>(0);
@@ -70,15 +66,26 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
 
   // 生成会话ID
   const getSessionId = useCallback((): string => {
-    if (sessionId) return sessionId;
-    
     let existingSessionId = localStorage.getItem('user_session_id');
     if (!existingSessionId) {
       existingSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       localStorage.setItem('user_session_id', existingSessionId);
     }
     return existingSessionId;
-  }, [sessionId]);
+  }, []);
+
+  // 获取用户ID
+  const getUserId = useCallback((): string => {
+    return localStorage.getItem('user_id') || '';
+  }, []);
+
+  // 获取页面类型
+  const getCurrentPageType = useCallback((): string => {
+    const path = window.location.pathname;
+    if (path.includes('/tests')) return 'test';
+    if (path.includes('/blog')) return 'blog';
+    return 'homepage';
+  }, []);
 
   // 收集性能指标
   const collectPerformanceMetrics = useCallback((): PerformanceMetrics => {
@@ -141,7 +148,7 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
     const interactionEvent: InteractionEvent = {
       type: interactionType,
       element: target.tagName.toLowerCase(),
-      value: target instanceof HTMLInputElement ? target.value : undefined,
+      value: target instanceof HTMLInputElement ? target.value || '' : '',
       timestamp: Date.now()
     };
 
@@ -166,8 +173,8 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
 
     return {
       sessionId: getSessionId(),
-      userId,
-      pageType,
+      userId: getUserId(),
+      pageType: getCurrentPageType(),
       timestamp: new Date().toISOString(),
       url: window.location.href,
       referrer: document.referrer,
@@ -179,7 +186,7 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
       interactions: [...interactions.current],
       performance: collectPerformanceMetrics()
     };
-  }, [getSessionId, userId, pageType, collectPerformanceMetrics]);
+  }, [getSessionId, getUserId, getCurrentPageType, collectPerformanceMetrics]);
 
   // 发送数据到服务器
   const sendBehaviorData = useCallback(async (data: UserBehaviorData) => {
@@ -256,20 +263,6 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
 
   // 组件挂载时开始跟踪
   useEffect(() => {
-    if (autoTrack) {
-      startTracking();
-    }
-
-    // 组件卸载时停止跟踪
-    return () => {
-      if (autoTrack) {
-        stopTracking();
-      }
-    };
-  }, [autoTrack, startTracking, stopTracking]);
-
-  // 暴露方法给父组件
-  useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as any).userBehaviorTracker = {
         startTracking,
@@ -281,5 +274,9 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
   }, [startTracking, stopTracking, triggerDataCollection, collectBehaviorData]);
 
   // 这个组件不渲染任何UI，只负责数据收集
-  return null;
+  return (
+    <div className={cn("user-behavior-tracker", className)} data-testid={testId}>
+      {/* 组件内容 */}
+    </div>
+  );
 };

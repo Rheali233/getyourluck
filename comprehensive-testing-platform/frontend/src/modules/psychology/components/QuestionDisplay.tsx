@@ -38,7 +38,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
 
     try {
       setIsSubmitting(true);
-      onAnswer(question.id, selectedAnswer);
+      onAnswer(selectedAnswer);
       
       // 自动进入下一题
       setTimeout(() => {
@@ -160,13 +160,13 @@ function renderQuestionOptions(
 ) {
   // 根据题目类型渲染不同的选项
   if (isMbtiQuestion(question)) {
-    return renderMbtiOptions(question, selectedAnswer, onSelect);
+    return renderMbtiOptions(question, selectedAnswer as string | null, onSelect as (answer: string) => void);
   } else if (isPhq9Question(question)) {
-    return renderPhq9Options(question, selectedAnswer, onSelect);
+    return renderPhq9Options(question, selectedAnswer as number | null, onSelect as (answer: number) => void);
   } else if (isEqQuestion(question)) {
-    return renderEqOptions(question, selectedAnswer, onSelect);
+    return renderEqOptions(question, selectedAnswer as number | null, onSelect as (answer: number) => void);
   } else if (isHappinessQuestion(question)) {
-    return renderHappinessOptions(question, selectedAnswer, onSelect);
+    return renderHappinessOptions(question, selectedAnswer as number | null, onSelect as (answer: number) => void);
   }
 
   // 默认渲染

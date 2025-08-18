@@ -303,7 +303,7 @@ export const useHomepageStore = create<HomepageModuleState>()(
         }
       },
 
-      getSearchSuggestions: async (query) => {
+      getSearchSuggestions: async (_query) => {
         try {
           // TODO: 实现搜索建议API调用
           // const response = await api.get(`/search/suggestions?q=${encodeURIComponent(query)}`);

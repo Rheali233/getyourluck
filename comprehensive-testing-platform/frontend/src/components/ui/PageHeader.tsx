@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import type { PageHeaderProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
+import type { PageHeaderProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
 import { Button } from './Button';
 
 /**

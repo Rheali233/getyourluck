@@ -3,7 +3,7 @@
  * 测试用户交互、界面响应和可用性
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 
 export interface UXTestResult {
@@ -30,6 +30,119 @@ export const UXTestSuite: React.FC<UXTestSuiteProps> = ({
   const [currentTest, setCurrentTest] = useState<string>('');
 
   // 用户体验测试用例
+  const testButtonResponsiveness = async (): Promise<UXTestResult> => {
+    const buttons = document.querySelectorAll('button');
+    let responsiveButtons = 0;
+    let totalButtons = buttons.length;
+
+    buttons.forEach(button => {
+      if (button.disabled === false && button.style.pointerEvents !== 'none') {
+        responsiveButtons++;
+      }
+    });
+
+    const score = Math.round((responsiveButtons / totalButtons) * 100);
+    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
+
+    return {
+      category: '交互响应',
+      testName: '按钮点击响应测试',
+      status,
+      score,
+      feedback: `${responsiveButtons}/${totalButtons} 个按钮响应正常`,
+      suggestions: score < 80 ? ['检查按钮状态', '优化按钮交互'] : []
+    };
+  };
+
+  const testPageLoadPerformance = async (): Promise<UXTestResult> => {
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const loadTime = navigation ? navigation.loadEventEnd - navigation.loadEventStart : 0;
+    
+    const score = loadTime < 2000 ? 100 : loadTime < 4000 ? 80 : loadTime < 6000 ? 60 : 40;
+    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
+
+    return {
+      category: '加载性能',
+      testName: '页面加载速度测试',
+      status,
+      score,
+      feedback: `页面加载时间: ${Math.round(loadTime)}ms`,
+      suggestions: loadTime > 2000 ? ['优化资源加载', '启用缓存策略'] : []
+    };
+  };
+
+  const testTouchInteractions = async (): Promise<UXTestResult> => {
+    const touchElements = document.querySelectorAll('[data-touch-friendly]');
+    const hasTouchSupport = 'ontouchstart' in window;
+    
+    let score = 0;
+    if (hasTouchSupport) {
+      score = touchElements.length > 0 ? 100 : 60;
+    } else {
+      score = 80; // 桌面端不需要触摸支持
+    }
+
+    const status = score >= 80 ? 'pass' : 'pending';
+
+    return {
+      category: '移动端适配',
+      testName: '触摸交互测试',
+      status,
+      score,
+      feedback: `触摸支持: ${hasTouchSupport ? '是' : '否'}, 触摸友好元素: ${touchElements.length}个`,
+      suggestions: score < 80 ? ['添加触摸友好属性', '优化移动端交互'] : []
+    };
+  };
+
+  const testKeyboardNavigation = async (): Promise<UXTestResult> => {
+    const focusableElements = document.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    let accessibleElements = 0;
+    let totalElements = focusableElements.length;
+
+    focusableElements.forEach(element => {
+      if (element.getAttribute('tabindex') !== '-1') {
+        accessibleElements++;
+      }
+    });
+
+    const score = Math.round((accessibleElements / totalElements) * 100);
+    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
+
+    return {
+      category: '可访问性',
+      testName: '键盘导航测试',
+      status,
+      score,
+      feedback: `${accessibleElements}/${totalElements} 个元素支持键盘导航`,
+      suggestions: score < 80 ? ['添加tabindex属性', '优化键盘导航顺序'] : []
+    };
+  };
+
+  const testVisualFeedback = async (): Promise<UXTestResult> => {
+    const interactiveElements = document.querySelectorAll('button, a, input');
+    let feedbackElements = 0;
+    let totalElements = interactiveElements.length;
+
+    interactiveElements.forEach(element => {
+      const styles = window.getComputedStyle(element);
+      if (styles.transition || styles.animation || element.classList.contains('hover:') || element.classList.contains('focus:')) {
+        feedbackElements++;
+      }
+    });
+
+    const score = Math.round((feedbackElements / totalElements) * 100);
+    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
+
+    return {
+      category: '视觉反馈',
+      testName: '状态变化反馈测试',
+      status,
+      score,
+      feedback: `${feedbackElements}/${totalElements} 个元素有视觉反馈`,
+      suggestions: score < 80 ? ['添加hover效果', '优化状态变化动画'] : []
+    };
+  };
+
   const uxTests = [
     {
       category: '交互响应',
@@ -85,124 +198,6 @@ export const UXTestSuite: React.FC<UXTestSuiteProps> = ({
     setIsRunning(false);
     setCurrentTest('');
     onTestComplete?.(results);
-  };
-
-  // 按钮响应性测试
-  const testButtonResponsiveness = async (): Promise<UXTestResult> => {
-    const buttons = document.querySelectorAll('button');
-    let responsiveButtons = 0;
-    let totalButtons = buttons.length;
-
-    buttons.forEach(button => {
-      if (button.disabled === false && button.style.pointerEvents !== 'none') {
-        responsiveButtons++;
-      }
-    });
-
-    const score = Math.round((responsiveButtons / totalButtons) * 100);
-    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
-
-    return {
-      category: '交互响应',
-      testName: '按钮点击响应测试',
-      status,
-      score,
-      feedback: `${responsiveButtons}/${totalButtons} 个按钮响应正常`,
-      suggestions: score < 80 ? ['检查按钮状态', '优化按钮交互'] : []
-    };
-  };
-
-  // 页面加载性能测试
-  const testPageLoadPerformance = async (): Promise<UXTestResult> => {
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    const loadTime = navigation ? navigation.loadEventEnd - navigation.loadEventStart : 0;
-    
-    const score = loadTime < 2000 ? 100 : loadTime < 4000 ? 80 : loadTime < 6000 ? 60 : 40;
-    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
-
-    return {
-      category: '加载性能',
-      testName: '页面加载速度测试',
-      status,
-      score,
-      feedback: `页面加载时间: ${Math.round(loadTime)}ms`,
-      suggestions: loadTime > 2000 ? ['优化资源加载', '启用缓存策略'] : []
-    };
-  };
-
-  // 触摸交互测试
-  const testTouchInteractions = async (): Promise<UXTestResult> => {
-    const touchElements = document.querySelectorAll('[data-touch-friendly]');
-    const hasTouchSupport = 'ontouchstart' in window;
-    
-    let score = 0;
-    if (hasTouchSupport) {
-      score = touchElements.length > 0 ? 100 : 60;
-    } else {
-      score = 80; // 桌面端不需要触摸支持
-    }
-
-    const status = score >= 80 ? 'pass' : 'pending';
-
-    return {
-      category: '移动端适配',
-      testName: '触摸交互测试',
-      status,
-      score,
-      feedback: `触摸支持: ${hasTouchSupport ? '是' : '否'}, 触摸友好元素: ${touchElements.length}个`,
-      suggestions: score < 80 ? ['添加触摸友好属性', '优化移动端交互'] : []
-    };
-  };
-
-  // 键盘导航测试
-  const testKeyboardNavigation = async (): Promise<UXTestResult> => {
-    const focusableElements = document.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    let accessibleElements = 0;
-    let totalElements = focusableElements.length;
-
-    focusableElements.forEach(element => {
-      if (element.getAttribute('tabindex') !== '-1') {
-        accessibleElements++;
-      }
-    });
-
-    const score = Math.round((accessibleElements / totalElements) * 100);
-    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
-
-    return {
-      category: '可访问性',
-      testName: '键盘导航测试',
-      status,
-      score,
-      feedback: `${accessibleElements}/${totalElements} 个元素支持键盘导航`,
-      suggestions: score < 80 ? ['添加tabindex属性', '优化键盘导航顺序'] : []
-    };
-  };
-
-  // 视觉反馈测试
-  const testVisualFeedback = async (): Promise<UXTestResult> => {
-    const interactiveElements = document.querySelectorAll('button, a, input');
-    let feedbackElements = 0;
-    let totalElements = interactiveElements.length;
-
-    interactiveElements.forEach(element => {
-      const styles = window.getComputedStyle(element);
-      if (styles.transition || styles.animation || element.classList.contains('hover:') || element.classList.contains('focus:')) {
-        feedbackElements++;
-      }
-    });
-
-    const score = Math.round((feedbackElements / totalElements) * 100);
-    const status = score >= 80 ? 'pass' : score >= 60 ? 'pending' : 'fail';
-
-    return {
-      category: '视觉反馈',
-      testName: '状态变化反馈测试',
-      status,
-      score,
-      feedback: `${feedbackElements}/${totalElements} 个元素有视觉反馈`,
-      suggestions: score < 80 ? ['添加hover效果', '优化状态变化动画'] : []
-    };
   };
 
   // 获取测试统计

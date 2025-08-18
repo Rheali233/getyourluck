@@ -3,8 +3,8 @@
  * 遵循统一开发标准的API接口规范
  */
 
-import type { APIResponse, PaginatedResponse } from '@/shared/types/apiResponse'
-import { ModuleError, ERROR_CODES } from '@/shared/types/errors'
+import type { APIResponse } from '../../../shared/types/apiResponse'
+import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
 
 class ApiClient {
   private baseURL: string

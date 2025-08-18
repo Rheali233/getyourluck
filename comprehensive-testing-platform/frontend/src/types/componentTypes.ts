@@ -46,7 +46,7 @@ export interface ButtonProps extends BaseComponentProps {
 /**
  * 卡片组件属性接口
  */
-export interface CardProps extends BaseComponentProps {
+export interface CardProps extends BaseComponentProps, React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   description?: string;
   actions?: React.ReactNode;

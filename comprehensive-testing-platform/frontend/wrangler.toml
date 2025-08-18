@@ -2,52 +2,16 @@ name = "getyourluck-frontend"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-[build]
-command = "npm run build"
-output_dir = "dist"
+# Cloudflare Pages 构建产物目录
+pages_build_output_dir = "dist"
 
-[env.production]
-name = "getyourluck-frontend-prod"
-route = "getyourluck.com/*"
-zone_id = "your-zone-id"
-
-[env.staging]
-name = "getyourluck-frontend-staging"
-route = "staging.getyourluck.com/*"
-zone_id = "your-zone-id"
-
-[env.development]
-name = "getyourluck-frontend-dev"
-route = "dev.getyourluck.com/*"
-zone_id = "your-zone-id"
-
-[site]
-bucket = "./dist"
-entry-point = "."
-
+# Pages 仅支持 preview / production 环境变量
 [env.production.vars]
 NODE_ENV = "production"
 API_BASE_URL = "https://api.getyourluck.com"
 CDN_BASE_URL = "https://cdn.getyourluck.com"
 
-[env.staging.vars]
+[env.preview.vars]
 NODE_ENV = "staging"
 API_BASE_URL = "https://staging-api.getyourluck.com"
 CDN_BASE_URL = "https://staging-cdn.getyourluck.com"
-
-[env.development.vars]
-NODE_ENV = "development"
-API_BASE_URL = "https://dev-api.getyourluck.com"
-CDN_BASE_URL = "https://dev-cdn.getyourluck.com"
-
-[env.production.rules]
-type = "ESModule"
-fallback = true
-
-[env.staging.rules]
-type = "ESModule"
-fallback = true
-
-[env.development.rules]
-type = "ESModule"
-fallback = true

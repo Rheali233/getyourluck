@@ -3,117 +3,121 @@
  * 优化移动端触摸体验
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
 export interface TouchFriendlyComponentsProps extends BaseComponentProps {
   children: React.ReactNode;
+  onSwipe?: (direction: 'left' | 'right' | 'up' | 'down') => void;
   onTap?: () => void;
   onLongPress?: () => void;
-  onSwipe?: (direction: 'left' | 'right' | 'up' | 'down') => void;
+  swipeThreshold?: number;
+  longPressDelay?: number;
 }
 
 export const TouchFriendlyComponents: React.FC<TouchFriendlyComponentsProps> = ({
   className,
   testId = 'touch-friendly-components',
   children,
+  onSwipe,
   onTap,
   onLongPress,
-  onSwipe,
+  swipeThreshold = 50,
+  longPressDelay = 500,
   ...props
 }) => {
-  const [isPressed, setIsPressed] = useState(false);
-  const [startTime, setStartTime] = useState(0);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
-  
-  const elementRef = useRef<HTMLDivElement>(null);
-  const longPressTimerRef = useRef<NodeJS.Timeout>();
-  const isLongPressRef = useRef(false);
+  const [isLongPress, setIsLongPress] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const touchStartTime = useRef<number>(0);
 
-  // 触摸开始
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
-    setStartTime(Date.now());
+    if (!touch) return;
+    
     setStartPosition({ x: touch.clientX, y: touch.clientY });
     setCurrentPosition({ x: touch.clientX, y: touch.clientY });
-    setIsPressed(true);
-    isLongPressRef.current = false;
+    setIsLongPress(false);
+    touchStartTime.current = Date.now();
 
-    // 长按检测
-    longPressTimerRef.current = setTimeout(() => {
-      isLongPressRef.current = true;
+    // 开始长按计时器
+    longPressTimer.current = setTimeout(() => {
+      setIsLongPress(true);
       onLongPress?.();
-    }, 500);
+    }, longPressDelay);
   };
 
-  // 触摸移动
   const handleTouchMove = (e: React.TouchEvent) => {
     const touch = e.touches[0];
-    setCurrentPosition({ x: touch.clientX, y: touch.clientY });
+    if (!touch) return;
     
-    // 如果移动距离过大，取消长按
+    setCurrentPosition({ x: touch.clientX, y: touch.clientY });
+
+    // 如果移动距离超过阈值，取消长按
     const deltaX = Math.abs(touch.clientX - startPosition.x);
     const deltaY = Math.abs(touch.clientY - startPosition.y);
     
-    if (deltaX > 10 || deltaY > 10) {
-      if (longPressTimerRef.current) {
-        clearTimeout(longPressTimerRef.current);
+    if (deltaX > swipeThreshold || deltaY > swipeThreshold) {
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
       }
     }
   };
 
-  // 触摸结束
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    setIsPressed(false);
-    
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
     }
 
-    // 计算移动距离和方向
-    const deltaX = currentPosition.x - startPosition.x;
-    const deltaY = currentPosition.y - startPosition.y;
-    const deltaTime = Date.now() - startTime;
-    
-    // 判断是否为滑动
-    if (deltaTime < 300 && (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50)) {
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // 水平滑动
+    if (!isLongPress) {
+      const deltaX = currentPosition.x - startPosition.x;
+      const deltaY = currentPosition.y - startPosition.y;
+
+      // 检测滑动方向
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > swipeThreshold) {
         onSwipe?.(deltaX > 0 ? 'right' : 'left');
-      } else {
-        // 垂直滑动
+      } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > swipeThreshold) {
         onSwipe?.(deltaY > 0 ? 'down' : 'up');
-      }
-    } else if (deltaTime < 300 && Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
-      // 点击
-      if (!isLongPressRef.current) {
+      } else if (Math.abs(deltaX) <= swipeThreshold && Math.abs(deltaY) <= swipeThreshold) {
+        // 轻触
         onTap?.();
       }
     }
+
+    // 重置状态
+    setStartPosition({ x: 0, y: 0 });
+    setCurrentPosition({ x: 0, y: 0 });
+    setIsLongPress(false);
   };
 
   // 鼠标事件支持
   const handleMouseDown = () => {
-    setIsPressed(true);
+    // This component is primarily for touch, but we can add mouse support if needed.
+    // For now, we'll just call onTap if no specific mouse handlers are provided.
+    onTap?.();
   };
 
   const handleMouseUp = () => {
-    setIsPressed(false);
+    // This component is primarily for touch, but we can add mouse support if needed.
+    // For now, we'll just call onTap if no specific mouse handlers are provided.
     onTap?.();
   };
 
   const handleMouseLeave = () => {
-    setIsPressed(false);
+    // This component is primarily for touch, but we can add mouse support if needed.
+    // For now, we'll just call onTap if no specific mouse handlers are provided.
+    onTap?.();
   };
 
   return (
     <div
-      ref={elementRef}
       className={cn(
         "touch-friendly-component select-none",
-        isPressed && "scale-95 transition-transform duration-100",
+        // isPressed && "scale-95 transition-transform duration-100", // This state is removed
         className
       )}
       data-testid={testId}

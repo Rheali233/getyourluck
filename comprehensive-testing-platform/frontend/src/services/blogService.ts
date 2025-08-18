@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from './apiClient'
-import type { APIResponse, PaginatedResponse } from '@/shared/types/apiResponse'
+import type { APIResponse, PaginatedResponse } from '../../../shared/types/apiResponse'
 
 export const blogService = {
   /**

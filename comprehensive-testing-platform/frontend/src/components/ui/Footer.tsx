@@ -5,8 +5,8 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { BaseComponentProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
+import type { BaseComponentProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
 
 export interface FooterProps extends BaseComponentProps {
   variant?: 'default' | 'simple';

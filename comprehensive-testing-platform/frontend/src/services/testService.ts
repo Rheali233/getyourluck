@@ -4,7 +4,7 @@
  */
 
 import { apiClient } from './apiClient'
-import type { APIResponse, TestResult, TestSubmission } from '@/shared/types/apiResponse'
+import type { APIResponse, TestResult, TestSubmission } from '../../../shared/types/apiResponse'
 
 export const testService = {
   /**

@@ -4,8 +4,8 @@
  */
 
 import { create } from 'zustand'
-import type { TestModuleState, TestModuleActions } from '@/shared/types/moduleState'
-import type { TestResult } from '@/shared/types/apiResponse'
+import type { TestModuleState, TestModuleActions } from '../../../shared/types/moduleState'
+import type { TestResult } from '../../../shared/types/apiResponse'
 import { testService } from '@/services/testService'
 
 export const useTestStore = create<TestModuleState & TestModuleActions>((set, get) => ({

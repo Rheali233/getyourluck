@@ -4,9 +4,9 @@
  */
 
 import React, { useEffect } from 'react';
-import type { BaseComponentProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
-import { Button } from './Button';
+import type { BaseComponentProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
+
 
 export interface ModalProps extends BaseComponentProps {
   isOpen: boolean;

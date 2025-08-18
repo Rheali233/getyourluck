@@ -5,7 +5,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { PsychologyModuleState, TestType, TestStatus, TestSession, UserAnswer, BaseQuestion, TestResult } from '../types';
+import type { PsychologyModuleState, TestSession, UserAnswer, TestResult, MbtiResult, Phq9Result, EqResult } from '../types';
+import { TestType, TestStatus } from '../types';
 
 // 默认题库数据（简化版本，实际应从API加载）
 const defaultQuestions = {
@@ -18,8 +19,8 @@ const defaultQuestions = {
       order: 1,
       dimension: 'E-I' as const,
       options: [
-        { id: 'mbti-1-e', text: '喜欢与很多人交谈，感到精力充沛', value: 'E' },
-        { id: 'mbti-1-i', text: '更喜欢与少数人深入交谈，感到放松', value: 'I' },
+        { id: 'mbti-1-e', text: '喜欢与很多人交谈，感到精力充沛', value: 'E' as const },
+        { id: 'mbti-1-i', text: '更喜欢与少数人深入交谈，感到放松', value: 'I' as const },
       ],
     },
     {
@@ -30,8 +31,8 @@ const defaultQuestions = {
       order: 2,
       dimension: 'S-N' as const,
       options: [
-        { id: 'mbti-2-s', text: '关注具体的事实和细节', value: 'S' },
-        { id: 'mbti-2-n', text: '关注可能性和未来趋势', value: 'N' },
+        { id: 'mbti-2-s', text: '关注具体的事实和细节', value: 'S' as const },
+        { id: 'mbti-2-n', text: '关注可能性和未来趋势', value: 'N' as const },
       ],
     },
     // 更多MBTI题目...
@@ -45,10 +46,10 @@ const defaultQuestions = {
       order: 1,
       symptom: 'anhedonia',
       options: [
-        { id: 'phq9-1-0', text: '完全不会', value: 0, description: '过去两周内完全没有这种感觉' },
-        { id: 'phq9-1-1', text: '几天', value: 1, description: '过去两周内有几天有这种感觉' },
-        { id: 'phq9-1-2', text: '一半以上的天数', value: 2, description: '过去两周内有一半以上的天数有这种感觉' },
-        { id: 'phq9-1-3', text: '几乎每天', value: 3, description: '过去两周内几乎每天都有这种感觉' },
+        { id: 'phq9-1-0', text: '完全不会', value: 0 as const, description: '过去两周内完全没有这种感觉' },
+        { id: 'phq9-1-1', text: '几天', value: 1 as const, description: '过去两周内有几天有这种感觉' },
+        { id: 'phq9-1-2', text: '一半以上的天数', value: 2 as const, description: '过去两周内有一半以上的天数有这种感觉' },
+        { id: 'phq9-1-3', text: '几乎每天', value: 3 as const, description: '过去两周内几乎每天都有这种感觉' },
       ],
     },
     // 更多PHQ-9题目...
@@ -62,11 +63,11 @@ const defaultQuestions = {
       order: 1,
       dimension: 'self_awareness' as const,
       options: [
-        { id: 'eq-1-1', text: '完全不同意', value: 1, description: '我完全无法识别自己的情绪' },
-        { id: 'eq-1-2', text: '不同意', value: 2, description: '我很少能识别自己的情绪' },
-        { id: 'eq-1-3', text: '中立', value: 3, description: '我有时能识别自己的情绪' },
-        { id: 'eq-1-4', text: '同意', value: 4, description: '我经常能识别自己的情绪' },
-        { id: 'eq-1-5', text: '完全同意', value: 5, description: '我总能准确识别自己的情绪' },
+        { id: 'eq-1-1', text: '完全不同意', value: 1 as const, description: '我完全无法识别自己的情绪' },
+        { id: 'eq-1-2', text: '不同意', value: 2 as const, description: '我很少能识别自己的情绪' },
+        { id: 'eq-1-3', text: '中立', value: 3 as const, description: '我有时能识别自己的情绪' },
+        { id: 'eq-1-4', text: '同意', value: 4 as const, description: '我经常能识别自己的情绪' },
+        { id: 'eq-1-5', text: '完全同意', value: 5 as const, description: '我总能准确识别自己的情绪' },
       ],
     },
     // 更多情商题目...
@@ -80,13 +81,13 @@ const defaultQuestions = {
       order: 1,
       domain: 'life_balance' as const,
       options: [
-        { id: 'happiness-1-1', text: '非常不同意', value: 1, description: '我对生活完全不满意' },
-        { id: 'happiness-1-2', text: '不同意', value: 2, description: '我对生活不太满意' },
-        { id: 'happiness-1-3', text: '有点不同意', value: 3, description: '我对生活有点不满意' },
-        { id: 'happiness-1-4', text: '中立', value: 4, description: '我对生活没有特别感觉' },
-        { id: 'happiness-1-5', text: '有点同意', value: 5, description: '我对生活有点满意' },
-        { id: 'happiness-1-6', text: '同意', value: 6, description: '我对生活满意' },
-        { id: 'happiness-1-7', text: '非常同意', value: 7, description: '我对生活非常满意' },
+        { id: 'happiness-1-1', text: '非常不同意', value: 1 as const, description: '我对生活完全不满意' },
+        { id: 'happiness-1-2', text: '不同意', value: 2 as const, description: '我对生活不太满意' },
+        { id: 'happiness-1-3', text: '有点不同意', value: 3 as const, description: '我对生活有点不满意' },
+        { id: 'happiness-1-4', text: '中立', value: 4 as const, description: '我对生活没有特别感觉' },
+        { id: 'happiness-1-5', text: '有点同意', value: 5 as const, description: '我对生活有点满意' },
+        { id: 'happiness-1-6', text: '同意', value: 6 as const, description: '我对生活满意' },
+        { id: 'happiness-1-7', text: '非常同意', value: 7 as const, description: '我对生活非常满意' },
       ],
     },
     // 更多幸福指数题目...
@@ -274,11 +275,11 @@ export const usePsychologyStore = create<PsychologyModuleState>()(
       },
 
       // 题库管理
-      loadQuestions: async (testType: TestType) => {
+      loadQuestions: async (_testType: TestType) => {
         try {
           set({ isLoading: true, error: null });
           
-          // TODO: 从API加载题库数据
+          // TODO: 从API加载题库
           // const response = await api.get(`/psychology/questions/${testType}`);
           // set({ questions: { ...get().questions, [testType]: response.data } });
           
@@ -300,7 +301,7 @@ export const usePsychologyStore = create<PsychologyModuleState>()(
           return null;
         }
 
-        return questionList[currentSession.currentQuestionIndex];
+        return questionList[currentSession.currentQuestionIndex] || null;
       },
 
       // 结果管理
@@ -404,15 +405,15 @@ export const usePsychologyStore = create<PsychologyModuleState>()(
 );
 
 // 辅助函数：生成MBTI结果
-function generateMbtiResults(session: TestSession) {
+function generateMbtiResults(_session: TestSession): MbtiResult {
   // TODO: 实现MBTI结果生成逻辑
   return {
     type: 'INTJ',
     dimensions: {
-      E_I: { score: 60, preference: 'I' },
-      S_N: { score: 70, preference: 'N' },
-      T_F: { score: 80, preference: 'T' },
-      J_P: { score: 65, preference: 'J' },
+      E_I: { score: 60, preference: 'I' as const },
+      S_N: { score: 70, preference: 'N' as const },
+      T_F: { score: 80, preference: 'T' as const },
+      J_P: { score: 65, preference: 'J' as const },
     },
     description: '建筑师型人格，富有想象力和战略性的思考者...',
     strengths: ['战略思维', '独立性强', '追求完美'],
@@ -424,7 +425,7 @@ function generateMbtiResults(session: TestSession) {
 }
 
 // 辅助函数：生成PHQ-9结果
-function generatePhq9Results(session: TestSession) {
+function generatePhq9Results(_session: TestSession): Phq9Result {
   // TODO: 实现PHQ-9结果生成逻辑
   return {
     totalScore: 5,
@@ -445,7 +446,7 @@ function generatePhq9Results(session: TestSession) {
 }
 
 // 辅助函数：生成情商结果
-function generateEqResults(session: TestSession) {
+function generateEqResults(_session: TestSession): EqResult {
   // TODO: 实现情商结果生成逻辑
   return {
     totalScore: 75,
@@ -464,7 +465,7 @@ function generateEqResults(session: TestSession) {
 }
 
 // 辅助函数：生成幸福指数结果
-function generateHappinessResults(session: TestSession) {
+function generateHappinessResults(_session: TestSession): any {
   // TODO: 实现幸福指数结果生成逻辑
   return {
     totalScore: 6.2,

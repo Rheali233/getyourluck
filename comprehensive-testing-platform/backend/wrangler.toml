@@ -103,10 +103,6 @@ RATE_LIMIT_MAX = "1000"
 command = "npm run build"
 watch_dir = "src"
 
-# 部署配置
-[deploy]
-upload.format = "service-worker"
-
 # 性能配置
 [env.production.performance]
 cpu = "high"

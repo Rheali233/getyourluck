@@ -3,7 +3,7 @@
  * 负责管理页面的SEO元数据、结构化数据和多语言SEO优化
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BaseComponentProps } from '@/types/componentTypes';
 
@@ -35,36 +35,32 @@ export interface StructuredData {
 }
 
 export interface SEOManagerProps extends BaseComponentProps {
-  metadata: SEOMetadata;
+  pageType?: 'homepage' | 'test' | 'blog';
   structuredData?: StructuredData[];
-  pageType?: 'homepage' | 'test' | 'blog' | 'search';
-  language?: string;
-  noIndex?: boolean;
-  noFollow?: boolean;
 }
 
 export const SEOManager: React.FC<SEOManagerProps> = ({
-  className,
-  testId = 'seo-manager',
-  metadata,
-  structuredData = [],
-  pageType = 'homepage',
-  language = 'zh-CN',
-  noIndex = false,
-  noFollow = false,
-  ...props
+  structuredData = []
 }) => {
   const { t } = useTranslation('homepage');
 
-  // 获取当前语言的元数据
-  const currentMetadata = useMemo(() => {
-    const isEnglish = language === 'en-US';
-    return {
-      title: isEnglish ? metadata.titleEn : metadata.title,
-      description: isEnglish ? metadata.descriptionEn : metadata.description,
-      keywords: isEnglish ? metadata.keywordsEn : metadata.keywords,
-    };
-  }, [metadata, language]);
+  // 默认元数据
+  const defaultMetadata = useMemo(() => ({
+    title: t('seo.defaultTitle'),
+    description: t('seo.defaultDescription'),
+    keywords: t('seo.defaultKeywords'),
+    canonicalUrl: window.location.href,
+    ogTitle: t('seo.defaultOgTitle'),
+    ogDescription: t('seo.defaultOgDescription'),
+    ogType: 'website',
+    ogImage: '',
+    twitterCard: 'summary_large_image',
+    twitterTitle: t('seo.defaultTwitterTitle'),
+    twitterDescription: t('seo.defaultTwitterDescription'),
+    twitterImage: ''
+  }), [t]);
+
+  const [currentMetadata] = useState(defaultMetadata);
 
   // 更新页面标题
   useEffect(() => {
@@ -76,7 +72,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 更新meta标签
   useEffect(() => {
     updateMetaTags();
-  }, [currentMetadata, metadata, noIndex, noFollow]);
+  }, [currentMetadata]);
 
   // 更新结构化数据
   useEffect(() => {
@@ -89,10 +85,10 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     updateMetaTag('description', currentMetadata.description);
     
     // 更新keywords
-    updateMetaTag('keywords', currentMetadata.keywords.join(', '));
+    updateMetaTag('keywords', currentMetadata.keywords);
     
     // 更新canonical URL
-    updateCanonicalUrl(metadata.canonicalUrl);
+    updateCanonicalUrl(defaultMetadata.canonicalUrl);
     
     // 更新Open Graph标签
     updateOpenGraphTags();
@@ -132,16 +128,16 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 更新Open Graph标签
   const updateOpenGraphTags = () => {
     const ogTags = [
-      { property: 'og:title', content: metadata.ogTitle || currentMetadata.title },
-      { property: 'og:description', content: metadata.ogDescription || currentMetadata.description },
-      { property: 'og:url', content: metadata.canonicalUrl },
-      { property: 'og:type', content: metadata.ogType || 'website' },
-      { property: 'og:locale', content: language },
+      { property: 'og:title', content: defaultMetadata.ogTitle || currentMetadata.title },
+      { property: 'og:description', content: defaultMetadata.ogDescription || currentMetadata.description },
+      { property: 'og:url', content: defaultMetadata.canonicalUrl },
+      { property: 'og:type', content: defaultMetadata.ogType || 'website' },
+      { property: 'og:locale', content: 'zh-CN' }, // 假设默认语言是中文
       { property: 'og:site_name', content: '综合测试平台' }
     ];
 
-    if (metadata.ogImage) {
-      ogTags.push({ property: 'og:image', content: metadata.ogImage });
+    if (defaultMetadata.ogImage) {
+      ogTags.push({ property: 'og:image', content: defaultMetadata.ogImage });
     }
 
     ogTags.forEach(tag => {
@@ -152,14 +148,14 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 更新Twitter Card标签
   const updateTwitterCardTags = () => {
     const twitterTags = [
-      { name: 'twitter:card', content: metadata.twitterCard || 'summary_large_image' },
-      { name: 'twitter:title', content: metadata.twitterTitle || currentMetadata.title },
-      { name: 'twitter:description', content: metadata.twitterDescription || currentMetadata.description },
+      { name: 'twitter:card', content: defaultMetadata.twitterCard || 'summary_large_image' },
+      { name: 'twitter:title', content: defaultMetadata.twitterTitle || currentMetadata.title },
+      { name: 'twitter:description', content: defaultMetadata.twitterDescription || currentMetadata.description },
       { name: 'twitter:site', content: '@testplatform' }
     ];
 
-    if (metadata.twitterImage) {
-      twitterTags.push({ name: 'twitter:image', content: metadata.twitterImage });
+    if (defaultMetadata.twitterImage) {
+      twitterTags.push({ name: 'twitter:image', content: defaultMetadata.twitterImage });
     }
 
     twitterTags.forEach(tag => {
@@ -169,8 +165,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
 
   // 更新robots标签
   const updateRobotsTags = () => {
-    let robots = noIndex || noFollow ? 'noindex' : 'index';
-    if (noFollow) robots += ',nofollow';
+    let robots = 'index'; // 默认允许索引
     
     updateMetaTag('robots', robots);
   };
@@ -178,7 +173,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 更新语言标签
   const updateLanguageTags = () => {
     // 更新html lang属性
-    document.documentElement.lang = language;
+    document.documentElement.lang = 'zh-CN'; // 假设默认语言是中文
     
     // 更新hreflang标签
     updateHreflangTags();
@@ -187,7 +182,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 更新hreflang标签
   const updateHreflangTags = () => {
     const supportedLanguages = ['zh-CN', 'en-US'];
-    const currentUrl = metadata.canonicalUrl;
+    const currentUrl = defaultMetadata.canonicalUrl;
     
     // 移除现有的hreflang标签
     const existingHreflangs = document.querySelectorAll('link[rel="alternate"][hreflang]');
@@ -236,44 +231,10 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     });
   };
 
-  // 生成默认的结构化数据
-  const defaultStructuredData = useMemo((): StructuredData[] => {
-    const baseData: StructuredData = {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: currentMetadata.title,
-      description: currentMetadata.description,
-      url: metadata.canonicalUrl,
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: `${metadata.canonicalUrl}/search?q={search_term_string}`,
-        'query-input': 'required name=search_term_string'
-      }
-    };
-
-    // 根据页面类型添加特定数据
-    if (pageType === 'homepage') {
-      baseData['@type'] = 'WebSite';
-      baseData.about = '专业的在线测试平台，提供心理测试、占星分析、塔罗占卜等多种测试服务';
-      baseData.audience = '希望了解自己、规划未来的用户';
-    } else if (pageType === 'test') {
-      baseData['@type'] = 'SoftwareApplication';
-      baseData.applicationCategory = 'TestApplication';
-      baseData.operatingSystem = 'Web Browser';
-    } else if (pageType === 'blog') {
-      baseData['@type'] = 'Blog';
-      baseData.blogPost = [];
-    }
-
-    return [baseData];
-  }, [currentMetadata, metadata, pageType]);
-
   // 组件挂载时初始化
   useEffect(() => {
-    // 如果没有传入结构化数据，使用默认数据
-    if (structuredData.length === 0) {
-      updateStructuredData();
-    }
+    // 初始化SEO设置
+    updateMetaTags();
   }, []);
 
   // 这个组件不渲染任何UI，只负责SEO管理

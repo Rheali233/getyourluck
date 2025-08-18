@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import type { CardProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
+import type { CardProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
 
 /**
  * 卡片组件

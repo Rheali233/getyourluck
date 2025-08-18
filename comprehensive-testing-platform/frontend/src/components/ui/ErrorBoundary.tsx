@@ -3,7 +3,7 @@
  * 遵循统一开发标准的错误处理规范
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 
 interface Props extends BaseComponentProps {
@@ -26,14 +26,14 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('Error caught by boundary:', error, errorInfo);
     
     // 这里可以添加错误报告服务
     // errorReportingService.captureException(error, errorInfo)
   }
 
-  render(): ReactNode {
+  override render(): ReactNode {
     if (this.state.hasError) {
       return this.props.fallback || (
         <div 
@@ -84,7 +84,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
             </div>
             
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env['NODE_ENV'] === 'development' && this.state.error && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
                   错误详情 (开发模式)

@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui';
 import type { TestModule } from '../types';
 import { cn } from '@/utils/classNames';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface TestModulesGridProps {
   className?: string;
@@ -22,8 +21,6 @@ const TestModuleCard: React.FC<{
   module: TestModule;
   onClick: (module: TestModule) => void;
 }> = ({ module, onClick }) => {
-  const { t } = useLanguage();
-  
   return (
     <Card
       className={cn(
@@ -99,13 +96,11 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
   className,
   testId = 'test-modules-grid',
   modules = [],
-  onModuleClick,
-  ...props
+  onModuleClick
 }) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const { t } = useLanguage();
 
   // 默认测试模块数据
   const defaultModules: TestModule[] = [
@@ -119,72 +114,72 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       rating: 4.8,
       isActive: true,
       route: '/tests/psychology',
-      features: ['性格分析', '情绪评估', '认知测试'],
-      estimatedTime: '10-20分钟'
+      features: ['MBTI性格测试', '抑郁筛查', '情商评估'],
+      estimatedTime: '10-15分钟'
     },
     {
       id: 'astrology',
-      name: '占星分析',
-      description: '基于星座和星盘的个性化分析，揭示你的天赋和潜力',
+      name: '占星运势',
+      description: '专业的占星分析，解读你的星座密码，预测未来运势',
       icon: '⭐',
       theme: 'astrology',
-      testCount: 8,
-      rating: 4.6,
-      isActive: true,
-      route: '/tests/astrology',
-      features: ['星座分析', '星盘解读', '运势预测'],
-      estimatedTime: '15-25分钟'
-    },
-    {
-      id: 'tarot',
-      name: '塔罗占卜',
-      description: '神秘的塔罗牌解读，为你的人生问题提供指引',
-      icon: '🎴',
-      theme: 'tarot',
       testCount: 12,
       rating: 4.7,
       isActive: true,
-      route: '/tests/tarot',
-      features: ['塔罗解读', '问题分析', '未来指引'],
-      estimatedTime: '20-30分钟'
+      route: '/tests/astrology',
+      features: ['星座运势', '星盘解读', '运势预测'],
+      estimatedTime: '5-8分钟'
     },
     {
       id: 'career',
       name: '职业规划',
-      description: '科学的职业倾向测试，帮你找到最适合的职业方向',
+      description: '科学的职业测评，帮你找到最适合的职业发展方向',
       icon: '💼',
       theme: 'career',
-      testCount: 10,
+      testCount: 18,
       rating: 4.9,
       isActive: true,
       route: '/tests/career',
-      features: ['职业倾向', '能力评估', '发展规划'],
-      estimatedTime: '25-35分钟'
+      features: ['职业兴趣', '能力评估', '职业规划'],
+      estimatedTime: '15-20分钟'
     },
     {
       id: 'relationship',
       name: '人际关系',
-      description: '深入分析你的人际交往模式，改善社交关系',
+      description: '深入分析你的人际关系模式，提升社交能力',
       icon: '❤️',
       theme: 'relationship',
-      testCount: 6,
-      rating: 4.5,
+      testCount: 10,
+      rating: 4.6,
       isActive: true,
       route: '/tests/relationship',
-      features: ['社交模式', '沟通风格', '关系建议'],
-      estimatedTime: '15-20分钟'
+      features: ['恋爱类型', '沟通方式', '关系模式'],
+      estimatedTime: '8-12分钟'
+    },
+    {
+      id: 'learning',
+      name: '学习能力',
+      description: '评估你的学习风格和认知能力，优化学习方法',
+      icon: '📚',
+      theme: 'learning',
+      testCount: 14,
+      rating: 4.5,
+      isActive: true,
+      route: '/tests/learning',
+      features: ['学习风格', '认知能力', '学习方法'],
+      estimatedTime: '12-18分钟'
     },
     {
       id: 'numerology',
-      name: '数字命理',
-      description: '通过数字分析你的性格特征和人生轨迹',
+      name: '传统命理',
+      description: '结合传统文化，解读你的命理密码和人生轨迹',
       icon: '🔢',
       theme: 'numerology',
-      testCount: 4,
+      testCount: 8,
       rating: 4.4,
       isActive: false,
-      route: '/tests/placeholder',
-      features: ['数字分析', '性格解读', '人生轨迹'],
+      route: '/tests/numerology',
+      features: ['八字分析', '生肖解读', '姓名学'],
       estimatedTime: '10-15分钟'
     }
   ];
@@ -211,16 +206,15 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
     <section
       className={cn("py-16 px-4 sm:px-6 lg:px-8 bg-gray-50", className)}
       data-testid={testId}
-      {...props}
     >
       <div className="max-w-7xl mx-auto">
         {/* 标题 */}
         <div className="text-left mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            {t('testSection.title')}
+            测试模块
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl">
-            {t('testSection.subtitle')}
+            这里汇集了各种类型的测试，帮助你更好地了解自己。
           </p>
         </div>
 
@@ -238,7 +232,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
         {/* 底部提示 */}
         <div className="text-center mt-12">
           <p className="text-gray-500 text-sm">
-            {t('testSection.footer')}
+            更多测试模块正在开发中，敬请期待！
           </p>
         </div>
 

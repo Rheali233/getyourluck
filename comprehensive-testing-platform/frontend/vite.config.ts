@@ -14,7 +14,7 @@ export default defineConfig({
       '@/services': '/src/services',
       '@/stores': '/src/stores',
       '@/types': '/src/types',
-      '@/shared': '/../shared',
+      '@/shared': '../shared',
     },
   },
   server: {

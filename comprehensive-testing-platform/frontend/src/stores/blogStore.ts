@@ -4,8 +4,8 @@
  */
 
 import { create } from 'zustand'
-import type { ModuleState, ModuleActions } from '@/shared/types/moduleState'
-import type { PaginatedResponse } from '@/shared/types/apiResponse'
+import type { ModuleState, ModuleActions } from '../../../shared/types/moduleState'
+import type { PaginatedResponse } from '../../../shared/types/apiResponse'
 import { blogService } from '@/services/blogService'
 
 interface BlogState extends ModuleState {
@@ -30,7 +30,7 @@ interface BlogActions extends ModuleActions {
   incrementViewCount: (id: string) => Promise<void>
 }
 
-export const useBlogStore = create<BlogState & BlogActions>((set, get) => ({
+export const useBlogStore = create<BlogState & BlogActions>((set) => ({
   // 基础状态
   isLoading: false,
   error: null,
@@ -59,7 +59,7 @@ export const useBlogStore = create<BlogState & BlogActions>((set, get) => ({
   setData: (data: any) => set({ data, lastUpdated: new Date() }),
 
   // 博客专用操作
-  fetchArticles: async (page = 1, category = null) => {
+  fetchArticles: async (page = 1, category: string | undefined = undefined) => {
     set({ isLoading: true, error: null })
     
     try {

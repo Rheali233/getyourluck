@@ -18,14 +18,17 @@ export { default as Footer } from './Footer';
 export { default as PageHeader } from './PageHeader';
 
 // 类型导出
-export type { ButtonProps } from './Button';
-export type { CardProps } from './Card';
-export type { InputProps } from './Input';
-export type { SelectProps } from './Select';
-export type { FormProps } from './Form';
+export type {
+  ButtonProps,
+  CardProps,
+  InputProps,
+  SelectProps,
+  FormProps,
+  LoadingProps as LoadingSpinnerProps,
+  NavigationProps,
+  PageHeaderProps,
+} from '../../types/componentTypes';
+
 export type { ModalProps } from './Modal';
 export type { AlertProps } from './Alert';
-export type { LoadingSpinnerProps } from './LoadingSpinner';
-export type { NavigationProps } from './Navigation';
 export type { FooterProps } from './Footer';
-export type { PageHeaderProps } from './PageHeader'; 

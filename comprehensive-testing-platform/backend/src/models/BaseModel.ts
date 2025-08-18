@@ -16,12 +16,9 @@ export abstract class BaseModel {
     if (!env.DB) {
       throw new ModuleError('Database connection not available', ERROR_CODES.DATABASE_ERROR, 500)
     }
-    if (!env.KV) {
-      throw new ModuleError('KV storage not available', ERROR_CODES.DATABASE_ERROR, 500)
-    }
     
     this.db = env.DB
-    this.kv = env.KV
+    this.kv = env.KV || null as any // 允许 KV 为 null
     this.tableName = tableName
   }
 

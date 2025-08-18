@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { CheckCircle, XCircle, AlertCircle, Clock, Zap, Shield, Globe, Database, Server } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle, XCircle, AlertCircle, Clock, Zap, Shield, Globe, Server } from 'lucide-react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 
 interface FinalTestSuiteProps extends BaseComponentProps {
@@ -26,20 +25,11 @@ interface TestResults {
   results: TestResult[];
 }
 
-interface PerformanceMetrics {
-  pageLoadTime: number;
-  searchResponseTime: number;
-  memoryUsage: number;
-  cpuUsage: number;
-  networkLatency: number;
-}
-
 export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
   className,
-  testId,
+  testId = 'final-test-suite',
   onTestComplete
 }) => {
-  const { t } = useTranslation('homepage');
   const [isRunning, setIsRunning] = useState(false);
   const [currentTest, setCurrentTest] = useState<string>('');
   const [progress, setProgress] = useState(0);
@@ -148,6 +138,8 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
     // 逐个执行测试
     for (let i = 0; i < allTests.length; i++) {
       const test = allTests[i];
+      if (!test) continue;
+      
       setCurrentTest(test.name);
       setProgress((i / allTests.length) * 100);
 
@@ -155,7 +147,7 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
       setResults(prev => ({
         ...prev,
         results: prev.results.map(t => 
-          t.id === test.id ? { ...t, status: 'running' } : t
+          t.id === test.id ? { ...t, status: 'running' as const } : t
         )
       }));
 
@@ -168,7 +160,7 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
         setResults(prev => ({
           ...prev,
           results: prev.results.map(t => 
-            t.id === test.id ? { ...t, ...result, duration, status: result.status } : t
+            t.id === test.id ? { ...t, ...result, duration, status: result.status || 'passed' } : t
           )
         }));
 
@@ -183,7 +175,7 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
           results: prev.results.map(t => 
             t.id === test.id ? { 
               ...t, 
-              status: 'failed', 
+              status: 'failed' as const, 
               message: `测试执行失败: ${error}`,
               duration: 0
             } : t
@@ -317,11 +309,6 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
 
   const testResponsiveDesign = async (): Promise<Partial<TestResult>> => {
     // 模拟响应式设计测试
-    const viewports = [
-      { width: 375, height: 667, name: 'Mobile' },
-      { width: 768, height: 1024, name: 'Tablet' },
-      { width: 1920, height: 1080, name: 'Desktop' }
-    ];
     
     return { status: 'passed', message: '响应式设计测试通过' };
   };

@@ -4,12 +4,8 @@
  */
 
 import type { 
-  TestModule, 
-  TestModuleStats, 
-  TestModuleRating,
-  TestModuleUsage,
-  TestModuleRecommendation 
-} from '@/types/homepage';
+  TestModule
+} from '../types';
 
 // 测试模块配置
 export const TEST_MODULES = {
@@ -108,18 +104,15 @@ export const getAllTestModules = (): TestModule[] => {
   return Object.values(TEST_MODULES).map(module => ({
     id: module.id,
     name: module.name,
-    nameEn: module.nameEn,
     description: module.description,
-    descriptionEn: module.descriptionEn,
     icon: module.icon,
-    color: module.color,
-    route: module.route,
-    features: module.features,
-    featuresEn: module.featuresEn,
+    theme: module.id as TestModule['theme'],
+    testCount: 0,
+    rating: 4.5,
     isActive: true,
-    order: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    route: module.route,
+    features: [...module.features],
+    estimatedTime: '10-15分钟'
   }));
 };
 
@@ -133,25 +126,22 @@ export const getTestModuleById = (id: TestModuleId): TestModule | null => {
   return {
     id: module.id,
     name: module.name,
-    nameEn: module.nameEn,
     description: module.description,
-    descriptionEn: module.descriptionEn,
     icon: module.icon,
-    color: module.color,
-    route: module.route,
-    features: module.features,
-    featuresEn: module.featuresEn,
+    theme: module.id as TestModule['theme'],
+    testCount: 0,
+    rating: 4.5,
     isActive: true,
-    order: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    route: module.route,
+    features: [...module.features],
+    estimatedTime: '10-15分钟'
   };
 };
 
 /**
  * 获取测试模块统计数据
  */
-export const getTestModuleStats = async (moduleId: TestModuleId): Promise<TestModuleStats | null> => {
+export const getTestModuleStats = async (moduleId: TestModuleId): Promise<any | null> => {
   try {
     const response = await fetch(`/api/homepage/modules/${moduleId}/stats`);
     if (!response.ok) return null;
@@ -167,8 +157,8 @@ export const getTestModuleStats = async (moduleId: TestModuleId): Promise<TestMo
 /**
  * 获取所有测试模块的统计数据
  */
-export const getAllTestModuleStats = async (): Promise<Record<TestModuleId, TestModuleStats>> => {
-  const stats: Record<TestModuleId, TestModuleStats> = {} as Record<TestModuleId, TestModuleStats>;
+export const getAllTestModuleStats = async (): Promise<Record<TestModuleId, any>> => {
+  const stats: Record<TestModuleId, any> = {} as Record<TestModuleId, any>;
   
   const promises = Object.keys(TEST_MODULES).map(async (moduleId) => {
     const moduleStats = await getTestModuleStats(moduleId as TestModuleId);
@@ -184,7 +174,7 @@ export const getAllTestModuleStats = async (): Promise<Record<TestModuleId, Test
 /**
  * 获取测试模块评分
  */
-export const getTestModuleRating = async (moduleId: TestModuleId): Promise<TestModuleRating | null> => {
+export const getTestModuleRating = async (moduleId: TestModuleId): Promise<any | null> => {
   try {
     const response = await fetch(`/api/homepage/modules/${moduleId}/rating`);
     if (!response.ok) return null;
@@ -200,7 +190,7 @@ export const getTestModuleRating = async (moduleId: TestModuleId): Promise<TestM
 /**
  * 获取测试模块使用情况
  */
-export const getTestModuleUsage = async (moduleId: TestModuleId): Promise<TestModuleUsage | null> => {
+export const getTestModuleUsage = async (moduleId: TestModuleId): Promise<any | null> => {
   try {
     const response = await fetch(`/api/homepage/modules/${moduleId}/usage`);
     if (!response.ok) return null;
@@ -216,7 +206,7 @@ export const getTestModuleUsage = async (moduleId: TestModuleId): Promise<TestMo
 /**
  * 获取个性化推荐
  */
-export const getPersonalizedRecommendations = async (): Promise<TestModuleRecommendation[]> => {
+export const getPersonalizedRecommendations = async (): Promise<any[]> => {
   try {
     const response = await fetch('/api/homepage/recommendations');
     if (!response.ok) return [];

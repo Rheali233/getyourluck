@@ -45,7 +45,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
   showDescription = true,
   ...props
 }) => {
-  const { t, i18n } = useTranslation('homepage');
+  const { i18n } = useTranslation('homepage');
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

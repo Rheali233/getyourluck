@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import type { BaseComponentProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
+import type { BaseComponentProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
 
 export interface AlertProps extends BaseComponentProps {
   variant?: 'success' | 'warning' | 'error' | 'info';

@@ -4,19 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import {
-  Button,
-  Card,
-  PageHeader,
-  Input,
-  Select,
-  Form,
-  LoadingSpinner,
-  Alert,
-  Modal,
-} from '@/components/ui';
+import { Button, Card, Input, Select, Alert, Modal } from '@/components/ui';
 import type { ButtonProps } from '@/types/componentTypes';
-import type { AlertProps } from '@/components/ui/Alert';
 
 /**
  * 组件展示页面
@@ -26,7 +15,6 @@ export const ComponentShowcase: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [selectValue, setSelectValue] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showAlert, setShowAlert] = useState<AlertProps['variant']>('info');
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,11 +34,10 @@ export const ComponentShowcase: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         {/* 页面头部 */}
-        <PageHeader
-          title="组件库展示"
-          description="展示所有可用的UI组件及其变体"
-          theme="primary"
-        />
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">组件库展示</h1>
+          <p className="text-lg text-gray-600">展示所有可用的UI组件及其变体</p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* 按钮组件 */}
@@ -90,7 +77,7 @@ export const ComponentShowcase: React.FC = () => {
 
           {/* 表单组件 */}
           <Card title="表单组件" description="输入框、选择框和表单">
-            <Form onSubmit={handleFormSubmit}>
+            <div className="space-y-4">
               <Input
                 label="文本输入"
                 placeholder="请输入文本"
@@ -113,21 +100,12 @@ export const ComponentShowcase: React.FC = () => {
                   重置
                 </Button>
               </div>
-            </Form>
+            </div>
           </Card>
 
           {/* 加载和警告组件 */}
           <Card title="状态组件" description="加载和警告提示">
             <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">加载状态</h4>
-                <div className="flex gap-4">
-                  <LoadingSpinner isLoading={true} size="small" text="小尺寸" />
-                  <LoadingSpinner isLoading={true} size="medium" text="中尺寸" />
-                  <LoadingSpinner isLoading={true} size="large" text="大尺寸" />
-                </div>
-              </div>
-              
               <div>
                 <h4 className="font-medium mb-2">警告提示</h4>
                 <div className="space-y-2">
@@ -135,25 +113,25 @@ export const ComponentShowcase: React.FC = () => {
                     variant="success"
                     title="成功"
                     message="操作已成功完成"
-                    onClose={() => setShowAlert(undefined)}
+                    onClose={() => {}}
                   />
                   <Alert
                     variant="warning"
                     title="警告"
                     message="请注意这个警告信息"
-                    onClose={() => setShowAlert(undefined)}
+                    onClose={() => {}}
                   />
                   <Alert
                     variant="error"
                     title="错误"
                     message="发生了一个错误"
-                    onClose={() => setShowAlert(undefined)}
+                    onClose={() => {}}
                   />
                   <Alert
                     variant="info"
                     title="信息"
                     message="这是一条信息提示"
-                    onClose={() => setShowAlert(undefined)}
+                    onClose={() => {}}
                   />
                 </div>
               </div>

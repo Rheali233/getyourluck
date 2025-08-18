@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import type { FormProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
+import type { FormProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
 
 /**
  * 表单组件

@@ -3,7 +3,7 @@
  * 用于捕获React组件树中的JavaScript错误，记录错误信息，并显示降级UI
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 
 export interface ErrorBoundaryProps extends BaseComponentProps {
@@ -39,7 +39,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // 生成错误ID
     const errorId = this.generateErrorId();
     
@@ -61,7 +61,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.reportError(error, errorInfo, errorId);
   }
 
-  componentDidUpdate(prevProps: ErrorBoundaryProps) {
+  override componentDidUpdate(prevProps: ErrorBoundaryProps) {
     // 如果启用了props变化时重置，则清除错误状态
     if (this.props.resetOnPropsChange && prevProps !== this.props) {
       this.resetError();
@@ -160,7 +160,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   // 渲染降级UI
-  render() {
+  override render() {
     if (this.state.hasError) {
       const { fallback, testId = 'error-boundary' } = this.props;
       const { error, errorInfo, errorId } = this.state;
@@ -205,7 +205,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             )}
 
             {/* 错误详情（开发环境显示） */}
-            {process.env.NODE_ENV === 'development' && error && (
+            {process.env['NODE_ENV'] === 'development' && error && (
               <details className="text-left mb-4">
                 <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
                   查看错误详情

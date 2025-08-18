@@ -34,13 +34,11 @@ export function createLazyComponent<T extends ComponentType<any>>(
 
 // 图片懒加载Hook
 export function useImageLazyLoading() {
-  const loadImage = (src: string, placeholder?: string): Promise<string> => {
+  const loadImage = (src: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      
       img.onload = () => resolve(src);
       img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
-      
       img.src = src;
     });
   };
@@ -101,7 +99,7 @@ export class PerformanceMonitor {
       const lcpObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         const lastEntry = entries[entries.length - 1];
-        if (this.metrics) {
+        if (this.metrics && lastEntry) {
           this.metrics.largestContentfulPaint = lastEntry.startTime;
         }
       });
@@ -112,8 +110,8 @@ export class PerformanceMonitor {
       const fidObserver = new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         const firstEntry = entries[0];
-        if (this.metrics && firstEntry) {
-          this.metrics.firstInputDelay = firstEntry.processingStart - firstEntry.startTime;
+        if (this.metrics && firstEntry && 'processingStart' in firstEntry) {
+          this.metrics.firstInputDelay = (firstEntry as any).processingStart - firstEntry.startTime;
         }
       });
       fidObserver.observe({ entryTypes: ['first-input'] });

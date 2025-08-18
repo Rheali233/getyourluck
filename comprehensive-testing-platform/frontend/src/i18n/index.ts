@@ -71,7 +71,7 @@ i18n
   .init({
     resources,
     fallbackLng: defaultLanguage,
-    debug: process.env.NODE_ENV === 'development',
+    debug: process.env['NODE_ENV'] === 'development',
     
     // 语言检测配置
     detection: languageDetectorOptions,

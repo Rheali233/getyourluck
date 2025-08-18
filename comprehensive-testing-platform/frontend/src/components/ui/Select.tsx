@@ -3,9 +3,9 @@
  * 遵循统一开发标准的UI组件
  */
 
-import React, { forwardRef } from 'react';
-import type { SelectProps } from '@/types/componentTypes';
-import { cn } from '@/utils/classNames';
+import { forwardRef } from 'react';
+import type { SelectProps } from '../../types/componentTypes';
+import { cn } from '../../utils/classNames';
 
 /**
  * 选择组件

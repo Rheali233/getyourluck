@@ -3,6 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Shield, Lock, Eye, EyeOff, Settings, CheckCircle, AlertCircle } from 'lucide-react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 
+// 扩展 Window 接口以包含 gtag
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 interface SecureCookiesManagerProps extends BaseComponentProps {
   sessionId: string;
   onConsentChange?: (consent: CookieConsent) => void;
@@ -337,7 +344,7 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
-                            checked={consent[category.id]}
+                            checked={Boolean(consent[category.id as keyof CookieConsent])}
                             onChange={(e) => handleConsentChange(category.id, e.target.checked)}
                             className="sr-only peer"
                           />

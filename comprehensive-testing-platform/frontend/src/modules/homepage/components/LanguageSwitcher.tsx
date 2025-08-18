@@ -3,8 +3,7 @@
  * 支持中英文切换和用户偏好存储
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect, useRef } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 import {
@@ -31,7 +30,6 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   size = 'md',
   ...props
 }) => {
-  const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const dropdownRef = useRef<HTMLDivElement>(null);

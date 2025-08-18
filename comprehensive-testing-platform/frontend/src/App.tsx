@@ -3,10 +3,8 @@
  * 遵循统一开发标准的应用架构
  */
 
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import { MainLayout } from '@/layouts/MainLayout';
 import { Homepage } from '@/modules/homepage/components/Homepage';
 import { BlogPage } from '@/pages/BlogPage/BlogPage';
 import { TestPages } from '@/pages/TestPages/TestPages';

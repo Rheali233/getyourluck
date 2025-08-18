@@ -38,7 +38,7 @@ export { TestType, TestStatus, QuestionType } from './types';
 export { usePsychologyStore } from './stores/usePsychologyStore';
 
 // 导出组件
-export { default as TestContainer } from './components/TestContainer';
+export { TestContainer } from './components/TestContainer';
 export { default as QuestionDisplay } from './components/QuestionDisplay';
 // export { default as TestProgress } from './components/TestProgress';
 // export { default as ResultsDisplay } from './components/ResultsDisplay';

@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { BaseComponentProps, HomepageModule } from '@/types/componentTypes';
+import type { BaseComponentProps } from '@/types/componentTypes';
+import type { HomepageModule } from '@/shared/types/homepage';
 import { cn } from '@/utils/classNames';
 
 export interface FeaturedTestsProps extends BaseComponentProps {
@@ -121,10 +122,10 @@ export const FeaturedTests: React.FC<FeaturedTestsProps> = ({
               {/* 测试特性 */}
               <div className="p-6">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {test.features.map((feature, index) => (
+                  {test.features.map((feature: string, index: number) => (
                     <span
                       key={index}
-                      className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                      className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full mr-2 mb-2"
                     >
                       {feature}
                     </span>

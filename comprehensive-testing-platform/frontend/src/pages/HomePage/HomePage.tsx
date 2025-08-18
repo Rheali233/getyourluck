@@ -13,18 +13,14 @@ interface HomePageProps extends BaseComponentProps {}
  * 首页页面组件
  * 使用首页模块的完整实现
  */
-export const HomePage: React.FC<HomePageProps> = ({
-  className,
-  testId = 'home-page',
-  'data-testid': dataTestId,
-  ...props
-}) => {
+export const HomePage: React.FC<HomePageProps> = () => {
   return (
-    <Homepage
-      className={className}
-      testId={dataTestId || testId}
-      {...props}
-    />
+    <div className="min-h-screen bg-gray-50">
+      <Homepage
+        className=""
+        testId="homepage"
+      />
+    </div>
   );
 };
 
