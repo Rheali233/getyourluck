@@ -10,8 +10,6 @@ zone_id = "your-zone-id"
 
 [env.staging]
 name = "getyourluck-backend-staging"
-route = "staging-api.getyourluck.com/*"
-zone_id = "your-zone-id"
 
 [env.development]
 name = "getyourluck-backend-dev"
