@@ -6,6 +6,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  deployments: write
+  id-token: write
+
 jobs:
   deploy:
     name: Build and Deploy
