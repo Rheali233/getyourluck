@@ -27,7 +27,7 @@ database_id = "your-production-database-id"
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "getyourluck-staging"
-database_id = "your-staging-database-id"
+database_id = "ad5be588-a683-45b5-94b4-47c585abd34f"
 
 [[env.development.d1_databases]]
 binding = "DB"
@@ -48,8 +48,8 @@ preview_id = "your-production-kv-preview-id"
 
 [[env.staging.kv_namespaces]]
 binding = "CACHE"
-id = "your-staging-kv-id"
-preview_id = "your-staging-kv-preview-id"
+id = "439757d0175e4f89a4b57a2c82ccf464"
+preview_id = "439757d0175e4f89a4b57a2c82ccf464"
 
 [[env.development.kv_namespaces]]
 binding = "CACHE"
