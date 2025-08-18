@@ -1,0 +1,33 @@
+name: Build Frontend (Pages Preview on branch, Production on main)
+
+on:
+  push:
+    branches:
+      - chore/cf-test-deploy
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: comprehensive-testing-platform/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Type check and build
+        run: npm run build
+
+      # 提示：Pages 的实际部署建议直接绑定 GitHub 仓库由 Cloudflare Pages 驱动
+      # 这里仅做构建校验，避免在 PR 前破坏主分支
+
+
