@@ -1,16 +1,16 @@
 /**
- * 题目展示组件
- * 遵循统一开发标准的心理测试组件
+ * Question Display Component
+ * Psychology test component following unified development standards
  */
 
 import React, { useState } from 'react';
-import { Button, Card } from '@/components/ui';
+import { Button, Card, QuestionOptions } from '@/components/ui';
 import type { QuestionDisplayProps, BaseQuestion, MbtiQuestion, Phq9Question, EqQuestion, HappinessQuestion } from '../types';
 import { cn } from '@/utils/classNames';
 
 /**
- * 题目展示组件
- * 根据题目类型显示相应的题目和选项
+ * Question Display Component
+ * Displays questions and options based on question type
  */
 export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   className,
@@ -19,68 +19,120 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   onAnswer,
   onNext,
   onPrevious,
+  onComplete,
   currentIndex,
   totalQuestions,
   isAnswered,
+  testType,
   ...props
 }) => {
-  const [selectedAnswer, setSelectedAnswer] = useState<string | number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAnswered, setHasAnswered] = useState(false);
 
-  // 处理答案选择
-  const handleAnswerSelect = (answer: string | number) => {
+  // Handle answer selection
+  const handleAnswerSelect = (answer: number) => {
     setSelectedAnswer(answer);
   };
 
-  // 处理答案提交
+  // Handle answer submission
   const handleSubmitAnswer = async () => {
     if (selectedAnswer === null) return;
 
     try {
       setIsSubmitting(true);
+      
+      // First save the answer
       onAnswer(selectedAnswer);
       
-      // 自动进入下一题
-      setTimeout(() => {
-        onNext();
-        setSelectedAnswer(null);
-        setIsSubmitting(false);
-      }, 500);
+      // If this is the last question, trigger completion directly
+      if (currentIndex === totalQuestions - 1) {
+        // Directly call onComplete for the last question
+        onComplete?.();
+      } else {
+        // Mark as answered and move to next question
+        setHasAnswered(true);
+        setTimeout(() => {
+          onNext();
+          setSelectedAnswer(null);
+          setIsSubmitting(false);
+          setHasAnswered(false);
+        }, 100);
+      }
     } catch (error) {
       setIsSubmitting(false);
-      console.error('提交答案失败:', error);
+      console.error('Failed to submit answer:', error);
     }
   };
 
-  // 处理下一题
+  // Handle next question
   const handleNext = () => {
-    if (isAnswered) {
+    if (hasAnswered) {
       onNext();
       setSelectedAnswer(null);
+      setHasAnswered(false);
     }
   };
 
-  // 处理上一题
+  // Handle previous question
   const handlePrevious = () => {
     onPrevious();
     setSelectedAnswer(null);
   };
 
-  // 计算进度
+  // Calculate progress
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
+
+  // Get test type display name
+  const getTestTypeDisplayName = () => {
+    if (!testType) return 'Psychological Test';
+    
+    switch (testType) {
+      case 'mbti':
+        return 'MBTI Personality Test';
+      case 'phq9':
+        return 'PHQ-9 Depression Screening';
+      case 'eq':
+        return 'Emotional Intelligence Test';
+      case 'happiness':
+        return 'Happiness Index Assessment';
+      default:
+        return 'Psychological Test';
+    }
+  };
+
+  // Convert question options to unified format
+  const getQuestionOptions = (question: BaseQuestion) => {
+    if (isMbtiQuestion(question) || isPhq9Question(question) || isEqQuestion(question) || isHappinessQuestion(question)) {
+      return question.options.map(option => ({
+        id: option.id,
+        text: option.text,
+        value: option.value,
+        description: option.description
+      }));
+    }
+    return [];
+  };
 
   return (
     <div
-      className={cn("min-h-screen bg-gray-50 py-8 px-4", className)}
+      className={cn("bg-blue-50 min-h-screen", className)}
       data-testid={testId}
       {...props}
     >
-      <div className="max-w-4xl mx-auto">
-        {/* 进度条 */}
+      <div className="max-w-4xl mx-auto py-8 px-4">
+        {/* Test Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-black mb-4">
+            {getTestTypeDisplayName()}
+          </h1>
+        </div>
+        
+        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-600">
-              题目 {currentIndex + 1} / {totalQuestions}
+              Question {currentIndex + 1} / {totalQuestions}
             </span>
             <span className="text-sm text-gray-600">
               {Math.round(progress)}%
@@ -94,56 +146,59 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
           </div>
         </div>
 
-        {/* 题目卡片 */}
-        <Card className="p-8 mb-8">
-          {/* 题目内容 */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        {/* Question Card */}
+        <Card className="bg-white shadow-lg">
+          {/* Question Content */}
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 mb-6">
               {question.text}
-            </h2>
+            </h3>
             
-            {/* 根据题目类型渲染不同的选项 */}
-            {renderQuestionOptions(question, selectedAnswer, handleAnswerSelect)}
+            {/* Render different options based on question type */}
+            <QuestionOptions
+              options={getQuestionOptions(question)}
+              selectedAnswer={selectedAnswer}
+              onSelect={handleAnswerSelect}
+              theme="blue"
+            />
           </div>
 
-          {/* 操作按钮 */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <div className="flex gap-4">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={currentIndex === 0}
-              >
-                上一题
-              </Button>
-            </div>
+          {/* Action Buttons - Fixed at bottom */}
+          <div className="flex justify-between items-center mt-4 pt-4">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentIndex === 0}
+              className="px-4 py-2"
+            >
+              Previous
+            </Button>
 
-            <div className="flex gap-4">
-              {!isAnswered ? (
-                <Button
-                  onClick={handleSubmitAnswer}
-                  disabled={selectedAnswer === null || isSubmitting}
-                  className="px-8"
-                >
-                  {isSubmitting ? '提交中...' : '提交答案'}
-                </Button>
-              ) : (
+            {!hasAnswered ? (
+              <Button
+                onClick={handleSubmitAnswer}
+                disabled={selectedAnswer === null || isSubmitting}
+                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit'}
+              </Button>
+            ) : (
+              // Only show Next button for non-last questions
+              currentIndex < totalQuestions - 1 ? (
                 <Button
                   onClick={handleNext}
-                  disabled={currentIndex === totalQuestions - 1}
-                  className="px-8"
+                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
                 >
-                  {currentIndex === totalQuestions - 1 ? '完成测试' : '下一题'}
+                  Next
                 </Button>
-              )}
-            </div>
+              ) : null
+            )}
           </div>
         </Card>
 
-        {/* 提示信息 */}
-        <div className="text-center text-sm text-gray-500">
-          <p>请根据您的真实想法和感受选择最符合的选项</p>
-          <p>没有对错之分，诚实回答才能获得准确结果</p>
+        {/* Hint Information */}
+        <div className="text-center text-xs text-gray-500 mt-2">
+          <p>Please choose the option that best matches your true thoughts and feelings</p>
         </div>
       </div>
     </div>
@@ -152,187 +207,8 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
 
 export default QuestionDisplay;
 
-// 渲染题目选项的辅助函数
-function renderQuestionOptions(
-  question: BaseQuestion,
-  selectedAnswer: string | number | null,
-  onSelect: (answer: string | number) => void
-) {
-  // 根据题目类型渲染不同的选项
-  if (isMbtiQuestion(question)) {
-    return renderMbtiOptions(question, selectedAnswer as string | null, onSelect as (answer: string) => void);
-  } else if (isPhq9Question(question)) {
-    return renderPhq9Options(question, selectedAnswer as number | null, onSelect as (answer: number) => void);
-  } else if (isEqQuestion(question)) {
-    return renderEqOptions(question, selectedAnswer as number | null, onSelect as (answer: number) => void);
-  } else if (isHappinessQuestion(question)) {
-    return renderHappinessOptions(question, selectedAnswer as number | null, onSelect as (answer: number) => void);
-  }
 
-  // 默认渲染
-  return (
-    <div className="space-y-3">
-      <p className="text-gray-600">不支持的题目类型</p>
-    </div>
-  );
-}
-
-// 渲染MBTI选项
-function renderMbtiOptions(
-  question: MbtiQuestion,
-  selectedAnswer: string | null,
-  onSelect: (answer: string) => void
-) {
-  return (
-    <div className="space-y-4">
-      {question.options.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => onSelect(option.value)}
-          className={cn(
-            "w-full p-4 text-left border-2 rounded-lg transition-all duration-200",
-            "hover:border-primary-300 hover:bg-primary-50",
-            selectedAnswer === option.value
-              ? "border-primary-600 bg-primary-100 text-primary-900"
-              : "border-gray-200 bg-white text-gray-700"
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-lg">{option.text}</span>
-            {selectedAnswer === option.value && (
-              <span className="text-primary-600 text-xl">✓</span>
-            )}
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// 渲染PHQ-9选项
-function renderPhq9Options(
-  question: Phq9Question,
-  selectedAnswer: number | null,
-  onSelect: (answer: number) => void
-) {
-  return (
-    <div className="space-y-4">
-      <div className="mb-4">
-        <p className="text-sm text-gray-600 mb-2">
-          症状：{question.symptom}
-        </p>
-      </div>
-      
-      {question.options.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => onSelect(option.value)}
-          className={cn(
-            "w-full p-4 text-left border-2 rounded-lg transition-all duration-200",
-            "hover:border-primary-300 hover:bg-primary-50",
-            selectedAnswer === option.value
-              ? "border-primary-600 bg-primary-100 text-primary-900"
-              : "border-gray-200 bg-white text-gray-700"
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <div className="text-left">
-              <div className="font-medium text-lg">{option.text}</div>
-              <div className="text-sm text-gray-600 mt-1">{option.description}</div>
-            </div>
-            {selectedAnswer === option.value && (
-              <span className="text-primary-600 text-xl">✓</span>
-            )}
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// 渲染情商测试选项
-function renderEqOptions(
-  question: EqQuestion,
-  selectedAnswer: number | null,
-  onSelect: (answer: number) => void
-) {
-  return (
-    <div className="space-y-4">
-      <div className="mb-4">
-        <p className="text-sm text-gray-600 mb-2">
-          维度：{getEqDimensionName(question.dimension)}
-        </p>
-      </div>
-      
-      {question.options.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => onSelect(option.value)}
-          className={cn(
-            "w-full p-4 text-left border-2 rounded-lg transition-all duration-200",
-            "hover:border-primary-300 hover:bg-primary-50",
-            selectedAnswer === option.value
-              ? "border-primary-600 bg-primary-100 text-primary-900"
-              : "border-gray-200 bg-white text-gray-700"
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <div className="text-left">
-              <div className="font-medium text-lg">{option.text}</div>
-              <div className="text-sm text-gray-600 mt-1">{option.description}</div>
-            </div>
-            {selectedAnswer === option.value && (
-              <span className="text-primary-600 text-xl">✓</span>
-            )}
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// 渲染幸福指数选项
-function renderHappinessOptions(
-  question: HappinessQuestion,
-  selectedAnswer: number | null,
-  onSelect: (answer: number) => void
-) {
-  return (
-    <div className="space-y-4">
-      <div className="mb-4">
-        <p className="text-sm text-gray-600 mb-2">
-          领域：{getHappinessDomainName(question.domain)}
-        </p>
-      </div>
-      
-      {question.options.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => onSelect(option.value)}
-          className={cn(
-            "w-full p-4 text-left border-2 rounded-lg transition-all duration-200",
-            "hover:border-primary-300 hover:bg-primary-50",
-            selectedAnswer === option.value
-              ? "border-primary-600 bg-primary-100 text-primary-900"
-              : "border-gray-200 bg-white text-gray-700"
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <div className="text-left">
-              <div className="font-medium text-lg">{option.text}</div>
-              <div className="text-sm text-gray-600 mt-1">{option.description}</div>
-            </div>
-            {selectedAnswer === option.value && (
-              <span className="text-primary-600 text-xl">✓</span>
-            )}
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// 类型判断辅助函数
+// Type judgment helper function
 function isMbtiQuestion(question: BaseQuestion): question is MbtiQuestion {
   return 'dimension' in question && typeof (question as any).dimension === 'string';
 }
@@ -349,25 +225,26 @@ function isHappinessQuestion(question: BaseQuestion): question is HappinessQuest
   return 'domain' in question;
 }
 
-// 获取情商维度名称
-function getEqDimensionName(dimension: string): string {
-  const dimensionNames = {
-    self_awareness: '自我意识',
-    self_management: '自我管理',
-    social_awareness: '社会意识',
-    relationship_management: '人际关系管理',
-  };
-  return dimensionNames[dimension as keyof typeof dimensionNames] || dimension;
-}
+// Get MBTI dimension names (no longer used, but kept for future needs)
+// function getMbtiDimensionName(dimension: string): string {
+//   const dimensionNames = {
+//     'E-I': 'Extraversion/Introversion',
+//     'S-N': 'Sensing/Intuition',
+//     'T-F': 'Thinking/Feeling',
+//     'J-P': 'Judging/Perceiving',
+//   };
+//   return dimensionNames[dimension as keyof typeof dimensionNames] || dimension;
+// }
 
-// 获取幸福指数领域名称
-function getHappinessDomainName(domain: string): string {
-  const domainNames = {
-    work: '工作',
-    relationships: '人际关系',
-    health: '健康',
-    personal_growth: '个人成长',
-    life_balance: '生活平衡',
-  };
-  return domainNames[domain as keyof typeof domainNames] || domain;
-} 
+// Get EQ dimension names (no longer used, but kept for future needs)
+// function getEqDimensionName(dimension: string): string {
+//   const dimensionNames = {
+//     self_awareness: 'Self-Awareness',
+//     self_management: 'Self-Management',
+//     social_awareness: 'Social Awareness',
+//     relationship_management: 'Relationship Management',
+//   };
+//   return dimensionNames[dimension as keyof typeof dimensionNames] || dimension;
+// }
+
+// Get happiness index domain names
