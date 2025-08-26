@@ -3,18 +3,7 @@
  * AI-powered analysis for relationship tests
  */
 
-import type { TestSession, TestResult } from '../types';
-
-export interface AIAnalysisRequest {
-  testType: 'love_language' | 'love_style' | 'interpersonal';
-  answers: Array<{ questionId: string; answer: string | number; timestamp: string }>;
-}
-
-export interface AIAnalysisResponse {
-  success: boolean;
-  data?: TestResult;
-  error?: string;
-}
+import type { TestSession, TestResult, AIAnalysisResponse } from '../types';
 
 
 export class RelationshipAIService {
@@ -31,11 +20,8 @@ export class RelationshipAIService {
    */
   async analyzeTest(session: TestSession): Promise<TestResult> {
     try {
-      console.log('Starting AI analysis for session:', session.id, 'test type:', session.testType);
-      
       // Only use AI analysis - no fallback
       const aiResult = await this.analyzeWithAI(session);
-      console.log('AI analysis result:', aiResult);
       
       if (aiResult.success && aiResult.data) {
         return aiResult.data;
@@ -44,7 +30,6 @@ export class RelationshipAIService {
       // If AI fails, throw error - no fallback
       throw new Error(aiResult.error || 'AI analysis failed');
     } catch (error) {
-      console.error('AI analysis failed:', error);
       throw new Error(`AI analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -72,10 +57,10 @@ export class RelationshipAIService {
   /**
    * Submit user feedback
    */
-  async submitFeedback(sessionId: string, feedback: 'like' | 'dislike'): Promise<void> {
+  async submitFeedback(_sessionId: string, _feedback: 'like' | 'dislike'): Promise<void> {
     try {
       // TODO: Implement feedback submission
-      console.log(`Feedback submitted: ${sessionId} - ${feedback}`);
+      // _sessionId and _feedback will be used when implementing the actual feedback logic
     } catch (error) {
       throw new Error(`Failed to submit feedback: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -105,7 +90,6 @@ export class RelationshipAIService {
         error: response.error || 'AI analysis failed'
       };
     } catch (error) {
-      console.error('AI analysis error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -143,13 +127,20 @@ ${answers.map((answer, index) => `Question ${index + 1}: ${answer.answer}`).join
 
 Please provide a complete love language analysis, including:
 
-1. **Score calculation for five love languages** (Words of Affirmation, Quality Time, Receiving Gifts, Acts of Service, Physical Touch)
-2. **Primary love language identification** (highest score)
-3. **Secondary love language identification** (second highest score)
-4. **Detailed interpretation** of the user's love language profile
-5. **Personalized recommendations** (3-5 specific, actionable suggestions)
-6. **Relationship improvement tips** (3-5 practical tips for better relationships)
-7. **Test summary** (brief, personalized summary of results)
+1. **Primary love language identification** (dominant preference)
+2. **Secondary love language identification** (secondary preference)
+3. **Detailed interpretation** of the user's love language profile
+4. **Personalized recommendations** (3-5 specific, actionable suggestions)
+5. **Relationship improvement tips** (3-5 practical tips for better relationships)
+6. **Test summary** (brief, personalized summary of results)
+
+**IMPORTANT: For each love language (primary and secondary), provide:**
+- **Expression patterns** - How this person naturally shows love to others
+- **Reception preferences** - How they prefer to receive love and affection
+- **Relationship benefits** - What positive impact this brings to relationships
+- **Potential misunderstandings** - How others might misinterpret their needs
+- **Partner communication tips** - How partners can better connect with them
+- **Daily application examples** - Specific ways to practice this love language
 
 Requirements:
 - Analysis must be based on Dr. Gary Chapman's love language theory
@@ -166,12 +157,21 @@ IMPORTANT: Return ONLY the JSON object, nothing else:
 {
   "primaryType": "words_of_affirmation",
   "secondaryType": "quality_time",
-  "scores": {
-    "words_of_affirmation": 4.2,
-    "quality_time": 3.8,
-    "receiving_gifts": 2.5,
-    "acts_of_service": 3.1,
-    "physical_touch": 2.9
+  "primaryLanguageAnalysis": {
+    "expressionPatterns": "How this person naturally shows love...",
+    "receptionPreferences": "How they prefer to receive love...",
+    "relationshipBenefits": "What positive impact this brings...",
+    "potentialMisunderstandings": "How others might misinterpret...",
+    "partnerCommunicationTips": "How partners can better connect...",
+    "dailyApplicationExamples": "Specific ways to practice..."
+  },
+  "secondaryLanguageAnalysis": {
+    "expressionPatterns": "Secondary expression patterns...",
+    "receptionPreferences": "Secondary reception preferences...",
+    "relationshipBenefits": "Additional relationship benefits...",
+    "potentialMisunderstandings": "Secondary misunderstandings...",
+    "partnerCommunicationTips": "Additional communication tips...",
+    "dailyApplicationExamples": "Secondary application examples..."
   },
   "interpretation": "Detailed interpretation of your love language profile...",
   "recommendations": [
@@ -208,6 +208,14 @@ Please provide a complete love style analysis, including:
 5. **Relationship improvement tips** (3-5 practical tips for better relationships)
 6. **Test summary** (brief, personalized summary of results)
 
+**IMPORTANT: For each love style (dominant and secondary), provide:**
+- **Behavioral patterns and tendencies** - How this style manifests in daily interactions
+- **Strengths and advantages** - What positive qualities this brings to relationships
+- **Potential challenges** - Areas that might need attention or growth
+- **Partner expectations** - What this person typically expects from their romantic partner
+- **Communication style** - How they prefer to express and receive love
+- **Relationship dynamics** - How this style affects relationship patterns
+
 Requirements:
 - Analysis must be based on attachment theory and relationship psychology
 - Language must be warm, encouraging, and easy to understand
@@ -221,7 +229,23 @@ Please return results in the following JSON format:
 {
   "dominantStyle": "secure",
   "secondaryStyle": "anxious",
-  "interpretation": "Detailed interpretation of your love style...",
+  "dominantStyleAnalysis": {
+    "behavioralPatterns": "How this style manifests in daily interactions...",
+    "strengths": "Positive qualities this brings to relationships...",
+    "challenges": "Areas that might need attention or growth...",
+    "partnerExpectations": "What this person typically expects from their romantic partner...",
+    "communicationStyle": "How they prefer to express and receive love...",
+    "relationshipDynamics": "How this style affects relationship patterns..."
+  },
+  "secondaryStyleAnalysis": {
+    "behavioralPatterns": "How this secondary style manifests...",
+    "strengths": "Additional positive qualities...",
+    "challenges": "Secondary areas for growth...",
+    "partnerExpectations": "Additional expectations from partner...",
+    "communicationStyle": "Secondary communication preferences...",
+    "relationshipDynamics": "How secondary style influences relationships..."
+  },
+  "interpretation": "Overall interpretation of your love style combination...",
   "recommendations": [
     "Specific recommendation 1",
     "Specific recommendation 2",
@@ -257,6 +281,27 @@ Please provide a complete interpersonal relationship analysis, including:
 6. **Relationship improvement tips** (3-5 practical tips for better relationships)
 7. **Test summary** (brief, personalized summary of results)
 
+**IMPORTANT: For each interpersonal skill area, provide detailed analysis:**
+
+**Communication Style Analysis:**
+- **Behavioral patterns** - How this person typically communicates in relationships
+- **Communication strengths** - What positive qualities they bring to interactions
+- **Communication growth areas** - Specific areas where they can improve
+
+**Conflict Resolution Analysis:**
+- **Conflict behavior patterns** - How they handle disagreements and challenges
+- **Conflict resolution strengths** - What positive qualities they bring to conflict situations
+- **Conflict resolution growth areas** - Specific areas where they can improve
+
+**Emotional Intelligence Analysis:**
+- **Emotional response patterns** - How they manage and express emotions
+- **Emotional intelligence strengths** - What positive qualities they bring to emotional situations
+- **Emotional intelligence growth areas** - Specific areas where they can improve
+
+**Overall Relationship Impact:**
+- **Partner interaction tips** - How partners can better communicate with them
+- **Social dynamics** - How their style affects group and one-on-one relationships
+
 Requirements:
 - Analysis must be based on interpersonal communication theory and psychology
 - Language must be warm, encouraging, and easy to understand
@@ -271,7 +316,18 @@ Please return results in the following JSON format:
   "communicationStyle": "assertive",
   "conflictResolution": "collaborative",
   "emotionalIntelligence": "high",
-  "interpretation": "Detailed interpretation of your interpersonal profile...",
+  "interpersonalAnalysis": {
+    "communicationPatterns": "Detailed analysis of how this person typically communicates...",
+    "communicationStrengths": "Specific positive qualities in communication...",
+    "communicationGrowthAreas": "Specific areas for communication improvement...",
+    "conflictBehavior": "Detailed analysis of how they handle disagreements...",
+    "conflictStrengths": "Specific positive qualities in conflict resolution...",
+    "conflictGrowthAreas": "Specific areas for conflict resolution improvement...",
+    "emotionalResponses": "Detailed analysis of how they manage emotions...",
+    "emotionalStrengths": "Specific positive qualities in emotional intelligence...",
+    "emotionalGrowthAreas": "Specific areas for emotional intelligence improvement..."
+  },
+  "interpretation": "Comprehensive interpretation of your interpersonal profile...",
   "recommendations": [
     "Specific recommendation 1",
     "Specific recommendation 2",
@@ -285,6 +341,29 @@ Please return results in the following JSON format:
   "summary": "Personalized summary of your test results..."
 }
 `;
+  }
+
+  /**
+   * Sanitize AI text to extract valid JSON string
+   * - 去除markdown代码块围栏
+   * - 截取首尾花括号中的JSON主体
+   */
+  private sanitizeJsonString(content: string): string {
+    if (!content) return content;
+
+    let cleaned = content.trim();
+
+    // 去除三引号代码块 ```json ... ``` 或 ``` ... ```
+    cleaned = cleaned.replace(/^```[a-zA-Z]*\s*/g, '').replace(/\s*```\s*$/g, '').trim();
+
+    // 若仍包含多余说明文字，尝试截取第一个{到最后一个}
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      cleaned = cleaned.slice(firstBrace, lastBrace + 1).trim();
+    }
+
+    return cleaned;
   }
 
   /**
@@ -316,12 +395,20 @@ Please return results in the following JSON format:
       }
 
       const data = await response.json();
-      
+
       if (data.choices && data.choices[0] && data.choices[0].message) {
-        const content = data.choices[0].message.content;
+        const content = data.choices[0].message.content as string;
         
         try {
-          const parsedContent = JSON.parse(content);
+          // 先尝试直接解析
+          let parsedContent = null as any;
+          try {
+            parsedContent = JSON.parse(content);
+          } catch (_) {
+            // 失败则进行清洗后再解析
+            const sanitized = this.sanitizeJsonString(content);
+            parsedContent = JSON.parse(sanitized);
+          }
           return { success: true, data: parsedContent };
         } catch (parseError) {
           const errorMessage = parseError instanceof Error ? parseError.message : 'Unknown parse error';
@@ -354,7 +441,6 @@ Please return results in the following JSON format:
           throw new Error(`Unsupported test type: ${testType}`);
       }
     } catch (error) {
-      console.error('Failed to parse AI response:', error);
       throw new Error('Failed to parse AI response');
     }
   }
@@ -363,16 +449,26 @@ Please return results in the following JSON format:
    * Parse Love Language AI response
    */
   private parseLoveLanguageAIResponse(response: any): TestResult {
+    // Extract detailed analysis for primary and secondary love languages
+    const primaryAnalysis = response.primaryLanguageAnalysis || {};
+    const secondaryAnalysis = response.secondaryLanguageAnalysis || {};
+    
     return {
       sessionId: '',
       testType: 'love_language',
-      scores: response.scores || {},
+      scores: {}, // No scores needed for text-only display
       primaryType: response.primaryType || 'words_of_affirmation',
       secondaryType: response.secondaryType || 'quality_time',
       interpretation: response.interpretation || '',
       recommendations: response.recommendations || [],
-      strengths: [],
-      areasForGrowth: [],
+      strengths: [
+        primaryAnalysis.relationshipBenefits || 'Strong love expression skills',
+        secondaryAnalysis.relationshipBenefits || 'Additional love language abilities'
+      ].filter(Boolean),
+      areasForGrowth: [
+        primaryAnalysis.potentialMisunderstandings || 'Communication improvement areas',
+        secondaryAnalysis.potentialMisunderstandings || 'Additional growth opportunities'
+      ].filter(Boolean),
       relationshipAdvice: response.relationshipAdvice || [],
       summary: response.summary || '',
       completedAt: new Date().toISOString()
@@ -383,16 +479,26 @@ Please return results in the following JSON format:
    * Parse Love Style AI response
    */
   private parseLoveStyleAIResponse(response: any): TestResult {
+    // Extract detailed analysis for dominant and secondary styles
+    const dominantAnalysis = response.dominantStyleAnalysis || {};
+    const secondaryAnalysis = response.secondaryStyleAnalysis || {};
+    
     return {
       sessionId: '',
       testType: 'love_style',
-      scores: {},
-      primaryType: response.dominantStyle || 'secure',
-      secondaryType: response.secondaryStyle || '',
+      scores: {}, // No scores needed for text-only display
+      primaryType: response.dominantStyle || response.primaryType || 'secure',
+      secondaryType: response.secondaryStyle || response.secondaryType || '',
       interpretation: response.interpretation || '',
       recommendations: response.recommendations || [],
-      strengths: [],
-      areasForGrowth: [],
+      strengths: [
+        dominantAnalysis.strengths || 'Strong emotional foundation',
+        secondaryAnalysis.strengths || 'Additional relationship skills'
+      ].filter(Boolean),
+      areasForGrowth: [
+        dominantAnalysis.challenges || 'Personal development areas',
+        secondaryAnalysis.challenges || 'Growth opportunities'
+      ].filter(Boolean),
       relationshipAdvice: response.relationshipAdvice || [],
       summary: response.summary || '',
       completedAt: new Date().toISOString()
@@ -403,16 +509,27 @@ Please return results in the following JSON format:
    * Parse Interpersonal AI response
    */
   private parseInterpersonalAIResponse(response: any): TestResult {
+    // Extract detailed interpersonal analysis
+    const interpersonalAnalysis = response.interpersonalAnalysis || {};
+    
     return {
       sessionId: '',
       testType: 'interpersonal',
-      scores: {},
+      scores: {}, // No scores needed for text-only display
       primaryType: response.communicationStyle || 'assertive',
       secondaryType: response.conflictResolution || '',
       interpretation: response.interpretation || '',
       recommendations: response.recommendations || [],
-      strengths: [],
-      areasForGrowth: [],
+      strengths: [
+        interpersonalAnalysis.communicationStrengths || 'Strong communication skills',
+        interpersonalAnalysis.conflictStrengths || 'Effective conflict resolution',
+        interpersonalAnalysis.emotionalStrengths || 'Good emotional intelligence'
+      ].filter(Boolean),
+      areasForGrowth: [
+        interpersonalAnalysis.communicationGrowthAreas || 'Communication improvement areas',
+        interpersonalAnalysis.conflictGrowthAreas || 'Conflict resolution development',
+        interpersonalAnalysis.emotionalGrowthAreas || 'Emotional intelligence growth'
+      ].filter(Boolean),
       relationshipAdvice: response.relationshipAdvice || [],
       summary: response.summary || '',
       completedAt: new Date().toISOString()
