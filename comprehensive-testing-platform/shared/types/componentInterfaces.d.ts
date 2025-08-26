@@ -33,4 +33,3 @@ export interface PageHeaderProps extends BaseComponentProps {
     theme?: "primary" | "constellation" | "mbti" | "tarot" | "psychology" | "career";
     onStart?: () => void;
 }
-//# sourceMappingURL=componentInterfaces.d.ts.map

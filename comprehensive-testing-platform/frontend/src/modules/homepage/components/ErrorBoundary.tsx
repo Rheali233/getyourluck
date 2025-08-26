@@ -205,7 +205,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             )}
 
             {/* 错误详情（开发环境显示） */}
-            {process.env['NODE_ENV'] === 'development' && error && (
+            {import.meta.env.DEV && error && (
               <details className="text-left mb-4">
                 <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
                   查看错误详情

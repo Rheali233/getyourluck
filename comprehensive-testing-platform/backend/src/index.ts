@@ -16,6 +16,8 @@ import { analyticsRoutes } from "./routes/analytics";
 import { homepageRoutes } from "./routes/homepage";
 import { searchRoutes } from "./routes/search";
 import { cookiesRoutes } from "./routes/cookies";
+import psychologyQuestionsRoutes from "./routes/psychology/questions";
+import relationshipQuestionsRoutes from "./routes/relationship/questions";
 import { DatabaseService } from "./services/DatabaseService";
 
 import type { APIResponse } from "../../shared/types/apiResponse";
@@ -87,6 +89,8 @@ app.use("*", async (c, next) => {
   // 生成请求ID
   const requestId = c.req.header("X-Request-ID") || crypto.randomUUID();
   
+  // 检查环境变量
+  
   // 初始化数据库服务 - 使用Cloudflare D1
   const dbService = new DatabaseService(c.env);
   
@@ -119,7 +123,8 @@ app.get("/", (c) => {
         homepage: "/api/homepage",
         search: "/api/search",
         cookies: "/api/cookies",
-        system: "/api/system",
+        psychology: "/api/psychology/questions",
+          relationship: "/api/relationship/questions",        system: "/api/system",
       },
     },
     timestamp: new Date().toISOString(),
@@ -173,7 +178,8 @@ app.route("/api/analytics", analyticsRoutes);
 app.route("/api/homepage", homepageRoutes);
 app.route("/api/search", searchRoutes);
 app.route("/api/cookies", cookiesRoutes);
-// app.route("/api/recommendations", recommendationsRoutes); // 暂时注释，未定义
+app.route("/api/psychology/questions", psychologyQuestionsRoutes);
+app.route("/api/relationship/questions", relationshipQuestionsRoutes);// app.route("/api/recommendations", recommendationsRoutes); // 暂时注释，未定义
 // app.route("/api/seo", seoRoutes); // 暂时注释，未定义
 
 // API版本信息
@@ -192,7 +198,8 @@ app.get("/api", (c) => {
           homepage: "/api/homepage",
           search: "/api/search",
           cookies: "/api/cookies",
-          // recommendations: "/api/recommendations", // 暂时注释
+          psychology: "/api/psychology/questions",
+          relationship: "/api/relationship/questions",          // recommendations: "/api/recommendations", // 暂时注释
           // seo: "/api/seo", // 暂时注释
           system: "/api/system",
         },

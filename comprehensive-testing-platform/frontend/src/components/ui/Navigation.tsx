@@ -7,23 +7,21 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 
 export interface NavigationProps extends BaseComponentProps {
-  showLanguageSwitch?: boolean;
   showThemeToggle?: boolean;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
   className,
   testId = 'navigation',
-  showLanguageSwitch = true,
   showThemeToggle = false, // 默认不显示主题切换
   ...props
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { language, setLanguage, t } = useLanguage();
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -42,11 +40,7 @@ export const Navigation: React.FC<NavigationProps> = ({
     setIsMenuOpen(false);
   };
 
-  // 切换语言
-  const toggleLanguage = () => {
-    const newLang = language === 'zh-CN' ? 'en-US' : 'zh-CN';
-    setLanguage(newLang);
-  };
+
 
   // 测试中心点击处理
   const handleTestCenterClick = (e: React.MouseEvent) => {
@@ -77,16 +71,15 @@ export const Navigation: React.FC<NavigationProps> = ({
     closeMobileMenu();
   };
 
-  // 导航菜单项（修改版）
+  // Navigation menu items
   const navigationItems = [
-    { name: t('nav.home'), href: '/', icon: '🏠', onClick: handleHomeClick },
-    { name: t('nav.testCenter'), href: '#', icon: '🧪', onClick: handleTestCenterClick },
-    { name: t('nav.blog'), href: '/blog', icon: '📝' },
-    { name: t('nav.about'), href: '/about', icon: 'ℹ️' },
+    { name: 'Home', href: '/', icon: '🏠', onClick: handleHomeClick },
+    { name: 'Test Center', href: '#', icon: '🧪', onClick: handleTestCenterClick },
+    { name: 'Blog', href: '/blog', icon: '📝' },
+    { name: 'About', href: '/about', icon: 'ℹ️' },
   ];
 
-  // 语言显示文本
-  const languageText = t('nav.language');
+
 
   return (
     <nav
@@ -138,16 +131,9 @@ export const Navigation: React.FC<NavigationProps> = ({
             })}
           </div>
 
-          {/* 桌面端操作按钮 - 只保留语言切换 */}
+          {/* Desktop action buttons - removed language switching */}
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
-            {showLanguageSwitch && (
-              <button 
-                onClick={toggleLanguage}
-                className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-0"
-              >
-                {languageText}
-              </button>
-            )}
+            {/* Language switching removed */}
           </div>
 
           {/* 移动端菜单按钮 */}
@@ -224,16 +210,9 @@ export const Navigation: React.FC<NavigationProps> = ({
               })}
             </div>
             
-            {/* 移动端操作按钮 - 只保留语言切换 */}
+            {/* Mobile action buttons - removed language switching */}
             <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-              {showLanguageSwitch && (
-                <button 
-                  onClick={toggleLanguage}
-                  className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-0"
-                >
-                  {languageText}
-                </button>
-              )}
+              {/* Language switching removed */}
             </div>
           </div>
         )}

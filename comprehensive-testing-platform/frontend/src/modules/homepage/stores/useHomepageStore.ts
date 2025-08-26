@@ -379,4 +379,4 @@ export const useHomepageStore = create<HomepageModuleState>()(
       }),
     }
   )
-); 
+);

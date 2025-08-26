@@ -53,13 +53,7 @@ export const FunctionalTestSuite: React.FC<FunctionalTestSuiteProps> = ({
     return { name: 'Cookies管理测试', status: 'pass', message: 'Cookies横幅正常显示' };
   };
 
-  const testLanguageSwitching = async (): Promise<TestResult> => {
-    const languageSwitcher = document.querySelector('[data-testid="language-switcher"]');
-    if (!languageSwitcher) {
-      return { name: '语言切换测试', status: 'warning', message: '语言切换器未找到' };
-    }
-    return { name: '语言切换测试', status: 'pass', message: '语言切换器正常显示' };
-  };
+
 
   const testResponsiveDesign = async (): Promise<TestResult> => {
     const isMobile = window.innerWidth <= 768;
@@ -92,12 +86,7 @@ export const FunctionalTestSuite: React.FC<FunctionalTestSuiteProps> = ({
       category: 'compliance',
       test: testCookiesManagement
     },
-    {
-      id: 'language-switching',
-      name: '语言切换测试',
-      category: 'i18n',
-      test: testLanguageSwitching
-    },
+
     {
       id: 'responsive-design',
       name: '响应式设计测试',

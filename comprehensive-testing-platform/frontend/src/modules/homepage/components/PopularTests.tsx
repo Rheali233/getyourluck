@@ -6,7 +6,7 @@
 import React from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 
 export interface PopularTest {
   id: string;
@@ -32,16 +32,14 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
   onTestClick,
   ...props
 }) => {
-  const { t } = useLanguage();
-
-  // 默认热门测试数据
+  // Default popular tests data
   const defaultTests: PopularTest[] = [
     {
       id: 'mbti-personality',
-      name: 'MBTI性格测试',
-      description: '想知道自己是什么性格吗？这个有趣的测试会告诉你，你是内向还是外向，是理性还是感性。',
+      name: 'MBTI Personality Test',
+      description: 'Want to know your personality type? This interesting test will tell you whether you are introverted or extroverted, rational or emotional.',
       icon: '🧠',
-      category: '心理学',
+      category: 'Psychology',
       rating: 4.9,
       testCount: 12500,
       isHot: true,
@@ -49,10 +47,10 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
     },
     {
       id: 'daily-horoscope',
-      name: '今日星座运势',
-      description: '今天适合做什么？爱情运势如何？工作会顺利吗？每天花1分钟看看你的星座运势。',
+      name: 'Daily Horoscope',
+      description: 'What should you do today? How is your love fortune? Will work go smoothly? Spend 1 minute each day checking your zodiac fortune.',
       icon: '⭐',
-      category: '占星学',
+      category: 'Astrology',
       rating: 4.8,
       testCount: 8900,
       isHot: true,
@@ -60,10 +58,10 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
     },
     {
       id: 'tarot-love',
-      name: '塔罗爱情占卜',
-      description: '心里有个人却不知道ta对你的感觉？感情遇到困惑不知道怎么办？让神秘的塔罗牌为你指点迷津。',
+      name: 'Tarot Love Reading',
+      description: 'Have someone in mind but don\'t know how they feel about you? Confused about relationships? Let the mysterious tarot cards guide you.',
       icon: '🎴',
-      category: '塔罗牌',
+      category: 'Tarot',
       rating: 4.7,
       testCount: 6700,
       isHot: true,
@@ -71,10 +69,10 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
     },
     {
       id: 'mental-health',
-      name: '心理健康小测试',
-      description: '最近感觉有点累？情绪不太好？这个温和的小测试帮你了解自己的心理状态。',
+      name: 'Mental Health Assessment',
+      description: 'Feeling tired lately? Emotions not great? This gentle test helps you understand your mental state.',
       icon: '💚',
-      category: '心理健康',
+      category: 'Mental Health',
       rating: 4.8,
       testCount: 5400,
       isHot: false,
@@ -82,10 +80,10 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
     },
     {
       id: 'career-interest',
-      name: '职业兴趣探索',
-      description: '不知道自己适合什么工作？对未来职业规划感到迷茫？这个测试会帮你发现自己的兴趣和天赋。',
+      name: 'Career Interest Exploration',
+      description: 'Don\'t know what job suits you? Confused about future career planning? This test will help you discover your interests and talents.',
       icon: '💼',
-      category: '职业规划',
+      category: 'Career Planning',
       rating: 4.6,
       testCount: 4800,
       isHot: false,
@@ -108,13 +106,13 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
       {...props}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 标题区域 */}
+        {/* Title section */}
         <div className="text-left mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            🔥 {t('popularSection.title')}
+            🔥 Popular Tests
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl">
-            {t('popularSection.subtitle')}
+            Try our most popular tests and discover your true self
           </p>
         </div>
 
@@ -130,7 +128,7 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
               {test.isHot && (
                 <div className="absolute top-3 right-3">
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    🔥 热门
+                    🔥 Hot
                   </span>
                 </div>
               )}
@@ -175,13 +173,13 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
                     </span>
                   </div>
                   <span className="text-sm text-gray-500">
-                    {test.testCount.toLocaleString()} 次测试
+                    {test.testCount.toLocaleString()} tests
                   </span>
                 </div>
 
                 {/* 行动按钮 */}
                 <button className="w-full bg-primary-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-primary-700 transition-colors duration-200 focus:outline-none focus:ring-0">
-                  {t('popularSection.cta')}
+                  Start Test
                 </button>
               </div>
             </div>
@@ -191,7 +189,7 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
         {/* 查看更多按钮 */}
         <div className="text-center mt-12">
           <button className="inline-flex items-center px-6 py-3 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors duration-200 focus:outline-none focus:ring-0">
-            {t('popularSection.viewMore')}
+            View More Tests
             <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

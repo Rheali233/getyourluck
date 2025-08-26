@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 
 export interface SearchSuggestion {
   id: string;
@@ -27,20 +27,19 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   suggestions = [],
   ...props
 }) => {
-  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
-  // 默认搜索建议
+  // Default search suggestions
   const defaultSuggestions: SearchSuggestion[] = [
-    { id: '1', text: '我是什么性格', type: 'keyword', icon: '🔍' },
-    { id: '2', text: '今日运势', type: 'keyword', icon: '⭐' },
-    { id: '3', text: '塔罗占卜', type: 'test', icon: '🎴' },
-    { id: '4', text: '适合的职业', type: 'keyword', icon: '💼' },
-    { id: '5', text: '心理测试', type: 'test', icon: '🧠' },
-    { id: '6', text: '星座配对', type: 'test', icon: '❤️' },
-    { id: '7', text: '爱情运势', type: 'keyword', icon: '💕' },
-    { id: '8', text: '性格分析', type: 'keyword', icon: '📊' }
+    { id: '1', text: 'What is my personality', type: 'keyword', icon: '🔍' },
+    { id: '2', text: 'Today\'s fortune', type: 'keyword', icon: '⭐' },
+    { id: '3', text: 'Tarot reading', type: 'test', icon: '🎴' },
+    { id: '4', text: 'Suitable career', type: 'keyword', icon: '💼' },
+    { id: '5', text: 'Psychological test', type: 'test', icon: '🧠' },
+    { id: '6', text: 'Zodiac compatibility', type: 'test', icon: '❤️' },
+    { id: '7', text: 'Love fortune', type: 'keyword', icon: '💕' },
+    { id: '8', text: 'Personality analysis', type: 'keyword', icon: '📊' }
   ];
 
   const displaySuggestions = suggestions.length > 0 ? suggestions : defaultSuggestions;
@@ -71,13 +70,13 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
       {...props}
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 标题区域 */}
+        {/* Title section */}
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            🔍 {t('searchSection.title')}
+            🔍 Find What You Need
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {t('searchSection.subtitle')}
+            Search for tests, articles, and insights that match your interests
           </p>
         </div>
 
@@ -89,7 +88,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('searchSection.placeholder')}
+                placeholder="Search for tests, articles, or insights..."
                 className="w-full px-6 py-4 text-lg border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:outline-none"
                 disabled={isSearching}
               />
@@ -106,10 +105,10 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
                 {isSearching ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    {t('searchSection.searching')}
+                    Searching...
                   </div>
                 ) : (
-                  t('searchSection.search')
+                  'Search'
                 )}
               </button>
             </div>
@@ -119,7 +118,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
         {/* 热门搜索关键词 */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-            {t('searchSection.popularSearches')}
+            Popular Searches
           </h3>
           <div className="flex flex-wrap justify-center gap-3">
             {displaySuggestions.slice(0, 8).map((suggestion) => (
@@ -145,34 +144,34 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
         {/* 搜索分类说明 */}
         <div className="bg-gray-50 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-            {t('searchSection.categories')}
+            Search Categories
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-white rounded-lg">
               <div className="text-2xl mb-2">🧠</div>
               <h4 className="font-medium text-gray-900 mb-2">
-                {t('searchSection.psychology')}
+                Psychology
               </h4>
               <p className="text-sm text-gray-600">
-                {t('searchSection.psychologyDesc')}
+                Personality tests, mental health assessments, and emotional intelligence tests
               </p>
             </div>
             <div className="text-center p-4 bg-white rounded-lg">
               <div className="text-2xl mb-2">⭐</div>
               <h4 className="font-medium text-gray-900 mb-2">
-                {t('searchSection.astrology')}
+                Astrology
               </h4>
               <p className="text-sm text-gray-600">
-                {t('searchSection.astrologyDesc')}
+                Daily horoscopes, zodiac compatibility, and fortune predictions
               </p>
             </div>
             <div className="text-center p-4 bg-white rounded-lg">
               <div className="text-2xl mb-2">💼</div>
               <h4 className="font-medium text-gray-900 mb-2">
-                {t('searchSection.career')}
+                Career
               </h4>
               <p className="text-sm text-gray-600">
-                {t('searchSection.careerDesc')}
+                Career planning, job matching, and professional development tests
               </p>
             </div>
           </div>

@@ -9,14 +9,12 @@ import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
 export interface ResponsiveNavigationProps extends BaseComponentProps {
-  showLanguageSwitch?: boolean;
   showThemeToggle?: boolean;
 }
 
 export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
   className,
   testId = 'responsive-navigation',
-  showLanguageSwitch = true,
   showThemeToggle = true,
   ...props
 }) => {
@@ -43,7 +41,7 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
   const navigationItems = [
     { name: '首页', href: '/', icon: '🏠' },
     { name: '测试中心', href: '/tests', icon: '🧪' },
-    { name: '心理测试', href: '/tests/psychology', icon: '🧠' },
+            { name: '心理测试', href: '/psychology', icon: '🧠' },
     { name: '星座运势', href: '/tests/astrology', icon: '⭐' },
     { name: '塔罗占卜', href: '/tests/tarot', icon: '🔮' },
     { name: '职业规划', href: '/tests/career', icon: '📊' },
@@ -87,11 +85,6 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
 
           {/* 桌面端操作按钮 */}
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
-            {showLanguageSwitch && (
-              <button className="p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200">
-                <span className="text-lg">🌐</span>
-              </button>
-            )}
             {showThemeToggle && (
               <button className="p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200">
                 <span className="text-lg">🌙</span>
@@ -161,12 +154,6 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
             
             {/* 移动端操作按钮 */}
             <div className="pt-4 border-t border-gray-200 space-y-3">
-              {showLanguageSwitch && (
-                <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-                  <span className="text-lg">🌐</span>
-                  <span>切换语言</span>
-                </button>
-              )}
               {showThemeToggle && (
                 <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200">
                   <span className="text-lg">🌙</span>

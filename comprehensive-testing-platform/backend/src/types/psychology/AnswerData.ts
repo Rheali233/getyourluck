@@ -35,7 +35,7 @@ export interface Phq9AnswerData extends BaseAnswerData {
 // 情商答题数据接口
 export interface EqAnswerData extends BaseAnswerData {
   testType: 'eq';
-  dimension: 'self_awareness' | 'self_management' | 'social_awareness' | 'relationship_management';
+  dimension: 'self_awareness' | 'self_regulation' | 'motivation' | 'empathy' | 'social_skills';
   score: number; // 1-5分
   confidence: number; // 答题信心度 1-5
   reflection?: string; // 答题后的反思
@@ -88,7 +88,7 @@ export interface CreatePhq9AnswerData extends CreateAnswerData {
 // 情商创建答题数据接口
 export interface CreateEqAnswerData extends CreateAnswerData {
   testType: 'eq';
-  dimension: 'self_awareness' | 'self_management' | 'social_awareness' | 'relationship_management';
+  dimension: 'self_awareness' | 'self_regulation' | 'motivation' | 'empathy' | 'social_skills';
   score: number;
   confidence: number;
   reflection?: string;

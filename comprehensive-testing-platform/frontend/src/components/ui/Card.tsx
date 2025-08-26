@@ -36,7 +36,7 @@ export const Card: React.FC<CardProps> = ({
         </div>
       )}
       
-      <div className="p-5">{children}</div>
+      <div className="p-6">{children}</div>
       
       {actions && (
         <div className="px-5 py-4 bg-gray-50 border-t border-gray-100 flex justify-end space-x-2">

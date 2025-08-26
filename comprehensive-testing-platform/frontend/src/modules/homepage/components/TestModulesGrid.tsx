@@ -46,15 +46,15 @@ const TestModuleCard: React.FC<{
           {module.description}
         </p>
         
-        {/* 统计信息 */}
+        {/* Statistics */}
         <div className="flex justify-center items-center space-x-4 text-xs text-gray-500 mb-4">
           <span className="flex items-center">
             <span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
-            {module.testCount} 个测试
+            {module.testCount} tests
           </span>
           <span className="flex items-center">
             <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
-            {module.rating} 分
+            {module.rating} rating
           </span>
         </div>
         
@@ -70,16 +70,16 @@ const TestModuleCard: React.FC<{
           ))}
         </div>
         
-        {/* 预计时间 */}
+        {/* Estimated time */}
         <div className="text-xs text-gray-500">
-          预计用时: {module.estimatedTime}
+          Estimated time: {module.estimatedTime}
         </div>
         
-        {/* 状态标识 */}
+        {/* Status indicator */}
         {!module.isActive && (
           <div className="mt-3">
             <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
-              🚧 开发中
+              🚧 In Development
             </span>
           </div>
         )}
@@ -102,85 +102,85 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  // 默认测试模块数据
+  // Default test modules data
   const defaultModules: TestModule[] = [
     {
       id: 'psychology',
-      name: '心理学测试',
-      description: '专业的心理测评，帮助你了解自己的性格、情绪和认知特点',
+      name: 'Psychology Tests',
+      description: 'Professional psychological assessments to help you understand your personality, emotions, and cognitive traits',
       icon: '🧠',
       theme: 'psychology',
       testCount: 15,
       rating: 4.8,
       isActive: true,
-      route: '/tests/psychology',
-      features: ['MBTI性格测试', '抑郁筛查', '情商评估'],
-      estimatedTime: '10-15分钟'
+      route: '/psychology',
+      features: ['MBTI Personality Test', 'Depression Screening', 'EQ Assessment'],
+      estimatedTime: '10-15 minutes'
     },
     {
       id: 'astrology',
-      name: '占星运势',
-      description: '专业的占星分析，解读你的星座密码，预测未来运势',
+      name: 'Astrology & Fortune',
+      description: 'Professional astrological analysis, decode your zodiac secrets and predict future fortune',
       icon: '⭐',
       theme: 'astrology',
       testCount: 12,
       rating: 4.7,
       isActive: true,
       route: '/tests/astrology',
-      features: ['星座运势', '星盘解读', '运势预测'],
-      estimatedTime: '5-8分钟'
+      features: ['Horoscope', 'Chart Reading', 'Fortune Prediction'],
+      estimatedTime: '5-8 minutes'
     },
     {
       id: 'career',
-      name: '职业规划',
-      description: '科学的职业测评，帮你找到最适合的职业发展方向',
+      name: 'Career Planning',
+      description: 'Scientific career assessment to help you find the most suitable career development direction',
       icon: '💼',
       theme: 'career',
       testCount: 18,
       rating: 4.9,
       isActive: true,
       route: '/tests/career',
-      features: ['职业兴趣', '能力评估', '职业规划'],
-      estimatedTime: '15-20分钟'
+      features: ['Career Interests', 'Ability Assessment', 'Career Planning'],
+      estimatedTime: '15-20 minutes'
     },
     {
       id: 'relationship',
-      name: '人际关系',
-      description: '深入分析你的人际关系模式，提升社交能力',
+      name: 'Interpersonal Relationships',
+      description: 'In-depth analysis of your interpersonal relationship patterns to improve social skills',
       icon: '❤️',
       theme: 'relationship',
       testCount: 10,
       rating: 4.6,
       isActive: true,
-      route: '/tests/relationship',
-      features: ['恋爱类型', '沟通方式', '关系模式'],
-      estimatedTime: '8-12分钟'
+      route: '/relationship',
+      features: ['Love Type', 'Communication Style', 'Relationship Pattern'],
+      estimatedTime: '8-12 minutes'
     },
     {
       id: 'learning',
-      name: '学习能力',
-      description: '评估你的学习风格和认知能力，优化学习方法',
+      name: 'Learning Ability',
+      description: 'Assess your learning style and cognitive abilities to optimize learning methods',
       icon: '📚',
       theme: 'learning',
       testCount: 14,
       rating: 4.5,
       isActive: true,
       route: '/tests/learning',
-      features: ['学习风格', '认知能力', '学习方法'],
-      estimatedTime: '12-18分钟'
+      features: ['Learning Style', 'Cognitive Ability', 'Learning Method'],
+      estimatedTime: '12-18 minutes'
     },
     {
       id: 'numerology',
-      name: '传统命理',
-      description: '结合传统文化，解读你的命理密码和人生轨迹',
+      name: 'Traditional Numerology',
+      description: 'Combining traditional culture to decode your numerological code and life trajectory',
       icon: '🔢',
       theme: 'numerology',
       testCount: 8,
       rating: 4.4,
       isActive: false,
       route: '/tests/numerology',
-      features: ['八字分析', '生肖解读', '姓名学'],
-      estimatedTime: '10-15分钟'
+      features: ['Eight Characters', 'Zodiac Reading', 'Name Study'],
+      estimatedTime: '10-15 minutes'
     }
   ];
 
@@ -193,11 +193,12 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       if (onModuleClick) {
         onModuleClick(module);
       } else {
+        // 直接导航到对应的测试模块
         navigate(module.route);
       }
     } else {
-      // 显示友好提示弹窗
-      setModalMessage(`"${module.name}" 测试功能正在开发中，敬请期待！`);
+      // Show friendly notice popup
+      setModalMessage(`"${module.name}" test feature is under development, stay tuned!`);
       setShowModal(true);
     }
   };
@@ -208,13 +209,13 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       data-testid={testId}
     >
       <div className="max-w-7xl mx-auto">
-        {/* 标题 */}
+        {/* Title */}
         <div className="text-left mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            测试模块
+            Test Modules
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl">
-            这里汇集了各种类型的测试，帮助你更好地了解自己。
+            Discover various types of tests that help you better understand yourself.
           </p>
         </div>
 
@@ -229,21 +230,21 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
           ))}
         </div>
 
-        {/* 底部提示 */}
+        {/* Bottom notice */}
         <div className="text-center mt-12">
           <p className="text-gray-500 text-sm">
-            更多测试模块正在开发中，敬请期待！
+            More test modules are under development, stay tuned!
           </p>
         </div>
 
-        {/* 友好提示弹窗 */}
+        {/* Friendly notice popup */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
               <div className="text-center">
                 <div className="text-4xl mb-4">🚧</div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  功能开发中
+                  Feature Under Development
                 </h3>
                 <p className="text-gray-600 mb-6">
                   {modalMessage}
@@ -252,7 +253,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
                   onClick={() => setShowModal(false)}
                   className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200"
                 >
-                  知道了
+                  Got it
                 </button>
               </div>
             </div>

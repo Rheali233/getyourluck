@@ -8,8 +8,32 @@ import { HomepageModuleModel } from "../../models/HomepageModuleModel";
 import { HomepageConfigModel } from "../../models/HomepageConfigModel";
 import { AnalyticsEventModel } from "../../models/AnalyticsEventModel";
 import type { AppContext } from "../../types/env";
+import type { APIResponse } from "../../../../shared/types/apiResponse";
 
 const homepageRoutes = new Hono<AppContext>();
+
+// 首页模块根路径
+homepageRoutes.get("/", async (c) => {
+  const response: APIResponse = {
+    success: true,
+    data: {
+      name: "首页模块",
+      description: "提供首页配置和测试模块管理功能",
+      endpoints: {
+        config: "/config",
+        modules: "/modules",
+        modulesByTheme: "/modules/:theme",
+        stats: "/stats"
+      },
+      version: "1.0.0"
+    },
+    message: "Homepage module information",
+    timestamp: new Date().toISOString(),
+    requestId: c.get("requestId") || "",
+  };
+
+  return c.json(response);
+});
 
 // 获取首页配置
 homepageRoutes.get("/config", async (c) => {
@@ -92,9 +116,8 @@ homepageRoutes.get("/stats", async (c) => {
   try {
     const dbService = c.get("dbService");
     
-    // 直接测试数据库查询
-    const testQuery = await dbService.db.prepare("SELECT COUNT(*) as count FROM homepage_modules").first();
-    console.log("Test query result:", testQuery);
+    // Test database connection
+    await dbService.db.prepare("SELECT COUNT(*) as count FROM homepage_modules").first();
     
     const moduleModel = new HomepageModuleModel(dbService.env);
     

@@ -192,14 +192,7 @@ functional_validation() {
         log_warning "首页配置加载可能存在问题"
     fi
     
-    # 测试多语言支持
-    log_info "验证多语言支持..."
-    local i18n_response=$(curl -s "$API_BASE_URL/i18n/zh-CN/homepage")
-    if [[ $? -eq 0 ]]; then
-        log_success "多语言支持正常"
-    else
-        log_warning "多语言支持可能存在问题"
-    fi
+    
     
     log_success "功能验证测试完成"
 }

@@ -92,7 +92,7 @@ export class MigrationRunner {
         throw new Error(recordResult.error || 'Failed to record migration')
       }
 
-      console.log(`Applied migration: ${migration.id} - ${migration.name}`)
+      // 迁移应用成功
     } catch (error) {
       throw new ModuleError(
         `Failed to apply migration ${migration.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -119,18 +119,18 @@ export class MigrationRunner {
       )
 
       if (pendingMigrations.length === 0) {
-        console.log('No pending migrations to apply')
+        // 没有待应用的迁移
         return
       }
 
-      console.log(`Applying ${pendingMigrations.length} pending migrations...`)
+      // 开始应用待处理的迁移
 
       // 按顺序应用迁移
       for (const migration of pendingMigrations) {
         await this.applyMigration(migration)
       }
 
-      console.log('All migrations applied successfully')
+      // 所有迁移应用成功
     } catch (error) {
       if (error instanceof ModuleError) {
         throw error

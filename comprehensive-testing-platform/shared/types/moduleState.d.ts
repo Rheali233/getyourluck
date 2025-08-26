@@ -28,4 +28,3 @@ export interface TestModuleActions extends ModuleActions {
     calculateResult: () => Promise<void>;
     resetTest: () => void;
 }
-//# sourceMappingURL=moduleState.d.ts.map

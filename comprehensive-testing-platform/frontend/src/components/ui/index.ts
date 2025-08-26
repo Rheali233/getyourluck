@@ -16,6 +16,8 @@ export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as Navigation } from './Navigation';
 export { default as Footer } from './Footer';
 export { default as PageHeader } from './PageHeader';
+export { TestNavigation } from './TestNavigation';
+export { default as QuestionOptions } from './QuestionOptions';
 
 // 类型导出
 export type {
@@ -32,3 +34,4 @@ export type {
 export type { ModalProps } from './Modal';
 export type { AlertProps } from './Alert';
 export type { FooterProps } from './Footer';
+export type { TestNavigationProps } from './TestNavigation';

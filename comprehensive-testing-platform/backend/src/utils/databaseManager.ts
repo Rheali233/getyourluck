@@ -22,12 +22,12 @@ export class DatabaseManager {
    */
   async initialize(): Promise<void> {
     try {
-      console.log('Initializing database...')
+      // 初始化数据库
       
       // 运行数据库迁移
       await this.migrationRunner.runMigrations(migrations)
       
-      console.log('Database initialized successfully')
+      // 数据库初始化成功
     } catch (error) {
       console.error('Database initialization failed:', error)
       throw new ModuleError(
@@ -235,7 +235,7 @@ export class DatabaseManager {
         eventsDeleted = (eventsResult as any).changes || 0
       }
 
-      console.log(`Database cleanup completed: ${sessionsDeleted} sessions, ${feedbackDeleted} feedback, ${eventsDeleted} events deleted`)
+      // 数据库清理完成
 
       return {
         sessionsDeleted,

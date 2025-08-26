@@ -53,7 +53,7 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
         { id: 'homepage-load', name: '首页加载测试', category: 'core' },
         { id: 'search-function', name: '搜索功能测试', category: 'core' },
         { id: 'cookies-management', name: 'Cookies管理测试', category: 'compliance' },
-        { id: 'multi-language', name: '多语言支持测试', category: 'i18n' },
+
         { id: 'responsive-design', name: '响应式设计测试', category: 'ui' },
         { id: 'navigation', name: '导航功能测试', category: 'core' },
         { id: 'user-preferences', name: '用户偏好测试', category: 'user' }
@@ -217,8 +217,6 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
         return await testSearchFunction();
       case 'cookies-management':
         return await testCookiesManagement();
-      case 'multi-language':
-        return await testMultiLanguage();
       case 'responsive-design':
         return await testResponsiveDesign();
       case 'page-load-time':
@@ -283,29 +281,7 @@ export const FinalTestSuite: React.FC<FinalTestSuiteProps> = ({
     }
   };
 
-  const testMultiLanguage = async (): Promise<Partial<TestResult>> => {
-    try {
-      // 测试多语言切换
-      const languages = ['zh-CN', 'en-US'];
-      let allSupported = true;
-      
-      for (const lang of languages) {
-        const response = await fetch(`/api/i18n/${lang}/homepage`);
-        if (!response.ok) {
-          allSupported = false;
-          break;
-        }
-      }
-      
-      if (allSupported) {
-        return { status: 'passed', message: '多语言支持完整' };
-      } else {
-        return { status: 'warning', message: '部分语言支持缺失' };
-      }
-    } catch (error) {
-      return { status: 'failed', message: `多语言测试错误: ${error}` };
-    }
-  };
+
 
   const testResponsiveDesign = async (): Promise<Partial<TestResult>> => {
     // 模拟响应式设计测试

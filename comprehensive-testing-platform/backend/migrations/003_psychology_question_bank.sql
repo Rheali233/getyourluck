@@ -103,14 +103,21 @@ CREATE INDEX IF NOT EXISTS idx_psychology_question_versions_active ON psychology
 
 -- 插入题库分类种子数据
 INSERT OR IGNORE INTO psychology_question_categories (id, name, code, description, question_count, dimensions, scoring_type, min_score, max_score, estimated_time) VALUES
-('mbti-category', 'MBTI性格测试', 'mbti', '迈尔斯-布里格斯类型指标，16种人格类型测试', 60, '["E/I", "S/N", "T/F", "J/P"]', 'binary', 0, 1, 20),
+('love-style-category', 'Love Style Assessment', 'love_style', 'Assessment of romantic relationship styles based on John Alan Lees Love Styles Theory', 30, '["Eros", "Ludus", "Storge", "Pragma", "Mania", "Agape"]', 'likert', 30, 150, 15),
+('love-language-category', 'Love Language Test', 'love_language', 'Assessment of how you prefer to give and receive love based on Gary Chapmans 5 Love Languages', 30, '["Words_of_Affirmation", "Quality_Time", "Receiving_Gifts", "Acts_of_Service", "Physical_Touch"]', 'likert', 30, 150, 15),
+('interpersonal-category', 'Interpersonal Skills Assessment', 'interpersonal', 'Comprehensive assessment of interpersonal communication and relationship skills', 30, '["Communication_Skills", "Empathy", "Conflict_Resolution", "Trust_Building", "Social_Skills"]', 'likert', 30, 150, 15),('mbti-category', 'MBTI性格测试', 'mbti', '迈尔斯-布里格斯类型指标，16种人格类型测试', 60, '["E/I", "S/N", "T/F", "J/P"]', 'binary', 0, 1, 20),
 ('phq9-category', 'PHQ-9抑郁筛查', 'phq9', '患者健康问卷-9项，专业抑郁风险评估', 9, '["anhedonia", "depressed_mood", "sleep_problems", "fatigue", "appetite_changes", "poor_concentration", "psychomotor_changes", "suicidal_thoughts", "guilt_feelings"]', 'likert', 0, 27, 5),
 ('eq-category', '情商测试', 'eq', '情绪智力评估，四维度全面分析', 40, '["self_awareness", "self_management", "social_awareness", "relationship_management"]', 'likert', 40, 200, 20),
 ('happiness-category', '幸福指数评估', 'happiness', '生活满意度综合评估，五领域全面分析', 30, '["work", "relationships", "health", "personal_growth", "life_balance"]', 'likert', 30, 210, 15);
 
 -- 插入题库配置种子数据
 INSERT OR IGNORE INTO psychology_question_configs (id, category_id, config_key, config_value, config_type, description) VALUES
-('mbti-config-1', 'mbti-category', 'dimension_weights', '{"E/I": 1, "S/N": 1, "T/F": 1, "J/P": 1}', 'json', 'MBTI各维度权重配置'),
+('love-style-config-1', 'love-style-category', 'dimension_weights', '{"Eros": 1, "Ludus": 1, "Storge": 1, "Pragma": 1, "Mania": 1, "Agape": 1}', 'json', 'Love Style Assessment dimension weights configuration'),
+('love-style-config-2', 'love-style-category', 'scoring_algorithm', 'dimension_average', 'string', 'Love Style Assessment scoring algorithm: dimension average'),
+('love-language-config-1', 'love-language-category', 'dimension_weights', '{"Words_of_Affirmation": 1, "Quality_Time": 1, "Receiving_Gifts": 1, "Acts_of_Service": 1, "Physical_Touch": 1}', 'json', 'Love Language Test dimension weights configuration'),
+('love-language-config-2', 'love-language-category', 'scoring_algorithm', 'dimension_average', 'string', 'Love Language Test scoring algorithm: dimension average'),
+('interpersonal-config-1', 'interpersonal-category', 'dimension_weights', '{"Communication_Skills": 1, "Empathy": 1, "Conflict_Resolution": 1, "Trust_Building": 1, "Social_Skills": 1}', 'json', 'Interpersonal Skills Assessment dimension weights configuration'),
+('interpersonal-config-2', 'interpersonal-category', 'scoring_algorithm', 'dimension_average', 'string', 'Interpersonal Skills Assessment scoring algorithm: dimension average'),('mbti-config-1', 'mbti-category', 'dimension_weights', '{"E/I": 1, "S/N": 1, "T/F": 1, "J/P": 1}', 'json', 'MBTI各维度权重配置'),
 ('mbti-config-2', 'mbti-category', 'scoring_algorithm', 'binary_preference', 'string', 'MBTI评分算法：二元偏好'),
 ('phq9-config-1', 'phq9-category', 'risk_thresholds', '{"minimal": 0, "mild": 5, "moderate": 10, "moderately_severe": 15, "severe": 20}', 'json', 'PHQ-9风险等级阈值'),
 ('phq9-config-2', 'phq9-category', 'safety_warning', 'true', 'boolean', 'PHQ-9启用安全警告'),

@@ -6,7 +6,7 @@
 import React from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 
 export interface HeroSectionProps extends BaseComponentProps {
   onStartTest?: () => void;
@@ -48,22 +48,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onStartTest,
   ...props
 }) => {
-  const { t } = useLanguage();
-
-  // 使用语言上下文进行配置
+  // Hero section configuration
   const heroConfig = {
-    title: t('hero.title'),
-    subtitle: t('hero.subtitle'),
-    description: t('hero.description'),
+    title: "Discover Your True Self, Meet a Better Future",
+    subtitle: "🌟 Get your personality code in 3 minutes through fun psychological tests and AI intelligent analysis!",
+    description: "Still confused about \"who am I?\" Want to know what career suits you best? No registration needed, just take the test and get a professional report instantly ✨",
     features: [
-      t('hero.feature.psychology'),
-      t('hero.feature.astrology'),
-      t('hero.feature.tarot'),
-      t('hero.feature.career'),
-      t('hero.feature.relationship'),
-      t('hero.feature.cognitive')
+      "🔬 Scientific & Reliable",
+      "🎯 Accurate & Insightful", 
+      "🔒 Privacy Protected",
+      "⚡ Instant Results",
+      "📱 Access Anywhere"
     ],
-    ctaText: t('hero.cta.start'),
+    ctaText: "Start Testing",
     ctaRoute: "/tests"
   };
 
@@ -111,19 +108,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           ))}
         </div>
 
-        {/* 信任标识 */}
+        {/* Trust indicators */}
         <div className="mt-16 flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            {t('trust.users')}
+            Trusted by 10,000+ Users
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-            {t('trust.team')}
+            Professional Team
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-            {t('trust.ai')}
+            AI-Powered Analysis
           </div>
         </div>
       </div>

@@ -36,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({
         {...props}
       >
         <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
-          <p>© {year} getyourluck. 保留所有权利.</p>
+          <p>© {year} getyourluck. All rights reserved.</p>
         </div>
       </footer>
     );
@@ -44,57 +44,57 @@ export const Footer: React.FC<FooterProps> = ({
 
   const footerLinks = {
     tests: {
-      title: '测试服务',
+      title: 'Test Services',
       links: [
-        { name: '心理测试', href: '/tests/psychology' },
-        { name: '星座运势', href: '/tests/astrology' },
-        { name: '塔罗占卜', href: '/tests/tarot' },
-        { name: '职业规划', href: '/tests/career' },
-        { name: '学习能力', href: '/tests/learning' },
-        { name: '情感关系', href: '/tests/relationship' },
+        { name: 'Psychology Tests', href: '/psychology' },
+        { name: 'Astrology Fortune', href: '/astrology' },
+        { name: 'Tarot Reading', href: '/tarot' },
+        { name: 'Career Planning', href: '/career' },
+        { name: 'Learning Ability', href: '/learning' },
+        { name: 'Relationships', href: '/relationship' },
       ],
     },
     resources: {
-      title: '资源中心',
+      title: 'Resources',
       links: [
-        { name: '博客文章', href: '/blog' },
-        { name: '测试指南', href: '/guides' },
-        { name: '常见问题', href: '/faq' },
-        { name: '用户反馈', href: '/feedback' },
-        { name: '帮助中心', href: '/help' },
-        { name: '联系我们', href: '/contact' },
+        { name: 'Blog Articles', href: '/blog' },
+        { name: 'Test Guides', href: '/guides' },
+        { name: 'FAQ', href: '/faq' },
+        { name: 'User Feedback', href: '/feedback' },
+        { name: 'Help Center', href: '/help' },
+        { name: 'Contact Us', href: '/contact' },
       ],
     },
     company: {
-      title: '关于我们',
+      title: 'About Us',
       links: [
-        { name: '公司介绍', href: '/about' },
-        { name: '团队介绍', href: '/team' },
-        { name: '发展历程', href: '/history' },
-        { name: '媒体报道', href: '/media' },
-        { name: '加入我们', href: '/careers' },
-        { name: '合作伙伴', href: '/partners' },
+        { name: 'Company Info', href: '/about' },
+        { name: 'Our Team', href: '/team' },
+        { name: 'History', href: '/history' },
+        { name: 'Media Coverage', href: '/media' },
+        { name: 'Join Us', href: '/careers' },
+        { name: 'Partners', href: '/partners' },
       ],
     },
     legal: {
-      title: '法律条款',
+      title: 'Legal Terms',
       links: [
-        { name: '用户协议', href: '/terms' },
-        { name: '隐私政策', href: '/privacy' },
-        { name: 'Cookie政策', href: '/cookies' },
-        { name: '免责声明', href: '/disclaimer' },
-        { name: '版权信息', href: '/copyright' },
-        { name: '投诉建议', href: '/complaints' },
+        { name: 'Terms of Service', href: '/terms' },
+        { name: 'Privacy Policy', href: '/privacy' },
+        { name: 'Cookie Policy', href: '/cookies' },
+        { name: 'Disclaimer', href: '/disclaimer' },
+        { name: 'Copyright Info', href: '/copyright' },
+        { name: 'Complaints & Suggestions', href: '/complaints' },
       ],
     },
   };
 
   const socialMedia = [
-    { name: '微信', icon: '💬', href: '#', color: 'hover:text-green-600' },
-    { name: '微博', icon: '📱', href: '#', color: 'hover:text-red-600' },
-    { name: '知乎', icon: '🧠', href: '#', color: 'hover:text-blue-600' },
-    { name: '小红书', icon: '📖', href: '#', color: 'hover:text-pink-600' },
-    { name: 'B站', icon: '📺', href: '#', color: 'hover:text-purple-600' },
+    { name: 'WeChat', icon: '💬', href: '#', color: 'hover:text-green-600' },
+    { name: 'Twitter', icon: '🐦', href: '#', color: 'hover:text-blue-600' },
+    { name: 'Facebook', icon: '📘', href: '#', color: 'hover:text-blue-600' },
+    { name: 'Instagram', icon: '📷', href: '#', color: 'hover:text-pink-600' },
+    { name: 'YouTube', icon: '📺', href: '#', color: 'hover:text-red-600' },
   ];
   
   return (
@@ -114,8 +114,8 @@ export const Footer: React.FC<FooterProps> = ({
                 <span className="text-xl font-bold">getyourluck</span>
               </div>
               <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                专业的在线测试平台，提供心理测试、占星分析、塔罗占卜等多种测试服务。
-                通过科学的方法帮助您更好地了解自己，发现潜能，规划未来。
+                Professional online testing platform providing psychological tests, astrological analysis, tarot reading and various testing services.
+                Help you better understand yourself, discover potential, and plan for the future through scientific methods.
               </p>
               
               {showSocialMedia && (
@@ -211,17 +211,17 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="border-t border-gray-800 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © {year} getyourluck. 保留所有权利.
+              © {year} getyourluck. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm text-gray-400">
               <Link to="/terms" className="hover:text-white transition-colors duration-200">
-                服务条款
+                Terms of Service
               </Link>
               <Link to="/privacy" className="hover:text-white transition-colors duration-200">
-                隐私政策
+                Privacy Policy
               </Link>
               <Link to="/cookies" className="hover:text-white transition-colors duration-200">
-                Cookie政策
+                Cookie Policy
               </Link>
             </div>
           </div>

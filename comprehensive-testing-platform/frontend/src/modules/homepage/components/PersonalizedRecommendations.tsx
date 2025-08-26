@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
@@ -45,7 +45,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
   showDescription = true,
   ...props
 }) => {
-  const { i18n } = useTranslation('homepage');
+
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +87,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
 
   // 获取本地化文本
   const getLocalizedText = (item: RecommendationItem, field: 'title' | 'description' | 'category' | 'reason') => {
-    const currentLang = i18n.language;
+    const currentLang = 'en';
     const fieldEn = `${field}En` as keyof RecommendationItem;
     
     if (currentLang === 'en' && item[fieldEn]) {

@@ -9,6 +9,7 @@ dist/
 build/
 .next/
 out/
+*.tsbuildinfo
 
 # Environment variables
 .env
@@ -83,7 +84,6 @@ jspm_packages/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/

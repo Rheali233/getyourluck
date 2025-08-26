@@ -1,10 +1,10 @@
 /**
  * SEO元数据管理组件
- * 负责管理页面的SEO元数据、结构化数据和多语言SEO优化
+ * 负责管理页面的SEO元数据、结构化数据和SEO优化
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import type { BaseComponentProps } from '@/types/componentTypes';
 
 export interface SEOMetadata {
@@ -42,23 +42,23 @@ export interface SEOManagerProps extends BaseComponentProps {
 export const SEOManager: React.FC<SEOManagerProps> = ({
   structuredData = []
 }) => {
-  const { t } = useTranslation('homepage');
+
 
   // 默认元数据
   const defaultMetadata = useMemo(() => ({
-    title: t('seo.defaultTitle'),
-    description: t('seo.defaultDescription'),
-    keywords: t('seo.defaultKeywords'),
+    title: 'Comprehensive Testing Platform - Personality, Psychology & Astrology Tests',
+    description: 'Discover yourself with our comprehensive testing platform. Take personality tests, psychological assessments, astrology readings, and more.',
+    keywords: 'personality test, psychology test, astrology, numerology, tarot, self-discovery',
     canonicalUrl: window.location.href,
-    ogTitle: t('seo.defaultOgTitle'),
-    ogDescription: t('seo.defaultOgDescription'),
+    ogTitle: 'Comprehensive Testing Platform',
+    ogDescription: 'Discover yourself with personality, psychology, and astrology tests',
     ogType: 'website',
     ogImage: '',
     twitterCard: 'summary_large_image',
-    twitterTitle: t('seo.defaultTwitterTitle'),
-    twitterDescription: t('seo.defaultTwitterDescription'),
+    twitterTitle: 'Comprehensive Testing Platform',
+    twitterDescription: 'Discover yourself with personality, psychology, and astrology tests',
     twitterImage: ''
-  }), [t]);
+  }), []);
 
   const [currentMetadata] = useState(defaultMetadata);
 
@@ -99,8 +99,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     // 更新robots标签
     updateRobotsTags();
     
-    // 更新语言标签
-    updateLanguageTags();
+
   };
 
   // 更新单个meta标签
@@ -170,40 +169,10 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     updateMetaTag('robots', robots);
   };
 
-  // 更新语言标签
-  const updateLanguageTags = () => {
-    // 更新html lang属性
-    document.documentElement.lang = 'zh-CN'; // 假设默认语言是中文
-    
-    // 更新hreflang标签
-    updateHreflangTags();
-  };
-
-  // 更新hreflang标签
-  const updateHreflangTags = () => {
-    const supportedLanguages = ['zh-CN', 'en-US'];
-    const currentUrl = defaultMetadata.canonicalUrl;
-    
-    // 移除现有的hreflang标签
-    const existingHreflangs = document.querySelectorAll('link[rel="alternate"][hreflang]');
-    existingHreflangs.forEach(tag => tag.remove());
-    
-    // 添加新的hreflang标签
-    supportedLanguages.forEach(lang => {
-      const hreflang = document.createElement('link');
-      hreflang.rel = 'alternate';
-      hreflang.hreflang = lang;
-      hreflang.href = currentUrl.replace(/\/[a-z]{2}-[A-Z]{2}/, `/${lang}`);
-      document.head.appendChild(hreflang);
-    });
-    
-    // 添加x-default标签
-    const xDefault = document.createElement('link');
-    xDefault.rel = 'alternate';
-    xDefault.hreflang = 'x-default';
-    xDefault.href = currentUrl.replace(/\/[a-z]{2}-[A-Z]{2}/, '');
-    document.head.appendChild(xDefault);
-  };
+  // 设置HTML语言属性
+  useEffect(() => {
+    document.documentElement.lang = 'en';
+  }, []);
 
   // 更新meta标签（通过property属性）
   const updateMetaTagByProperty = (property: string, content: string) => {

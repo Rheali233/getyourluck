@@ -89,7 +89,7 @@ export const TEST_MODULES = {
     descriptionEn: 'Understand your love code',
     icon: '💕',
     color: 'pink',
-    route: '/tests/relationship',
+    route: '/relationship',
     features: ['恋爱类型', '沟通方式'],
     featuresEn: ['Love Type', 'Communication Style']
   }

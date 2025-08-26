@@ -91,7 +91,7 @@ class DatabaseSeeder {
         code: 'eq',
         description: '评估情绪智力的四个维度',
         questionCount: 4,
-        dimensions: '["self_awareness", "self_management", "social_awareness", "relationship_management"]',
+        dimensions: '["self_awareness", "self_regulation", "motivation", "empathy", "social_skills"]',
         scoringType: 'likert',
         minScore: 4,
         maxScore: 20,

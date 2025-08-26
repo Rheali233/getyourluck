@@ -16,7 +16,7 @@ export { Footer } from './components/Footer';
 export { ResponsiveNavigation } from './components/ResponsiveNavigation';
 export { TouchFriendlyComponents, TouchFriendlyButton, TouchFriendlyCard } from './components/TouchFriendlyComponents';
 export { ResponsiveLayout, ResponsiveContainer, ResponsiveText, ResponsiveSpacing, ResponsiveVisibility } from './components/ResponsiveLayout';
-export { LanguageSwitcher } from './components/LanguageSwitcher';
+
 export { TestModuleStats } from './components/TestModuleStats';
 export { UserBehaviorTracker } from './components/UserBehaviorTracker';
 export { OptimizedImage } from './components/OptimizedImage';

@@ -184,7 +184,7 @@ export class PsychologyAnswerValidationService {
   ): void {
     // 维度验证
     const validDimensions = [
-      'self_awareness', 'self_management', 'social_awareness', 'relationship_management'
+              'self_awareness', 'self_regulation', 'motivation', 'empathy', 'social_skills'
     ];
     
     if (!validDimensions.includes(data.dimension)) {

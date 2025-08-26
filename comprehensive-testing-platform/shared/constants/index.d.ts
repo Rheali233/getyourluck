@@ -46,4 +46,3 @@ export declare const DB_TABLES: {
     readonly ANALYTICS_EVENTS: "analytics_events";
     readonly SYS_CONFIGS: "sys_configs";
 };
-//# sourceMappingURL=index.d.ts.map

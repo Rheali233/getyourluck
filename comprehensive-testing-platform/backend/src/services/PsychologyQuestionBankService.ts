@@ -260,9 +260,9 @@ export class PsychologyQuestionBankService {
         }
       }
 
-      // 应用语言过滤
+      // Apply language filtering (all questions are now in English)
       if (language === 'en') {
-        questions = questions.filter(q => q.questionTextEn);
+        // All questions are already in English, no filtering needed
       }
 
       // 应用分页

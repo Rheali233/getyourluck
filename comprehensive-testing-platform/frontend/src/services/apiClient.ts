@@ -5,13 +5,13 @@
 
 import type { APIResponse } from '../../../shared/types/apiResponse'
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
-import { env } from '../config/environment'
+import { environmentConfig } from '../config/environment'
 
 class ApiClient {
   private baseURL: string
 
   constructor() {
-    this.baseURL = env.API_BASE_URL
+    this.baseURL = environmentConfig.API_BASE_URL
   }
 
   async request<T>(

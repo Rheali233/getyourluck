@@ -34,7 +34,7 @@ export const FeaturedTests: React.FC<FeaturedTestsProps> = ({
       testCount: 15600,
       rating: 4.9,
       isActive: true,
-      route: '/tests/psychology/mbti',
+              route: '/psychology/mbti',
       features: ['16种性格类型', '详细分析报告', '职业建议'],
       estimatedTime: '8-12分钟',
       sortOrder: 1,

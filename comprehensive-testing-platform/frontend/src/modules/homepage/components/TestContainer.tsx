@@ -16,7 +16,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   // 开始测试
   const handleStartTest = () => {
     if (testType) {
-      console.log('Starting test:', testType);
+      // 开始测试逻辑
     }
   };
 

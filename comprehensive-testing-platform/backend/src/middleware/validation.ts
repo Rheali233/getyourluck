@@ -81,8 +81,6 @@ export const validateTestSubmission = async (c: Context<AppContext>, next: Next)
 };
 
 export const validateFeedback = async (c: Context<AppContext>, next: Next) => {
-  console.log("validateFeedback middleware called");
-  
   try {
     // 尝试解析JSON
     const body = await c.req.json();

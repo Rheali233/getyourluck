@@ -1,13 +1,13 @@
 /**
- * 心理测试题库数据模型
- * 遵循统一开发标准的数据模型规范
+ * Psychology test question bank data model
+ * Follows unified development standard data model specifications
  */
 
 import { BaseModel } from "./BaseModel";
 import type { Env } from "../index";
 import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 
-// 题库分类数据接口
+// Question bank category data interface
 export interface PsychologyQuestionCategoryData {
   id: string;
   name: string;
@@ -25,12 +25,11 @@ export interface PsychologyQuestionCategoryData {
   updatedAt: Date;
 }
 
-// 题库题目数据接口
+// Question bank question data interface
 export interface PsychologyQuestionData {
   id: string;
   categoryId: string;
-  questionText: string;
-  questionTextEn?: string;
+  questionText: string;        // English only
   questionType: 'single_choice' | 'likert_scale' | 'multiple_choice';
   dimension?: string;
   domain?: string;
@@ -38,16 +37,16 @@ export interface PsychologyQuestionData {
   orderIndex: number;
   isRequired: boolean;
   isActive: boolean;
+  isReverse?: boolean;         // Whether reverse scoring is applied
   createdAt: Date;
   updatedAt: Date;
 }
 
-// 题目选项数据接口
+// Question options data interface
 export interface PsychologyQuestionOptionData {
   id: string;
   questionId: string;
-  optionText: string;
-  optionTextEn?: string;
+  optionText: string;          // English only
   optionValue: string;
   optionScore?: number;
   optionDescription?: string;
@@ -57,7 +56,7 @@ export interface PsychologyQuestionOptionData {
   createdAt: Date;
 }
 
-// 题库配置数据接口
+// Question bank configuration data interface
 export interface PsychologyQuestionConfigData {
   id: string;
   categoryId: string;
@@ -70,7 +69,7 @@ export interface PsychologyQuestionConfigData {
   updatedAt: Date;
 }
 
-// 题库版本数据接口
+// Question bank version data interface
 export interface PsychologyQuestionVersionData {
   id: string;
   categoryId: string;
@@ -81,7 +80,7 @@ export interface PsychologyQuestionVersionData {
   createdAt: Date;
 }
 
-// 创建题库分类数据接口
+// Create question bank category data interface
 export interface CreatePsychologyQuestionCategoryData {
   name: string;
   code: string;
@@ -95,24 +94,23 @@ export interface CreatePsychologyQuestionCategoryData {
   sortOrder?: number;
 }
 
-// 创建题库题目数据接口
+// Create question bank question data interface
 export interface CreatePsychologyQuestionData {
   categoryId: string;
-  questionText: string;
-  questionTextEn?: string;
+  questionText: string;        // English only
   questionType: 'single_choice' | 'likert_scale' | 'multiple_choice';
   dimension?: string;
   domain?: string;
   weight?: number;
   orderIndex: number;
   isRequired?: boolean;
+  isReverse?: boolean;         // Whether reverse scoring is applied
 }
 
-// 创建题目选项数据接口
+// Create question options data interface
 export interface CreatePsychologyQuestionOptionData {
   questionId: string;
-  optionText: string;
-  optionTextEn?: string;
+  optionText: string;          // English only
   optionValue: string;
   optionScore?: number;
   optionDescription?: string;
@@ -120,7 +118,7 @@ export interface CreatePsychologyQuestionOptionData {
   isCorrect?: boolean;
 }
 
-// 创建题库配置数据接口
+// Create question bank configuration data interface
 export interface CreatePsychologyQuestionConfigData {
   categoryId: string;
   configKey: string;
@@ -130,7 +128,7 @@ export interface CreatePsychologyQuestionConfigData {
   isPublic?: boolean;
 }
 
-// 创建题库版本数据接口
+// Create question bank version data interface
 export interface CreatePsychologyQuestionVersionData {
   categoryId: string;
   versionNumber: string;
@@ -140,14 +138,14 @@ export interface CreatePsychologyQuestionVersionData {
 }
 
 /**
- * 心理测试题库数据模型类
+ * Psychology test question bank data model class
  */
 export class PsychologyQuestionBankModel extends BaseModel {
   constructor(env: Env) {
     super(env, "psychology_question_categories");
   }
 
-  // ==================== 题库分类管理 ====================
+  // ==================== Question Bank Category Management ====================
 
   /**
    * 创建题库分类
@@ -222,15 +220,14 @@ export class PsychologyQuestionBankModel extends BaseModel {
     const result = await this.db
       .prepare(`
         INSERT INTO psychology_questions (
-          id, category_id, question_text, question_text_en, question_type,
+          id, category_id, question_text, question_type,
           dimension, domain, weight, order_index, is_required
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `)
       .bind(
         id,
         data.categoryId,
         data.questionText,
-        data.questionTextEn || null,
         data.questionType,
         data.dimension || null,
         data.domain || null,
@@ -264,6 +261,56 @@ export class PsychologyQuestionBankModel extends BaseModel {
   }
 
   /**
+   * 根据分类ID获取题目列表（包含选项）
+   */
+  async getQuestionsWithOptionsByCategory(categoryId: string): Promise<any[]> {
+    const results = await this.db
+      .prepare(`
+        SELECT * FROM psychology_questions 
+        WHERE category_id = ? AND is_active = 1 
+        ORDER BY order_index
+      `)
+      .bind(categoryId)
+      .all();
+
+    const questions = [];
+    
+    for (const result of results.results) {
+      // 直接构建前端需要的格式，不使用mapToQuestionData
+      const question = {
+        id: result['id'] as string,
+        text: result['question_text'] as string, // 前端期望的字段名
+        type: result['question_type'] as 'single_choice' | 'likert_scale' | 'multiple_choice',
+        required: Boolean(result['is_required']),
+        order: result['order_index'] as number,
+        category: (result['dimension'] as string) ?? "",
+        weight: result['weight'] as number,
+        dimension: (result['dimension'] as string) ?? "",
+        domain: (result['domain'] as string) ?? "",
+      };
+      
+      // 获取该题目的选项
+      const options = await this.getOptionsByQuestion(question.id);
+      
+      // 将选项转换为前端需要的格式
+      const formattedOptions = options.map(option => ({
+        id: option.id,
+        text: option.optionText,
+        value: option.optionValue,
+        score: option.optionScore,
+        description: option.optionDescription || ''
+      }));
+      
+      questions.push({
+        ...question,
+        options: formattedOptions
+      });
+    }
+
+    return questions;
+  }
+
+  /**
    * 根据维度获取题目列表
    */
   async getQuestionsByDimension(dimension: string): Promise<PsychologyQuestionData[]> {
@@ -290,15 +337,14 @@ export class PsychologyQuestionBankModel extends BaseModel {
     const result = await this.db
       .prepare(`
         INSERT INTO psychology_question_options (
-          id, question_id, option_text, option_text_en, option_value,
+          id, question_id, option_text, option_value,
           option_score, option_description, order_index, is_correct
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `)
       .bind(
         id,
         data.questionId,
         data.optionText,
-        data.optionTextEn || null,
         data.optionValue,
         data.optionScore || null,
         data.optionDescription || null,
@@ -481,7 +527,6 @@ export class PsychologyQuestionBankModel extends BaseModel {
       id: row.id as string,
       categoryId: row.category_id as string,
       questionText: row.question_text as string,
-      questionTextEn: (row.question_text_en as string) ?? "",
       questionType: row.question_type as 'single_choice' | 'likert_scale' | 'multiple_choice',
       dimension: (row.dimension as string) ?? "",
       domain: (row.domain as string) ?? "",
@@ -489,6 +534,7 @@ export class PsychologyQuestionBankModel extends BaseModel {
       orderIndex: row.order_index as number,
       isRequired: Boolean(row.is_required),
       isActive: Boolean(row.is_active),
+      isReverse: Boolean(row.is_reverse),
       createdAt: new Date(row.created_at as string),
       updatedAt: new Date(row.updated_at as string),
     };
@@ -499,7 +545,6 @@ export class PsychologyQuestionBankModel extends BaseModel {
       id: row.id as string,
       questionId: row.question_id as string,
       optionText: row.option_text as string,
-      optionTextEn: (row.option_text_en as string) ?? "",
       optionValue: row.option_value as string,
       optionScore: (row.option_score as number) ?? 0,
       optionDescription: (row.option_description as string) ?? "",

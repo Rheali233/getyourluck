@@ -11,6 +11,28 @@ import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
 
 const blogRoutes = new Hono<AppContext>();
 
+// 博客模块根路径
+blogRoutes.get("/", async (c) => {
+  const response: APIResponse = {
+    success: true,
+    data: {
+      name: "博客模块",
+      description: "提供博客文章管理功能",
+      endpoints: {
+        articles: "/articles",
+        article: "/articles/:id",
+        viewCount: "/articles/:id/view"
+      },
+      version: "1.0.0"
+    },
+    message: "Blog module information",
+    timestamp: new Date().toISOString(),
+    requestId: c.get("requestId") || "",
+  };
+
+  return c.json(response);
+});
+
 // 获取博客文章列表（分页）
 blogRoutes.get("/articles", async (c) => {
   const page = parseInt(c.req.query("page") || "1");

@@ -19,4 +19,3 @@ export declare const ERROR_CODES: {
     readonly NOT_FOUND: "NOT_FOUND";
 };
 export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
-//# sourceMappingURL=errors.d.ts.map

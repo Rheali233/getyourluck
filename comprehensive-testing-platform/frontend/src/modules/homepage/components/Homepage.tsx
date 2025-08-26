@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 import { Navigation } from '@/components/ui';
@@ -29,6 +29,7 @@ export const Homepage: React.FC<HomepageProps> = ({
   ...props
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // 处理从导航组件传递的滚动状态
   useEffect(() => {
@@ -54,17 +55,19 @@ export const Homepage: React.FC<HomepageProps> = ({
   };
 
   const handleModuleClick = (module: any) => {
-    console.log('Module clicked:', module);
-    // 这里可以添加模块点击的逻辑
+    // 直接导航到模块对应路由
+    if (module?.route) {
+      navigate(module.route);
+      return;
+    }
+    // 模块点击处理
   };
 
-  const handleArticleClick = (article: any) => {
-    console.log('Article clicked:', article);
+  const handleArticleClick = (_article: any) => {
     // 这里可以添加文章点击的逻辑
   };
 
-  const handleSearch = (query: string) => {
-    console.log('Search query:', query);
+  const handleSearch = (_query: string) => {
     // 这里可以添加搜索逻辑
   };
 

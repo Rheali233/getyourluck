@@ -35,7 +35,7 @@
       "@/middleware/*": ["./src/middleware/*"],
       "shared/*": ["../shared/*"]
     },
-    "types": ["@cloudflare/workers-types", "jest"]
+    "types": ["@cloudflare/workers-types", "jest", "node"]
   },
   "include": [
     "src/**/*",

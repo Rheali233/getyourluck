@@ -11,4 +11,3 @@ export declare function safeJsonParse<T>(json: string, fallback: T): T;
 export declare function hashString(input: string): Promise<string>;
 export declare function isValidUUID(uuid: string): boolean;
 export declare function sanitizeString(input: string, maxLength?: number): string;
-//# sourceMappingURL=index.d.ts.map

@@ -7,7 +7,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 
 export interface BlogArticle {
   id: string;
@@ -40,61 +40,59 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
   onArticleClick,
   ...props
 }) => {
-  const { t } = useLanguage();
-  
-  // 使用语言上下文的标题和副标题
-  const displayTitle = title || t('blog.title');
-  const displaySubtitle = subtitle || t('blog.subtitle');
+  // Title and subtitle configuration
+  const displayTitle = title || 'Latest Insights & Articles';
+  const displaySubtitle = subtitle || 'Discover valuable insights about psychology, career, and personal development';
 
-  // 默认博客文章数据
+  // Default blog articles data
   const defaultArticles: BlogArticle[] = [
     {
       id: 'mbti-guide',
-      title: 'MBTI性格测试完全指南：16种性格类型详解',
-      excerpt: '深入了解MBTI性格测试的科学原理，探索16种性格类型的特点，帮助你更好地认识自己和他人...',
+      title: 'Complete Guide to MBTI Personality Test: 16 Personality Types Explained',
+      excerpt: 'Deep dive into the scientific principles of MBTI personality test, explore the characteristics of 16 personality types, helping you better understand yourself and others...',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk1CVEkgR3VpZGU8L3RleHQ+PC9zdmc+',
-      category: '心理学',
-      readTime: '8分钟',
+      category: 'Psychology',
+      readTime: '8 min',
       publishDate: '2024-01-15',
-      author: '心理学专家',
+      author: 'Psychology Expert',
       readCount: 12500,
-      tags: ['MBTI', '性格测试', '心理学'],
+      tags: ['MBTI', 'Personality Test', 'Psychology'],
     },
     {
       id: 'career-planning',
-      title: '如何通过职业测试找到最适合的工作？',
-      excerpt: '职业规划测试不仅能帮你了解自己的职业倾向，还能为你的职业发展提供科学指导...',
+      title: 'How to Find Your Perfect Job Through Career Tests?',
+      excerpt: 'Career planning tests not only help you understand your career inclinations but also provide scientific guidance for your career development...',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcmVlciBQbGFubmluZzwvdGV4dD48L3N2Zz4=',
-      category: '职业发展',
-      readTime: '6分钟',
+      category: 'Career Development',
+      readTime: '6 min',
       publishDate: '2024-01-12',
-      author: '职业规划师',
+      author: 'Career Counselor',
       readCount: 8900,
-      tags: ['职业规划', '职业测试', '个人发展'],
+      tags: ['Career Planning', 'Career Test', 'Personal Development'],
     },
     {
       id: 'relationship-communication',
-      title: '改善人际关系的5个心理学技巧',
-      excerpt: '人际关系是人生的重要组成部分，掌握这些心理学技巧，让你的社交更加顺畅...',
+      title: '5 Psychology Tips to Improve Interpersonal Relationships',
+      excerpt: 'Interpersonal relationships are an important part of life. Master these psychology techniques to make your social interactions smoother...',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlJlbGF0aW9uc2hpcDwvdGV4dD48L3N2Zz4=',
-      category: '人际关系',
-      readTime: '10分钟',
+      category: 'Interpersonal',
+      readTime: '10 min',
       publishDate: '2024-01-10',
-      author: '心理咨询师',
+      author: 'Counseling Psychologist',
       readCount: 15600,
-      tags: ['人际关系', '沟通技巧', '心理学'],
+      tags: ['Interpersonal', 'Communication Skills', 'Psychology'],
     },
     {
       id: 'stress-management',
-      title: '现代人压力管理：从心理学角度解读',
-      excerpt: '在快节奏的现代生活中，压力管理变得越来越重要。了解压力的心理学机制...',
+      title: 'Modern Stress Management: A Psychological Perspective',
+      excerpt: 'In the fast-paced modern life, stress management is becoming increasingly important. Understand the psychological mechanisms of stress...',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlN0cmVzcyBNYW5hZ2VtZW50PC90ZXh0Pjwvc3ZnPg==',
-      category: '心理健康',
-      readTime: '7分钟',
+      category: 'Mental Health',
+      readTime: '7 min',
       publishDate: '2024-01-08',
-      author: '心理健康专家',
+      author: 'Mental Health Expert',
       readCount: 11200,
-      tags: ['压力管理', '心理健康', '心理学'],
+      tags: ['Stress Management', 'Mental Health', 'Psychology'],
     },
   ];
 
@@ -111,7 +109,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
       {...props}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 标题区域 */}
+        {/* Title section */}
         <div className="text-left mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {displayTitle}

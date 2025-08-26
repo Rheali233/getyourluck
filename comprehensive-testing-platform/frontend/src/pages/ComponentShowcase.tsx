@@ -18,7 +18,7 @@ export const ComponentShowcase: React.FC = () => {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', { inputValue, selectValue });
+    // 表单提交处理
   };
 
   const buttonVariants: NonNullable<ButtonProps['variant']>[] = ['primary', 'secondary', 'outline', 'ghost'];

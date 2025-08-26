@@ -26,12 +26,12 @@ export const Footer: React.FC<FooterProps> = ({
     tests: {
       title: '测试服务',
       links: [
-        { name: '心理测试', href: '/tests/psychology' },
-        { name: '星座运势', href: '/tests/astrology' },
-        { name: '塔罗占卜', href: '/tests/tarot' },
-        { name: '职业规划', href: '/tests/career' },
-        { name: '学习能力', href: '/tests/learning' },
-        { name: '情感关系', href: '/tests/relationship' },
+        { name: '心理测试', href: '/psychology' },
+        { name: '星座运势', href: '/astrology' },
+        { name: '塔罗占卜', href: '/tarot' },
+        { name: '职业规划', href: '/career' },
+        { name: '学习能力', href: '/learning' },
+        { name: '情感关系', href: '/relationship' },
       ],
     },
     resources: {

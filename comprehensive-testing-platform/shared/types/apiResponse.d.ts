@@ -36,4 +36,3 @@ export interface TestSubmission {
         timestamp?: string;
     };
 }
-//# sourceMappingURL=apiResponse.d.ts.map

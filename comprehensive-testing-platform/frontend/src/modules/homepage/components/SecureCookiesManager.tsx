@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import { Shield, Lock, Eye, EyeOff, Settings, CheckCircle, AlertCircle } from 'lucide-react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 
@@ -39,7 +39,7 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
   onConsentChange,
   showAdvancedSettings = false
 }) => {
-  const { t } = useTranslation('homepage');
+
   const [consent, setConsent] = useState<CookieConsent>({
     necessary: true, // 必要的cookies总是启用
     analytics: false,
@@ -55,29 +55,29 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
   const cookieCategories: CookieCategory[] = [
     {
       id: 'necessary',
-      name: t('cookies.categories.necessary.name'),
-      description: t('cookies.categories.necessary.description'),
+      name: 'Necessary Cookies',
+      description: 'Essential for the website to function properly.',
       required: true,
       icon: <Shield className="w-5 h-5 text-blue-600" />
     },
     {
       id: 'analytics',
-      name: t('cookies.categories.analytics.name'),
-      description: t('cookies.categories.analytics.description'),
+      name: 'Analytics Cookies',
+      description: 'Help us understand how visitors interact with the website.',
       required: false,
       icon: <Eye className="w-5 h-5 text-green-600" />
     },
     {
       id: 'marketing',
-      name: t('cookies.categories.marketing.name'),
-      description: t('cookies.categories.marketing.description'),
+      name: 'Marketing Cookies',
+      description: 'Used to track visitors across websites for advertising purposes.',
       required: false,
       icon: <Settings className="w-5 h-5 text-purple-600" />
     },
     {
       id: 'thirdParty',
-      name: t('cookies.categories.thirdParty.name'),
-      description: t('cookies.categories.thirdParty.description'),
+      name: 'Third Party Cookies',
+      description: 'Set by third party services integrated on our website.',
       required: false,
       icon: <Lock className="w-5 h-5 text-orange-600" />
     }
@@ -113,11 +113,11 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
       }
     } catch (err) {
       console.error('加载用户同意状态失败:', err);
-      setError(t('cookies.errors.loadFailed'));
+      setError('Failed to load user consent settings.');
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, t]);
+  }, [sessionId]);
 
   // 保存用户同意
   const saveConsent = useCallback(async (newConsent: CookieConsent) => {
@@ -153,11 +153,11 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
       applyCookieSettings(newConsent);
     } catch (err) {
       console.error('保存用户同意失败:', err);
-      setError(t('cookies.errors.saveFailed'));
+      setError('Failed to save user consent settings.');
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, onConsentChange, t]);
+  }, [sessionId, onConsentChange]);
 
   // 应用cookies设置
   const applyCookieSettings = useCallback((consent: CookieConsent) => {
@@ -258,10 +258,10 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
             <Shield className="w-6 h-6 text-blue-600" />
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                {t('cookies.title')}
+                Cookie Settings
               </h3>
               <p className="text-sm text-gray-600">
-                {t('cookies.subtitle')}
+                Manage your cookie preferences for this website
               </p>
             </div>
           </div>
@@ -291,19 +291,19 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
             onClick={acceptAll}
             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
           >
-            {t('cookies.actions.acceptAll')}
+            Accept All
           </button>
           <button
             onClick={rejectNonEssential}
             className="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm font-medium"
           >
-            {t('cookies.actions.rejectNonEssential')}
+            Reject Non-Essential
           </button>
           <button
             onClick={resetConsent}
             className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm"
           >
-            {t('cookies.actions.reset')}
+            Reset
           </button>
         </div>
       </div>
@@ -324,7 +324,7 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
                         {category.name}
                         {category.required && (
                           <span className="ml-2 text-xs text-gray-500">
-                            ({t('cookies.required')})
+                            (Required)
                           </span>
                         )}
                       </h4>
@@ -337,7 +337,7 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
                         <div className="flex items-center text-green-600">
                           <CheckCircle className="w-5 h-5" />
                           <span className="text-sm font-medium ml-1">
-                            {t('cookies.alwaysEnabled')}
+                            Always Enabled
                           </span>
                         </div>
                       ) : (
@@ -365,7 +365,7 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
               disabled={isLoading}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
-              {isLoading ? t('cookies.saving') : t('cookies.saveSettings')}
+              {isLoading ? 'Saving...' : 'Save Settings'}
             </button>
           </div>
         </div>
@@ -374,12 +374,12 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
       {/* 底部信息 */}
       <div className="px-6 py-3 bg-gray-50 rounded-b-lg">
         <p className="text-xs text-gray-500 text-center">
-          {t('cookies.footer')}
+          Your privacy is important to us. Learn more about how we use cookies in our
           <a
             href="/privacy-policy"
             className="text-blue-600 hover:text-blue-800 underline ml-1"
           >
-            {t('cookies.privacyPolicy')}
+            Privacy Policy
           </a>
         </p>
       </div>

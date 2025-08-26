@@ -1,11 +1,17 @@
 /**
- * 测试结果组件
- * 显示测试完成后的结果信息
+ * Test Results Component
+ * Displays appropriate result display components based on test type
  */
 
 import React from 'react';
-import type { TestResult } from '../types';
 import { cn } from '@/utils/classNames';
+import { 
+  MBTIResultDisplay, 
+  PHQ9ResultDisplay, 
+  EQResultDisplay, 
+  HappinessResultDisplay
+} from './index';
+import type { TestResult, MBTIResult, PHQ9Result, EQResult, HappinessResult } from '../types';
 
 interface TestResultsProps {
   results: TestResult;
@@ -23,46 +29,74 @@ export const TestResults: React.FC<TestResultsProps> = ({
   onBackToHome,
   ...props
 }) => {
-  return (
-    <div className={cn("min-h-screen bg-gray-50 py-8 px-4", className)} data-testid={testId} {...props}>
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          {/* 标题 */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              测试完成！
-            </h1>
-            <p className="text-gray-600">
-              您的测试结果已生成，请查看详细分析。
-            </p>
-          </div>
+  // Test result data
 
-          {/* 结果内容 */}
-          <div className="mb-8">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-center">
-                结果展示组件开发中...
-              </p>
-            </div>
-          </div>
-
-          {/* 操作按钮 */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+  // Render appropriate result display component based on test type
+  const renderResultComponent = () => {
+    switch (results.testType) {
+      case 'mbti':
+        return (
+          <MBTIResultDisplay
+            result={results.result as MBTIResult}
+            onReset={onReset}
+            onShare={() => {
+              // Share functionality to be implemented
+            }}
+          />
+        );
+      
+      case 'phq9':
+        return (
+          <PHQ9ResultDisplay
+            result={results.result as PHQ9Result}
+            onReset={onReset}
+            onSeekHelp={() => {
+              // Seek help functionality to be implemented
+            }}
+          />
+        );
+      
+      case 'eq':
+        return (
+          <EQResultDisplay
+            result={results.result as EQResult}
+            onReset={onReset}
+            onPractice={() => {
+              // Start practice functionality to be implemented
+            }}
+          />
+        );
+      
+      case 'happiness':
+        return (
+          <HappinessResultDisplay
+            result={results.result as HappinessResult}
+            onReset={onReset}
+            onStartJourney={() => {
+              // Start happiness journey functionality to be implemented
+            }}
+          />
+        );
+      
+      default:
+        return (
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Test Results</h2>
+            <p className="text-gray-600 mb-8">Unknown test type</p>
             <button
               onClick={onReset}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              重新测试
-            </button>
-            <button
-              onClick={onBackToHome}
-              className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              返回首页
+              Retake Test
             </button>
           </div>
-        </div>
-      </div>
+        );
+    }
+  };
+
+  return (
+    <div className={cn("min-h-screen", className)} data-testid={testId} {...props}>
+      {renderResultComponent()}
     </div>
   );
 };
