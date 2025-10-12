@@ -46,7 +46,7 @@ export class CareerSessionModel extends BaseModel {
   async create(data: CreateCareerSessionData): Promise<string> {
     const id = this.generateId();
 
-    const result = await this.db
+    const result = await this.safeDB
       .prepare(`
         INSERT INTO career_sessions (
           id, test_session_id, test_subtype, holland_code,
@@ -75,7 +75,7 @@ export class CareerSessionModel extends BaseModel {
   }
 
   async findByTestSessionId(testSessionId: string): Promise<CareerSessionData | null> {
-    const result = await this.db
+    const result = await this.safeDB
       .prepare("SELECT * FROM career_sessions WHERE test_session_id = ?")
       .bind(testSessionId)
       .first();
@@ -88,7 +88,7 @@ export class CareerSessionModel extends BaseModel {
   }
 
   async findBySubtype(subtype: string): Promise<CareerSessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM career_sessions WHERE test_subtype = ? ORDER BY created_at DESC")
       .bind(subtype)
       .all();
@@ -97,7 +97,7 @@ export class CareerSessionModel extends BaseModel {
   }
 
   async getHollandCodeDistribution(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT holland_code, COUNT(*) as count 
         FROM career_sessions 
@@ -116,7 +116,7 @@ export class CareerSessionModel extends BaseModel {
   }
 
   async getPopularCareers(limit: number = 20): Promise<Array<{ title: string; count: number }>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT career_matches FROM career_sessions WHERE career_matches IS NOT NULL")
       .all();
 
@@ -146,7 +146,7 @@ export class CareerSessionModel extends BaseModel {
   }
 
   async getAverageInterestScores(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT interest_scores FROM career_sessions WHERE interest_scores IS NOT NULL")
       .all();
 

@@ -1,68 +1,52 @@
 /**
- * Universal Test Navigation Component
- * Applicable to all test interface top navigation
+ * 通用测试导航组件
+ * 适用于所有测试模块的导航
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { cn } from '@/utils/classNames';
+import type { BaseComponentProps } from '@/types/componentTypes';
 
-export interface TestNavigationProps {
-  /** Current module name for back button text */
+export interface TestNavigationProps extends BaseComponentProps {
   moduleName: string;
-  /** Back path */
   backPath: string;
-  /** Additional CSS class names */
   className?: string;
-  /** Whether to show reset test button */
-  showResetButton?: boolean;
-  /** Reset test callback function */
-  onReset?: () => void;
 }
 
 export const TestNavigation: React.FC<TestNavigationProps> = ({
   moduleName,
   backPath,
   className,
-  showResetButton = false,
-  onReset
+  testId = 'test-navigation',
+  ...props
 }) => {
-  const navigate = useNavigate();
-
   return (
-    <div className={cn("bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 sticky top-0 z-50", className)}>
-      <div className="flex justify-between items-center h-16">
-        {/* Left: Logo and Name */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+    <nav 
+      className={cn(
+        "bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200",
+        className
+      )}
+      data-testid={testId}
+      {...props}
+    >
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <Link
+            to={backPath}
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
-            <span className="text-2xl">🌟</span>
-            <span className="text-xl font-bold text-gray-900">getyourluck</span>
-          </button>
-        </div>
-        
-        {/* Right: Button Group */}
-        <div className="flex items-center space-x-3">
-          {showResetButton && onReset && (
-            <button
-              onClick={onReset}
-              className="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded-lg transition-colors"
-            >
-              Reset Test
-            </button>
-          )}
-          <button
-            onClick={() => navigate(backPath)}
-            className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            ← Back to {moduleName}
-          </button>
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            {moduleName}
+          </Link>
+          
+          <div className="flex items-center space-x-4">
+            {/* 右侧区域预留，可以根据需要添加其他元素 */}
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
-
-export default TestNavigation;

@@ -3,11 +3,17 @@
  * Export all components for easy importing
  */
 
-export { TestContainer } from './TestContainer';
-export { QuestionDisplay } from './QuestionDisplay';
-export { TestPreparation } from './TestPreparation';
-export { TestResults } from './TestResults';
+// Main components
 export { RelationshipHomePage } from './RelationshipHomePage';
+export { RelationshipTestContainer } from './RelationshipTestContainer';
+export { RelationshipGenericTestPage } from './RelationshipGenericTestPage';
 
-// Export chart components
-export * from './charts';
+// Test page components using unified testing architecture
+export { InterpersonalTestPage } from './InterpersonalTestPage';
+export { LoveLanguageTestPage } from './LoveLanguageTestPage';
+export { LoveStyleTestPage } from './LoveStyleTestPage';
+
+// Result display components
+export { LoveLanguageResultDisplay } from './LoveLanguageResultDisplay';
+export { LoveStyleResultDisplay } from './LoveStyleResultDisplay';
+export { InterpersonalResultDisplay } from './InterpersonalResultDisplay';

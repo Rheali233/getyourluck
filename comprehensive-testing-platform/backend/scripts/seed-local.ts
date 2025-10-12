@@ -29,7 +29,7 @@ class LocalDatabaseSeeder {
     try {
       // 清理SQL语句，移除多余的空格和换行
       const cleanSql = sql.replace(/\s+/g, ' ').trim();
-      const command = `wrangler d1 execute getyourluck-local --local --command "${cleanSql}"`;
+      const command = `wrangler d1 execute selfatlas-local --local --command "${cleanSql}"`;
       console.log(`执行SQL: ${cleanSql.substring(0, 80)}...`);
       
       const { execSync } = await import('child_process');

@@ -8,26 +8,31 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { errorHandler } from "./middleware/errorHandler";
-import { requestValidator } from "./middleware/requestValidator";
-import { testRoutes } from "./routes/tests";
+import { v1Routes } from "./routes/v1";
 import { blogRoutes } from "./routes/blog";
 import { feedbackRoutes } from "./routes/feedback";
+import { uploadRoute } from "./routes/feedback/upload";
 import { analyticsRoutes } from "./routes/analytics";
 import { homepageRoutes } from "./routes/homepage";
 import { searchRoutes } from "./routes/search";
 import { cookiesRoutes } from "./routes/cookies";
-import psychologyQuestionsRoutes from "./routes/psychology/questions";
-import relationshipQuestionsRoutes from "./routes/relationship/questions";
+import astrologyRoutes from "./routes/astrology";
+import tarotRoutes from "./routes/tarot";
+import testResultsRoutes from "./routes/testResults";
+import seoRoutes from "./routes/seo";
+import { learningQuestionsRoutes } from "./routes/learning-ability/questions";
+import { learningTestRoutes } from "./routes/learning-ability/test";
 import { DatabaseService } from "./services/DatabaseService";
+import { CacheService } from "./services/CacheService";
 
 import type { APIResponse } from "../../shared/types/apiResponse";
 import type { AppContext } from "./types/env";
 
 // Cloudflare Workers 环境类型定义
 export interface Env {
-  DB?: D1Database; // 可选，支持本地开发
-  KV?: KVNamespace; // 可选，支持本地开发
-  BUCKET?: R2Bucket; // 可选，支持本地开发
+  DB?: any; // D1Database - 可选，支持本地开发
+  KV?: any; // KVNamespace - 可选，支持本地开发
+  BUCKET?: any; // R2Bucket - 可选，支持本地开发
   ENVIRONMENT: string;
   [key: string]: any; // 添加索引签名
 }
@@ -50,12 +55,15 @@ app.use("*", cors({
     // 允许的域名列表
     const allowedOrigins = [
       "http://localhost:3000",
+      "http://localhost:3002", // Vite dev server
       "http://localhost:5173",
       "https://*.pages.dev",
       "https://*.cloudflare.com",
     ];
     
-    if (!origin) return origin; // 允许无origin的请求（如Postman），返回null/undefined表示允许
+    if (!origin) {
+      return origin; // 允许无origin的请求（如Postman），返回null/undefined表示允许
+    }
     
     const allowed = allowedOrigins.some(allowed => {
       if (allowed.includes("*")) {
@@ -66,13 +74,20 @@ app.use("*", cors({
     });
     return allowed ? origin : null;
   },
-  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
   allowHeaders: [
     "Content-Type", 
     "Authorization", 
     "X-Request-ID",
     "X-API-Key",
     "Cache-Control",
+    "Accept",
+    "Origin",
+    "X-Requested-With",
+  ],
+  exposeHeaders: [
+    "Content-Length",
+    "X-Request-ID",
   ],
   credentials: true,
   maxAge: 86400, // 24小时
@@ -81,8 +96,13 @@ app.use("*", cors({
 // 请求日志中间件
 app.use("*", logger());
 
-// 请求验证中间件
-app.use("*", requestValidator);
+// 全局OPTIONS处理 - 确保CORS预检请求得到正确处理
+app.options("*", (c) => {
+  return c.text("", 204);
+});
+
+// 请求验证中间件 - 暂时注释掉以诊断问题
+// app.use("*", requestValidator);
 
 // 服务初始化中间件
 app.use("*", async (c, next) => {
@@ -94,9 +114,22 @@ app.use("*", async (c, next) => {
   // 初始化数据库服务 - 使用Cloudflare D1
   const dbService = new DatabaseService(c.env);
   
+  // 初始化缓存服务 - 使用Cloudflare KV
+  const cacheService = new CacheService(c.env.KV || null, 3600);
+  
+  // 初始化数据库（运行迁移）
+  try {
+    await dbService.initialize();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to initialize database:", error);
+    // 继续执行，但记录错误
+  }
+  
   // 设置上下文变量
   c.set("requestId", requestId);
   c.set("dbService", dbService);
+  c.set("cacheService", cacheService);
   
   await next();
 });
@@ -104,27 +137,26 @@ app.use("*", async (c, next) => {
 // 错误处理中间件
 app.onError(errorHandler);
 
-// 根路径 - 欢迎页面
+// Root path - Welcome page
 app.get("/", (c) => {
   const response: APIResponse = {
     success: true,
     data: {
-      message: "欢迎使用综合测试平台 API",
+      message: "Welcome to Comprehensive Testing Platform API",
       version: "1.0.0",
       environment: c.env.ENVIRONMENT || "staging",
       timestamp: new Date().toISOString(),
       endpoints: {
         health: "/health",
         api: "/api",
-        tests: "/api/tests",
+        v1: "/api/v1",
         blog: "/api/blog",
         feedback: "/api/feedback",
         analytics: "/api/analytics",
         homepage: "/api/homepage",
         search: "/api/search",
         cookies: "/api/cookies",
-        psychology: "/api/psychology/questions",
-          relationship: "/api/relationship/questions",        system: "/api/system",
+        system: "/api/system",
       },
     },
     timestamp: new Date().toISOString(),
@@ -171,15 +203,21 @@ app.get("/health", async (c) => {
 });
 
 // API路由
-app.route("/api/tests", testRoutes);
+app.route("/api/v1", v1Routes);
 app.route("/api/blog", blogRoutes);
 app.route("/api/feedback", feedbackRoutes);
+app.route("/api/feedback/upload", uploadRoute);
 app.route("/api/analytics", analyticsRoutes);
 app.route("/api/homepage", homepageRoutes);
 app.route("/api/search", searchRoutes);
 app.route("/api/cookies", cookiesRoutes);
-app.route("/api/psychology/questions", psychologyQuestionsRoutes);
-app.route("/api/relationship/questions", relationshipQuestionsRoutes);// app.route("/api/recommendations", recommendationsRoutes); // 暂时注释，未定义
+app.route("/api/astrology", astrologyRoutes);
+app.route("/api/tarot", tarotRoutes);
+app.route("/api/test-results", testResultsRoutes);
+app.route("/api/seo", seoRoutes);
+app.route("/api/learning-ability/questions", learningQuestionsRoutes);
+app.route("/api/learning-ability/test", learningTestRoutes);
+// app.route("/api/recommendations", recommendationsRoutes); // 暂时注释，未定义
 // app.route("/api/seo", seoRoutes); // 暂时注释，未定义
 
 // API版本信息
@@ -187,20 +225,20 @@ app.get("/api", (c) => {
   const response: APIResponse = {
     success: true,
     data: {
-      name: "综合测试平台 API",
+      name: "Comprehensive Testing Platform API",
       version: "1.0.0",
-      description: "专业的心理测试、占星分析、塔罗占卜等在线测试服务API",
+      description: "Professional psychological testing, astrology analysis, tarot reading and other online testing services API",
               endpoints: {
-          tests: "/api/tests",
+          v1: "/api/v1",
           blog: "/api/blog", 
           feedback: "/api/feedback",
           analytics: "/api/analytics",
           homepage: "/api/homepage",
           search: "/api/search",
           cookies: "/api/cookies",
-          psychology: "/api/psychology/questions",
-          relationship: "/api/relationship/questions",          // recommendations: "/api/recommendations", // 暂时注释
-          // seo: "/api/seo", // 暂时注释
+          astrology: "/api/astrology",
+          // recommendations: "/api/recommendations", // 暂时注释
+          seo: "/api/seo",
           system: "/api/system",
         },
       documentation: "https://docs.example.com/api",

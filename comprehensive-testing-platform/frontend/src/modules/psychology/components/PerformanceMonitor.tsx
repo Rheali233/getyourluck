@@ -93,7 +93,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       <div className="fixed bottom-4 right-4 z-50">
         <button
           onClick={() => setShowDetailsState(!showDetailsState)}
-          className="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
+          className="bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
           title="Performance Monitoring"
         >
           📊
@@ -103,7 +103,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   }
 
   return (
-    <Card className={`p-4 bg-white shadow-lg ${className}`} data-testid={testId} {...props}>
+    <Card className={`p-4 bg-white ${className}`} data-testid={testId} {...props}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800">Performance Monitoring</h3>
         <div className="flex space-x-2">

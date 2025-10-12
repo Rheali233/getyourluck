@@ -1,17 +1,10 @@
 // Psychology test module component exports
-export { TestContainer } from './TestContainer';
-export { QuestionDisplay } from './QuestionDisplay';
-export { TestProgress } from './TestProgress';
-export { TestResults } from './TestResults';
-export { TestPreparation } from './TestPreparation';
 
 // Result display components
 export { MBTIResultDisplay } from './MBTIResultDisplay';
 export { MBTIRelationshipMatrix } from './MBTIRelationshipMatrix';
 export { PHQ9ResultDisplay } from './PHQ9ResultDisplay';
-export { PHQ9SymptomRadarChart } from './PHQ9SymptomRadarChart';
-export { PHQ9RiskLevelProgressBar } from './PHQ9RiskLevelProgressBar';
-export { PHQ9SymptomBarChart } from './PHQ9SymptomBarChart';
+// Removed unused chart components
 export { PHQ9SymptomFilter } from './PHQ9SymptomFilter';
 export { AnimatedCard } from './AnimatedCard';
 export { ResponsiveGrid, GridLayouts } from './ResponsiveGrid';
@@ -20,6 +13,7 @@ export { HappinessResultDisplay } from './HappinessResultDisplay';
 
 // Page components
 export { PsychologyHomePage } from './PsychologyHomePage';
+export { PsychologyTestContainer } from './PsychologyTestContainer';
 
 // Performance optimization components
 export { PerformanceMonitor } from './PerformanceMonitor';

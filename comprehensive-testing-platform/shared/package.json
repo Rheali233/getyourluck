@@ -1,0 +1,47 @@
+{
+  "name": "@comprehensive-testing-platform/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities, types, and services for the Comprehensive Testing Platform",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "eslint": "^8.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.ts"
+    },
+    "./types": {
+      "types": "./types/index.d.ts",
+      "import": "./types/index.ts"
+    },
+    "./utils": {
+      "types": "./utils/index.d.ts",
+      "import": "./utils/index.ts"
+    },
+    "./services": {
+      "types": "./services/index.d.ts",
+      "import": "./services/index.ts"
+    },
+    "./constants": {
+      "types": "./constants/index.d.ts",
+      "import": "./constants/index.ts"
+    }
+  }
+}

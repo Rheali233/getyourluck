@@ -47,10 +47,10 @@ cookiesRoutes.get("/consent/:sessionId", async (c) => {
       requestId: c.get("requestId"),
     });
   } catch (error) {
-    console.error("获取Cookies同意状态失败:", error);
+    console.error("Failed to get cookies consent status:", error);
     return c.json({
       success: false,
-      error: "获取Cookies同意状态失败",
+      error: "Failed to get cookies consent status",
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId"),
     }, 500);
@@ -100,15 +100,15 @@ cookiesRoutes.post("/consent", async (c) => {
 
     return c.json({
       success: true,
-      message: "Cookies同意状态更新成功",
+      message: "Cookies consent status updated successfully",
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId"),
     });
   } catch (error) {
-    console.error("更新Cookies同意状态失败:", error);
+    console.error("Failed to update cookies consent status:", error);
     return c.json({
       success: false,
-      error: "更新Cookies同意状态失败",
+      error: "Failed to update cookies consent status",
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId"),
     }, 500);

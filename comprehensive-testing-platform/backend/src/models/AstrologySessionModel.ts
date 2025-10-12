@@ -42,7 +42,7 @@ export class AstrologySessionModel extends BaseModel {
   async create(data: CreateAstrologySessionData): Promise<string> {
     const id = this.generateId();
 
-    const result = await this.db
+    const result = await this.safeDB
       .prepare(`
         INSERT INTO astrology_sessions (
           id, test_session_id, birth_date, birth_time, birth_location,
@@ -74,7 +74,7 @@ export class AstrologySessionModel extends BaseModel {
   }
 
   async findByTestSessionId(testSessionId: string): Promise<AstrologySessionData | null> {
-    const result = await this.db
+    const result = await this.safeDB
       .prepare("SELECT * FROM astrology_sessions WHERE test_session_id = ?")
       .bind(testSessionId)
       .first();
@@ -87,7 +87,7 @@ export class AstrologySessionModel extends BaseModel {
   }
 
   async findBySunSign(sunSign: string): Promise<AstrologySessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM astrology_sessions WHERE sun_sign = ? ORDER BY created_at DESC")
       .bind(sunSign)
       .all();
@@ -96,7 +96,7 @@ export class AstrologySessionModel extends BaseModel {
   }
 
   async getSunSignDistribution(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT sun_sign, COUNT(*) as count 
         FROM astrology_sessions 
@@ -114,7 +114,7 @@ export class AstrologySessionModel extends BaseModel {
   }
 
   async findByBirthDateRange(startDate: Date, endDate: Date): Promise<AstrologySessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT * FROM astrology_sessions 
         WHERE birth_date BETWEEN ? AND ? 

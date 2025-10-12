@@ -4,7 +4,7 @@
  */
 
 import { BaseModel } from './BaseModel';
-// import type { UserPreferences } from '../../../shared/types/homepage'; // 未使用，暂时注释
+
 
 export interface UserPreferencesData {
   id: string;
@@ -41,7 +41,7 @@ export class UserPreferencesModel extends BaseModel {
     try {
       const id = crypto.randomUUID();
       
-      await this.db
+      await this.safeDB
         .prepare(`
           INSERT OR REPLACE INTO user_preferences (
             id, session_id, language, theme, cookies_consent, analytics_consent,
@@ -75,7 +75,7 @@ export class UserPreferencesModel extends BaseModel {
    */
   async getPreferencesBySessionId(sessionId: string): Promise<UserPreferencesData | null> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare('SELECT * FROM user_preferences WHERE session_id = ?')
         .bind(sessionId)
         .first();
@@ -92,7 +92,7 @@ export class UserPreferencesModel extends BaseModel {
    */
   async updateCookiesConsent(sessionId: string, consent: CookiesConsentData): Promise<void> {
     try {
-      await this.db
+      await this.safeDB
         .prepare(`
           INSERT OR REPLACE INTO user_preferences (
             id, session_id, cookies_consent, analytics_consent, marketing_consent, 
@@ -128,7 +128,7 @@ export class UserPreferencesModel extends BaseModel {
     consentRate: number;
   }> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT 
             COUNT(*) as total_users,
@@ -172,7 +172,7 @@ export class UserPreferencesModel extends BaseModel {
    */
   async cleanupExpiredPreferences(daysOld: number = 365): Promise<number> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           DELETE FROM user_preferences 
           WHERE updated_at < datetime('now', '-${daysOld} days')
@@ -192,7 +192,7 @@ export class UserPreferencesModel extends BaseModel {
    */
   async getPreferencesList(limit: number = 100, offset: number = 0): Promise<UserPreferencesData[]> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT * FROM user_preferences 
           ORDER BY updated_at DESC 
@@ -213,7 +213,7 @@ export class UserPreferencesModel extends BaseModel {
    */
   async deletePreferences(id: string): Promise<void> {
     try {
-      await this.db
+      await this.safeDB
         .prepare('DELETE FROM user_preferences WHERE id = ?')
         .bind(id)
         .run();

@@ -13,6 +13,7 @@ export interface Env {
   MAX_REQUEST_SIZE: string;
   RATE_LIMIT_WINDOW: string;
   RATE_LIMIT_MAX: string;
+  DEEPSEEK_API_KEY: string;
 }
 
 // 应用上下文接口 - 使用Hono的Context类型

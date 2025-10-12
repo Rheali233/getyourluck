@@ -44,6 +44,9 @@ export interface BlogArticleListItem {
   likeCount: number
   publishedAt?: string
   createdAt: string
+  // 可选扩展字段（前端卡片展示）
+  slug?: string
+  coverImage?: string | null
 }
 
 export interface PaginationResult<T> {
@@ -139,6 +142,8 @@ export class BlogArticleModel extends BaseModel {
     const listQuery = `
       SELECT 
         id, title, excerpt, category, tags_data,
+        slug,              -- ensure slug is available
+        cover_image,       -- optional cover image column
         view_count, like_count, published_at, created_at
       FROM ${this.tableName} 
       ${whereClause}
@@ -155,6 +160,8 @@ export class BlogArticleModel extends BaseModel {
       excerpt: article.excerpt,
       category: article.category,
       tags: JSON.parse(article.tags_data || '[]'),
+      slug: (article.slug as string) ?? undefined,
+      coverImage: (article.cover_image as string | null) ?? null,
       viewCount: article.view_count,
       likeCount: article.like_count,
       publishedAt: article.published_at,
@@ -199,6 +206,22 @@ export class BlogArticleModel extends BaseModel {
       await this.setCache(cacheKey, result, 1800) // 30分钟缓存
     }
 
+    return result
+  }
+
+  /**
+   * 根据slug获取文章详情
+   */
+  async findBySlug(slug: string): Promise<BlogArticle | null> {
+    const cacheKey = `${CACHE_KEYS.BLOG_ARTICLE}slug:${slug}`
+    const cached = await this.getCache<BlogArticle>(cacheKey)
+    if (cached) return cached
+
+    const query = `SELECT * FROM ${this.tableName} WHERE slug = ? AND is_published = 1`
+    const result = await this.executeQueryFirst<BlogArticle>(query, [slug])
+    if (result) {
+      await this.setCache(cacheKey, result, 1800)
+    }
     return result
   }
 

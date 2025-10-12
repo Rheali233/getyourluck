@@ -17,7 +17,7 @@ export const TEST_MODULES = {
     descriptionEn: 'Discover your personality secrets',
     icon: '🧠',
     color: 'blue',
-    route: '/tests/psychology',
+    route: '/psychology',
     features: ['MBTI', '抑郁', '情商'],
     featuresEn: ['MBTI', 'Depression', 'EQ']
   },
@@ -29,7 +29,7 @@ export const TEST_MODULES = {
     descriptionEn: 'Know your daily fortune',
     icon: '⭐',
     color: 'purple',
-    route: '/tests/astrology',
+    route: '/astrology',
     features: ['星座配对', '运势'],
     featuresEn: ['Zodiac Matching', 'Fortune']
   },
@@ -41,7 +41,7 @@ export const TEST_MODULES = {
     descriptionEn: 'Mysterious tarot reveals your heart',
     icon: '🔮',
     color: 'indigo',
-    route: '/tests/tarot',
+    route: '/tarot',
     features: ['在线抽牌', '解读'],
     featuresEn: ['Online Drawing', 'Interpretation']
   },
@@ -53,7 +53,7 @@ export const TEST_MODULES = {
     descriptionEn: 'Find your perfect career path',
     icon: '💼',
     color: 'green',
-    route: '/tests/career',
+    route: '/career',
     features: ['霍兰德', 'DISC测试'],
     featuresEn: ['Holland Code', 'DISC Test']
   },
@@ -65,7 +65,7 @@ export const TEST_MODULES = {
     descriptionEn: 'Calculate your good fortune',
     icon: '🔢',
     color: 'orange',
-    route: '/tests/numerology',
+    route: '/numerology',
     features: ['八字', '生肖', '姓名'],
     featuresEn: ['BaZi', 'Chinese Zodiac', 'Name Analysis']
   },
@@ -77,7 +77,7 @@ export const TEST_MODULES = {
     descriptionEn: 'Discover your learning superpowers',
     icon: '📚',
     color: 'teal',
-    route: '/tests/learning',
+    route: '/learning',
     features: ['学习风格', '认知能力'],
     featuresEn: ['Learning Style', 'Cognitive Ability']
   },

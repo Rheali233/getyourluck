@@ -187,8 +187,8 @@ INSERT OR REPLACE INTO homepage_config (config_key, config_value, config_type, i
 
 -- 4. 设置生产环境特定的配置
 UPDATE homepage_config SET config_value = 'production' WHERE config_key = 'environment';
-UPDATE homepage_config SET config_value = 'https://api.getyourluck.com' WHERE config_key = 'api_base_url';
-UPDATE homepage_config SET config_value = 'https://cdn.getyourluck.com' WHERE config_key = 'cdn_base_url';
+UPDATE homepage_config SET config_value = 'https://api.selfatlas.net' WHERE config_key = 'api_base_url';
+UPDATE homepage_config SET config_value = 'https://cdn.selfatlas.net' WHERE config_key = 'cdn_base_url';
 
 -- 5. 创建生产环境统计视图
 CREATE VIEW IF NOT EXISTS production_stats AS

@@ -250,7 +250,7 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg border border-gray-200 ${className}`} data-testid={testId}>
+    <div className={`bg-white rounded-lg border border-gray-200 ${className}`} data-testid={testId}>
       {/* 头部 */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="flex items-center justify-between">

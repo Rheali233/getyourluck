@@ -36,7 +36,7 @@ export class RelationshipSessionModel extends BaseModel {
   async create(data: CreateRelationshipSessionData): Promise<string> {
     const id = this.generateId();
 
-    const result = await this.db
+    const result = await this.safeDB
       .prepare(`
         INSERT INTO relationship_sessions (
           id, test_session_id, test_subtype, primary_love_language,
@@ -65,7 +65,7 @@ export class RelationshipSessionModel extends BaseModel {
   }
 
   async findByTestSessionId(testSessionId: string): Promise<RelationshipSessionData | null> {
-    const result = await this.db
+    const result = await this.safeDB
       .prepare("SELECT * FROM relationship_sessions WHERE test_session_id = ?")
       .bind(testSessionId)
       .first();
@@ -78,7 +78,7 @@ export class RelationshipSessionModel extends BaseModel {
   }
 
   async findBySubtype(subtype: string): Promise<RelationshipSessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM relationship_sessions WHERE test_subtype = ? ORDER BY created_at DESC")
       .bind(subtype)
       .all();
@@ -87,7 +87,7 @@ export class RelationshipSessionModel extends BaseModel {
   }
 
   async getLoveLanguageDistribution(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT primary_love_language, COUNT(*) as count 
         FROM relationship_sessions 
@@ -106,7 +106,7 @@ export class RelationshipSessionModel extends BaseModel {
   }
 
   async getAttachmentStyleDistribution(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT attachment_style, COUNT(*) as count 
         FROM relationship_sessions 
@@ -125,7 +125,7 @@ export class RelationshipSessionModel extends BaseModel {
   }
 
   async getCommunicationStyleDistribution(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT communication_style, COUNT(*) as count 
         FROM relationship_sessions 
@@ -144,7 +144,7 @@ export class RelationshipSessionModel extends BaseModel {
   }
 
   async getAverageRelationshipSkills(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT relationship_skills FROM relationship_sessions WHERE relationship_skills IS NOT NULL")
       .all();
 
@@ -179,7 +179,7 @@ export class RelationshipSessionModel extends BaseModel {
     attachmentStyle: string;
     count: number;
   }>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT 
           primary_love_language,

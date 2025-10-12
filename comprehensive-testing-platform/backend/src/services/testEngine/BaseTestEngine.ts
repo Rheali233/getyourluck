@@ -174,6 +174,7 @@ export abstract class BaseTestEngine {
       interpretation: result.interpretation || "",
       recommendations: result.recommendations || [],
       completedAt: new Date().toISOString(),
+      status: 'completed',
     };
 
     // 缓存结果（如果启用）
@@ -235,6 +236,7 @@ export abstract class BaseTestEngine {
       interpretation: resultData.interpretation || "",
       recommendations: resultData.recommendations || [],
       completedAt: completedAt,
+      status: 'completed',
     };
 
     // 存入缓存

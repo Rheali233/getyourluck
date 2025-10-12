@@ -37,10 +37,32 @@ export interface StructuredData {
 export interface SEOManagerProps extends BaseComponentProps {
   pageType?: 'homepage' | 'test' | 'blog';
   structuredData?: StructuredData[];
+  // 允许外部覆盖的元数据
+  metadata?: Partial<{
+    title: string;
+    description: string;
+    keywords: string;
+    canonicalUrl: string;
+    ogTitle: string;
+    ogDescription: string;
+    ogImage: string;
+    ogType: string;
+    twitterCard: string;
+    twitterTitle: string;
+    twitterDescription: string;
+    twitterImage: string;
+  }>;
+  // robots 指令（例如 'index,follow' 或 'noindex,nofollow'）
+  robots?: string;
+  // 可选的链接标签（例如 prev/next）
+  links?: Array<{ rel: string; href: string }>;
 }
 
 export const SEOManager: React.FC<SEOManagerProps> = ({
-  structuredData = []
+  structuredData = [],
+  metadata,
+  robots,
+  links,
 }) => {
 
 
@@ -60,7 +82,10 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     twitterImage: ''
   }), []);
 
-  const [currentMetadata] = useState(defaultMetadata);
+  const [currentMetadata] = useState(() => ({
+    ...defaultMetadata,
+    ...(metadata || {}),
+  }));
 
   // 更新页面标题
   useEffect(() => {
@@ -88,7 +113,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     updateMetaTag('keywords', currentMetadata.keywords);
     
     // 更新canonical URL
-    updateCanonicalUrl(defaultMetadata.canonicalUrl);
+    updateCanonicalUrl(currentMetadata.canonicalUrl || defaultMetadata.canonicalUrl);
     
     // 更新Open Graph标签
     updateOpenGraphTags();
@@ -98,6 +123,11 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
     
     // 更新robots标签
     updateRobotsTags();
+
+    // 更新 link 标签（prev/next 等）
+    if (links && links.length > 0) {
+      updateLinkTags(links);
+    }
     
 
   };
@@ -127,16 +157,16 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 更新Open Graph标签
   const updateOpenGraphTags = () => {
     const ogTags = [
-      { property: 'og:title', content: defaultMetadata.ogTitle || currentMetadata.title },
-      { property: 'og:description', content: defaultMetadata.ogDescription || currentMetadata.description },
-      { property: 'og:url', content: defaultMetadata.canonicalUrl },
-      { property: 'og:type', content: defaultMetadata.ogType || 'website' },
-      { property: 'og:locale', content: 'zh-CN' }, // 假设默认语言是中文
-      { property: 'og:site_name', content: '综合测试平台' }
+      { property: 'og:title', content: (currentMetadata.ogTitle || currentMetadata.title) as string },
+      { property: 'og:description', content: (currentMetadata.ogDescription || currentMetadata.description) as string },
+      { property: 'og:url', content: (currentMetadata.canonicalUrl || defaultMetadata.canonicalUrl) as string },
+      { property: 'og:type', content: (currentMetadata.ogType || 'website') as string },
+      { property: 'og:locale', content: 'en-US' },
+      { property: 'og:site_name', content: 'Comprehensive Testing Platform' }
     ];
 
-    if (defaultMetadata.ogImage) {
-      ogTags.push({ property: 'og:image', content: defaultMetadata.ogImage });
+    if (currentMetadata.ogImage) {
+      ogTags.push({ property: 'og:image', content: currentMetadata.ogImage });
     }
 
     ogTags.forEach(tag => {
@@ -147,14 +177,14 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   // 更新Twitter Card标签
   const updateTwitterCardTags = () => {
     const twitterTags = [
-      { name: 'twitter:card', content: defaultMetadata.twitterCard || 'summary_large_image' },
-      { name: 'twitter:title', content: defaultMetadata.twitterTitle || currentMetadata.title },
-      { name: 'twitter:description', content: defaultMetadata.twitterDescription || currentMetadata.description },
+      { name: 'twitter:card', content: (currentMetadata.twitterCard || 'summary_large_image') as string },
+      { name: 'twitter:title', content: (currentMetadata.twitterTitle || currentMetadata.title) as string },
+      { name: 'twitter:description', content: (currentMetadata.twitterDescription || currentMetadata.description) as string },
       { name: 'twitter:site', content: '@testplatform' }
     ];
 
-    if (defaultMetadata.twitterImage) {
-      twitterTags.push({ name: 'twitter:image', content: defaultMetadata.twitterImage });
+    if (currentMetadata.twitterImage) {
+      twitterTags.push({ name: 'twitter:image', content: currentMetadata.twitterImage });
     }
 
     twitterTags.forEach(tag => {
@@ -164,9 +194,8 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
 
   // 更新robots标签
   const updateRobotsTags = () => {
-    let robots = 'index'; // 默认允许索引
-    
-    updateMetaTag('robots', robots);
+    const robotsValue = robots || 'index,follow';
+    updateMetaTag('robots', robotsValue);
   };
 
   // 设置HTML语言属性
@@ -183,6 +212,20 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
       document.head.appendChild(meta);
     }
     meta.content = content;
+  };
+
+  // 更新 link 标签（prev/next）
+  const updateLinkTags = (linkDefs: Array<{ rel: string; href: string }>) => {
+    // 先移除已有的 rel=prev/next
+    const existing = document.querySelectorAll('link[rel="prev"], link[rel="next"]');
+    existing.forEach((el) => el.parentElement?.removeChild(el));
+    // 添加新的
+    linkDefs.forEach(({ rel, href }) => {
+      const link = document.createElement('link');
+      link.rel = rel;
+      link.href = href;
+      document.head.appendChild(link);
+    });
   };
 
   // 更新结构化数据

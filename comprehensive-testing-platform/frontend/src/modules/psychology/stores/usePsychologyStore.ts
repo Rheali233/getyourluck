@@ -1,568 +1,218 @@
 /**
- * Psychology Module State Management
- * Follows unified development standard Zustand state management
+ * Psychology Module State Management - 重构版本
+ * 直接使用统一测试状态管理，完全消除重复代码
  */
 
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { 
-  PsychologyModuleState, 
-  TestSession, 
-  UserAnswer, 
-  TestResult
-} from '../types';
-import { TestType, TestStatus } from '../types';
-import { psychologyAIService } from '../services/psychologyAIService';
-import { questionService } from '../services/questionService';
-import { frontendCacheService } from '../services/frontendCacheService';
-import { progressManager } from '../services/progressManager';
-import { retryService } from '../services/retryService';
-
-// Default question bank data (temporary use, will be obtained from API later)
-const defaultQuestions = {
-  [TestType.MBTI]: [],
-  [TestType.PHQ9]: [],
-  [TestType.EQ]: [],
-  [TestType.HAPPINESS]: [],
-};
+import { useState } from 'react';
+import { useUnifiedTestStore } from '../../../stores/unifiedTestStore';
+import { PsychologyTestType, PsychologyTestTypes } from '../types';
+import { questionService } from '@/modules/testing/services/QuestionService';
 
 /**
- * Psychology Module State Management Hook
+ * Psychology Module State Management Hook - 重构版本
+ * 直接使用统一测试状态管理，完全消除重复代码
  */
-export const usePsychologyStore = create<PsychologyModuleState>()(
-  persist(
-    (set, get) => ({
-      // Base state
-      currentSession: null,
-      testHistory: [],
-      questions: defaultQuestions,
-      results: {
-        [TestType.MBTI]: null,
-        [TestType.PHQ9]: null,
-        [TestType.EQ]: null,
-        [TestType.HAPPINESS]: null,
-      },
-      currentTestResult: null,
-      isLoading: false,
-      error: null,
-      currentTestType: null,
-      showResults: false,
-      lastUpdated: null,
-      questionsLoaded: false, // New: Mark whether questions have been loaded from API
-
-      // Test session management
-      startTest: async (testType: TestType) => {
-        try {
-          set({ isLoading: true, error: null });
-          
-          // If questions are not loaded, load from API first
-          if (!get().questionsLoaded || !get().questions[testType]?.length) {
-            await get().loadQuestionsFromAPI(testType);
-          }
-          
-          const currentQuestions = get().questions[testType];
-          if (!currentQuestions || currentQuestions.length === 0) {
-            throw new Error(`Failed to load ${testType} test questions`);
-          }
-          
-          // Debug information (commented out in production)
-          // console.log('startTest Debug:', {
-          //   testType,
-          //   questionsForType: currentQuestions,
-          //   questionsLength: currentQuestions.length,
-          //   allQuestions: get().questions
-          // });
-          
-          // Create new test session
-          const session: TestSession = {
-            id: `session_${Date.now()}`,
-            testType,
-            status: TestStatus.IN_PROGRESS,
-            startTime: new Date(),
-            currentQuestionIndex: 0,
-            answers: [],
-            totalQuestions: currentQuestions.length,
-          };
-          
-          // console.log('Created session:', session);
-          
-          set({
-            currentSession: session,
-            currentTestType: testType,
-            testHistory: [...get().testHistory, session],
-            isLoading: false,
-          });
-        } catch (error) {
-          set({ 
-            isLoading: false, 
-            error: error instanceof Error ? error.message : 'Failed to start test' 
-          });
-        }
-      },
-
-      pauseTest: () => {
-        const { currentSession } = get();
-        if (currentSession) {
-          set({
-            currentSession: { ...currentSession, status: TestStatus.PAUSED },
-          });
-        }
-      },
-
-      resumeTest: () => {
-        const { currentSession } = get();
-        if (currentSession) {
-          set({
-            currentSession: { ...currentSession, status: TestStatus.IN_PROGRESS },
-          });
-        }
-      },
-
-      endTest: async () => {
-        const { currentSession, currentTestType } = get();
-        if (currentSession && currentTestType) {
-          try {
-            // Generate test results
-            const testResult = await get().analyzeTestResult(currentTestType, currentSession.answers);
-            
-            set({
-              currentSession: { ...currentSession, status: TestStatus.COMPLETED },
-              showResults: true,
-              currentTestResult: testResult,
-            });
-            
-            return { success: true, data: testResult };
-          } catch (error) {
-            console.error('Failed to generate test results:', error);
-            const errorMessage = error instanceof Error ? error.message : 'Failed to generate test results';
-            set({
-              currentSession: { ...currentSession, status: TestStatus.COMPLETED },
-              showResults: true,
-              error: errorMessage,
-            });
-            
-            return { success: false, error: errorMessage };
-          }
-        }
-        return { success: false, error: 'No valid test session' };
-      },
-
-      resetTest: () => {
-        set({
-          currentSession: null,
-          currentTestType: null,
-          showResults: false,
-          currentTestResult: null,
-          error: null,
-        });
-      },
-
-      // Answer management
-      submitAnswer: (questionId: string, answer: string | number) => {
-        const { currentSession } = get();
-        if (!currentSession) return;
-
-        const newAnswer: UserAnswer = {
-          questionId,
-          answer,
-          timestamp: new Date().toISOString(),
-        };
-
-        const updatedSession = {
-          ...currentSession,
-          answers: [...currentSession.answers, newAnswer],
-          // Do not automatically increment index, let component control manually
-          // currentQuestionIndex: currentSession.currentQuestionIndex + 1,
-        };
-
-        set({ currentSession: updatedSession });
-        
-        // Automatically save progress
-        setTimeout(() => {
-          get().saveProgress();
-        }, 100);
-      },
-
-      goToQuestion: (index: number) => {
-        const { currentSession } = get();
-        if (!currentSession) return;
-
-        set({
-          currentSession: { ...currentSession, currentQuestionIndex: index },
-        });
-      },
-
-      goToNextQuestion: () => {
-        const { currentSession } = get();
-        if (!currentSession) return;
-
-        const nextIndex = currentSession.currentQuestionIndex + 1;
-        if (nextIndex < currentSession.totalQuestions) {
-          set({
-            currentSession: { ...currentSession, currentQuestionIndex: nextIndex },
-          });
-        }
-      },
-
-      goToPreviousQuestion: () => {
-        const { currentSession } = get();
-        if (!currentSession) return;
-
-        const prevIndex = currentSession.currentQuestionIndex - 1;
-        if (prevIndex >= 0) {
-          set({
-            currentSession: { ...currentSession, currentQuestionIndex: prevIndex },
-          });
-        }
-      },
-
-      // Question bank management
-      loadQuestions: async (_testType: TestType) => {
-        try {
-          set({ isLoading: true, error: null });
-          
-          // TODO: Load question bank from API
-          // const response = await api.get(`/psychology/questions/${testType}`);
-          // set({ questions: { ...get().questions, [testType]: response.data } });
-          
-          set({ isLoading: false });
-        } catch (error) {
-          set({ 
-            isLoading: false, 
-            error: error instanceof Error ? error.message : 'Failed to load question bank' 
-          });
-        }
-      },
-
-      // Load question data from API (with caching and retry)
-      loadQuestionsFromAPI: async (testType: TestType) => {
-        try {
-          set({ isLoading: true, error: null });
-          
-          // Get current language setting
-          const language = get().getCurrentLanguage();
-          
-          // Start loading questions from API
-          
-          // First try to get from cache
-          const cacheKey = `questions:${testType}:${language}`;
-          const cachedQuestions = frontendCacheService.get<any[]>(cacheKey, 'questions');
-          
-          if (cachedQuestions && cachedQuestions.length > 0) {
-            // Load questions from cache
-            set(state => ({
-              questions: {
-                ...state.questions,
-                [testType]: cachedQuestions
-              },
-              questionsLoaded: true,
-              isLoading: false
-            }));
-            return;
-          }
-          
-          // Cache miss, load from API (with retry)
-          const retryResult = await retryService.executeWithRetry(
-            () => questionService.getQuestionsByType(testType, language),
-            { maxRetries: 3, retryDelay: 1000 }
-          );
-          
-          if (retryResult.success && retryResult.data) {
-            // retryResult.data is the return value of questionService
-            const response = retryResult.data;
-            console.log(`Retry service successful, questionService returned:`, response);
-            
-            if (response.success && response.data && Array.isArray(response.data)) {
-              console.log(`Successfully loaded ${testType} questions from API, total ${response.data.length} questions`);
-              
-              // Update question data
-              set(state => ({
-                questions: {
-                  ...state.questions,
-                  [testType]: response.data
-                },
-                questionsLoaded: true,
-                isLoading: false
-              }));
-              
-              // Cache to local storage (24 hour expiration)
-              frontendCacheService.set(cacheKey, response.data, {
-                namespace: 'questions',
-                ttl: 24 * 60 * 60 * 1000
-              });
-            } else {
-              throw new Error(response.error || `Failed to load ${testType} questions`);
-            }
-          } else {
-            throw new Error(retryResult.error || `Failed to load ${testType} questions`);
-          }
-        } catch (error) {
-          console.error(`Failed to load ${testType} questions:`, error);
-          
-          // If API loading fails, display error message
-          set({ 
-            isLoading: false, 
-            error: error instanceof Error ? error.message : `Failed to load ${testType} questions` 
-          });
-        }
-      },
-
-      getCurrentQuestion: () => {
-        const { currentSession, questions, currentTestType } = get();
-        if (!currentSession || !currentTestType) return null;
-
-        const questionList = questions[currentTestType];
-        
-        // Debug information (production environment commented out)
-        // console.log('getCurrentQuestion Debug:', {
-        //   currentSession,
-        //   currentTestType,
-        //   questionListLength: questionList?.length,
-        //   currentIndex: currentSession.currentQuestionIndex,
-        //   questionList: questionList
-        // });
-        
-        if (!questionList || currentSession.currentQuestionIndex >= questionList.length) {
-          console.log('getCurrentQuestion: Returning null, reason:', {
-            noQuestionList: !questionList,
-            indexOutOfRange: currentSession.currentQuestionIndex >= (questionList?.length || 0)
-          });
-          return null;
-        }
-
-        return questionList[currentSession.currentQuestionIndex] || null;
-      },
-
-      // Result management
-      generateResults: async (testType: TestType): Promise<TestResult> => {
-        const { currentSession } = get();
-        if (!currentSession) {
-          throw new Error('No active test session');
-        }
-
-        // Use AI analysis to generate results
-        return await get().analyzeTestResult(testType, currentSession.answers);
-      },
-
-      // Language management
-      getCurrentLanguage: () => {
-        // Try to get language from homepage store first
-        try {
-          const { useHomepageStore } = require('@/modules/homepage/stores/useHomepageStore');
-          const homepageLanguage = useHomepageStore.getState().userPreferences.language;
-          if (homepageLanguage) {
-            return homepageLanguage === 'zh-CN' ? 'zh' : 'en';
-          }
-        } catch (error) {
-          console.log('Unable to get homepage language setting, using default language');
-        }
-        
-        // Fallback to browser language or default to 'zh'
-        const browserLang = navigator.language || 'zh-CN';
-        return browserLang.startsWith('zh') ? 'zh' : 'en';
-      },
-
-      // Progress management
-      saveProgress: () => {
-        const { currentSession } = get();
-        if (!currentSession) return false;
-
-        const progress = {
-          testType: currentSession.testType,
-          sessionId: currentSession.id,
-          currentQuestionIndex: currentSession.currentQuestionIndex,
-          answers: currentSession.answers,
-          startTime: currentSession.startTime.toISOString(),
-          lastUpdateTime: new Date().toISOString(),
-          isCompleted: currentSession.status === TestStatus.COMPLETED
-        };
-
-        return progressManager.saveProgress(progress);
-      },
-
-      loadProgress: (testType: TestType, sessionId: string) => {
-        return progressManager.loadProgress(testType, sessionId);
-      },
-
-      restoreProgress: (testType: TestType, sessionId: string) => {
-        const progress = progressManager.loadProgress(testType, sessionId);
-        if (progress && progress.answers.length > 0) {
-          // Restore session state
-          const session: TestSession = {
-            id: progress.sessionId,
-            testType: progress.testType,
-            status: progress.isCompleted ? TestStatus.COMPLETED : TestStatus.IN_PROGRESS,
-            startTime: new Date(progress.startTime),
-            currentQuestionIndex: progress.currentQuestionIndex,
-            answers: progress.answers,
-            totalQuestions: get().questions[testType]?.length || 0
-          };
-
-          set({
-            currentSession: session,
-            currentTestType: testType,
-            questionsLoaded: true
-          });
-
-          return true;
-        }
-        return false;
-      },
-
-      saveResults: async (testType: TestType, results: TestResult) => {
-        try {
-          // TODO: Save results to API or local storage
-          console.log('Saving test results:', { testType, results });
-        } catch (error) {
-          console.error('Failed to save results:', error);
-        }
-      },
-
-      loadResults: async (testType: TestType) => {
-        try {
-          // TODO: Load results from API or local storage
-          const result = get().results[testType];
-          if (result) {
-            return {
-              testType,
-              result
-            } as TestResult;
-          }
-          return null;
-        } catch (error) {
-          console.error('Failed to load results:', error);
-          return null;
-        }
-      },
-
-      // AI analysis management
-      analyzeTestResult: async (testType: TestType, answers: UserAnswer[]) => {
-        set({ isLoading: true, error: null });
-        
-        try {
-          let analysisResult;
-          
-          switch (testType) {
-            case TestType.MBTI:
-              analysisResult = await psychologyAIService.analyzeMBTI(answers);
-              break;
-            case TestType.PHQ9:
-              analysisResult = await psychologyAIService.analyzePHQ9(answers);
-              break;
-            case TestType.EQ:
-              analysisResult = await psychologyAIService.analyzeEQ(answers);
-              break;
-            case TestType.HAPPINESS:
-              analysisResult = await psychologyAIService.analyzeHappiness(answers);
-              break;
-            default:
-              throw new Error('Unsupported test type');
-          }
-          
-          if (analysisResult.success && analysisResult.data) {
-            const testResult: TestResult = {
-              testType,
-              result: analysisResult.data
-            };
-            
-            set({
-              currentTestResult: testResult,
-              isLoading: false,
-              lastUpdated: new Date()
-            });
-            
-            return testResult;
-          } else {
-            throw new Error(analysisResult.error || 'AI analysis failed');
-          }
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Failed to analyze test results';
-          set({ 
-            isLoading: false, 
-            error: errorMessage 
-          });
-          throw error;
-        }
-      },
-
-      // Get AI analysis status
-      getAnalysisStatus: () => {
-        const { isLoading, error, currentTestResult } = get();
-        return {
-          isLoading,
-          error,
-          hasResult: !!currentTestResult
-        };
-      },
-
-      // Clear analysis results
-      clearAnalysisResult: () => {
-        set({
-          currentTestResult: null,
-          error: null
-        });
-      },
-
-      // History management
-      loadTestHistory: async () => {
-        try {
-          set({ isLoading: true, error: null });
-          
-          // TODO: Load test history from API
-          // const response = await api.get('/psychology/history');
-          // set({ testHistory: response.data });
-          
-          set({ isLoading: false });
-        } catch (error) {
-          set({ 
-            isLoading: false, 
-            error: error instanceof Error ? error.message : 'Failed to load test history' 
-          });
-        }
-      },
-
-      deleteTestSession: async (sessionId: string) => {
-        try {
-          // TODO: Delete test session from API
-          const updatedHistory = get().testHistory.filter(session => session.id !== sessionId);
-          set({ testHistory: updatedHistory });
-        } catch (error) {
-          console.error('Failed to delete test session:', error);
-        }
-      },
-
-      // State management
-      setLoading: (loading: boolean) => set({ isLoading: loading }),
-      setError: (error: string | null) => set({ error }),
-      setCurrentTestType: (testType: TestType | null) => set({ currentTestType: testType }),
-      setShowResults: (show: boolean) => set({ showResults: show }),
-      reset: () => set({
-        currentSession: null,
-        testHistory: [],
-        results: {
-          [TestType.MBTI]: null,
-          [TestType.PHQ9]: null,
-          [TestType.EQ]: null,
-          [TestType.HAPPINESS]: null,
-        },
-        currentTestResult: null,
-        isLoading: false,
-        error: null,
-        currentTestType: null,
-        showResults: false,
-        lastUpdated: null,
-        questionsLoaded: false,
-      }),
-    }),
-    {
-      name: 'psychology-store',
-      partialize: (state) => ({
-        currentSession: state.currentSession,
-        testHistory: state.testHistory,
-        currentTestType: state.currentTestType,
-        questions: state.questions,
-        currentTestResult: state.currentTestResult
-      })
+export const usePsychologyStore = () => {
+  // 直接使用统一测试状态管理
+  const unifiedStore = useUnifiedTestStore();
+  
+  // Psychology特有的问题数据
+  const [questions, setQuestions] = useState({
+    [PsychologyTestTypes.MBTI]: [],
+    [PsychologyTestTypes.PHQ9]: [],
+    [PsychologyTestTypes.EQ]: [],
+    [PsychologyTestTypes.HAPPINESS]: [],
+  });
+  
+  const [questionsLoaded, setQuestionsLoaded] = useState(false);
+  
+  // 从统一Store获取基础状态
+  const {
+    currentSession,
+    testHistory,
+    currentTestResult,
+    isLoading,
+    error,
+    currentTestType,
+    showResults,
+    lastUpdated
+  } = unifiedStore;
+  
+  // Psychology特有的结果数据
+  const [results, setResults] = useState({
+    [PsychologyTestTypes.MBTI]: null,
+    [PsychologyTestTypes.PHQ9]: null,
+    [PsychologyTestTypes.EQ]: null,
+    [PsychologyTestTypes.HAPPINESS]: null,
+  });
+  
+  // 使用统一Store的方法
+  const {
+    startTest: unifiedStartTest,
+    submitAnswer: unifiedSubmitAnswer,
+    endTest: unifiedEndTest,
+    pauseTest: unifiedPauseTest,
+    resumeTest: unifiedResumeTest,
+    resetTest: unifiedResetTest,
+    setLoading,
+    setError,
+    setCurrentTestType,
+    setShowResults,
+    setCurrentTestResult,
+    updateProgress
+  } = unifiedStore;
+  
+  // Psychology特有的方法
+  const loadQuestionsFromAPI = async (testType: PsychologyTestType) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // 使用现有的问题服务方法
+      const response = await questionService.getQuestionsByType(testType, 'en');
+      if (response.success && response.data) {
+        setQuestions(prev => ({
+          ...prev,
+          [testType]: response.data
+        }));
+        setQuestionsLoaded(true);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load questions';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
     }
-  )
-);
+  };
+  
+  // 重构后的startTest方法
+  const startTest = async (testType: PsychologyTestType) => {
+    try {
+      // 使用统一Store的startTest
+      await unifiedStartTest(testType);
+      
+      // 加载问题
+      if (!questionsLoaded || !questions[testType]?.length) {
+        await loadQuestionsFromAPI(testType);
+      }
+      
+      const currentQuestions = questions[testType];
+      if (!currentQuestions || currentQuestions.length === 0) {
+        throw new Error(`Failed to load ${testType} test questions`);
+      }
+      
+      setCurrentTestType(testType);
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start test';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+  
+  // 重构后的submitAnswer方法
+  const submitAnswer = async (questionId: string, answer: string | number) => {
+    try {
+      // 使用统一Store的submitAnswer
+      unifiedSubmitAnswer(questionId, answer);
+      
+      // Psychology特有的逻辑
+      const currentSession = unifiedStore.currentSession;
+      if (currentSession) {
+        // 更新进度
+        updateProgress();
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit answer';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+  
+  // 重构后的submitTest方法
+  const submitTest = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const currentSession = unifiedStore.currentSession;
+      if (!currentSession) {
+        throw new Error('No active test session');
+      }
+      
+      // 使用统一Store的endTest
+      const result = await unifiedEndTest();
+      
+      if (result) {
+        // 检查AI分析是否失败
+        if (result.aiAnalysisFailed) {
+          throw new Error(`AI analysis failed: ${result.aiError || 'Unknown error'}. Please try again.`);
+        }
+        
+        setCurrentTestResult(result);
+        setResults(prev => ({
+          ...prev,
+          [currentSession.testType]: result
+        }));
+      }
+      
+      setShowResults(true);
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit test';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // 重构后的resetTest方法
+  const resetTest = () => {
+    // 使用统一Store的resetTest
+    unifiedResetTest();
+    
+    // 重置Psychology特有的状态
+    setQuestionsLoaded(false);
+    setResults({
+      [PsychologyTestTypes.MBTI]: null,
+      [PsychologyTestTypes.PHQ9]: null,
+      [PsychologyTestTypes.EQ]: null,
+      [PsychologyTestTypes.HAPPINESS]: null,
+    });
+  };
+  
+  // 返回重构后的状态和方法
+  return {
+    // 状态
+    currentSession,
+    testHistory,
+    questions,
+    results,
+    currentTestResult,
+    isLoading,
+    error,
+    currentTestType,
+    showResults,
+    lastUpdated,
+    questionsLoaded,
+    
+    // 方法
+    startTest,
+    submitAnswer,
+    submitTest,
+    resetTest,
+    loadQuestionsFromAPI,
+    setCurrentTestType,
+    setShowResults,
+    setCurrentTestResult,
+    
+    // 使用统一Store的方法
+    pauseTest: unifiedPauseTest,
+    resumeTest: unifiedResumeTest,
+    goToNextQuestion: unifiedStore.goToNextQuestion,
+    goToPreviousQuestion: unifiedStore.goToPreviousQuestion,
+    getCurrentQuestion: unifiedStore.getCurrentQuestion,
+  };
+};

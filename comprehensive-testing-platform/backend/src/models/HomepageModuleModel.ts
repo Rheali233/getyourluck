@@ -16,7 +16,7 @@ export class HomepageModuleModel extends BaseModel {
    */
   async getAllActiveModules(): Promise<HomepageModule[]> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT * FROM homepage_modules 
           WHERE is_active = 1 
@@ -36,7 +36,7 @@ export class HomepageModuleModel extends BaseModel {
    */
   async getModulesByTheme(theme: string): Promise<HomepageModule[]> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT * FROM homepage_modules 
           WHERE theme = ? AND is_active = 1 
@@ -57,7 +57,7 @@ export class HomepageModuleModel extends BaseModel {
    */
   async getModuleById(id: string): Promise<HomepageModule | null> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare('SELECT * FROM homepage_modules WHERE id = ? AND is_active = 1')
         .bind(id)
         .first();
@@ -74,7 +74,7 @@ export class HomepageModuleModel extends BaseModel {
    */
   async updateModuleStats(id: string, testCount: number, rating: number): Promise<void> {
     try {
-      await this.db
+      await this.safeDB
         .prepare(`
           UPDATE homepage_modules 
           SET test_count = ?, rating = ?, updated_at = CURRENT_TIMESTAMP 
@@ -99,15 +99,15 @@ export class HomepageModuleModel extends BaseModel {
   }> {
     try {
       // 分别查询统计信息，避免SQLite兼容性问题
-      const countResult = await this.db
+      const countResult = await this.safeDB
         .prepare('SELECT COUNT(*) as total_modules FROM homepage_modules WHERE is_active = 1')
         .first();
         
-      const sumResult = await this.db
+      const sumResult = await this.safeDB
         .prepare('SELECT SUM(test_count) as total_tests, AVG(rating) as average_rating FROM homepage_modules WHERE is_active = 1')
         .first();
         
-      const themesResult = await this.db
+      const themesResult = await this.safeDB
         .prepare('SELECT DISTINCT theme FROM homepage_modules WHERE is_active = 1')
         .all();
 

@@ -4,8 +4,8 @@
  */
 
 import type { Env } from "../index";
-// import { DatabaseManager } from "../utils/databaseManager"; // 未使用，暂时注释
 import { MigrationRunner } from "../utils/migrationRunner";
+import { getAllMigrations } from "../utils/migrations";
 import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 import {
   TestTypeModel,
@@ -20,10 +20,10 @@ import {
   LearningSessionModel,
   RelationshipSessionModel,
   NumerologySessionModel,
+  QuestionBankModel,
 } from "../models";
 
 export class DatabaseService {
-  // private dbManager: DatabaseManager; // 未使用，暂时注释
   private migrationRunner: MigrationRunner;
   
   // 暴露数据库连接供路由使用
@@ -34,37 +34,115 @@ export class DatabaseService {
     return this.env.DB;
   }
 
-  // 模型实例
-  public testTypes: TestTypeModel;
-  public testSessions: TestSessionModel;
-  public blogArticles: BlogArticleModel;
-  public userFeedback: UserFeedbackModel;
-  public analyticsEvents: AnalyticsEventModel;
-  public psychologySessions: PsychologySessionModel;
-  public astrologySessions: AstrologySessionModel;
-  public tarotSessions: TarotSessionModel;
-  public careerSessions: CareerSessionModel;
-  public learningSessions: LearningSessionModel;
-  public relationshipSessions: RelationshipSessionModel;
-  public numerologySessions: NumerologySessionModel;
+  // 模型实例 - 延迟初始化
+  private _testTypes?: TestTypeModel;
+  private _testSessions?: TestSessionModel;
+  private _blogArticles?: BlogArticleModel;
+  private _userFeedback?: UserFeedbackModel;
+  private _analyticsEvents?: AnalyticsEventModel;
+  private _psychologySessions?: PsychologySessionModel;
+  private _astrologySessions?: AstrologySessionModel;
+  private _tarotSessions?: TarotSessionModel;
+  private _careerSessions?: CareerSessionModel;
+  private _learningSessions?: LearningSessionModel;
+  private _relationshipSessions?: RelationshipSessionModel;
+  private _numerologySessions?: NumerologySessionModel;
+  private _questionBank?: QuestionBankModel;
 
   constructor(private env: Env) {
-    // this.dbManager = new DatabaseManager(env); // 未使用，暂时注释
     this.migrationRunner = new MigrationRunner(env);
+  }
 
-    // 初始化所有模型实例
-    this.testTypes = new TestTypeModel(env);
-    this.testSessions = new TestSessionModel(env);
-    this.blogArticles = new BlogArticleModel(env);
-    this.userFeedback = new UserFeedbackModel(env);
-    this.analyticsEvents = new AnalyticsEventModel(env);
-    this.psychologySessions = new PsychologySessionModel(env);
-    this.astrologySessions = new AstrologySessionModel(env);
-    this.tarotSessions = new TarotSessionModel(env);
-    this.careerSessions = new CareerSessionModel(env);
-    this.learningSessions = new LearningSessionModel(env);
-    this.relationshipSessions = new RelationshipSessionModel(env);
-    this.numerologySessions = new NumerologySessionModel(env);
+  // 延迟初始化的getter方法
+  get testTypes(): TestTypeModel {
+    if (!this._testTypes) {
+      this._testTypes = new TestTypeModel(this.env);
+    }
+    return this._testTypes;
+  }
+
+  get testSessions(): TestSessionModel {
+    if (!this._testSessions) {
+      this._testSessions = new TestSessionModel(this.env);
+    }
+    return this._testSessions;
+  }
+
+  get blogArticles(): BlogArticleModel {
+    if (!this._blogArticles) {
+      this._blogArticles = new BlogArticleModel(this.env);
+    }
+    return this._blogArticles;
+  }
+
+  get userFeedback(): UserFeedbackModel {
+    if (!this._userFeedback) {
+      this._userFeedback = new UserFeedbackModel(this.env);
+    }
+    return this._userFeedback;
+  }
+
+  get analyticsEvents(): AnalyticsEventModel {
+    if (!this._analyticsEvents) {
+      this._analyticsEvents = new AnalyticsEventModel(this.env);
+    }
+    return this._analyticsEvents;
+  }
+
+  get psychologySessions(): PsychologySessionModel {
+    if (!this._psychologySessions) {
+      this._psychologySessions = new PsychologySessionModel(this.env);
+    }
+    return this._psychologySessions;
+  }
+
+  get astrologySessions(): AstrologySessionModel {
+    if (!this._astrologySessions) {
+      this._astrologySessions = new AstrologySessionModel(this.env);
+    }
+    return this._astrologySessions;
+  }
+
+  get tarotSessions(): TarotSessionModel {
+    if (!this._tarotSessions) {
+      this._tarotSessions = new TarotSessionModel(this.env);
+    }
+    return this._tarotSessions;
+  }
+
+  get careerSessions(): CareerSessionModel {
+    if (!this._careerSessions) {
+      this._careerSessions = new CareerSessionModel(this.env);
+    }
+    return this._careerSessions;
+  }
+
+  get learningSessions(): LearningSessionModel {
+    if (!this._learningSessions) {
+      this._learningSessions = new LearningSessionModel(this.env);
+    }
+    return this._learningSessions;
+  }
+
+  get relationshipSessions(): RelationshipSessionModel {
+    if (!this._relationshipSessions) {
+      this._relationshipSessions = new RelationshipSessionModel(this.env);
+    }
+    return this._relationshipSessions;
+  }
+
+  get numerologySessions(): NumerologySessionModel {
+    if (!this._numerologySessions) {
+      this._numerologySessions = new NumerologySessionModel(this.env);
+    }
+    return this._numerologySessions;
+  }
+
+  get questionBank(): QuestionBankModel {
+    if (!this._questionBank) {
+      this._questionBank = new QuestionBankModel(this.env);
+    }
+    return this._questionBank;
   }
 
   /**
@@ -73,8 +151,9 @@ export class DatabaseService {
    */
   async initialize(): Promise<void> {
     try {
-      // 暂无迁移列表，传入空数组，满足签名
-      await this.migrationRunner.runMigrations([]);
+      // 获取所有迁移并运行
+      const migrations = getAllMigrations();
+      await this.migrationRunner.runMigrations(migrations);
       console.log("Database initialized successfully");
     } catch (error) {
       console.error("Database initialization failed:", error);
@@ -109,7 +188,7 @@ export class DatabaseService {
         WHERE type='table' AND name NOT LIKE 'sqlite_%'
         ORDER BY name
       `).all();
-      const tables = (tablesResult.success ? tablesResult.results : []).map((row: any) => row.name);
+      const tables = (tablesResult.results || []).map((row: any) => row.name);
 
       const requiredTables = [
         "test_types",

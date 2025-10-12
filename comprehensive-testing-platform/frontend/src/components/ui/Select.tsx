@@ -61,8 +61,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(({
         data-testid={testId}
         {...props}
       >
-        <option value="">请选择...</option>
-        {options.map((option) => (
+        <option value="">All Categories</option>
+        {options.map((option: { value: string; label: string }) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

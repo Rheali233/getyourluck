@@ -30,7 +30,7 @@ export const TouchFriendlyComponents: React.FC<TouchFriendlyComponentsProps> = (
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
   const [isLongPress, setIsLongPress] = useState(false);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const touchStartTime = useRef<number>(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -96,20 +96,14 @@ export const TouchFriendlyComponents: React.FC<TouchFriendlyComponentsProps> = (
 
   // 鼠标事件支持
   const handleMouseDown = () => {
-    // This component is primarily for touch, but we can add mouse support if needed.
-    // For now, we'll just call onTap if no specific mouse handlers are provided.
     onTap?.();
   };
 
   const handleMouseUp = () => {
-    // This component is primarily for touch, but we can add mouse support if needed.
-    // For now, we'll just call onTap if no specific mouse handlers are provided.
     onTap?.();
   };
 
   const handleMouseLeave = () => {
-    // This component is primarily for touch, but we can add mouse support if needed.
-    // For now, we'll just call onTap if no specific mouse handlers are provided.
     onTap?.();
   };
 
@@ -117,7 +111,12 @@ export const TouchFriendlyComponents: React.FC<TouchFriendlyComponentsProps> = (
     <div
       className={cn(
         "touch-friendly-component select-none",
-        // isPressed && "scale-95 transition-transform duration-100", // This state is removed
+        "bg-blue-500 text-white shadow-lg",
+        "hover:bg-blue-600 active:bg-blue-700",
+        "transition-all duration-200 ease-in-out",
+        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
+        "transform transition-transform duration-100",
         className
       )}
       data-testid={testId}
@@ -220,7 +219,7 @@ export const TouchFriendlyCard: React.FC<TouchFriendlyCardProps> = ({
   const [isPressed, setIsPressed] = useState(false);
 
   const cardClasses = cn(
-    "bg-white rounded-xl shadow-md transition-all duration-200",
+    "bg-white rounded-xl transition-all duration-200",
     hoverable && "hover:shadow-lg",
     interactive && "cursor-pointer",
     isPressed && "scale-98 shadow-lg",

@@ -89,7 +89,7 @@ export class SearchIndexModel extends BaseModel {
    */
   async getSearchSuggestions(query: string, language: string = 'zh-CN', limit: number = 10): Promise<SearchSuggestion[]> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT DISTINCT title, content_type, relevance_score
           FROM search_index 
@@ -126,7 +126,7 @@ export class SearchIndexModel extends BaseModel {
    */
   async getPopularKeywords(language: string = 'zh-CN', limit: number = 10): Promise<string[]> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT keyword 
           FROM popular_search_keywords 
@@ -149,7 +149,7 @@ export class SearchIndexModel extends BaseModel {
    */
   async incrementSearchCount(id: string): Promise<void> {
     try {
-      await this.db
+      await this.safeDB
         .prepare(`
           UPDATE search_index 
           SET search_count = search_count + 1, last_searched = CURRENT_TIMESTAMP 
@@ -167,7 +167,7 @@ export class SearchIndexModel extends BaseModel {
    */
   async recordSearchKeyword(keyword: string, language: string = 'zh-CN'): Promise<void> {
     try {
-      await this.db
+      await this.safeDB
         .prepare(`
           INSERT INTO popular_search_keywords (id, keyword, language, search_count)
           VALUES (?, ?, ?, 1)
@@ -189,7 +189,7 @@ export class SearchIndexModel extends BaseModel {
     try {
       const id = crypto.randomUUID();
       
-      await this.db
+      await this.safeDB
         .prepare(`
           INSERT INTO search_index (
             id, content_type, content_id, title, description, content, 
@@ -251,7 +251,7 @@ export class SearchIndexModel extends BaseModel {
       updates.push('updated_at = CURRENT_TIMESTAMP');
       values.push(id);
 
-      await this.db
+      await this.safeDB
         .prepare(`
           UPDATE search_index 
           SET ${updates.join(', ')}
@@ -270,7 +270,7 @@ export class SearchIndexModel extends BaseModel {
    */
   async deleteSearchIndex(id: string): Promise<void> {
     try {
-      await this.db
+      await this.safeDB
         .prepare('DELETE FROM search_index WHERE id = ?')
         .bind(id)
         .run();

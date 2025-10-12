@@ -4,6 +4,7 @@
  */
 
 import type { MbtiQuestion } from '../types';
+import { QuestionFormat } from '@/modules/testing/types/TestTypes';
 
 // Likert scale options
 const LIKERT_OPTIONS = [
@@ -20,7 +21,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-01',
     text: 'In group situations, I actively initiate conversations.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 1,
     category: 'E/I',
@@ -31,7 +32,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-02',
     text: 'In business social situations, I actively communicate with key contacts.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 2,
     category: 'E/I',
@@ -42,7 +43,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-03',
     text: 'I can naturally participate in group discussions even when elders or authorities are present.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 3,
     category: 'E/I',
@@ -53,7 +54,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-04',
     text: 'I tend to be noticed in groups.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 4,
     category: 'E/I',
@@ -64,7 +65,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-05',
     text: 'I actively establish and maintain work or social connections.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 5,
     category: 'E/I',
@@ -75,7 +76,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-06',
     text: 'After long social interactions, I need alone time to recharge.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 6,
     category: 'E/I',
@@ -86,7 +87,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-07',
     text: 'When facing new tasks, I think quietly before taking action.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 7,
     category: 'E/I',
@@ -97,7 +98,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-08',
     text: 'In group discussions, I often speak among the first.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 8,
     category: 'E/I',
@@ -108,7 +109,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-09',
     text: 'I trust my internal thinking and judgment more than external feedback.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 9,
     category: 'E/I',
@@ -119,7 +120,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-10',
     text: 'High-intensity social interactions tend to make me feel tired.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 10,
     category: 'E/I',
@@ -130,7 +131,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-11',
     text: 'I usually wait for others to speak first before joining the conversation.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 11,
     category: 'E/I',
@@ -141,7 +142,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-12',
     text: 'In formal situations involving face-saving, I prefer to communicate privately before expressing publicly.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 12,
     category: 'E/I',
@@ -152,7 +153,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-13',
     text: 'I prefer direct action over repeated discussion.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 13,
     category: 'E/I',
@@ -163,7 +164,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-14',
     text: 'I prefer one-on-one deep conversations over large group communication.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 14,
     category: 'E/I',
@@ -174,7 +175,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-15',
     text: 'I feel pressured when scheduled for consecutive social activities.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 15,
     category: 'E/I',
@@ -185,7 +186,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-E-16',
     text: 'In formal social situations involving small talk, I prefer written or online communication over face-to-face interaction.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 16,
     category: 'E/I',
@@ -198,7 +199,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-01',
     text: 'When making decisions, I prioritize relying on verified facts and data.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 17,
     category: 'S/N',
@@ -209,7 +210,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-02',
     text: 'I take time to confirm that details are accurate and correct.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 18,
     category: 'S/N',
@@ -220,7 +221,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-03',
     text: 'I often refer to past experiences to handle current problems.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 19,
     category: 'S/N',
@@ -231,7 +232,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-04',
     text: 'When learning new skills, I prefer to master them step by step.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 20,
     category: 'S/N',
@@ -242,7 +243,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-05',
     text: 'I prefer to use methods that have been proven effective.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 21,
     category: 'S/N',
@@ -253,7 +254,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-N-06',
     text: 'I often see potential patterns or trends from scattered information.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 22,
     category: 'S/N',
@@ -264,7 +265,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-N-07',
     text: 'I prefer to understand principles first, then flexibly apply them to different situations.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 23,
     category: 'S/N',
@@ -275,7 +276,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-N-08',
     text: 'I often think about the long-term future impact of current choices.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 24,
     category: 'S/N',
@@ -286,7 +287,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-N-09',
     text: 'When facing problems, I enjoy trying unusual new methods.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 25,
     category: 'S/N',
@@ -297,7 +298,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-N-10',
     text: 'I rarely think about connecting different things together.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 26,
     category: 'S/N',
@@ -308,7 +309,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-11',
     text: 'When organizational systems or processes change, I trust clear written regulations and existing practices.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 27,
     category: 'S/N',
@@ -319,7 +320,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-N-12',
     text: 'I focus more on overall thinking rather than specific details.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 28,
     category: 'S/N',
@@ -330,7 +331,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-13',
     text: 'Compared to radical innovation, I prefer to choose lower-risk approaches.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 29,
     category: 'S/N',
@@ -341,7 +342,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-N-14',
     text: 'When facing organizational change, I tend to envision improvement paths and propose new solutions.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 30,
     category: 'S/N',
@@ -352,7 +353,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-15',
     text: 'I focus more on current reality than future vision.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 31,
     category: 'S/N',
@@ -363,7 +364,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-S-16',
     text: 'I prefer to make incremental improvements based on existing processes rather than completely redesigning them.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 32,
     category: 'S/N',
@@ -376,7 +377,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-01',
     text: 'When evaluating solutions, I value logical consistency and verifiability more.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 33,
     category: 'T/F',
@@ -387,7 +388,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-02',
     text: 'When facing disagreements, I tend to judge based on universal principles and facts.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 34,
     category: 'T/F',
@@ -398,7 +399,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-03',
     text: 'When providing feedback, I directly point out problems and give improvement suggestions.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 35,
     category: 'T/F',
@@ -409,7 +410,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-04',
     text: 'When handling affairs, I prioritize considering fair and consistent standards.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 36,
     category: 'T/F',
@@ -420,7 +421,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-05',
     text: 'I focus more on the logic of decisions than others\' feelings.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 37,
     category: 'T/F',
@@ -431,7 +432,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-06',
     text: 'When handling disagreements, I try to consider everyone\'s feelings.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 38,
     category: 'T/F',
@@ -442,7 +443,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-07',
     text: 'When publicly expressing different opinions, I consider the other person\'s face-saving feelings.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 39,
     category: 'T/F',
@@ -453,7 +454,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-08',
     text: 'Before making decisions, I think about their impact and feelings on relevant people.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 40,
     category: 'T/F',
@@ -464,7 +465,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-09',
     text: 'Compared to efficiency, I value team harmony more.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 41,
     category: 'T/F',
@@ -475,7 +476,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-10',
     text: 'In important family decisions, I usually consider elders\' opinions.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 42,
     category: 'T/F',
@@ -486,7 +487,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-11',
     text: 'I think "affirm first, then suggest improvements" is more effective than "directly point out problems".',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 43,
     category: 'T/F',
@@ -497,7 +498,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-12',
     text: 'When making moral judgments, I value factual evidence more than individual positions.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 44,
     category: 'T/F',
@@ -508,7 +509,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-13',
     text: 'I actively maintain relationships with colleagues to reduce potential conflicts.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 45,
     category: 'T/F',
@@ -519,7 +520,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-T-14',
     text: 'When facing dilemmas, I prioritize making rational choices for organizational goals.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 46,
     category: 'T/F',
@@ -530,7 +531,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-15',
     text: 'I rarely consider social expectations, valuing personal positions more.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 47,
     category: 'T/F',
@@ -541,7 +542,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-F-16',
     text: 'In team decisions, I value reaching consensus more than pursuing optimal solutions.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 48,
     category: 'T/F',
@@ -554,7 +555,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-01',
     text: 'Before starting execution, I prefer to arrange the steps clearly first.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 49,
     category: 'J/P',
@@ -565,7 +566,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-02',
     text: 'When facing deadlines, I reserve time in advance for checking and correcting.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 50,
     category: 'J/P',
@@ -576,7 +577,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-03',
     text: 'I adapt better to work styles with clear processes and clear divisions of labor.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 51,
     category: 'J/P',
@@ -587,7 +588,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-04',
     text: 'I like clean and orderly environments and maintain relatively stable rhythms.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 52,
     category: 'J/P',
@@ -598,7 +599,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-05',
     text: 'When I have sufficient information, I make decisions quickly without delay.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 53,
     category: 'J/P',
@@ -609,7 +610,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-P-06',
     text: 'When plans change temporarily, I can adapt quickly and maintain efficiency.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 54,
     category: 'J/P',
@@ -620,7 +621,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-P-07',
     text: 'After having basic ideas, I prefer to improve while doing.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 55,
     category: 'J/P',
@@ -631,7 +632,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-P-08',
     text: 'I enjoy capturing unexpected good opportunities outside of existing plans.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 56,
     category: 'J/P',
@@ -642,7 +643,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-P-09',
     text: 'I usually feel excited rather than anxious about frequently changing environments.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 57,
     category: 'J/P',
@@ -653,7 +654,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-P-10',
     text: 'I can accept a certain degree of chaos, as long as things can ultimately progress.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 58,
     category: 'J/P',
@@ -664,7 +665,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-11',
     text: 'I stick to the original plan, even when better solutions appear, I don\'t easily change.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 59,
     category: 'J/P',
@@ -675,7 +676,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-P-12',
     text: 'When plans are interrupted, I usually need a long time to readjust.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 60,
     category: 'J/P',
@@ -686,7 +687,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-13',
     text: 'I tend to establish clear classification systems to manage information and files.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 61,
     category: 'J/P',
@@ -697,7 +698,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-P-14',
     text: 'I prefer to keep options open rather than finalize too early.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 62,
     category: 'J/P',
@@ -708,7 +709,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-15',
     text: 'I do systematic review and wrap-up at completion stages.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 63,
     category: 'J/P',
@@ -719,7 +720,7 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
   {
     id: 'MBTI-J-16',
     text: 'I reserve checking time for important tasks to ensure quality.',
-    type: 'likert_scale',
+    type: QuestionFormat.SCALE,
     required: true,
     order: 64,
     category: 'J/P',

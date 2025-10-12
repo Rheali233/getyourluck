@@ -34,7 +34,7 @@ export class PsychologySessionModel extends BaseModel {
   async create(data: CreatePsychologySessionData): Promise<string> {
     const id = this.generateId();
 
-    const result = await this.db
+    const result = await this.safeDB
       .prepare(`
         INSERT INTO psychology_sessions (
           id, test_session_id, test_subtype, personality_type,
@@ -61,7 +61,7 @@ export class PsychologySessionModel extends BaseModel {
   }
 
   async findByTestSessionId(testSessionId: string): Promise<PsychologySessionData | null> {
-    const result = await this.db
+    const result = await this.safeDB
       .prepare("SELECT * FROM psychology_sessions WHERE test_session_id = ?")
       .bind(testSessionId)
       .first();
@@ -74,7 +74,7 @@ export class PsychologySessionModel extends BaseModel {
   }
 
   async findBySubtype(subtype: string): Promise<PsychologySessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM psychology_sessions WHERE test_subtype = ? ORDER BY created_at DESC")
       .bind(subtype)
       .all();
@@ -87,7 +87,7 @@ export class PsychologySessionModel extends BaseModel {
     averageScores?: Record<string, number>;
     personalityTypeDistribution?: Record<string, number>;
   }> {
-    const totalResult = await this.db
+    const totalResult = await this.safeDB
       .prepare("SELECT COUNT(*) as total FROM psychology_sessions WHERE test_subtype = ?")
       .bind(subtype)
       .first();
@@ -97,7 +97,7 @@ export class PsychologySessionModel extends BaseModel {
     };
 
     if (subtype === "mbti") {
-      const typeDistribution = await this.db
+      const typeDistribution = await this.safeDB
         .prepare(`
           SELECT personality_type, COUNT(*) as count 
           FROM psychology_sessions 

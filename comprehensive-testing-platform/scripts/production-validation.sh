@@ -38,16 +38,16 @@ log_error() {
 setup_environment() {
     case $ENVIRONMENT in
         "production")
-            BASE_URL="https://getyourluck.com"
-            API_BASE_URL="https://api.getyourluck.com"
+            BASE_URL="https://selfatlas.net"
+            API_BASE_URL="https://api.selfatlas.net"
             ;;
         "staging")
-            BASE_URL="https://staging.getyourluck.com"
-            API_BASE_URL="https://staging-api.getyourluck.com"
+            BASE_URL="https://staging.selfatlas.net"
+            API_BASE_URL="https://staging-api.selfatlas.net"
             ;;
         "development")
-            BASE_URL="https://dev.getyourluck.com"
-            API_BASE_URL="https://dev-api.getyourluck.com"
+            BASE_URL="https://dev.selfatlas.net"
+            API_BASE_URL="https://dev-api.selfatlas.net"
             ;;
         *)
             log_error "无效的环境: $ENVIRONMENT"

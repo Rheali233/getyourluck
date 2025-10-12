@@ -41,16 +41,18 @@ export class TestEngineService {
   async getTestTypes(activeOnly: boolean = true): Promise<any[]> {
     try {
       const testTypes = await this.dbService.testTypes.getAllActive();
+      
       const filteredTypes = activeOnly 
-        ? testTypes.filter((type: any) => type.isActive) 
+        ? testTypes.filter((type: any) => type.is_active === 1) 
         : testTypes;
+      
       return filteredTypes.map((type: any) => ({
         id: type.id,
         name: type.name || '',
         description: type.description || '',
         category: type.category || '',
         configData: type.configData,
-        isActive: type.isActive || false
+        isActive: type.is_active === 1
       }));
     } catch (error) {
       throw new ModuleError(
@@ -77,7 +79,7 @@ export class TestEngineService {
         description: config.description || '',
         category: config.category || '',
         configData: config.configData,
-        isActive: config.isActive || false
+        isActive: config.isActive
       };
     } catch (error) {
       if (error instanceof ModuleError) {
@@ -85,6 +87,45 @@ export class TestEngineService {
       }
       throw new ModuleError(
         `Failed to retrieve test configuration for: ${testType}`,
+        ERROR_CODES.DATABASE_ERROR,
+        500
+      );
+    }
+  }
+
+  /**
+   * 获取测试会话
+   * @param sessionId 会话ID
+   * @returns 测试会话
+   */
+  async getTestSession(sessionId: string): Promise<any> {
+    try {
+      const session = await this.dbService.testSessions.findById(sessionId);
+      if (!session) {
+        throw new ModuleError(
+          `Test session not found: ${sessionId}`,
+          ERROR_CODES.NOT_FOUND,
+          404
+        );
+      }
+      
+      // 修复字段名映射问题：D1返回下划线格式，需要映射到驼峰格式
+      return {
+        id: session.id,
+        testTypeId: session.testTypeId || (session as any).test_type_id,
+        answersData: session.answersData || (session as any).answers_data,
+        resultData: session.resultData || (session as any).result_data,
+        userAgent: session.userAgent || (session as any).user_agent,
+        ipAddressHash: session.ipAddressHash || (session as any).ip_address_hash,
+        sessionDuration: session.sessionDuration || (session as any).session_duration,
+        createdAt: session.createdAt || (session as any).created_at
+      };
+    } catch (error) {
+      if (error instanceof ModuleError) {
+        throw error;
+      }
+      throw new ModuleError(
+        `Failed to retrieve test session: ${sessionId}`,
         ERROR_CODES.DATABASE_ERROR,
         500
       );
@@ -122,16 +163,21 @@ export class TestEngineService {
         ? JSON.parse(session.resultData)
         : (session.resultData || {});
       
-      // 格式化结果
+      // 格式化结果 - 从resultData中提取所有必要信息
       const result = {
         sessionId: session.id,
-        testType: session.testTypeId,
-        scores: resultData.scores || {},
+        testType: session.testTypeId || (session as any).test_type_id,
+        scores: resultData.totalScore ? { totalScore: resultData.totalScore } : {},
         interpretation: resultData.interpretation || "",
         recommendations: resultData.recommendations || [],
         completedAt: typeof session.createdAt === 'string'
           ? session.createdAt
           : new Date().toISOString(),
+        // 添加更多字段以提供完整的结果
+        severity: resultData.severity,
+        individualScores: resultData.individualScores,
+        metadata: resultData.metadata,
+        aiAnalysis: resultData.aiAnalysis
       };
 
       // 存入缓存
@@ -144,6 +190,38 @@ export class TestEngineService {
       }
       throw new ModuleError(
         `Failed to retrieve result for session: ${sessionId}`,
+        ERROR_CODES.DATABASE_ERROR,
+        500
+      );
+    }
+  }
+
+  /**
+   * 获取测试会话统计信息
+   * @param testType 测试类型
+   * @returns 统计信息
+   */
+  async getTestStats(testType: string): Promise<any> {
+    try {
+      const cacheKey = `test_stats:${testType}`;
+      const cachedStats = await this.cacheService.get(cacheKey);
+      
+      if (cachedStats) {
+        return cachedStats;
+      }
+
+      const stats = await this.dbService.testSessions.getStatsByTestType(testType);
+      
+      // 存入缓存
+      await this.cacheService.set(cacheKey, stats, { ttl: 1800 }); // 30分钟缓存
+      
+      return stats;
+    } catch (error) {
+      if (error instanceof ModuleError) {
+        throw error;
+      }
+      throw new ModuleError(
+        `Failed to retrieve test stats for: ${testType}`,
         ERROR_CODES.DATABASE_ERROR,
         500
       );

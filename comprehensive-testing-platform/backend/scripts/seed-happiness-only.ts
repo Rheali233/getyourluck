@@ -31,7 +31,7 @@ class HappinessSeeder {
     try {
       // 清理SQL语句，移除多余的空格和换行
       const cleanSql = sql.replace(/\s+/g, ' ').trim();
-      const command = `wrangler d1 execute getyourluck-${this.env} --env ${this.env} --remote --command "${cleanSql}"`;
+      const command = `wrangler d1 execute selfatlas-${this.env} --env ${this.env} --remote --command "${cleanSql}"`;
       console.log(`执行SQL: ${cleanSql.substring(0, 80)}...`);
       
       const result = execSync(command, { 
@@ -160,7 +160,7 @@ class HappinessSeeder {
         }
       }
 
-      console.log(`✅ 成功插入幸福指数题目: ${successCount}/${totalCount}`);
+      console.log(`✅ Successfully inserted happiness index questions: ${successCount}/${totalCount}`);
       return { success: true, message: `成功插入${successCount}道题目` };
     } catch (error) {
       return { success: false, message: `插入题目失败: ${error}` };
@@ -201,7 +201,7 @@ class HappinessSeeder {
         }
       }
 
-      console.log(`✅ 成功插入幸福指数题目选项: ${successCount}/${totalCount}`);
+      console.log(`✅ Successfully inserted happiness index questions选项: ${successCount}/${totalCount}`);
       return { success: true, message: `成功插入${successCount}个选项` };
     } catch (error) {
       return { success: false, message: `插入选项失败: ${error}` };

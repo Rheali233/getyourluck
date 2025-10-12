@@ -8,13 +8,26 @@ import type { AppContext } from "../types/env";
 import { z } from "zod";
 import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 
+// 测试答案验证模式
+const testAnswerSchema = z.object({
+  questionId: z.string().min(1, "Question ID is required"),
+  value: z.union([
+    z.string().min(1, "Answer value cannot be empty"),
+    z.number().min(0, "Answer value must be non-negative"),
+    z.boolean(),
+    z.array(z.string().min(1, "Array answer value cannot be empty"))
+  ], {
+    errorMap: () => ({ message: "Answer value must be string, number, boolean, or string array" })
+  })
+});
+
 // 测试提交数据验证模式
 const testSubmissionSchema = z.object({
-  testType: z.string().min(1, "Test type is required"),
-  answers: z.array(z.any()).min(1, "At least one answer is required"),
+  testType: z.string().min(1, "Test type is required").max(50, "Test type too long"),
+  answers: z.array(testAnswerSchema).min(1, "At least one answer is required").max(200, "Too many answers"),
   userInfo: z.object({
-    userAgent: z.string().optional(),
-    timestamp: z.string().optional(),
+    userAgent: z.string().max(500, "User agent too long").optional(),
+    timestamp: z.string().datetime("Invalid timestamp format").optional(),
   }).optional(),
 });
 
@@ -65,15 +78,27 @@ export function validatePagination(page: number, limit: number, maxLimit: number
 export const validateTestSubmission = async (c: Context<AppContext>, next: Next) => {
   try {
     const body = await c.req.json();
+    
+    // 添加调试日志
+    // eslint-disable-next-line no-console
+    console.log(`Validating test submission: testType=${body.testType}, answersCount=${body.answers?.length || 0}`);
+    
     testSubmissionSchema.parse(body);
     return next();
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // 提供更详细的验证错误信息
+      const errorDetails = error.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message,
+        code: err.code
+      }));
+      
       throw new ModuleError(
-        "Invalid test submission data",
+        `Validation failed: ${errorDetails.map(e => `${e.field}: ${e.message}`).join(', ')}`,
         ERROR_CODES.VALIDATION_ERROR,
         400,
-        error.errors
+        errorDetails
       );
     }
     throw error;

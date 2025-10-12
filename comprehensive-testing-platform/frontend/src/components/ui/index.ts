@@ -1,37 +1,64 @@
 /**
- * UI组件索引文件
- * 遵循统一开发标准的组件导出规范
+ * 通用组件索引文件
+ * 导出所有通用UI组件
  */
 
-// UI组件库导出
-export { default as Button } from './Button';
-export { default as Card } from './Card';
-export { default as Input } from './Input';
-export { default as Select } from './Select';
-export { default as Form } from './Form';
-export { default as Modal } from './Modal';
-export { default as Alert } from './Alert';
-export { default as LoadingSpinner } from './LoadingSpinner';
-export { default as ErrorBoundary } from './ErrorBoundary';
-export { default as Navigation } from './Navigation';
-export { default as Footer } from './Footer';
-export { default as PageHeader } from './PageHeader';
+// 基础UI组件
+export { Card } from './Card';
+export { Button } from './Button';
+export { Modal } from './Modal';
 export { TestNavigation } from './TestNavigation';
-export { default as QuestionOptions } from './QuestionOptions';
+export { DateInput } from './DateInput';
+export { TimeInput } from './TimeInput';
+export { LocationInput } from './LocationInput';
+export { LoadingSpinner } from './LoadingSpinner';
+export { Select } from './Select';
+export { Input } from './Input';
 
-// 类型导出
-export type {
-  ButtonProps,
-  CardProps,
-  InputProps,
-  SelectProps,
-  FormProps,
-  LoadingProps as LoadingSpinnerProps,
-  NavigationProps,
-  PageHeaderProps,
-} from '../../types/componentTypes';
+// 导航和页脚组件
+export { Navigation } from './Navigation';
+export { Footer } from './Footer';
+export { Breadcrumb } from './Breadcrumb';
+export { LazyLoad, createLazyComponent } from '../LazyLoad';
+export { LazyImage, OptimizedImage } from '../LazyImage';
+export { Preload, PreloadCriticalModules, PreloadImage, PreloadFont } from '../Preload';
+export { 
+  InternalLink, 
+  KeywordLink, 
+  RelatedTests, 
+  ModuleRecommendations, 
+  EnhancedBreadcrumb, 
+  ContextualLinks 
+} from '../InternalLinks';
+export { SEODashboard } from '../SEODashboard';
+export { 
+  MobileOptimized, 
+  TouchTarget, 
+  MobileImage, 
+  GestureHandler, 
+  MobilePerformanceMonitor, 
+  MobileNavigation 
+} from '../MobileOptimized';
+export { MobileSEOHead, MobilePerformanceHead } from '../MobileSEOHead';
 
-export type { ModalProps } from './Modal';
-export type { AlertProps } from './Alert';
-export type { FooterProps } from './Footer';
-export type { TestNavigationProps } from './TestNavigation';
+// 布局组件
+export { TestPreparationLayout } from './TestPreparationLayout';
+
+// 通用内容组件
+export { InfoCard } from './common/InfoCard';
+export { InstructionList } from './common/InstructionList';
+export { ArticleCard } from './common/ArticleCard';
+export { ArticleMeta } from './common/ArticleMeta';
+export { Pagination } from './common/Pagination';
+export { ArticleContent } from './common/ArticleContent';
+export { Skeleton, ArticleCardSkeleton } from './common/Skeleton';
+
+// 结果页面组件
+// ResultPageLayout已删除，现在使用专门的结果显示组件
+
+// 数据展示组件
+export { ScoreDisplay } from './common/ScoreDisplay';
+export { ChartComponent } from './common/ChartComponent';
+
+// 反馈组件
+export { FeedbackFloatingWidget } from './FeedbackFloatingWidget';

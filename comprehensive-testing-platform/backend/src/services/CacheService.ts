@@ -17,11 +17,11 @@ export interface CacheEntry<T = any> {
 }
 
 export class CacheService {
-  private kv: KVNamespace;
+  private kv: KVNamespace | null;
   private defaultTTL: number;
   private version: string;
 
-  constructor(kv: KVNamespace, defaultTTL: number = 3600) {
+  constructor(kv: KVNamespace | null, defaultTTL: number = 3600) {
     this.kv = kv;
     this.defaultTTL = defaultTTL;
     this.version = '1.0.0';
@@ -44,6 +44,11 @@ export class CacheService {
     options: CacheOptions = {}
   ): Promise<boolean> {
     try {
+      if (!this.kv) {
+        // 如果没有KV，直接返回true（跳过缓存）
+        return true;
+      }
+      
       const cacheKey = this.generateKey(key, options.namespace);
       const ttl = options.ttl || this.defaultTTL;
       
@@ -69,6 +74,11 @@ export class CacheService {
    */
   async get<T>(key: string, namespace?: string): Promise<T | null> {
     try {
+      if (!this.kv) {
+        // 如果没有KV，直接返回null（跳过缓存）
+        return null;
+      }
+      
       const cacheKey = this.generateKey(key, namespace);
       const cached = await this.kv.get(cacheKey);
       
@@ -104,6 +114,11 @@ export class CacheService {
    */
   async delete(key: string, namespace?: string): Promise<boolean> {
     try {
+      if (!this.kv) {
+        // 如果没有KV，直接返回true（跳过缓存）
+        return true;
+      }
+      
       const cacheKey = this.generateKey(key, namespace);
       await this.kv.delete(cacheKey);
       return true;
@@ -147,6 +162,11 @@ export class CacheService {
    */
   async exists(key: string, namespace?: string): Promise<boolean> {
     try {
+      if (!this.kv) {
+        // 如果没有KV，直接返回false（跳过缓存）
+        return false;
+      }
+      
       const cacheKey = this.generateKey(key, namespace);
       const cached = await this.kv.get(cacheKey);
       return cached !== null;
@@ -195,6 +215,11 @@ export class CacheService {
     }
 
     try {
+      if (!this.kv) {
+        // 如果没有KV，直接返回true（跳过缓存）
+        return true;
+      }
+      
       const cacheKey = this.generateKey(key, options.namespace);
       const ttl = options.ttl || this.defaultTTL;
       
@@ -252,6 +277,11 @@ export class CacheService {
     options: CacheOptions = {}
   ): Promise<boolean> {
     try {
+      if (!this.kv) {
+        // 如果没有KV，直接返回true（跳过缓存）
+        return true;
+      }
+      
       const cacheKey = this.generateKey(key, options.namespace);
       const ttl = options.ttl || this.defaultTTL;
       
@@ -300,6 +330,11 @@ export class CacheService {
    */
   async listKeys(prefix?: string, namespace?: string): Promise<string[]> {
     try {
+      if (!this.kv) {
+        // 如果没有KV，直接返回空数组（跳过缓存）
+        return [];
+      }
+      
       const cachePrefix = this.generateKey(prefix || '', namespace);
       const list = await this.kv.list({ prefix: cachePrefix });
       return list.keys.map(key => key.name);

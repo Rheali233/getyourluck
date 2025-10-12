@@ -5,13 +5,13 @@
  */
 
 import type { 
-  CreatePsychologyQuestionCategoryData,
-  CreatePsychologyQuestionData,
-  CreatePsychologyQuestionOptionData 
+  CreateQuestionCategoryData,
+  CreateQuestionData,
+  CreateQuestionOptionData 
 } from '../src/models';
 
 // Happiness index question bank category
-export const happinessCategory: CreatePsychologyQuestionCategoryData = {
+export const happinessCategory: CreateQuestionCategoryData = {
   name: 'Happiness Index Assessment',
   code: 'happiness-category',
   description: 'Happiness index assessment scale based on PERMA model, measuring five dimensions: positive emotions, engagement, relationships, meaning, and achievement',
@@ -19,13 +19,13 @@ export const happinessCategory: CreatePsychologyQuestionCategoryData = {
   dimensions: ['P', 'E', 'R', 'M', 'A'],
   scoringType: 'likert',
   minScore: 50,
-  maxScore: 250,
+  maxScore: 500, // Updated for 1-10 scale: 50 questions × 10 points
   estimatedTime: 15,
   sortOrder: 4
 };
 
 // Happiness index question data
-export const happinessQuestions: CreatePsychologyQuestionData[] = [
+export const happinessQuestions: CreateQuestionData[] = [
   // P - Positive Emotion (10 questions)
   {
     categoryId: 'happiness-category',
@@ -498,48 +498,88 @@ export const happinessQuestions: CreatePsychologyQuestionData[] = [
 ];
 
 // Happiness index question options data
-export const happinessQuestionOptions: CreatePsychologyQuestionOptionData[] = [
-  // Create 5-point scale options for each question
+export const happinessQuestionOptions: CreateQuestionOptionData[] = [
+  // Create 10-point scale options for each question (1-10 scale)
   ...happinessQuestions.map((question, index) => [
     {
       questionId: `happiness-q-${index + 1}`,
-      optionText: 'Strongly Disagree',
-      optionTextEn: 'Strongly Disagree',
+      optionText: '1 - Strongly Disagree',
+      optionTextEn: '1 - Strongly Disagree',
       optionValue: '1',
       optionScore: 1,
       orderIndex: 1
     },
     {
       questionId: `happiness-q-${index + 1}`,
-      optionText: 'Disagree',
-      optionTextEn: 'Disagree',
+      optionText: '2',
+      optionTextEn: '2',
       optionValue: '2',
       optionScore: 2,
       orderIndex: 2
     },
     {
       questionId: `happiness-q-${index + 1}`,
-      optionText: 'Neutral',
-      optionTextEn: 'Neutral',
+      optionText: '3',
+      optionTextEn: '3',
       optionValue: '3',
       optionScore: 3,
       orderIndex: 3
     },
     {
       questionId: `happiness-q-${index + 1}`,
-      optionText: 'Agree',
-      optionTextEn: 'Agree',
+      optionText: '4',
+      optionTextEn: '4',
       optionValue: '4',
       optionScore: 4,
       orderIndex: 4
     },
     {
       questionId: `happiness-q-${index + 1}`,
-      optionText: 'Strongly Agree',
-      optionTextEn: 'Strongly Agree',
+      optionText: '5 - Neutral',
+      optionTextEn: '5 - Neutral',
       optionValue: '5',
       optionScore: 5,
       orderIndex: 5
+    },
+    {
+      questionId: `happiness-q-${index + 1}`,
+      optionText: '6',
+      optionTextEn: '6',
+      optionValue: '6',
+      optionScore: 6,
+      orderIndex: 6
+    },
+    {
+      questionId: `happiness-q-${index + 1}`,
+      optionText: '7',
+      optionTextEn: '7',
+      optionValue: '7',
+      optionScore: 7,
+      orderIndex: 7
+    },
+    {
+      questionId: `happiness-q-${index + 1}`,
+      optionText: '8',
+      optionTextEn: '8',
+      optionValue: '8',
+      optionScore: 8,
+      orderIndex: 8
+    },
+    {
+      questionId: `happiness-q-${index + 1}`,
+      optionText: '9',
+      optionTextEn: '9',
+      optionValue: '9',
+      optionScore: 9,
+      orderIndex: 9
+    },
+    {
+      questionId: `happiness-q-${index + 1}`,
+      optionText: '10 - Strongly Agree',
+      optionTextEn: '10 - Strongly Agree',
+      optionValue: '10',
+      optionScore: 10,
+      orderIndex: 10
     }
   ]).flat()
 ];
@@ -550,39 +590,39 @@ export const happinessDimensionMapping = {
     name: 'Positive Emotion',
     questions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     reverseScored: [5, 10], // Reverse scored questions
-    maxScore: 50
+    maxScore: 100 // 10 questions × 10 points each
   },
   E: {
     name: 'Engagement',
     questions: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
     reverseScored: [14, 18],
-    maxScore: 50
+    maxScore: 100
   },
   R: {
     name: 'Relationships',
     questions: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
     reverseScored: [24, 29],
-    maxScore: 50
+    maxScore: 100
   },
   M: {
     name: 'Meaning',
     questions: [31, 32, 33, 34, 35, 36, 37, 38, 39, 40],
     reverseScored: [34, 39],
-    maxScore: 50
+    maxScore: 100
   },
   A: {
     name: 'Accomplishment',
     questions: [41, 42, 43, 44, 45, 46, 47, 48, 49, 50],
     reverseScored: [45, 49],
-    maxScore: 50
+    maxScore: 100
   }
 };
 
-// Happiness level assessment criteria
+// Happiness level assessment criteria (updated for 1-10 scale: 50 questions × 10 points = 500 max)
 export const happinessLevelCriteria = {
-  very_low: { min: 50, max: 100, name: '很低', nameEn: 'Very Low' },
-  low: { min: 101, max: 150, name: '低', nameEn: 'Low' },
-  moderate: { min: 151, max: 200, name: '中等', nameEn: 'Moderate' },
-  high: { min: 201, max: 225, name: '高', nameEn: 'High' },
-  very_high: { min: 226, max: 250, name: '很高', nameEn: 'Very High' }
+  very_low: { min: 50, max: 200, name: '很低', nameEn: 'Very Low' },
+  low: { min: 201, max: 300, name: '低', nameEn: 'Low' },
+  moderate: { min: 301, max: 400, name: '中等', nameEn: 'Moderate' },
+  high: { min: 401, max: 450, name: '高', nameEn: 'High' },
+  very_high: { min: 451, max: 500, name: '很高', nameEn: 'Very High' }
 };

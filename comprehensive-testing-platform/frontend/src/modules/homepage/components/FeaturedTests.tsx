@@ -6,11 +6,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
-import type { HomepageModule } from '@/shared/types/homepage';
+// import type { HomepageModule } from '@/shared/types/homepage';
 import { cn } from '@/utils/classNames';
 
 export interface FeaturedTestsProps extends BaseComponentProps {
-  featuredTests?: HomepageModule[];
+  featuredTests?: any[]; // HomepageModule[];
   title?: string;
   subtitle?: string;
 }
@@ -24,7 +24,7 @@ export const FeaturedTests: React.FC<FeaturedTestsProps> = ({
   ...props
 }) => {
   // 默认热门测试数据
-  const defaultFeaturedTests: HomepageModule[] = [
+  const defaultFeaturedTests: any[] = [ // HomepageModule[]
     {
       id: 'mbti-personality',
       name: 'MBTI性格测试',
@@ -50,7 +50,7 @@ export const FeaturedTests: React.FC<FeaturedTestsProps> = ({
       testCount: 8900,
       rating: 4.8,
       isActive: true,
-      route: '/tests/relationship/compatibility',
+      route: '/relationship',
       features: ['契合度分析', '沟通建议', '关系提升'],
       estimatedTime: '5-8分钟',
       sortOrder: 2,
@@ -66,7 +66,7 @@ export const FeaturedTests: React.FC<FeaturedTestsProps> = ({
       testCount: 12300,
       rating: 4.7,
       isActive: true,
-      route: '/tests/career/planning',
+      route: '/career',
       features: ['职业倾向', '技能分析', '发展建议'],
       estimatedTime: '10-15分钟',
       sortOrder: 3,
@@ -83,7 +83,7 @@ export const FeaturedTests: React.FC<FeaturedTestsProps> = ({
       data-testid={testId}
       {...props}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 标题区域 */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -99,7 +99,7 @@ export const FeaturedTests: React.FC<FeaturedTestsProps> = ({
           {tests.map((test) => (
             <div
               key={test.id}
-              className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              className="bg-white rounded-xl hover:transition-all duration-300 transform hover:-translate-y-1"
             >
               {/* 测试卡片头部 */}
               <div className="p-6 border-b border-gray-100">

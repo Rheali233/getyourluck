@@ -16,8 +16,8 @@ blogRoutes.get("/", async (c) => {
   const response: APIResponse = {
     success: true,
     data: {
-      name: "博客模块",
-      description: "提供博客文章管理功能",
+      name: "Blog Module",
+      description: "Provides blog article management functionality",
       endpoints: {
         articles: "/articles",
         article: "/articles/:id",
@@ -39,18 +39,18 @@ blogRoutes.get("/articles", async (c) => {
   const limit = parseInt(c.req.query("limit") || "10");
 
   try {
-    // TODO: 从数据库获取博客文章列表
+    const dbService = c.get("dbService");
+    const category = c.req.query("category") || undefined;
+    const articles = await dbService.blogArticles.getList(page, limit, category);
+    
     const response: PaginatedResponse = {
       success: true,
-      data: [],
-      pagination: {
-        page,
-        limit,
-        total: 0,
-        totalPages: 0,
-        hasNext: false,
-        hasPrev: false,
-      },
+      data: articles.data.map((a: any) => ({
+        ...a,
+        slug: a.slug || a.id,
+        coverImage: a.coverImage || a.cover_image || undefined,
+      })),
+      pagination: articles.pagination,
       message: "Blog articles retrieved successfully",
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId") || "",
@@ -66,16 +66,35 @@ blogRoutes.get("/articles", async (c) => {
   }
 });
 
-// 获取单篇博客文章
-blogRoutes.get("/articles/:id", async (c) => {
-  const id = c.req.param("id");
+// 获取单篇博客文章（仅 slug）
+blogRoutes.get("/articles/:slug", async (c) => {
+  const slug = c.req.param("slug");
 
   try {
-    // TODO: 从数据库获取博客文章详情
+    const dbService = c.get("dbService");
+    const article = await dbService.blogArticles.findBySlug?.(slug) || null;
+    
+    if (!article) {
+      throw new ModuleError(
+        `Blog article not found: ${slug}`,
+        ERROR_CODES.NOT_FOUND,
+        404
+      );
+    }
+    
+    // Increment view count
+    await dbService.blogArticles.incrementViewCount(article.id);
+
     const response: APIResponse = {
       success: true,
-      data: null,
-      message: `Blog article ${id} retrieved successfully`,
+      data: {
+        ...article,
+        // 兼容前端字段命名
+        coverImage: (article as any).cover_image || (article as any).coverImage,
+        slug: (article as any).slug || (article as any).id,
+        contentHtml: (article as any).content,
+      },
+      message: `Blog article ${article.id} retrieved successfully`,
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId") || "",
     };
@@ -83,7 +102,7 @@ blogRoutes.get("/articles/:id", async (c) => {
     return c.json(response);
   } catch (error) {
     throw new ModuleError(
-      `Failed to retrieve blog article: ${id}`,
+      `Failed to retrieve blog article: ${slug}`,
       ERROR_CODES.DATABASE_ERROR,
       404
     );
@@ -91,16 +110,30 @@ blogRoutes.get("/articles/:id", async (c) => {
 });
 
 // 增加文章浏览量
-blogRoutes.post("/articles/:id/view", 
+// 基于 slug 的浏览量统计
+blogRoutes.post("/articles/:slug/view", 
   rateLimiter(30, 60000), // 每分钟最多30次浏览记录
   async (c) => {
-    const id = c.req.param("id");
+    const slug = c.req.param("slug");
 
     try {
-      // TODO: 更新文章浏览量
+      const dbService = c.get("dbService");
+      // Check article by slug
+      const article = await dbService.blogArticles.findBySlug?.(slug);
+      if (!article) {
+        throw new ModuleError(
+          `Blog article not found: ${slug}`,
+          ERROR_CODES.NOT_FOUND,
+          404
+        );
+      }
+      
+      // Update view count
+      await dbService.blogArticles.incrementViewCount(article.id);
+      
       const response: APIResponse = {
         success: true,
-        message: `View count updated for article ${id}`,
+        message: `View count updated for article ${article.id}`,
         timestamp: new Date().toISOString(),
         requestId: c.get("requestId") || "",
       };
@@ -108,7 +141,7 @@ blogRoutes.post("/articles/:id/view",
       return c.json(response);
     } catch (error) {
       throw new ModuleError(
-        `Failed to update view count for article: ${id}`,
+        `Failed to update view count for article slug`,
         ERROR_CODES.DATABASE_ERROR,
         500
       );

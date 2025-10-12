@@ -308,7 +308,7 @@ securityRoutes.get('/security/status', async (c) => {
       },
       cors: {
         enabled: true,
-        allowedOrigins: ['https://getyourluck.com', 'https://www.getyourluck.com']
+        allowedOrigins: ['https://selfatlas.net', 'https://www.selfatlas.net']
       },
       inputValidation: {
         enabled: true,

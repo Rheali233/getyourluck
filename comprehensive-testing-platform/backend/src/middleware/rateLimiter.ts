@@ -7,7 +7,7 @@ import type { Context, Next } from "hono";
 import type { Env } from "../index";
 import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 
-export const rateLimiter = (requests: number, windowMs: number) => {
+export const rateLimiter = (requests: number = 100, windowMs: number = 60000) => {
   return async (c: Context<{ Bindings: Env }>, next: Next) => {
     const ip = c.req.header("CF-Connecting-IP") || 
                c.req.header("X-Forwarded-IP") || 
@@ -19,8 +19,16 @@ export const rateLimiter = (requests: number, windowMs: number) => {
     try {
       // 检查KV是否可用
       if (!c.env.KV) {
-        console.warn("KV not available, skipping rate limiting");
-        return next();
+        // 在开发环境中，KV可能不可用，这是正常的
+        if (c.env['NODE_ENV'] === 'development') {
+          // 开发环境不显示警告，直接跳过速率限制
+          return next();
+        } else {
+          // 生产环境才显示警告
+          // eslint-disable-next-line no-console
+          console.warn("KV not available, skipping rate limiting");
+          return next();
+        }
       }
 
       const current = await c.env.KV.get(key);
@@ -46,6 +54,7 @@ export const rateLimiter = (requests: number, windowMs: number) => {
       }
       
       // KV存储失败时记录日志但不阻塞请求
+      // eslint-disable-next-line no-console
       console.warn("Rate limiter KV operation failed:", error);
       await next();
     }

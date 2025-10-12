@@ -67,20 +67,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section
       className={cn(
-        "relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-secondary-50",
+        "relative overflow-hidden",
         "py-20 px-4 sm:px-6 lg:px-8",
         className
       )}
       data-testid={testId}
       {...props}
     >
-      {/* 背景装饰 */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full opacity-20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-100 rounded-full opacity-20 blur-3xl" />
-      </div>
 
-      <div className="relative max-w-7xl mx-auto text-center">
+      <div className="relative max-w-6xl mx-auto text-center">
         {/* 主标题 */}
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
           {heroConfig.title}
@@ -101,7 +96,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {heroConfig.features.map((feature, index) => (
             <span
               key={index}
-              className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 shadow-sm"
+              className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/80 border border-gray-200 text-gray-700 shadow-sm"
             >
               {feature}
             </span>

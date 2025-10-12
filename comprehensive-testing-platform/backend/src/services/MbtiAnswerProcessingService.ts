@@ -461,9 +461,9 @@ export class MbtiAnswerProcessingService {
       recommendations.push('答题一致性较低，建议重新测试以获得更可靠的结果');
     }
 
-    // 如果没有特殊建议，提供一般性建议
+          // If no specific advice, provide general advice
     if (recommendations.length === 0) {
-      recommendations.push('测试结果可靠，建议根据结果进行自我反思和成长');
+              recommendations.push('Test results are reliable, recommend self-reflection and growth based on results');
     }
 
     return recommendations;

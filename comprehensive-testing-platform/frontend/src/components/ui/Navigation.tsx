@@ -10,13 +10,11 @@ import { cn } from '@/utils/classNames';
 
 
 export interface NavigationProps extends BaseComponentProps {
-  showThemeToggle?: boolean;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
   className,
   testId = 'navigation',
-  showThemeToggle = false, // 默认不显示主题切换
   ...props
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,19 +40,10 @@ export const Navigation: React.FC<NavigationProps> = ({
 
 
 
-  // 测试中心点击处理
+  // 测试中心跳转
   const handleTestCenterClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (location.pathname === '/') {
-      // 如果已经在首页，滚动到测试模块
-      const testModulesSection = document.getElementById('test-modules-section');
-      if (testModulesSection) {
-        testModulesSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      // 如果不在首页，先导航到首页，然后滚动
-      navigate('/', { state: { scrollTo: 'test-modules-section' } });
-    }
+    navigate('/tests');
     closeMobileMenu();
   };
 
@@ -71,10 +60,11 @@ export const Navigation: React.FC<NavigationProps> = ({
     closeMobileMenu();
   };
 
+
   // Navigation menu items
   const navigationItems = [
     { name: 'Home', href: '/', icon: '🏠', onClick: handleHomeClick },
-    { name: 'Test Center', href: '#', icon: '🧪', onClick: handleTestCenterClick },
+    { name: 'Test Center', href: '/tests', icon: '🧪', onClick: handleTestCenterClick },
     { name: 'Blog', href: '/blog', icon: '📝' },
     { name: 'About', href: '/about', icon: 'ℹ️' },
   ];
@@ -91,12 +81,12 @@ export const Navigation: React.FC<NavigationProps> = ({
       data-testid={testId}
       {...props}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
             <span className="text-2xl">🌟</span>
-            <span className="text-xl font-bold text-gray-900">getyourluck</span>
+            <span className="text-xl font-bold text-gray-900">SelfAtlas</span>
           </Link>
 
           {/* 桌面端导航 - 靠左对齐 */}
@@ -131,9 +121,9 @@ export const Navigation: React.FC<NavigationProps> = ({
             })}
           </div>
 
-          {/* Desktop action buttons - removed language switching */}
+          {/* Desktop action buttons */}
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
-            {/* Language switching removed */}
+            {/* 右侧操作按钮区域 - 目前为空 */}
           </div>
 
           {/* 移动端菜单按钮 */}
@@ -210,9 +200,9 @@ export const Navigation: React.FC<NavigationProps> = ({
               })}
             </div>
             
-            {/* Mobile action buttons - removed language switching */}
+            {/* Mobile action buttons */}
             <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-              {/* Language switching removed */}
+              {/* 移动端操作按钮区域 - 目前为空 */}
             </div>
           </div>
         )}

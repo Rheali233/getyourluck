@@ -1,0 +1,22 @@
+{
+  "name": "selfatlas-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "comprehensive-testing-platform",
+    "comprehensive-testing-platform/backend",
+    "comprehensive-testing-platform/frontend",
+    "comprehensive-testing-platform/shared"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=comprehensive-testing-platform",
+    "build": "npm run build --workspace=comprehensive-testing-platform",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "description": "Comprehensive testing platform workspace",
+  "repository": {
+    "type": "git",
+    "url": "."
+  }
+}

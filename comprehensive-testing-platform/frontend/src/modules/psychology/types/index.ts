@@ -4,41 +4,23 @@
  */
 
 import type { BaseComponentProps } from '@/types/componentTypes';
+import type { TestStatus, QuestionFormat } from '@/modules/testing/types/TestTypes';
 
-// Test type constants
-export const TestType = {
+// Psychology-specific test type constants
+export const PsychologyTestTypes = {
   MBTI: 'mbti',
   PHQ9: 'phq9',
   EQ: 'eq',
   HAPPINESS: 'happiness',
 } as const;
 
-export type TestType = typeof TestType[keyof typeof TestType];
-
-// Test status constants
-export const TestStatus = {
-  NOT_STARTED: 'not_started',
-  IN_PROGRESS: 'in_progress',
-  COMPLETED: 'completed',
-  PAUSED: 'paused',
-} as const;
-
-export type TestStatus = typeof TestStatus[keyof typeof TestStatus];
-
-// Question type constants
-export const QuestionType = {
-  SINGLE_CHOICE: 'single_choice',
-  LIKERT_SCALE: 'likert_scale',
-  MULTIPLE_CHOICE: 'multiple_choice',
-} as const;
-
-export type QuestionType = typeof QuestionType[keyof typeof QuestionType];
+export type PsychologyTestType = typeof PsychologyTestTypes[keyof typeof PsychologyTestTypes];
 
 // Base question interface
 export interface BaseQuestion {
   id: string;
   text: string;
-  type: QuestionType;
+  type: QuestionFormat;
   required: boolean;
   order: number;
   category?: string;
@@ -47,8 +29,8 @@ export interface BaseQuestion {
 
 // MBTI question interface
 export interface MbtiQuestion extends BaseQuestion {
-  dimension: 'E-I' | 'S-N' | 'T-F' | 'J-P';
-  category: 'E/I' | 'S/N' | 'T/F' | 'J/P';
+  dimension?: 'E-I' | 'S-N' | 'T-F' | 'J-P';  // Optional for backward compatibility
+  category?: 'E/I' | 'S/N' | 'T/F' | 'J/P';   // Optional for backward compatibility
   options: {
     id: string;
     text: string;
@@ -59,7 +41,9 @@ export interface MbtiQuestion extends BaseQuestion {
 
 // PHQ-9 question interface
 export interface Phq9Question extends BaseQuestion {
-  symptom: string;
+  symptom?: string;  // Optional for backward compatibility
+  category?: string; // Backend returns this field
+  dimension?: string; // Backend returns this field
   options: {
     id: string;
     text: string;
@@ -70,7 +54,7 @@ export interface Phq9Question extends BaseQuestion {
 
 // Emotional intelligence question interface
 export interface EqQuestion extends BaseQuestion {
-  dimension: 'self_awareness' | 'self_regulation' | 'motivation' | 'empathy' | 'social_skills';
+  dimension?: 'self_awareness' | 'self_regulation' | 'motivation' | 'empathy' | 'social_skills';  // Optional for backward compatibility
   options: {
     id: string;
     text: string;
@@ -81,8 +65,8 @@ export interface EqQuestion extends BaseQuestion {
 
 // Happiness index question interface
 export interface HappinessQuestion extends BaseQuestion {
-  dimension: 'P' | 'E' | 'R' | 'M' | 'A'; // Five dimensions of PERMA model
-  domain: string; // Specific sub-dimensions, such as optimism, gratitude, etc.
+  dimension?: 'P' | 'E' | 'R' | 'M' | 'A'; // Five dimensions of PERMA model, optional for backward compatibility
+  domain?: string; // Specific sub-dimensions, such as optimism, gratitude, etc., optional for backward compatibility
   reverseScored?: boolean; // Whether reverse scoring is applied
   options: {
     id: string;
@@ -103,7 +87,7 @@ export interface UserAnswer {
 // Test session interface
 export interface TestSession {
   id: string;
-  testType: TestType;
+  testType: PsychologyTestType;
   status: TestStatus;
   startTime: Date;
   endTime?: Date;
@@ -114,7 +98,7 @@ export interface TestSession {
 
 // Test progress interface
 export interface TestProgress {
-  testType: TestType;
+  testType: PsychologyTestType;
   sessionId: string;
   currentQuestionIndex: number;
   answers: UserAnswer[];
@@ -132,7 +116,6 @@ export interface HappinessResult {
   maxScore: number;
   happinessLevel: 'very_low' | 'low' | 'moderate' | 'high' | 'very_high';
   levelName: string;
-  levelDescription: string;
   domains: HappinessDomain[];
   overallAnalysis: string;
   improvementPlan: {
@@ -164,7 +147,7 @@ export interface HappinessDomain {
 
 // Test result union type
 export interface TestResult {
-  testType: TestType;
+  testType: PsychologyTestType;
   result: MBTIResult | PHQ9Result | EQResult | HappinessResult;
 }
 
@@ -176,18 +159,18 @@ export interface PsychologyState {
   
   // Question bank data
   questions: {
-    [TestType.MBTI]: MbtiQuestion[];
-    [TestType.PHQ9]: Phq9Question[];
-    [TestType.EQ]: EqQuestion[];
-    [TestType.HAPPINESS]: HappinessQuestion[];
+    [PsychologyTestTypes.MBTI]: MbtiQuestion[];
+    [PsychologyTestTypes.PHQ9]: Phq9Question[];
+    [PsychologyTestTypes.EQ]: EqQuestion[];
+    [PsychologyTestTypes.HAPPINESS]: HappinessQuestion[];
   };
   
   // Test results
   results: {
-    [TestType.MBTI]: MBTIResult | null;
-    [TestType.PHQ9]: PHQ9Result | null;
-    [TestType.EQ]: EQResult | null;
-    [TestType.HAPPINESS]: HappinessResult | null;
+    [PsychologyTestTypes.MBTI]: MBTIResult | null;
+    [PsychologyTestTypes.PHQ9]: PHQ9Result | null;
+    [PsychologyTestTypes.EQ]: EQResult | null;
+    [PsychologyTestTypes.HAPPINESS]: HappinessResult | null;
   };
   
   // AI analysis results
@@ -196,7 +179,7 @@ export interface PsychologyState {
   // UI state
   isLoading: boolean;
   error: string | null;
-  currentTestType: TestType | null;
+  currentPsychologyTestType: PsychologyTestType | null;
   showResults: boolean;
   lastUpdated: Date | null;
   
@@ -207,7 +190,7 @@ export interface PsychologyState {
 // Psychology module operations
 export interface PsychologyActions {
   // Test session management
-  startTest: (testType: TestType) => Promise<void>;
+  startTest: (testType: PsychologyTestType) => Promise<void>;
   pauseTest: () => void;
   resumeTest: () => void;
   endTest: () => Promise<{ success: boolean; data?: TestResult; error?: string }>;
@@ -220,22 +203,22 @@ export interface PsychologyActions {
   goToPreviousQuestion: () => void;
   
   // Question bank management
-  loadQuestions: (testType: TestType) => Promise<void>;
-  loadQuestionsFromAPI: (testType: TestType) => Promise<void>;
+  loadQuestions: (testType: PsychologyTestType) => Promise<void>;
+  loadQuestionsFromAPI: (testType: PsychologyTestType) => Promise<void>;
   getCurrentQuestion: () => MbtiQuestion | Phq9Question | EqQuestion | HappinessQuestion | null;
   
   // Result management
-  generateResults: (testType: TestType) => Promise<TestResult>;
-  saveResults: (testType: TestType, results: TestResult) => Promise<void>;
-  loadResults: (testType: TestType) => Promise<TestResult | null>;
+  generateResults: (testType: PsychologyTestType) => Promise<TestResult>;
+  saveResults: (testType: PsychologyTestType, results: TestResult) => Promise<void>;
+  loadResults: (testType: PsychologyTestType) => Promise<TestResult | null>;
   
   // Progress management
   saveProgress: () => boolean;
-  loadProgress: (testType: TestType, sessionId: string) => TestProgress | null;
-  restoreProgress: (testType: TestType, sessionId: string) => boolean;
+  loadProgress: (testType: PsychologyTestType, sessionId: string) => TestProgress | null;
+  restoreProgress: (testType: PsychologyTestType, sessionId: string) => boolean;
   
   // AI analysis management
-  analyzeTestResult: (testType: TestType, answers: UserAnswer[]) => Promise<TestResult>;
+  analyzeTestResult: (testType: PsychologyTestType, answers: UserAnswer[]) => Promise<TestResult>;
   getAnalysisStatus: () => { isLoading: boolean; error: string | null; hasResult: boolean };
   clearAnalysisResult: () => void;
   
@@ -246,7 +229,7 @@ export interface PsychologyActions {
   // State management
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setCurrentTestType: (testType: TestType | null) => void;
+  setCurrentPsychologyTestType: (testType: PsychologyTestType | null) => void;
   setShowResults: (show: boolean) => void;
   reset: () => void;
   
@@ -259,7 +242,7 @@ export interface PsychologyModuleState extends PsychologyState, PsychologyAction
 
 // Component property interface
 export interface TestContainerProps extends BaseComponentProps {
-  testType: TestType;
+  testType: PsychologyTestType;
   onTestComplete: (results: TestResult) => void;
   onTestPause: () => void;
 }
@@ -273,7 +256,7 @@ export interface QuestionDisplayProps extends BaseComponentProps {
   currentIndex: number;
   totalQuestions: number;
   isAnswered: boolean;
-  testType?: TestType;
+  testType?: PsychologyTestType;
 }
 
 export interface TestProgressProps extends BaseComponentProps {
@@ -286,14 +269,14 @@ export interface TestProgressProps extends BaseComponentProps {
 
 export interface ResultsDisplayProps extends BaseComponentProps {
   results: TestResult;
-  testType: TestType;
+  testType: PsychologyTestType;
   onRetake: () => void;
   onShare: () => void;
   onSave: () => void;
 }
 
 export interface TestSelectionProps extends BaseComponentProps {
-  onTestSelect: (testType: TestType) => void;
+  onTestSelect: (testType: PsychologyTestType) => void;
   testHistory: TestSession[];
 }
 
@@ -366,37 +349,26 @@ export interface MBTIResult {
 // PHQ-9 test result type
 export interface PHQ9Result {
   totalScore: number;
-  riskLevel: 'minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe';
+  severity: 'minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe';
+  riskLevel: 'low' | 'moderate' | 'high';
   riskLevelName: string;
   riskDescription: string;
-  symptoms: Array<{
-    name: string;
-    score: number;
-    description: string;
-  }>;
-  recommendations: string[];
-  professionalHelp: {
-    needed: boolean;
-    urgency: 'low' | 'medium' | 'high';
-    suggestions: string[];
-    resources: Array<{
-      name: string;
-      description: string;
-      contact?: string;
-      url?: string;
-    }>;
+  lifestyleInterventions: {
+    sleepHygiene: string;
+    physicalActivity: string;
+    nutrition: string;
+    socialSupport: string;
   };
-  lifestyleTips: string[];
   followUpAdvice: string;
+  physicalAnalysis: string;
+  psychologicalAnalysis: string;
 }
 
 // Emotional intelligence test result type
 export interface EQResult {
-  totalScore: number;
-  maxScore: number;
-  overallLevel: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  // 与后端统一的温和等级文案
+  overallLevel: 'Needs Improvement' | 'Average' | 'Good' | 'Very Good' | 'Excellent';
   levelName: string;
-  levelDescription: string;
   dimensions: EQDimension[];
   overallAnalysis: string;
   improvementPlan: {
@@ -404,15 +376,14 @@ export interface EQResult {
     longTerm: string[];
     dailyPractices: string[];
   };
-  careerImplications: string[];
-  relationshipInsights: string[];
+  // 错误信息（用于前端显示错误弹窗）
+  error?: string;
 }
 
 export interface EQDimension {
   name: string;
-  score: number;
-  maxScore: number;
   description: string;
   strengths: string[];
-  improvementAreas: string[];
+  // 维度等级（与后端统一）
+  level?: 'Needs Improvement' | 'Average' | 'Good' | 'Very Good' | 'Excellent';
 }

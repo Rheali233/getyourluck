@@ -1,6 +1,6 @@
 /**
- * 统一工具函数
- * 遵循统一开发标准的工具函数规范
+ * 共享工具函数导出
+ * 提供项目中常用的工具函数和类
  */
 
 import type { ClassValue } from "clsx";
@@ -56,3 +56,20 @@ export function isValidUUID(uuid: string): boolean {
 export function sanitizeString(input: string, maxLength: number = 1000): string {
   return input.trim().slice(0, maxLength);
 }
+
+// 错误处理工具
+export {
+  BaseErrorHandler,
+  createError,
+  createValidationError,
+  createNotFoundError,
+  createUnauthorizedError,
+  createForbiddenError,
+  createNetworkError,
+  createDatabaseError,
+  createAIServiceError,
+  createRateLimitError,
+  isRetryable,
+  getUserFriendlyMessage,
+  handleError
+} from './errorHandler';

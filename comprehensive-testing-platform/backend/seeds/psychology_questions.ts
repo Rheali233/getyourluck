@@ -4,9 +4,9 @@
  */
 
 import type { 
-  CreatePsychologyQuestionCategoryData,
-  CreatePsychologyQuestionData,
-  CreatePsychologyQuestionOptionData 
+  CreateQuestionCategoryData,
+  CreateQuestionData,
+  CreateQuestionOptionData 
 } from '../src/models';
 
 // Import other question bank data
@@ -14,7 +14,7 @@ import { eqQuestionsOptimized, eqOptionsOptimized } from './eq-questions-optimiz
 import { happinessQuestions as happinessQuestionsData, happinessQuestionOptions } from './happiness-questions';
 
 // MBTI question bank seed data - Extended version (20 core questions)
-export const mbtiQuestions: CreatePsychologyQuestionData[] = [
+export const mbtiQuestions: CreateQuestionData[] = [
   // E/I dimension questions
   {
     categoryId: 'mbti-category',
@@ -182,7 +182,7 @@ export const mbtiQuestions: CreatePsychologyQuestionData[] = [
 ];
 
 // MBTI question options seed data - Extended version
-export const mbtiOptions: CreatePsychologyQuestionOptionData[] = [
+export const mbtiOptions: CreateQuestionOptionData[] = [
   // E/I dimension options - Questions 1-5
   {
     questionId: 'mbti-q-1',
@@ -430,7 +430,7 @@ export const mbtiOptions: CreatePsychologyQuestionOptionData[] = [
 ];
 
 // PHQ-9题库种子数据 - 完整9道题目
-export const phq9Questions: CreatePsychologyQuestionData[] = [
+export const phq9Questions: CreateQuestionData[] = [
   {
     categoryId: 'phq9-category',
     questionText: 'Little interest or pleasure in doing things',
@@ -506,7 +506,7 @@ export const phq9Questions: CreatePsychologyQuestionData[] = [
 ];
 
 // PHQ-9题目选项种子数据 - 为所有9道题目创建选项
-export const phq9Options: CreatePsychologyQuestionOptionData[] = [
+export const phq9Options: CreateQuestionOptionData[] = [
   // 题目1的选项
   {
     questionId: 'phq9-q-1',

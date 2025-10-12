@@ -13,9 +13,13 @@ export { BlogArticleModel } from "./BlogArticleModel";
 export { UserFeedbackModel } from "./UserFeedbackModel";
 export { AnalyticsEventModel } from "./AnalyticsEventModel";
 
+// 统一数据模型
+export { UnifiedSessionModel } from "./UnifiedSessionModel";
+export { UnifiedResultModel } from "./UnifiedResultModel";
+
 // 模块专用会话模型
 export { PsychologySessionModel } from "./PsychologySessionModel";
-export { PsychologyQuestionBankModel } from "./PsychologyQuestionBankModel";
+export { QuestionBankModel } from "./QuestionBankModel";
 export { AstrologySessionModel } from "./AstrologySessionModel";
 export { TarotSessionModel } from "./TarotSessionModel";
 export { CareerSessionModel } from "./CareerSessionModel";
@@ -40,19 +44,35 @@ export type { BlogArticle, CreateBlogArticleData } from "./BlogArticleModel";
 export type { UserFeedback, CreateUserFeedbackData } from "./UserFeedbackModel";
 export type { AnalyticsEvent, CreateAnalyticsEventData } from "./AnalyticsEventModel";
 
+// 统一数据模型类型导出
+export type { 
+  UnifiedSession, 
+  CreateUnifiedSessionData, 
+  UpdateUnifiedSessionData,
+  SessionStats,
+  TestTypeStats
+} from "./UnifiedSessionModel";
+export type { 
+  UnifiedResult, 
+  CreateUnifiedResultData,
+  ResultTemplate
+} from "./UnifiedResultModel";
+export { SessionStatus, TestCategory } from "./UnifiedSessionModel";
+export { ResultType } from "./UnifiedResultModel";
+
 export type { PsychologySessionData, CreatePsychologySessionData } from "./PsychologySessionModel";
 export type { 
-  PsychologyQuestionCategoryData, 
-  PsychologyQuestionData, 
-  PsychologyQuestionOptionData, 
-  PsychologyQuestionConfigData, 
-  PsychologyQuestionVersionData,
-  CreatePsychologyQuestionCategoryData,
-  CreatePsychologyQuestionData,
-  CreatePsychologyQuestionOptionData,
-  CreatePsychologyQuestionConfigData,
-  CreatePsychologyQuestionVersionData
-} from "./PsychologyQuestionBankModel";
+  QuestionCategoryData, 
+  QuestionData, 
+  QuestionOptionData, 
+  QuestionConfigData, 
+  QuestionVersionData,
+  CreateQuestionCategoryData,
+  CreateQuestionData,
+  CreateQuestionOptionData,
+  CreateQuestionConfigData,
+  CreateQuestionVersionData
+} from "./QuestionBankModel";
 export type { AstrologySessionData, CreateAstrologySessionData } from "./AstrologySessionModel";
 export type { TarotSessionData, CreateTarotSessionData, TarotCard } from "./TarotSessionModel";
 export type { CareerSessionData, CreateCareerSessionData } from "./CareerSessionModel";

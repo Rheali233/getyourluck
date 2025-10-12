@@ -10,7 +10,6 @@ import { cn } from '../../utils/classNames';
 
 export interface FooterProps extends BaseComponentProps {
   variant?: 'default' | 'simple';
-  showNewsletter?: boolean;
   showSocialMedia?: boolean;
 }
 
@@ -22,11 +21,11 @@ export const Footer: React.FC<FooterProps> = ({
   className,
   testId = 'footer',
   variant = 'default',
-  showNewsletter = true,
   showSocialMedia = true,
   ...props
 }) => {
   const year = new Date().getFullYear();
+  const [showEmail, setShowEmail] = React.useState(false);
   
   if (variant === 'simple') {
     return (
@@ -36,7 +35,7 @@ export const Footer: React.FC<FooterProps> = ({
         {...props}
       >
         <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
-          <p>© {year} getyourluck. All rights reserved.</p>
+          <p>© {year} SelfAtlas. All rights reserved.</p>
         </div>
       </footer>
     );
@@ -58,43 +57,23 @@ export const Footer: React.FC<FooterProps> = ({
       title: 'Resources',
       links: [
         { name: 'Blog Articles', href: '/blog' },
-        { name: 'Test Guides', href: '/guides' },
-        { name: 'FAQ', href: '/faq' },
-        { name: 'User Feedback', href: '/feedback' },
-        { name: 'Help Center', href: '/help' },
-        { name: 'Contact Us', href: '/contact' },
+        { name: 'Test Center', href: '/tests' },
       ],
     },
     company: {
       title: 'About Us',
       links: [
         { name: 'Company Info', href: '/about' },
-        { name: 'Our Team', href: '/team' },
-        { name: 'History', href: '/history' },
-        { name: 'Media Coverage', href: '/media' },
-        { name: 'Join Us', href: '/careers' },
-        { name: 'Partners', href: '/partners' },
-      ],
-    },
-    legal: {
-      title: 'Legal Terms',
-      links: [
         { name: 'Terms of Service', href: '/terms' },
         { name: 'Privacy Policy', href: '/privacy' },
         { name: 'Cookie Policy', href: '/cookies' },
-        { name: 'Disclaimer', href: '/disclaimer' },
-        { name: 'Copyright Info', href: '/copyright' },
-        { name: 'Complaints & Suggestions', href: '/complaints' },
+        { name: 'Contact Us', href: 'contact_toggle' },
       ],
     },
   };
 
   const socialMedia = [
-    { name: 'WeChat', icon: '💬', href: '#', color: 'hover:text-green-600' },
-    { name: 'Twitter', icon: '🐦', href: '#', color: 'hover:text-blue-600' },
-    { name: 'Facebook', icon: '📘', href: '#', color: 'hover:text-blue-600' },
-    { name: 'Instagram', icon: '📷', href: '#', color: 'hover:text-pink-600' },
-    { name: 'YouTube', icon: '📺', href: '#', color: 'hover:text-red-600' },
+    { name: 'Email', icon: '📧', href: 'mailto:support@selfatlas.net', color: 'hover:text-blue-600' },
   ];
   
   return (
@@ -103,15 +82,15 @@ export const Footer: React.FC<FooterProps> = ({
       data-testid={testId}
       {...props}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 主要内容区域 */}
         <div className="py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-            {/* 品牌信息 */}
-            <div className="lg:col-span-2">
+            {/* 品牌信息 - 加宽 */}
+            <div className="lg:col-span-3">
               <div className="flex items-center space-x-2 mb-4">
                 <span className="text-2xl">🌟</span>
-                <span className="text-xl font-bold">getyourluck</span>
+                <span className="text-xl font-bold">SelfAtlas</span>
               </div>
               <p className="text-gray-300 text-sm leading-relaxed mb-6">
                 Professional online testing platform providing psychological tests, astrological analysis, tarot reading and various testing services.
@@ -138,7 +117,7 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             {/* 测试服务 */}
-            <div>
+            <div className="lg:col-span-1">
               <h4 className="text-lg font-semibold mb-4">{footerLinks.tests.title}</h4>
               <ul className="space-y-2">
                 {footerLinks.tests.links.map((link) => (
@@ -154,8 +133,8 @@ export const Footer: React.FC<FooterProps> = ({
               </ul>
             </div>
 
-            {/* 资源中心 */}
-            <div>
+          {/* 资源中心（仅保留当前已实现的内容） */}
+            <div className="lg:col-span-1">
               <h4 className="text-lg font-semibold mb-4">{footerLinks.resources.title}</h4>
               <ul className="space-y-2">
                 {footerLinks.resources.links.map((link) => (
@@ -172,38 +151,38 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             {/* 关于我们 */}
-            <div>
+            <div className="lg:col-span-1">
               <h4 className="text-lg font-semibold mb-4">{footerLinks.company.title}</h4>
               <ul className="space-y-2">
                 {footerLinks.company.links.map((link) => (
                   <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
-                    >
-                      {link.name}
-                    </Link>
+                    {link.name === 'Contact Us' ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowEmail(!showEmail)}
+                        className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
+                      >
+                        {link.name}
+                      </button>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
+              {showEmail && (
+                <div className="mt-3 text-sm text-gray-300">
+                  Email: <a className="underline hover:text-white" href="mailto:support@selfatlas.net">support@selfatlas.net</a>
+                </div>
+              )}
             </div>
 
-            {/* 法律条款 */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">{footerLinks.legal.title}</h4>
-              <ul className="space-y-2">
-                {footerLinks.legal.links.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* 保留占位（未来可扩展 Legal） */}
           </div>
         </div>
 
@@ -211,18 +190,7 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="border-t border-gray-800 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © {year} getyourluck. All rights reserved.
-            </div>
-            <div className="flex space-x-6 text-sm text-gray-400">
-              <Link to="/terms" className="hover:text-white transition-colors duration-200">
-                Terms of Service
-              </Link>
-              <Link to="/privacy" className="hover:text-white transition-colors duration-200">
-                Privacy Policy
-              </Link>
-              <Link to="/cookies" className="hover:text-white transition-colors duration-200">
-                Cookie Policy
-              </Link>
+              © {year} SelfAtlas. All rights reserved.
             </div>
           </div>
         </div>

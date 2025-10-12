@@ -29,7 +29,7 @@ class EQDatabaseImporter {
   private async executeSQL(sql: string): Promise<ImportResult> {
     try {
       const cleanSql = sql.replace(/\s+/g, ' ').trim();
-      const command = `npx wrangler d1 execute getyourluck-local --local --command "${cleanSql}"`;
+      const command = `npx wrangler d1 execute selfatlas-local --local --command "${cleanSql}"`;
       
       console.log(`执行SQL: ${cleanSql.substring(0, 80)}...`);
       const result = execSync(command, { 

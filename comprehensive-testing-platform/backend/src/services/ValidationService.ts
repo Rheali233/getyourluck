@@ -35,7 +35,7 @@ export class ValidationService {
       astrology: z.enum(["basic", "detailed", "compatibility"]),
       tarot: z.enum(["single", "three_card", "celtic_cross", "relationship", "career"]),
       career: z.enum(["holland", "career_values", "skills_assessment"]),
-      learning: z.enum(["vark", "raven", "learning_strategies"]),
+      learning: z.enum(["vark", "learning_strategies"]),
       relationship: z.enum(["love_languages", "attachment_style", "relationship_skills"]),
       numerology: z.enum(["basic", "detailed", "compatibility"]),
     }),
@@ -160,7 +160,7 @@ export class ValidationService {
 
     learning: z.object({
       testSessionId: this.baseSchemas.uuid,
-      testSubtype: z.enum(["vark", "raven", "learning_strategies"]),
+      testSubtype: z.enum(["vark", "learning_strategies"]),
       learningStyle: z.enum(["visual", "auditory", "reading", "kinesthetic", "multimodal"]).optional(),
       cognitiveScore: z.number().optional(),
       percentileRank: z.number().min(0).max(100).optional(),

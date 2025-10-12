@@ -1,71 +1,71 @@
-name = "getyourluck-backend"
+name = "selfatlas-backend"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [env.production]
-name = "getyourluck-backend-prod"
-route = "api.getyourluck.com/*"
-zone_id = "your-zone-id"
+name = "selfatlas-backend-prod"
+# route = "api.selfatlas.net/*"
+# zone_id = "your-zone-id"
 
 [env.staging]
-name = "getyourluck-backend-staging"
+name = "selfatlas-backend-staging"
 
 [env.development]
-name = "getyourluck-backend-dev"
-route = "dev-api.getyourluck.com/*"
-zone_id = "your-zone-id"
+name = "selfatlas-backend-dev"
+# route = "dev-api.selfatlas.net/*"
+# zone_id = "your-zone-id"
 
 # D1数据库配置
-[[env.production.d1_databases]]
-binding = "DB"
-database_name = "getyourluck-prod"
-database_id = "your-production-database-id"
+# [[env.production.d1_databases]]
+# binding = "DB"
+# database_name = "getyourluck-prod"
+# database_id = "your-production-database-id"
 
 [[env.staging.d1_databases]]
 binding = "DB"
-database_name = "getyourluck-staging"
+database_name = "selfatlas-staging"
 database_id = "ad5be588-a683-45b5-94b4-47c585abd34f"
 
-[[env.development.d1_databases]]
-binding = "DB"
-database_name = "getyourluck-dev"
-database_id = "your-development-database-id"
+# [[env.development.d1_databases]]
+# binding = "DB"
+# database_name = "getyourluck-dev"
+# database_id = "your-development-database-id"
 
 # 本地开发D1数据库配置
 [[d1_databases]]
 binding = "DB"
-database_name = "getyourluck-local"
+database_name = "selfatlas-local"
 database_id = "a9f563cf-ce1b-46f8-adfe-38d58c7686a0"
 
 # KV存储配置
-[[env.production.kv_namespaces]]
-binding = "CACHE"
-id = "your-production-kv-id"
-preview_id = "your-production-kv-preview-id"
+# [[env.production.kv_namespaces]]
+# binding = "CACHE"
+# id = "your-production-kv-id"
+# preview_id = "your-production-kv-preview-id"
 
 [[env.staging.kv_namespaces]]
 binding = "CACHE"
 id = "439757d0175e4f89a4b57a2c82ccf464"
 preview_id = "439757d0175e4f89a4b57a2c82ccf464"
 
-[[env.development.kv_namespaces]]
-binding = "CACHE"
-id = "your-development-kv-id"
-preview_id = "your-development-kv-preview-id"
+# [[env.development.kv_namespaces]]
+# binding = "CACHE"
+# id = "your-development-kv-id"
+# preview_id = "your-development-kv-preview-id"
 
 # R2存储配置
-[[env.production.r2_buckets]]
-binding = "STORAGE"
-bucket_name = "getyourluck-prod-storage"
+# [[env.production.r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = "getyourluck-prod-storage"
 
 [[env.staging.r2_buckets]]
 binding = "STORAGE"
-bucket_name = "getyourluck-staging-storage"
+bucket_name = "selfatlas-staging-storage"
 
-[[env.development.r2_buckets]]
-binding = "STORAGE"
-bucket_name = "getyourluck-dev-storage"
+# [[env.development.r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = "getyourluck-dev-storage"
 
 # 环境变量
 [env.production.vars]
@@ -77,6 +77,7 @@ CACHE_TTL = "3600"
 MAX_REQUEST_SIZE = "1048576"
 RATE_LIMIT_WINDOW = "60000"
 RATE_LIMIT_MAX = "100"
+DEEPSEEK_API_KEY = "sk-4e4b5c204fd54073bdcb74b28dcc7413"
 
 [env.staging.vars]
 NODE_ENV = "staging"
@@ -87,6 +88,7 @@ CACHE_TTL = "1800"
 MAX_REQUEST_SIZE = "1048576"
 RATE_LIMIT_WINDOW = "60000"
 RATE_LIMIT_MAX = "200"
+DEEPSEEK_API_KEY = "sk-4e4b5c204fd54073bdcb74b28dcc7413"
 
 [env.development.vars]
 NODE_ENV = "development"
@@ -97,6 +99,7 @@ CACHE_TTL = "300"
 MAX_REQUEST_SIZE = "2097152"
 RATE_LIMIT_WINDOW = "60000"
 RATE_LIMIT_MAX = "1000"
+DEEPSEEK_API_KEY = "sk-4e4b5c204fd54073bdcb74b28dcc7413"
 
 # 构建配置
 [build]

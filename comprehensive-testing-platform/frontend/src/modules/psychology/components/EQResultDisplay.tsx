@@ -5,25 +5,22 @@
  */
 
 import React from 'react';
-import { Card } from '@/components/ui';
+import { Card, Button, FeedbackFloatingWidget } from '@/components/ui';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
 export interface EQDimension {
   name: string;
-  score: number;
-  maxScore: number;
+  // 与后端统一的温和等级文案（可选，缺失时显示 Not Available）
+  level?: 'Needs Improvement' | 'Average' | 'Good' | 'Very Good' | 'Excellent';
   description: string;
   strengths: string[];
-  improvementAreas: string[];
 }
 
 export interface EQResult {
-  totalScore: number;
-  maxScore: number;
-  overallLevel: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  // 与后端统一的温和等级文案
+  overallLevel: 'Needs Improvement' | 'Average' | 'Good' | 'Very Good' | 'Excellent';
   levelName: string;
-  levelDescription: string;
   dimensions: EQDimension[];
   overallAnalysis: string;
   improvementPlan: {
@@ -31,14 +28,13 @@ export interface EQResult {
     longTerm: string[];
     dailyPractices: string[];
   };
-  careerImplications: string[];
-  relationshipInsights: string[];
+  error?: string;
 }
 
 export interface EQResultDisplayProps extends BaseComponentProps {
   result: EQResult;
   onReset: () => void;
-  onPractice?: () => void;
+  onRetry?: () => void;
 }
 
 export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
@@ -46,107 +42,175 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
   testId = 'eq-result-display',
   result,
   onReset,
-  onPractice,
+  onRetry,
   ...props
 }) => {
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'beginner': return 'text-red-600 bg-red-50 border-red-200';
-      case 'intermediate': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'advanced': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'expert': return 'text-green-600 bg-green-50 border-green-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+  // 添加默认值处理，防止访问 undefined 属性
+  const safeResult: any = {
+    // 不使用默认等级以免误导，若缺失则用占位展示
+    overallLevel: result?.overallLevel,
+    levelName: result?.levelName || 'Emotional Intelligence Assessment',
+    dimensions: result?.dimensions || [
+      { 
+        name: 'Self-Awareness', 
+        level: 'Average', 
+        description: 'This dimension measures your ability to recognize and understand your own emotions and their impact on your thoughts and behaviors.', 
+        strengths: ['Basic emotional recognition', 'Some self-reflection skills'] 
+      },
+      { 
+        name: 'Self-Management', 
+        level: 'Average', 
+        description: 'This dimension assesses your ability to regulate your emotions and manage your impulses effectively in various situations.', 
+        strengths: ['Some emotional regulation', 'Basic stress management'] 
+      },
+      { 
+        name: 'Social Awareness', 
+        level: 'Average', 
+        description: 'This dimension evaluates your ability to understand others\' emotions and read social cues in different contexts.', 
+        strengths: ['Some empathy', 'Basic social understanding'] 
+      },
+      { 
+        name: 'Relationship Management', 
+        level: 'Average', 
+        description: 'This dimension measures your ability to build and maintain healthy relationships with others.', 
+        strengths: ['Some communication skills', 'Basic relationship building'] 
+      }
+    ],
+    overallAnalysis: typeof result?.overallAnalysis === 'string' ? result.overallAnalysis : 
+                    typeof result?.overallAnalysis === 'object' ? JSON.stringify(result.overallAnalysis) : '',
+    improvementPlan: {
+      shortTerm: Array.isArray(result?.improvementPlan?.shortTerm) ? result.improvementPlan.shortTerm : [],
+      longTerm: Array.isArray(result?.improvementPlan?.longTerm) ? result.improvementPlan.longTerm : [],
+      dailyPractices: Array.isArray(result?.improvementPlan?.dailyPractices) ? result.improvementPlan.dailyPractices : []
     }
   };
 
-  const getLevelIcon = (level: string) => {
+
+
+
+  const getLevelIcon = (level?: string) => {
     switch (level) {
-      case 'beginner': return '🌱';
-      case 'intermediate': return '🌿';
-      case 'advanced': return '🌳';
-      case 'expert': return '🏆';
+      case 'Needs Improvement': return '🌱';
+      case 'Average': return '🌿';
+      case 'Good': return '🌳';
+      case 'Very Good': return '🌟';
+      case 'Excellent': return '🏆';
       default: return '🌱';
     }
   };
 
 
 
+
+  // 错误状态处理
+  if (result?.error) {
+    return (
+      <div className={cn("bg-red-50 py-6 px-4", className)} data-testid={testId} {...props}>
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <div className="bg-white rounded-lg p-8 border border-red-200">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold text-red-800 mb-4">Analysis Incomplete</h2>
+            <p className="text-gray-700 mb-6">
+              We encountered an issue while analyzing your EQ test results. The analysis was incomplete and cannot be displayed properly.
+            </p>
+            <div className="bg-red-100 rounded-lg p-4 mb-6">
+              <p className="text-sm text-red-700 font-mono">
+                Error: {result.error}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {onRetry && (
+                <Button
+                  onClick={onRetry}
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white"
+                >
+                  Retry Analysis
+                </Button>
+              )}
+              <Button
+                onClick={onReset}
+                variant="outline"
+                className="px-8 py-3 border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Take Test Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-indigo-50 py-8 px-4", className)} data-testid={testId} {...props}>
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId} {...props}>
+      <div id="mainContent" className="max-w-6xl mx-auto space-y-8">
         
-        {/* Overall result */}
-        <Card className="p-8 text-center bg-white/80 backdrop-blur-sm">
-          <div className={cn("w-24 h-24 rounded-full flex items-center justify-center mb-6 mx-auto text-4xl shadow-lg", 
-            getLevelColor(result.overallLevel).split(' ')[0] === 'text-red-600' ? 'bg-red-100' :
-            getLevelColor(result.overallLevel).split(' ')[0] === 'text-yellow-600' ? 'bg-yellow-100' :
-            getLevelColor(result.overallLevel).split(' ')[0] === 'text-blue-600' ? 'bg-blue-100' :
-            getLevelColor(result.overallLevel).split(' ')[0] === 'text-green-600' ? 'bg-green-100' : 'bg-gray-100'
-          )}>
-            {getLevelIcon(result.overallLevel)}
+        {/* Overall result - align layout with DISC: left icon, right content */}
+        <Card className="p-6 bg-transparent border-0">
+          <div className="grid grid-cols-[64px_1fr] gap-6 items-start">
+            {/* Left: Icon (square, slightly lower) */}
+            <div className="flex items-start justify-center">
+              <div className="w-16 h-16 mt-2 shrink-0 rounded-lg flex items-center justify-center text-2xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow">
+                {getLevelIcon(safeResult.overallLevel)}
+              </div>
+            </div>
+
+            {/* Right: Title + analysis (shifted left, aligned with container padding) */}
+            <div className="space-y-3">
+              <h2 className="text-2xl font-bold text-gray-900">Emotional Intelligence Assessment</h2>
+              <div className="text-sm text-gray-700 mb-2">
+                <span className="font-medium">Overall Level: </span>
+                <span className="text-blue-600 font-semibold">
+                  {safeResult.overallLevel || 'Unknown'}
+                </span>
+              </div>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {safeResult.overallAnalysis || 'Analysis not available'}
+              </p>
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">{result.levelName}</h2>
-          <div className={cn("inline-block px-6 py-2 rounded-full text-sm font-medium border mb-4", getLevelColor(result.overallLevel))}>
-            Total Score: {result.totalScore}/{result.maxScore}
-          </div>
-          <div className="text-center text-sm text-gray-600 mb-4 max-w-2xl mx-auto">
-            <p className="mb-2">
-              <strong>Scoring Explanation:</strong> This test is based on Daniel Goleman's five core dimensions of emotional intelligence, each dimension has a maximum score of {result.maxScore / 5} points, and the total score for five dimensions is {result.maxScore} points.
-            </p>
-            <p>
-              The dimensions are: Self-awareness, Self-management, Motivation, Empathy, and Social skills, comprehensively reflecting your emotional intelligence level.
-            </p>
-          </div>
-          <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
-            {result.levelDescription}
-          </p>
         </Card>
 
 
 
         {/* Dimensional emotional intelligence analysis */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm">
+        <Card className="p-6 bg-transparent border-0">
           <h3 className="text-xl font-semibold mb-6 text-gray-900 flex items-center">
             <span className="text-2xl mr-2">📊</span>
-            Dimensional Emotional Intelligence Analysis
+            Dimensional Analysis
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {result.dimensions.map((dimension, index) => (
-              <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="text-lg font-semibold mb-4 text-gray-900">{dimension.name}</h4>
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-600">Score</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {dimension.score}/{dimension.maxScore}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000"
-                      style={{ width: `${(dimension.score / dimension.maxScore) * 100}%` }}
-                    />
-                  </div>
+            {safeResult.dimensions.map((dimension: any, index: number) => (
+              <div key={index} className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900">{dimension.name}</h4>
+                  <span className="text-sm font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded-full">
+                    {dimension.level || 'Not Available'}
+                  </span>
                 </div>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">{dimension.description}</p>
+                {/* 始终显示description */}
+                <div className="mb-4">
+                  <h5 className="font-medium text-gray-800 text-sm mb-2">Analysis:</h5>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {dimension.description || 'No description available for this dimension.'}
+                  </p>
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h5 className="font-medium text-green-700 text-sm mb-2">Strengths:</h5>
-                    <ul className="space-y-1">
-                       {dimension.strengths.map((strength, idx) => (
-                         <li key={idx} className="text-xs text-green-600">• {strength}</li>
-                       ))}
-                     </ul>
-                   </div>
-                   <div>
-                     <h5 className="font-medium text-blue-700 text-sm mb-2">Improvement Areas:</h5>
-                     <ul className="space-y-1">
-                       {dimension.improvementAreas.map((area, idx) => (
-                         <li key={idx} className="text-xs text-blue-600">• {area}</li>
-                       ))}
-                     </ul>
-                   </div>
+                {/* 始终显示strengths */}
+                <div className="space-y-2">
+                  <h5 className="font-medium text-gray-800 text-sm mb-2">Strengths:</h5>
+                  <ul className="space-y-0.5">
+                    {(dimension.strengths && dimension.strengths.length > 0) ? 
+                      dimension.strengths.map((strength: any, idx: number) => (
+                        <li key={idx} className="text-sm text-gray-600 flex items-start">
+                          <span className="text-gray-500 mr-2 mt-0.5">•</span>
+                          {typeof strength === 'string' ? strength : JSON.stringify(strength)}
+                        </li>
+                      )) : (
+                        <li className="text-sm text-gray-500 italic">No strengths data available</li>
+                      )
+                    }
+                  </ul>
                 </div>
               </div>
             ))}
@@ -156,91 +220,74 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
 
 
         {/* Improvement plan */}
-        <Card className="p-6 bg-white/80 backdrop-blur-sm">
+        <Card className="p-6 bg-transparent border-0">
           <h3 className="text-xl font-semibold mb-6 text-gray-900 flex items-center">
             <span className="text-2xl mr-2">📈</span>
-            Emotional Intelligence Improvement Plan
+            Improvement Plan
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-3">Short-term Goals</h4>
+            <div className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Short-term Goals</h4>
               <ul className="space-y-2">
-                {result.improvementPlan.shortTerm.map((goal, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="text-black mr-2 font-bold">{index + 1}.</span>
-                    <span className="text-black text-sm leading-relaxed">{goal}</span>
-                  </li>
-                ))}
+                {safeResult.improvementPlan.shortTerm.length > 0 ? (
+                  safeResult.improvementPlan.shortTerm.map((goal: any, index: number) => (
+                    <li key={index} className="text-sm text-blue-800 flex items-start">
+                      <span className="text-blue-600 mr-2 mt-0.5">•</span>
+                      {typeof goal === 'string' ? goal : JSON.stringify(goal)}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-sm text-gray-500 italic">No short-term goals available</li>
+                )}
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-3">Long-term Goals</h4>
+            
+            <div className="p-6 rounded-lg bg-indigo-50 border border-teal-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Long-term Goals</h4>
               <ul className="space-y-2">
-                {result.improvementPlan.longTerm.map((goal, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="text-black mr-2 font-bold">{index + 1}.</span>
-                    <span className="text-black text-sm leading-relaxed">{goal}</span>
-                  </li>
-                ))}
+                {safeResult.improvementPlan.longTerm.length > 0 ? (
+                  safeResult.improvementPlan.longTerm.map((goal: any, index: number) => (
+                    <li key={index} className="text-sm text-indigo-800 flex items-start">
+                      <span className="text-indigo-600 mr-2 mt-0.5">•</span>
+                      {typeof goal === 'string' ? goal : JSON.stringify(goal)}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-sm text-gray-500 italic">No long-term goals available</li>
+                )}
               </ul>
             </div>
-            <div>
-               <h4 className="font-semibold text-gray-800 mb-3">Daily Practices</h4>
-               <ul className="space-y-2">
-                 {result.improvementPlan.dailyPractices.map((practice, index) => (
-                   <li key={index} className="flex items-start">
-                     <span className="text-black mr-2 font-bold">{index + 1}.</span>
-                     <span className="text-black text-sm leading-relaxed">{practice}</span>
-                   </li>
-                 ))}
-               </ul>
-             </div>
+            
+            <div className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Daily Practices</h4>
+              <ul className="space-y-2">
+                {safeResult.improvementPlan.dailyPractices.length > 0 ? (
+                  safeResult.improvementPlan.dailyPractices.map((practice: any, index: number) => (
+                    <li key={index} className="text-sm text-blue-800 flex items-start">
+                      <span className="text-blue-600 mr-2 mt-0.5">•</span>
+                      {typeof practice === 'string' ? practice : JSON.stringify(practice)}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-sm text-gray-500 italic">No daily practices available</li>
+                )}
+              </ul>
+            </div>
           </div>
         </Card>
 
-        {/* Career and relationship insights */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-6 bg-white/80 backdrop-blur-sm">
-            <h3 className="text-xl font-semibold mb-4 text-gray-900 flex items-center">
-              <span className="text-2xl mr-2">💼</span>
-              Career Development Impact
-            </h3>
-            <ul className="space-y-2">
-              {result.careerImplications.map((implication, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="text-blue-500 mr-2 text-lg">•</span>
-                  <span className="text-gray-700 text-sm leading-relaxed">{implication}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-          
-          <Card className="p-6 bg-white/80 backdrop-blur-sm">
-            <h3 className="text-xl font-semibold mb-4 text-gray-900 flex items-center">
-              <span className="text-2xl mr-2">🤝</span>
-              Relationship Insights
-            </h3>
-            <ul className="space-y-2">
-              {result.relationshipInsights.map((insight, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="text-green-500 mr-2 text-lg">•</span>
-                  <span className="text-gray-700 text-sm leading-relaxed">{insight}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </div>
 
-
-
-        {/* Disclaimer */}
-        <div className="text-center text-sm text-gray-500 max-w-2xl mx-auto">
-          <p>
-            Emotional intelligence test results are for reference only, aimed at helping you understand your emotional management abilities.
-            Emotional intelligence can be continuously improved through learning and practice, and persistent effort will bring significant improvement.
-          </p>
+        <div className="text-center text-xs text-gray-500 max-w-2xl mx-auto">
+          This result is for reference only and does not constitute any clinical or legal advice.
         </div>
       </div>
+      <FeedbackFloatingWidget
+        containerSelector="#mainContent"
+        testContext={{
+          testType: 'psychology',
+          testId: 'eq',
+        }}
+      />
     </div>
   );
 };

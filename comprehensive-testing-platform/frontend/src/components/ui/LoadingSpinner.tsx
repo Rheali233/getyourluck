@@ -24,14 +24,14 @@ export const LoadingSpinner: React.FC<LoadingProps> = ({
   }
 
   // 尺寸样式映射
-  const sizeStyles = {
+  const sizeStyles: Record<NonNullable<LoadingProps['size']>, string> = {
     small: 'w-4 h-4',
     medium: 'w-8 h-8',
     large: 'w-12 h-12',
   };
 
   // 文本尺寸映射
-  const textSizeStyles = {
+  const textSizeStyles: Record<NonNullable<LoadingProps['size']>, string> = {
     small: 'text-xs',
     medium: 'text-sm',
     large: 'text-base',

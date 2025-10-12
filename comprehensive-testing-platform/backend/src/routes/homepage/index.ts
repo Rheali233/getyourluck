@@ -17,8 +17,8 @@ homepageRoutes.get("/", async (c) => {
   const response: APIResponse = {
     success: true,
     data: {
-      name: "首页模块",
-      description: "提供首页配置和测试模块管理功能",
+              name: "Homepage Module",
+      description: "Provides homepage configuration and test module management functionality",
       endpoints: {
         config: "/config",
         modules: "/modules",
@@ -50,10 +50,10 @@ homepageRoutes.get("/config", async (c) => {
       requestId: c.get("requestId") || "",
     });
   } catch (error) {
-    console.error("获取首页配置失败:", error);
+    console.error("Failed to get homepage configuration:", error);
     return c.json({
       success: false,
-      error: "获取首页配置失败",
+      error: "Failed to get homepage configuration",
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId") || "",
     }, 500);
@@ -75,10 +75,10 @@ homepageRoutes.get("/modules", async (c) => {
       requestId: c.get("requestId") || "",
     });
   } catch (error) {
-    console.error("获取测试模块列表失败:", error);
+    console.error("Failed to get test module list:", error);
     return c.json({
       success: false,
-      error: "获取测试模块列表失败",
+      error: "Failed to get test module list",
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId") || "",
     }, 500);

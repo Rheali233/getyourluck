@@ -39,7 +39,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   /**
    * 设置主题
    */
-  const setTheme = (newTheme: string) => {
+  const setTheme: React.Dispatch<React.SetStateAction<string>> = (newTheme) => {
     setThemeState(newTheme);
   };
 

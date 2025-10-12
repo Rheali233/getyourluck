@@ -53,7 +53,7 @@ export class NumerologySessionModel extends BaseModel {
   async create(data: CreateNumerologySessionData): Promise<string> {
     const id = this.generateId();
 
-    const result = await this.db
+    const result = await this.safeDB
       .prepare(`
         INSERT INTO numerology_sessions (
           id, test_session_id, birth_date, full_name,
@@ -84,7 +84,7 @@ export class NumerologySessionModel extends BaseModel {
   }
 
   async findByTestSessionId(testSessionId: string): Promise<NumerologySessionData | null> {
-    const result = await this.db
+    const result = await this.safeDB
       .prepare("SELECT * FROM numerology_sessions WHERE test_session_id = ?")
       .bind(testSessionId)
       .first();
@@ -97,7 +97,7 @@ export class NumerologySessionModel extends BaseModel {
   }
 
   async findByLifePathNumber(lifePathNumber: number): Promise<NumerologySessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM numerology_sessions WHERE life_path_number = ? ORDER BY created_at DESC")
       .bind(lifePathNumber)
       .all();
@@ -106,7 +106,7 @@ export class NumerologySessionModel extends BaseModel {
   }
 
   async getLifePathDistribution(): Promise<Record<number, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT life_path_number, COUNT(*) as count 
         FROM numerology_sessions 
@@ -124,7 +124,7 @@ export class NumerologySessionModel extends BaseModel {
   }
 
   async getDestinyNumberDistribution(): Promise<Record<number, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT destiny_number, COUNT(*) as count 
         FROM numerology_sessions 
@@ -142,7 +142,7 @@ export class NumerologySessionModel extends BaseModel {
   }
 
   async findByBirthDateRange(startDate: Date, endDate: Date): Promise<NumerologySessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT * FROM numerology_sessions 
         WHERE birth_date BETWEEN ? AND ? 
@@ -163,7 +163,7 @@ export class NumerologySessionModel extends BaseModel {
     masterNumber33: number;
     totalMasterNumbers: number;
   }> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT numerology_chart FROM numerology_sessions
       `)
@@ -195,7 +195,7 @@ export class NumerologySessionModel extends BaseModel {
   }
 
   async getKarmicDebtStats(): Promise<Record<number, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT numerology_chart FROM numerology_sessions
       `)
@@ -230,7 +230,7 @@ export class NumerologySessionModel extends BaseModel {
     month: number;
     count: number;
   }>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT 
           CAST(strftime('%m', birth_date) AS INTEGER) as month,

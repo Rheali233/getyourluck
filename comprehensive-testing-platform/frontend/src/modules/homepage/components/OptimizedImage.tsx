@@ -208,7 +208,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       >
         <div className="text-center">
           <div className="text-2xl mb-2">🖼️</div>
-          <div className="text-sm">图片加载失败</div>
+                        <div className="text-sm">Image loading failed</div>
         </div>
       </div>
     );

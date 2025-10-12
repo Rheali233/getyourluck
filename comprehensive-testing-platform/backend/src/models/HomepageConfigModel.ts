@@ -23,7 +23,7 @@ export class HomepageConfigModel extends BaseModel {
    */
   async getAllPublicConfigs(): Promise<Record<string, any>> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT key, value, description 
           FROM homepage_config 
@@ -54,7 +54,7 @@ export class HomepageConfigModel extends BaseModel {
    */
   async getConfigByKey(key: string): Promise<any> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare('SELECT value FROM homepage_config WHERE key = ? AND is_public = 1')
         .bind(key)
         .first();
@@ -82,7 +82,7 @@ export class HomepageConfigModel extends BaseModel {
     try {
       const jsonValue = typeof value === 'string' ? value : JSON.stringify(value);
       
-      await this.db
+      await this.safeDB
         .prepare(`
           INSERT OR REPLACE INTO homepage_config (key, value, description, updated_at)
           VALUES (?, ?, ?, CURRENT_TIMESTAMP)
@@ -100,7 +100,7 @@ export class HomepageConfigModel extends BaseModel {
    */
   async batchUpdateConfigs(configs: Record<string, any>): Promise<void> {
     try {
-      const stmt = this.db.prepare(`
+      const stmt = this.safeDB.prepare(`
         INSERT OR REPLACE INTO homepage_config (key, value, updated_at)
         VALUES (?, ?, CURRENT_TIMESTAMP)
       `);
@@ -110,7 +110,7 @@ export class HomepageConfigModel extends BaseModel {
         return stmt.bind(key, jsonValue);
       });
 
-      await this.db.batch(batch);
+      await this.safeDB.batch(batch);
     } catch (error) {
       console.error('批量更新配置失败:', error);
       throw new Error('批量更新配置失败');
@@ -122,7 +122,7 @@ export class HomepageConfigModel extends BaseModel {
    */
   async deleteConfig(key: string): Promise<void> {
     try {
-      await this.db
+      await this.safeDB
         .prepare('DELETE FROM homepage_config WHERE key = ?')
         .bind(key)
         .run();
@@ -137,7 +137,7 @@ export class HomepageConfigModel extends BaseModel {
    */
   async getConfigList(): Promise<HomepageConfigData[]> {
     try {
-      const result = await this.db
+      const result = await this.safeDB
         .prepare(`
           SELECT key, value, description, is_public, updated_at
           FROM homepage_config

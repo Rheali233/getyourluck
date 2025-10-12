@@ -56,21 +56,7 @@ export interface PlatformFeature {
   color: string;
 }
 
-// 搜索建议
-export interface SearchSuggestion {
-  id: string;
-  text: string;
-  type: 'test' | 'blog' | 'category';
-  relevance: number;
-}
-
-// 搜索历史
-export interface SearchHistory {
-  id: string;
-  query: string;
-  timestamp: string;
-  resultCount: number;
-}
+// 已移除搜索模块相关类型
 
 // 用户偏好
 export interface UserPreferences {
@@ -104,17 +90,14 @@ export interface HomepageConfig {
   popularTests: PopularTest[];
   platformFeatures: PlatformFeature[];
   blogArticles: BlogArticle[];
-  searchPlaceholder: string;
-  hotSearches: string[];
+  // removed search config
 }
 
 // 首页状态
 export interface HomepageState {
   config: HomepageConfig | null;
   stats: HomepageStats | null;
-  searchQuery: string;
-  searchSuggestions: SearchSuggestion[];
-  searchHistory: SearchHistory[];
+  // removed search state
   userPreferences: UserPreferences;
   isLoading: boolean;
   error: string | null;
@@ -129,11 +112,7 @@ export interface HomepageActions {
   // 统计数据
   loadStats: () => Promise<void>;
   
-  // 搜索功能
-  search: (query: string) => Promise<void>;
-  getSearchSuggestions: (query: string) => Promise<void>;
-  addToSearchHistory: (query: string) => void;
-  clearSearchHistory: () => void;
+  // removed search actions
   
   // 用户偏好
   updateUserPreferences: (preferences: Partial<UserPreferences>) => void;
@@ -175,12 +154,7 @@ export interface BlogSectionProps extends BaseComponentProps {
   onViewMore: () => void;
 }
 
-export interface SearchSectionProps extends BaseComponentProps {
-  placeholder: string;
-  hotSearches: string[];
-  onSearch: (query: string) => void;
-  onHotSearchClick: (search: string) => void;
-}
+// removed SearchSectionProps
 
 export interface CookiesBannerProps extends BaseComponentProps {
   isVisible: boolean;

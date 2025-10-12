@@ -7,12 +7,11 @@
 export { default as Homepage } from './components/Homepage';
 export { default as HeroSection } from './components/HeroSection';
 export { default as TestModulesGrid } from './components/TestModulesGrid';
-export { SearchSection } from './components/SearchSection';
 export { CookiesBanner } from './components/CookiesBanner';
 export { FeaturedTests } from './components/FeaturedTests';
 export { PlatformFeatures } from './components/PlatformFeatures';
 export { BlogRecommendations } from './components/BlogRecommendations';
-export { Footer } from './components/Footer';
+export { FAQ } from './components/FAQ';
 export { ResponsiveNavigation } from './components/ResponsiveNavigation';
 export { TouchFriendlyComponents, TouchFriendlyButton, TouchFriendlyCard } from './components/TouchFriendlyComponents';
 export { ResponsiveLayout, ResponsiveContainer, ResponsiveText, ResponsiveSpacing, ResponsiveVisibility } from './components/ResponsiveLayout';
@@ -21,8 +20,7 @@ export { TestModuleStats } from './components/TestModuleStats';
 export { UserBehaviorTracker } from './components/UserBehaviorTracker';
 export { OptimizedImage } from './components/OptimizedImage';
 export { ErrorBoundary } from './components/ErrorBoundary';
-export { FunctionalTestSuite } from './components/FunctionalTestSuite';
-export { UXTestSuite } from './components/UXTestSuite';
+// 已删除的测试套件组件：FunctionalTestSuite, UXTestSuite
 
 // 导出状态管理
 export { useHomepageStore } from './stores/useHomepageStore';
@@ -33,8 +31,7 @@ export type {
   PopularTest,
   BlogArticle,
   PlatformFeature,
-  SearchSuggestion,
-  SearchHistory,
+  
   UserPreferences,
   HomepageStats,
   HomepageConfig,
@@ -46,7 +43,7 @@ export type {
   PopularTestsProps,
   PlatformFeaturesProps,
   BlogSectionProps,
-  SearchSectionProps,
+  
   CookiesBannerProps,
   CookiesSettingsProps,
 } from './types'; 

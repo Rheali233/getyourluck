@@ -4,7 +4,7 @@
  */
 
 import { Hono } from 'hono';
-import { PsychologyQuestionBankModel } from '../../models/PsychologyQuestionBankModel';
+import { QuestionBankModel } from '../../models/QuestionBankModel';
 import type { AppContext } from '../../types/env';
 
 const relationshipQuestionsRouter = new Hono<AppContext>();
@@ -13,7 +13,7 @@ const relationshipQuestionsRouter = new Hono<AppContext>();
 relationshipQuestionsRouter.get('/', async (c) => {
   try {
     const dbService = c.get('dbService');
-    const questionModel = new PsychologyQuestionBankModel(dbService.env);
+    const questionModel = new QuestionBankModel(dbService.env);
     
     // Get questions for all relationship test categories
     const categories = ['love-style-category', 'love-language-category', 'interpersonal-category'];
@@ -67,7 +67,7 @@ relationshipQuestionsRouter.get('/:testType', async (c) => {
     }
     
     const dbService = c.get('dbService');
-    const questionModel = new PsychologyQuestionBankModel(dbService.env);
+    const questionModel = new QuestionBankModel(dbService.env);
     
     // Map testType to category_id
     const categoryIdMap: { [key: string]: string } = {

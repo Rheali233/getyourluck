@@ -31,7 +31,7 @@ seoRoutes.get('/sitemap.xml', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to generate sitemap',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });
@@ -58,7 +58,7 @@ seoRoutes.get('/sitemap-homepage.xml', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to generate homepage sitemap',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });
@@ -85,7 +85,7 @@ seoRoutes.get('/sitemap-tests.xml', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to generate tests sitemap',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });
@@ -112,7 +112,7 @@ seoRoutes.get('/sitemap-blog.xml', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to generate blog sitemap',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });
@@ -139,7 +139,7 @@ seoRoutes.get('/sitemap-search.xml', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to generate search sitemap',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });
@@ -166,7 +166,7 @@ seoRoutes.get('/robots.txt', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to generate robots.txt',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });
@@ -194,7 +194,7 @@ seoRoutes.post('/submit', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to submit sitemap',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });
@@ -241,7 +241,7 @@ seoRoutes.get('/stats', async (c: Context) => {
     return c.json({
       success: false,
       error: 'Failed to get SEO stats',
-      message: '服务器内部错误'
+      message: 'Internal server error'
     }, 500);
   }
 });

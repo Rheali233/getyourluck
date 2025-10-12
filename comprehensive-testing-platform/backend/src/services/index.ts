@@ -8,4 +8,7 @@ export * from './CacheService';
 export * from './ValidationService';
 export * from './testEngine';
 export * from './ContentFilterService';
-export * from './PsychologyQuestionBankService';
+export * from './QuestionBankService';
+export * from './QuestionService';
+export * from './TestResultService';
+export * from './UnifiedAIService';

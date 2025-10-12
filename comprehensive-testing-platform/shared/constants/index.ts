@@ -58,3 +58,45 @@ export const DB_TABLES = {
   ANALYTICS_EVENTS: "analytics_events",
   SYS_CONFIGS: "sys_configs",
 } as const;
+
+// 统一英文 UI 文本：反馈组件
+export const UI_TEXT = {
+  feedback: {
+    title: "We value your feedback",
+    subtitle: "Tell us what went well and what could be improved",
+    ratingLabel: "Satisfaction",
+    categoryLabel: "Category",
+    categories: {
+      bug: "Bug",
+      incorrect_result: "Incorrect Result",
+      feature_request: "Feature Request",
+      other: "Other",
+    },
+    messageLabel: "Your feedback",
+    messagePlaceholder: "Describe the issue or share your suggestions...",
+    emailLabel: "Email",
+    contactConsent: "I agree to be contacted regarding this feedback",
+    screenshotUrlLabel: "Screenshot URL (optional)",
+    uploadImagesLabel: "Upload images (0-5)",
+    submit: "Submit Feedback",
+    submitting: "Submitting...",
+    cancel: "Cancel",
+    open: "Feedback",
+    successTitle: "Thank you for your feedback!",
+    successMessage: "We have received your submission and will review it soon.",
+    errorTitle: "Submission failed",
+    errorMessage: "Please try again later.",
+    validation: {
+      ratingRequired: "Please provide a rating.",
+      categoryRequired: "Please select a category.",
+      messageRequired: "Please enter at least 10 characters.",
+      emailInvalid: "Please enter a valid email address.",
+      urlInvalid: "Please enter a valid URL.",
+    },
+    a11y: {
+      dialogLabel: "Feedback dialog",
+      openButton: "Open feedback",
+      closeButton: "Hide",
+    },
+  },
+} as const;

@@ -31,35 +31,59 @@
 
 ### 1.3 模块主题色彩系统
 
-每个测试模块使用独特的渐变色彩，与统一开发标准中的MODULE_THEMES配置保持一致：
+每个测试模块使用完全不同的色彩体系，确保视觉区分度和品牌识别度：
 
 ```css
-/* 模块主题色彩 - 与development-guide.md中的MODULE_THEMES对应 */
+/* 模块主题色彩 - 每个模块使用完全不同的色彩体系 */
 :root {
-  /* 星座模块 */
-  --constellation-primary: #a855f7;
-  --constellation-secondary: #c084fc;
-  --constellation-bg: #fdf4ff;
+  /* 心理学模块 - 蓝色系 */
+  --psychology-primary: #3B82F6; /* blue-500 */
+  --psychology-secondary: #6366F1; /* indigo-500 */
+  --psychology-bg: #EFF6FF; /* blue-50 */
+  --psychology-text: #1E40AF; /* blue-800 */
+  --psychology-border: #BFDBFE; /* blue-200 */
 
-  /* 心理测试模块 */
-  --psychology-primary: #22c55e;
-  --psychology-secondary: #4ade80;
-  --psychology-bg: #f0fdf4;
+  /* 职业发展模块 - 绿色系 */
+  --career-primary: #10B981; /* emerald-500 */
+  --career-secondary: #14B8A6; /* teal-500 */
+  --career-bg: #F0FDF4; /* green-50 */
+  --career-text: #065F46; /* emerald-800 */
+  --career-border: #A7F3D0; /* emerald-200 */
 
-  /* 塔罗牌模块 */
-  --tarot-primary: #eab308;
-  --tarot-secondary: #facc15;
-  --tarot-bg: #fefce8;
+  /* 关系测试模块 - 粉色系 */
+  --relationship-primary: #EC4899; /* pink-500 */
+  --relationship-secondary: #F43F5E; /* rose-500 */
+  --relationship-bg: #FDF2F8; /* pink-50 */
+  --relationship-text: #BE185D; /* pink-800 */
+  --relationship-border: #FBCFE8; /* pink-200 */
 
-  /* MBTI测试模块 */
-  --mbti-primary: #0ea5e9;
-  --mbti-secondary: #38bdf8;
-  --mbti-bg: #f0f9ff;
+  /* 学习能力模块 - 青色系 */
+  --learning-primary: #0891B2; /* cyan-600 */
+  --learning-secondary: #0EA5E9; /* sky-500 */
+  --learning-bg: #F0F9FF; /* sky-50 */
+  --learning-text: #0C4A6E; /* sky-900 */
+  --learning-border: #7DD3FC; /* sky-300 */
 
-  /* 职业发展模块 */
-  --career-primary: #f97316;
-  --career-secondary: #fb923c;
-  --career-bg: #fff7ed;
+  /* 占星模块 - 深紫色系 */
+  --astrology-primary: #7C3AED; /* violet-600 */
+  --astrology-secondary: #6366F1; /* indigo-500 */
+  --astrology-bg: #FAF5FF; /* violet-50 */
+  --astrology-text: #4C1D95; /* violet-900 */
+  --astrology-border: #C4B5FD; /* violet-300 */
+
+  /* 塔罗模块 - 深棕色系 */
+  --tarot-primary: #92400E; /* amber-800 */
+  --tarot-secondary: #D97706; /* amber-600 */
+  --tarot-bg: #FEF3C7; /* amber-100 */
+  --tarot-text: #78350F; /* amber-900 */
+  --tarot-border: #FDE68A; /* amber-200 */
+
+  /* 传统命理模块 - 深红色系 */
+  --numerology-primary: #DC2626; /* red-600 */
+  --numerology-secondary: #EA580C; /* orange-600 */
+  --numerology-bg: #FEF2F2; /* red-50 */
+  --numerology-text: #991B1B; /* red-800 */
+  --numerology-border: #FECACA; /* red-200 */
 }
 ```
 
@@ -68,6 +92,114 @@
 - 使用双色渐变 `linear-gradient(135deg, primary, secondary)`
 - 背景色用于页面背景和卡片背景
 - 保持足够的颜色对比度确保可读性（4.5:1以上）
+- 每个模块使用完全不同的色彩体系，避免相似色
+
+### 1.4 模块配色使用指南
+
+#### 心理学模块 (Psychology) - 蓝色系
+```css
+/* 页面背景 */
+.psychology-page { @apply bg-blue-50; }
+
+/* 渐变按钮 */
+.psychology-button { @apply bg-gradient-to-r from-blue-500 to-indigo-500; }
+
+/* 卡片样式 */
+.psychology-card { @apply bg-white/80 border-blue-200; }
+
+/* 文字颜色 */
+.psychology-text { @apply text-blue-800; }
+```
+
+#### 职业发展模块 (Career) - 绿色系
+```css
+/* 页面背景 */
+.career-page { @apply bg-green-50; }
+
+/* 渐变按钮 */
+.career-button { @apply bg-gradient-to-r from-emerald-500 to-teal-500; }
+
+/* 卡片样式 */
+.career-card { @apply bg-white/80 border-emerald-200; }
+
+/* 文字颜色 */
+.career-text { @apply text-emerald-800; }
+```
+
+#### 关系测试模块 (Relationship) - 粉色系
+```css
+/* 页面背景 */
+.relationship-page { @apply bg-pink-50; }
+
+/* 渐变按钮 */
+.relationship-button { @apply bg-gradient-to-r from-pink-500 to-rose-500; }
+
+/* 卡片样式 */
+.relationship-card { @apply bg-white/80 border-pink-200; }
+
+/* 文字颜色 */
+.relationship-text { @apply text-pink-800; }
+```
+
+#### 学习能力模块 (Learning) - 青色系
+```css
+/* 页面背景 */
+.learning-page { @apply bg-sky-50; }
+
+/* 渐变按钮 */
+.learning-button { @apply bg-gradient-to-r from-cyan-600 to-sky-500; }
+
+/* 卡片样式 */
+.learning-card { @apply bg-white/80 border-sky-300; }
+
+/* 文字颜色 */
+.learning-text { @apply text-sky-900; }
+```
+
+#### 占星模块 (Astrology) - 深紫色系
+```css
+/* 页面背景 */
+.astrology-page { @apply bg-violet-50; }
+
+/* 渐变按钮 */
+.astrology-button { @apply bg-gradient-to-r from-violet-600 to-indigo-500; }
+
+/* 卡片样式 */
+.astrology-card { @apply bg-white/80 border-violet-300; }
+
+/* 文字颜色 */
+.astrology-text { @apply text-violet-900; }
+```
+
+#### 塔罗模块 (Tarot) - 深棕色系
+```css
+/* 页面背景 */
+.tarot-page { @apply bg-amber-100; }
+
+/* 渐变按钮 */
+.tarot-button { @apply bg-gradient-to-r from-amber-800 to-amber-600; }
+
+/* 卡片样式 */
+.tarot-card { @apply bg-white/80 border-amber-200; }
+
+/* 文字颜色 */
+.tarot-text { @apply text-amber-900; }
+```
+
+#### 传统命理模块 (Numerology) - 深红色系
+```css
+/* 页面背景 */
+.numerology-page { @apply bg-red-50; }
+
+/* 渐变按钮 */
+.numerology-button { @apply bg-gradient-to-r from-red-600 to-orange-600; }
+
+/* 卡片样式 */
+.numerology-card { @apply bg-white/80 border-red-200; }
+
+/* 文字颜色 */
+.numerology-text { @apply text-red-800; }
+```
 
 ## 2. 字体系统
 
@@ -224,9 +356,9 @@ font-family:
 
 ### 5.1 标准页面结构
 
+#### 心理学模块页面
 ```html
-<body class="bg-gradient-to-br from-{theme}-50 to-{theme}-100 min-h-screen">
-  <!-- 导航栏 -->
+<body class="bg-blue-50 min-h-screen">
   <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
@@ -234,8 +366,102 @@ font-family:
       </div>
     </div>
   </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 页面内容 -->
+  </main>
+</body>
+```
 
-  <!-- 主要内容 -->
+#### 职业发展模块页面
+```html
+<body class="bg-green-50 min-h-screen">
+  <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 导航内容 -->
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 页面内容 -->
+  </main>
+</body>
+```
+
+#### 关系测试模块页面
+```html
+<body class="bg-pink-50 min-h-screen">
+  <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 导航内容 -->
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 页面内容 -->
+  </main>
+</body>
+```
+
+#### 学习能力模块页面
+```html
+<body class="bg-sky-50 min-h-screen">
+  <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 导航内容 -->
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 页面内容 -->
+  </main>
+</body>
+```
+
+#### 占星模块页面
+```html
+<body class="bg-violet-50 min-h-screen">
+  <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 导航内容 -->
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 页面内容 -->
+  </main>
+</body>
+```
+
+#### 塔罗模块页面
+```html
+<body class="bg-amber-100 min-h-screen">
+  <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 导航内容 -->
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 页面内容 -->
+  </main>
+</body>
+```
+
+#### 传统命理模块页面
+```html
+<body class="bg-red-50 min-h-screen">
+  <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 导航内容 -->
+      </div>
+    </div>
+  </nav>
   <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- 页面内容 -->
   </main>
@@ -262,13 +488,37 @@ font-family:
 
 ### 5.3 特殊页面布局
 
-#### 塔罗牌等深色主题页面
+#### 塔罗模块深色主题页面
 
 ```html
-<body class="bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 min-h-screen text-white">
+<body class="bg-gradient-to-br from-amber-900 via-orange-900 to-red-900 min-h-screen text-white">
   <nav class="bg-black/30 backdrop-blur-md shadow-lg sticky top-0 z-50">
-    <!-- 深色导航栏 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 深色导航栏内容 -->
+      </div>
+    </div>
   </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 塔罗牌内容 -->
+  </main>
+</body>
+```
+
+#### 占星模块神秘主题页面
+
+```html
+<body class="bg-gradient-to-br from-slate-900 via-violet-900 to-blue-900 min-h-screen text-white">
+  <nav class="bg-black/30 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- 神秘主题导航栏 -->
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 占星内容 -->
+  </main>
 </body>
 ```
 

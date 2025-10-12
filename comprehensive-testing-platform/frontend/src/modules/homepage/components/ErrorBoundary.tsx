@@ -179,7 +179,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           className="min-h-screen flex items-center justify-center bg-gray-50 px-4"
           data-testid={testId}
         >
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+          <div className="max-w-md w-full bg-white rounded-lg p-6 text-center">
             {/* 错误图标 */}
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
               <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -189,18 +189,18 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
             {/* 错误标题 */}
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              页面出现错误
+              Page Error Occurred
             </h2>
 
             {/* 错误描述 */}
             <p className="text-gray-600 mb-4">
-              抱歉，页面遇到了一个意外错误。我们已经记录了这个错误，并将尽快修复。
+              Sorry, the page encountered an unexpected error. We have recorded this error and will fix it as soon as possible.
             </p>
 
             {/* 错误ID */}
             {errorId && (
               <div className="bg-gray-100 rounded p-3 mb-4 text-sm text-gray-600">
-                <strong>错误ID:</strong> {errorId}
+                <strong>Error ID:</strong> {errorId}
               </div>
             )}
 
@@ -208,10 +208,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             {import.meta.env.DEV && error && (
               <details className="text-left mb-4">
                 <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
-                  查看错误详情
+                  View Error Details
                 </summary>
                 <div className="mt-2 p-3 bg-red-50 rounded text-xs text-red-800 overflow-auto max-h-32">
-                  <div><strong>错误信息:</strong> {error.message}</div>
+                                      <div><strong>Error Message:</strong> {error.message}</div>
                   {error.stack && (
                     <div className="mt-2">
                       <strong>堆栈跟踪:</strong>
@@ -256,7 +256,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <div className="mt-4 text-sm text-gray-500">
               如果问题持续存在，请联系
               <a 
-                href="mailto:support@example.com" 
+                href="mailto:support@selfatlas.net" 
                 className="text-blue-600 hover:text-blue-800 ml-1"
               >
                 技术支持

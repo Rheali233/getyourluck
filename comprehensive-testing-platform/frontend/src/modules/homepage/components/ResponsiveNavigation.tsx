@@ -10,12 +10,15 @@ import { cn } from '@/utils/classNames';
 
 export interface ResponsiveNavigationProps extends BaseComponentProps {
   showThemeToggle?: boolean;
+  // eslint-disable-next-line no-unused-vars
+  onScrollToSection?: (sectionId: string) => void;
 }
 
 export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
   className,
   testId = 'responsive-navigation',
   showThemeToggle = true,
+  onScrollToSection,
   ...props
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -37,14 +40,28 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
     setIsMobileMenuOpen(false);
   };
 
+  // 处理滚动到指定区域
+  const handleScrollToSection = (sectionId: string) => {
+    closeMobileMenu();
+    if (onScrollToSection) {
+      onScrollToSection(sectionId);
+    } else {
+      // 默认滚动行为
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   // 导航菜单项
   const navigationItems = [
     { name: '首页', href: '/', icon: '🏠' },
     { name: '测试中心', href: '/tests', icon: '🧪' },
             { name: '心理测试', href: '/psychology', icon: '🧠' },
-    { name: '星座运势', href: '/tests/astrology', icon: '⭐' },
-    { name: '塔罗占卜', href: '/tests/tarot', icon: '🔮' },
-    { name: '职业规划', href: '/tests/career', icon: '📊' },
+    { name: '星座运势', href: '/astrology', icon: '⭐' },
+    { name: '塔罗占卜', href: '/tarot', icon: '🔮' },
+    { name: '职业规划', href: '/career', icon: '📊' },
     { name: '博客', href: '/blog', icon: '📝' },
     { name: '关于我们', href: '/about', icon: 'ℹ️' },
   ];
@@ -53,18 +70,18 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-transparent",
+        isScrolled ? "bg-white/95 shadow-lg" : "bg-transparent",
         className
       )}
       data-testid={testId}
       {...props}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
             <span className="text-2xl">🌟</span>
-            <span className="text-xl font-bold text-gray-900">getyourluck</span>
+            <span className="text-xl font-bold text-gray-900">SelfAtlas</span>
           </Link>
 
           {/* 桌面端导航 */}
@@ -85,8 +102,27 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
 
           {/* 桌面端操作按钮 */}
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
+            {/* FAQ 按钮 */}
+            <button
+              onClick={() => handleScrollToSection('faq-section')}
+              className="px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium"
+            >
+              FAQ
+            </button>
+            
+            {/* Search 按钮 */}
+            <button
+              onClick={() => handleScrollToSection('search-section')}
+              className="px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium"
+            >
+              Search
+            </button>
+            
             {showThemeToggle && (
-              <button className="p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200">
+              <button
+                className="p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200"
+                aria-label="Toggle theme"
+              >
                 <span className="text-lg">🌙</span>
               </button>
             )}
@@ -154,6 +190,24 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
             
             {/* 移动端操作按钮 */}
             <div className="pt-4 border-t border-gray-200 space-y-3">
+              {/* FAQ 按钮 */}
+              <button
+                onClick={() => handleScrollToSection('faq-section')}
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              >
+                <span className="text-lg">❓</span>
+                <span>FAQ</span>
+              </button>
+              
+              {/* Search 按钮 */}
+              <button
+                onClick={() => handleScrollToSection('search-section')}
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              >
+                <span className="text-lg">🔍</span>
+                <span>Search</span>
+              </button>
+              
               {showThemeToggle && (
                 <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200">
                   <span className="text-lg">🌙</span>

@@ -29,7 +29,7 @@
       "@/services/*": ["./services/*"],
       "@/stores/*": ["./stores/*"],
       "@/types/*": ["./types/*"],
-      "@/shared/*": ["../../shared/*"]
+      "@/shared/*": ["./shared/*"]
     }
   },
   "include": ["src", "src/**/*.d.ts"],

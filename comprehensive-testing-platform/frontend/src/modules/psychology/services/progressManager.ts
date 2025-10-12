@@ -4,10 +4,10 @@
  */
 
 import { frontendCacheService } from './frontendCacheService';
-import type { TestType, UserAnswer } from '../types';
+import type { PsychologyTestType, UserAnswer } from '../types';
 
 export interface TestProgress {
-  testType: TestType;
+  testType: PsychologyTestType;
   sessionId: string;
   currentQuestionIndex: number;
   answers: UserAnswer[];
@@ -24,7 +24,7 @@ export interface ProgressOptions {
 export class ProgressManager {
   private autoSave: boolean;
   private saveInterval: number;
-  private saveTimer: NodeJS.Timeout | null = null;
+  private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: ProgressOptions = {}) {
     this.autoSave = options.autoSave ?? true;
@@ -34,7 +34,7 @@ export class ProgressManager {
   /**
    * Generate progress storage key
    */
-  private generateProgressKey(testType: TestType, sessionId: string): string {
+  private generateProgressKey(testType: PsychologyTestType, sessionId: string): string {
     return `progress:${testType}:${sessionId}`;
   }
 
@@ -62,7 +62,7 @@ export class ProgressManager {
   /**
    * Load answer progress
    */
-  loadProgress(testType: TestType, sessionId: string): TestProgress | null {
+  loadProgress(testType: PsychologyTestType, sessionId: string): TestProgress | null {
     try {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.get<TestProgress>(key, 'test-progress');
@@ -75,7 +75,7 @@ export class ProgressManager {
   /**
    * Delete answer progress
    */
-  deleteProgress(testType: TestType, sessionId: string): boolean {
+  deleteProgress(testType: PsychologyTestType, sessionId: string): boolean {
     try {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.delete(key, 'test-progress');
@@ -89,7 +89,7 @@ export class ProgressManager {
    * Update answer progress
    */
   updateProgress(
-    testType: TestType, 
+    testType: PsychologyTestType, 
     sessionId: string, 
     updates: Partial<TestProgress>
   ): boolean {
@@ -116,7 +116,7 @@ export class ProgressManager {
    * Add answer
    */
   addAnswer(
-    testType: TestType,
+    testType: PsychologyTestType,
     sessionId: string,
     answer: UserAnswer
   ): boolean {

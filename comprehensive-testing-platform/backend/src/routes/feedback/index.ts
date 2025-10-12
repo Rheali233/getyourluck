@@ -12,6 +12,7 @@ import { ValidationService } from "../../services/ValidationService";
 import { ContentFilterService, ContentFilterCategory } from "../../services/ContentFilterService";
 import type { APIResponse, PaginatedResponse } from "../../../../shared/types/apiResponse";
 import { ModuleError, ERROR_CODES } from "../../../../shared/types/errors";
+import { FeedbackDetailsModel } from "../../models/FeedbackDetailsModel";
 
 const feedbackRoutes = new Hono<AppContext>();
 
@@ -24,7 +25,7 @@ feedbackRoutes.post("/",
       const feedbackData = await c.req.json();
       const dbService = c.get("dbService");
       
-      // 验证会话ID是否存在（如果提供）
+      // Validate if session ID exists (if provided)
       if (feedbackData.sessionId) {
         const session = await dbService.testSessions.findById(feedbackData.sessionId);
         if (!session) {
@@ -234,6 +235,68 @@ feedbackRoutes.get("/session/:sessionId", async (c: Context<AppContext>) => {
       ERROR_CODES.DATABASE_ERROR,
       500
     );
+  }
+});
+
+// 收集结构化详细反馈
+feedbackRoutes.post('/collect', async (c: Context<AppContext>) => {
+  try {
+    const body = await c.req.json();
+    const required = ["testType", "rating", "category", "message", "client"] as const;
+    for (const key of required) {
+      if (!(key in body)) {
+        throw new ModuleError(`Missing field: ${key}`, ERROR_CODES.VALIDATION_ERROR, 400);
+      }
+    }
+    if (typeof body.rating !== 'number' || body.rating < 1 || body.rating > 5) {
+      throw new ModuleError("Invalid rating (1-5)", ERROR_CODES.VALIDATION_ERROR, 400);
+    }
+    if (typeof body.message !== 'string' || body.message.trim().length < 10) {
+      throw new ModuleError("Message too short", ERROR_CODES.VALIDATION_ERROR, 400);
+    }
+
+    const ip = c.req.header('CF-Connecting-IP') || '';
+    const ipHash = ip
+      ? await crypto.subtle
+          .digest('SHA-256', new TextEncoder().encode(ip))
+          .then((buf) => Array.from(new Uint8Array(buf)).map((x) => x.toString(16).padStart(2, '0')).join(''))
+      : undefined;
+
+    const model = new FeedbackDetailsModel(c.env);
+    const createData: any = {
+      testType: body.testType,
+      testId: body.testId,
+      resultId: body.resultId,
+      sessionId: body.sessionId,
+      rating: body.rating,
+      category: body.category,
+      message: body.message,
+      email: body.email,
+      canContact: !!body.canContact,
+      screenshotUrl: body.screenshotUrl,
+      client: body.client,
+    };
+    if (Array.isArray(body.images)) {
+      createData.images = body.images.slice(0, 5);
+    }
+    if (ipHash) {
+      createData.ipHash = ipHash;
+    }
+    const feedbackId = await model.create(createData);
+
+    const response: APIResponse = {
+      success: true,
+      data: { feedbackId },
+      message: "Feedback collected",
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+    return c.json(response, 201);
+  } catch (error) {
+    if (error instanceof ModuleError) {
+      throw error;
+    }
+    throw new ModuleError("Failed to collect feedback", ERROR_CODES.DATABASE_ERROR, 500);
   }
 });
 

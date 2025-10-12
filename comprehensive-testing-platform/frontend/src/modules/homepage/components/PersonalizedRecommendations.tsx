@@ -99,11 +99,11 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
 
   // 获取推荐原因图标
   const getReasonIcon = (reason: string): string => {
-    if (reason.includes('热门')) return '🔥';
-    if (reason.includes('相似')) return '🔍';
-    if (reason.includes('新')) return '🆕';
-    if (reason.includes('评分')) return '⭐';
-    if (reason.includes('历史')) return '📚';
+    if (reason.includes('popular') || reason.includes('热门')) return '🔥';
+    if (reason.includes('similar') || reason.includes('相似')) return '🔍';
+    if (reason.includes('new') || reason.includes('新')) return '🆕';
+    if (reason.includes('rating') || reason.includes('评分')) return '⭐';
+    if (reason.includes('history') || reason.includes('历史')) return '📚';
     return '💡';
   };
 
@@ -123,7 +123,18 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
     // 根据类型进行导航
     switch (item.type) {
       case 'test':
-        window.location.href = `/tests/${item.category}/${item.id}`;
+        // 使用正确的模块路由
+        const routeMap: Record<string, string> = {
+          'psychology': '/psychology',
+          'astrology': '/astrology',
+          'career': '/career',
+          'relationship': '/relationship',
+          'learning': '/learning',
+          'tarot': '/tarot',
+          'numerology': '/numerology'
+        };
+        const moduleRoute = routeMap[item.category] || `/${item.category}`;
+        window.location.href = moduleRoute;
         break;
       case 'article':
         window.location.href = `/blog/${item.id}`;
@@ -177,7 +188,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
           onClick={fetchRecommendations}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          重试
+          Retry
         </button>
       </div>
     );
@@ -187,8 +198,8 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
   if (recommendations.length === 0) {
     return (
       <div className={cn("text-center py-8 text-gray-500", className)} data-testid={testId} {...props}>
-        <div className="text-lg mb-2">暂无个性化推荐</div>
-        <div className="text-sm">完成一些测试后，我们将为您提供个性化推荐</div>
+        <div className="text-lg mb-2">No personalized recommendations available</div>
+        <div className="text-sm">Complete some tests to get personalized recommendations</div>
       </div>
     );
   }
@@ -200,11 +211,11 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
         {showTitle && (
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              🎯 为您推荐
+              🎯 Recommended for You
             </h2>
             {showDescription && (
               <p className="text-gray-600">
-                基于您的兴趣和行为，我们为您精选了以下内容
+                Based on your interests and behavior, we've selected the following content for you
               </p>
             )}
           </div>
@@ -214,14 +225,14 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
           {recommendations.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 cursor-pointer group"
+              className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:transition-all duration-200 cursor-pointer group"
               onClick={() => handleRecommendationClick(item)}
             >
               <div className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="text-2xl">{item.icon || '📋'}</div>
                   <div className={cn("text-sm font-medium", getRelevanceColor(item.relevanceScore))}>
-                    {Math.round(item.relevanceScore * 100)}% 匹配
+                    {Math.round(item.relevanceScore * 100)}% Match
                   </div>
                 </div>
                 
@@ -259,11 +270,11 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
         {showTitle && (
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              🎯 为您推荐
+              🎯 Recommended for You
             </h2>
             {showDescription && (
               <p className="text-gray-600">
-                基于您的兴趣和行为，我们为您精选了以下内容
+                Based on your interests and behavior, we've selected the following content for you
               </p>
             )}
           </div>
@@ -273,7 +284,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
           {recommendations.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer group p-4"
+              className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:transition-all duration-200 cursor-pointer group p-4"
               onClick={() => handleRecommendationClick(item)}
             >
               <div className="flex items-center space-x-4">
@@ -328,7 +339,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
           {recommendations.map((item) => (
             <div
               key={item.id}
-              className="flex-shrink-0 w-80 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 cursor-pointer group"
+              className="flex-shrink-0 w-80 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:transition-all duration-200 cursor-pointer group"
               onClick={() => handleRecommendationClick(item)}
             >
               <div className="p-4">

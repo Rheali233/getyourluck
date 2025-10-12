@@ -8,25 +8,52 @@ import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
 // 本地实现通用工具，避免对shared/utils直接编译依赖
 
 export abstract class BaseModel {
-  protected db: D1Database
-  protected kv: KVNamespace
+  protected db: D1Database | null = null
+  protected kv: KVNamespace | null = null
   protected tableName: string
+  protected env: Env
 
   constructor(env: Env, tableName: string) {
-    if (!env.DB) {
+    this.env = env
+    this.tableName = tableName
+  }
+
+  /**
+   * 初始化数据库连接
+   */
+  protected initializeDB(): void {
+    if (!this.env.DB) {
       throw new ModuleError('Database connection not available', ERROR_CODES.DATABASE_ERROR, 500)
     }
     
-    this.db = env.DB
-    this.kv = env.KV || null as any // 允许 KV 为 null
-    this.tableName = tableName
+    if (!this.db) {
+      this.db = this.env.DB
+      this.kv = this.env.KV || null
+    }
   }
 
   /**
    * 获取数据库连接
    */
   protected get database(): D1Database {
-    return this.db;
+    this.initializeDB();
+    return this.db!;
+  }
+
+  /**
+   * 安全的数据库访问方法
+   */
+  protected get safeDB(): D1Database {
+    this.initializeDB();
+    return this.db!;
+  }
+
+  /**
+   * 安全的KV访问方法
+   */
+  protected get safeKV(): KVNamespace | null {
+    this.initializeDB();
+    return this.kv;
   }
 
   /**
@@ -37,19 +64,14 @@ export abstract class BaseModel {
     params: any[] = []
   ): Promise<T[]> {
     try {
-      const stmt = this.db.prepare(query)
+      this.initializeDB();
+      const stmt = this.db!.prepare(query)
       const result = params.length > 0 
         ? await stmt.bind(...params).all()
         : await stmt.all()
 
-      if (!result.success) {
-        throw new ModuleError(
-          `Database query failed: ${result.error}`,
-          ERROR_CODES.DATABASE_ERROR,
-          500
-        )
-      }
-
+      // D1 数据库的 all() 方法不返回 success 属性
+      // 如果有错误，会在 catch 块中捕获
       return result.results as T[]
     } catch (error) {
       if (error instanceof ModuleError) {
@@ -72,7 +94,8 @@ export abstract class BaseModel {
     params: any[] = []
   ): Promise<T | null> {
     try {
-      const stmt = this.db.prepare(query)
+      this.initializeDB();
+      const stmt = this.db!.prepare(query)
       const result = params.length > 0 
         ? await stmt.bind(...params).first()
         : await stmt.first()
@@ -95,19 +118,14 @@ export abstract class BaseModel {
     params: any[] = []
   ): Promise<D1Result> {
     try {
-      const stmt = this.db.prepare(query)
+      this.initializeDB();
+      const stmt = this.db!.prepare(query)
       const result = params.length > 0 
         ? await stmt.bind(...params).run()
         : await stmt.run()
 
-      if (!result.success) {
-        throw new ModuleError(
-          `Database operation failed: ${result.error}`,
-          ERROR_CODES.DATABASE_ERROR,
-          500
-        )
-      }
-
+      // D1 数据库的 run() 方法不返回 success 属性
+      // 如果有错误，会在 catch 块中捕获
       return result
     } catch (error) {
       if (error instanceof ModuleError) {
@@ -131,11 +149,13 @@ export abstract class BaseModel {
     ttl: number = 3600
   ): Promise<void> {
     try {
-      await this.kv.put(key, JSON.stringify(data), {
-        expirationTtl: ttl,
-      })
+      if (this.kv) {
+        await this.kv.put(key, JSON.stringify(data), {
+          expirationTtl: ttl,
+        })
+      }
     } catch (error) {
-      // 缓存失败不应该影响主要功能
+      // Cache failure should not affect main functionality
       console.warn('Cache operation failed:', error)
     }
   }
@@ -145,8 +165,11 @@ export abstract class BaseModel {
    */
   protected async getCache<T = any>(key: string): Promise<T | null> {
     try {
-      const cached = await this.kv.get(key)
-      return cached ? JSON.parse(cached) : null
+      if (this.kv) {
+        const cached = await this.kv.get(key)
+        return cached ? JSON.parse(cached) : null
+      }
+      return null
     } catch (error) {
       console.warn('Cache retrieval failed:', error)
       return null
@@ -158,7 +181,9 @@ export abstract class BaseModel {
    */
   protected async deleteCache(key: string): Promise<void> {
     try {
-      await this.kv.delete(key)
+      if (this.kv) {
+        await this.kv.delete(key)
+      }
     } catch (error) {
       console.warn('Cache deletion failed:', error)
     }

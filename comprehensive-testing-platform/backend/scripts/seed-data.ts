@@ -32,7 +32,7 @@ class DatabaseSeeder {
     try {
       // 清理SQL语句，移除多余的空格和换行
       const cleanSql = sql.replace(/\s+/g, ' ').trim();
-      const command = `wrangler d1 execute getyourluck-${this.env} --env ${this.env} --remote --command "${cleanSql}"`;
+      const command = `wrangler d1 execute selfatlas-${this.env} --env ${this.env} --remote --command "${cleanSql}"`;
       console.log(`执行SQL: ${cleanSql.substring(0, 80)}...`);
       
       const result = execSync(command, { 
@@ -156,12 +156,11 @@ class DatabaseSeeder {
     for (const question of questions) {
       const sql = `
         INSERT OR REPLACE INTO psychology_questions (
-          id, category_id, question_text, question_text_en, question_type, dimension, order_index, weight, created_at, updated_at
+          id, category_id, question_text, question_type, dimension, order_index, weight, created_at, updated_at
         ) VALUES (
           'mbti-q-${question.orderIndex}',
           '${question.categoryId}',
           '${question.questionText.replace(/'/g, "''")}',
-          '${question.questionTextEn.replace(/'/g, "''")}',
           '${question.questionType}',
           '${question.dimension}',
           ${question.orderIndex},
@@ -181,12 +180,11 @@ class DatabaseSeeder {
     for (const option of options) {
       const sql = `
         INSERT OR REPLACE INTO psychology_question_options (
-          id, question_id, option_text, option_text_en, option_value, order_index, created_at
+          id, question_id, option_text, option_value, order_index, created_at
         ) VALUES (
           'mbti-opt-${option.questionId}-${option.orderIndex}',
           '${option.questionId}',
           '${option.optionText.replace(/'/g, "''")}',
-          '${option.optionTextEn.replace(/'/g, "''")}',
           '${option.optionValue}',
           ${option.orderIndex},
           datetime('now')
@@ -215,12 +213,11 @@ class DatabaseSeeder {
     for (const question of questions) {
       const sql = `
         INSERT OR REPLACE INTO psychology_questions (
-          id, category_id, question_text, question_text_en, question_type, dimension, order_index, weight, created_at, updated_at
+          id, category_id, question_text, question_type, dimension, order_index, weight, created_at, updated_at
         ) VALUES (
           'phq9-q-${question.orderIndex}',
           '${question.categoryId}',
           '${question.questionText.replace(/'/g, "''")}',
-          '${question.questionTextEn.replace(/'/g, "''")}',
           '${question.questionType}',
           '${question.dimension}',
           ${question.orderIndex},
@@ -240,12 +237,11 @@ class DatabaseSeeder {
     for (const option of options) {
       const sql = `
         INSERT OR REPLACE INTO psychology_question_options (
-          id, question_id, option_text, option_text_en, option_value, option_score, order_index, created_at
+          id, question_id, option_text, option_value, option_score, order_index, created_at
         ) VALUES (
           'phq9-opt-${option.questionId}-${option.orderIndex}',
           '${option.questionId}',
           '${option.optionText.replace(/'/g, "''")}',
-          '${option.optionTextEn.replace(/'/g, "''")}',
           '${option.optionValue}',
           ${option.optionScore},
           ${option.orderIndex},
@@ -275,12 +271,11 @@ class DatabaseSeeder {
     for (const question of questions) {
       const sql = `
         INSERT OR REPLACE INTO psychology_questions (
-          id, category_id, question_text, question_text_en, question_type, dimension, order_index, weight, created_at, updated_at
+          id, category_id, question_text, question_type, dimension, order_index, weight, created_at, updated_at
         ) VALUES (
           'eq-q-${question.orderIndex}',
           '${question.categoryId}',
           '${question.questionText.replace(/'/g, "''")}',
-          '${question.questionTextEn.replace(/'/g, "''")}',
           '${question.questionType}',
           '${question.dimension}',
           ${question.orderIndex},
@@ -300,12 +295,11 @@ class DatabaseSeeder {
     for (const option of options) {
       const sql = `
         INSERT OR REPLACE INTO psychology_question_options (
-          id, question_id, option_text, option_text_en, option_value, option_score, order_index, created_at
+          id, question_id, option_text, option_value, option_score, order_index, created_at
         ) VALUES (
           'eq-opt-${option.questionId}-${option.orderIndex}',
           '${option.questionId}',
           '${option.optionText.replace(/'/g, "''")}',
-          '${option.optionTextEn.replace(/'/g, "''")}',
           '${option.optionValue}',
           ${option.optionScore},
           ${option.orderIndex},
@@ -335,12 +329,11 @@ class DatabaseSeeder {
     for (const question of questions) {
       const sql = `
         INSERT OR REPLACE INTO psychology_questions (
-          id, category_id, question_text, question_text_en, question_type, domain, order_index, weight, created_at, updated_at
+          id, category_id, question_text, question_type, domain, order_index, weight, created_at, updated_at
         ) VALUES (
           'happiness-q-${question.orderIndex}',
           '${question.categoryId}',
           '${question.questionText.replace(/'/g, "''")}',
-          '${question.questionTextEn.replace(/'/g, "''")}',
           '${question.questionType}',
           '${question.domain}',
           ${question.orderIndex},
@@ -360,12 +353,11 @@ class DatabaseSeeder {
     for (const option of options) {
       const sql = `
         INSERT OR REPLACE INTO psychology_question_options (
-          id, question_id, option_text, option_text_en, option_value, option_score, order_index, created_at
+          id, question_id, option_text, option_value, option_score, order_index, created_at
         ) VALUES (
           'happiness-opt-${option.questionId}-${option.orderIndex}',
           '${option.questionId}',
           '${option.optionText.replace(/'/g, "''")}',
-          '${option.optionTextEn.replace(/'/g, "''")}',
           '${option.optionValue}',
           ${option.optionScore},
           ${option.orderIndex},
@@ -432,7 +424,7 @@ class DatabaseSeeder {
       }
       console.log(`✅ ${happinessResult.message}\n`);
 
-      console.log(`🎉 所有种子数据已成功插入到 ${this.env} 环境！`);
+      console.log(`🎉 All seed data successfully inserted into ${this.env} 环境！`);
       console.log(`📊 总计: 4个测试类别, 38道题目, 89个选项`);
 
     } catch (error: any) {

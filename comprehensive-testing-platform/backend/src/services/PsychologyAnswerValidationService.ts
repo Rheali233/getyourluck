@@ -3,7 +3,7 @@
  * 遵循统一开发标准的服务层规范
  */
 
-// import { ModuleError, ERROR_CODES } from "../../../shared/types/errors"; // 未使用，暂时注释
+
 import type { 
   PsychologyAnswerData,
   CreatePsychologyAnswerData,

@@ -28,14 +28,39 @@ const MBTI_TYPES = [
   { type: 'ESFP', name: 'Entertainer', color: 'from-yellow-500 to-pink-600' }
 ];
 
-// Simplified grouping logic - evenly distribute 16 types into three groups
-const getCompatibilityLevel = (index: number): 'high' | 'medium' | 'low' => {
-  if (index < 6) return 'high';      // First 6 as highly compatible
-  if (index < 11) return 'medium';   // Next 5 as moderately compatible
-  return 'low';                       // Last 5 as low compatibility
+// Intelligent compatibility grouping based on MBTI theory
+const getCompatibilityLevel = (currentType: string, targetType: string): 'high' | 'medium' | 'low' => {
+  // Extract individual preferences
+  const currentE = currentType.includes('E');
+  const currentS = currentType.includes('S');
+  const currentT = currentType.includes('T');
+  const currentJ = currentType.includes('J');
+  
+  const targetE = targetType.includes('E');
+  const targetS = targetType.includes('S');
+  const targetT = targetType.includes('T');
+  const targetJ = targetType.includes('J');
+  
+  // Calculate compatibility score based on MBTI theory
+  let score = 0;
+  
+  // Energy preference (E/I) - opposites often complement well
+  if (currentE !== targetE) score += 2;
+  
+  // Sensing preference (S/N) - opposites often complement well
+  if (currentS !== targetS) score += 2;
+  
+  // Thinking preference (T/F) - opposites often complement well
+  if (currentT !== targetT) score += 2;
+  
+  // Judging preference (J/P) - opposites often complement well
+  if (currentJ !== targetJ) score += 2;
+  
+  // Determine compatibility level
+  if (score >= 6) return 'high';      // High complementarity
+  if (score >= 3) return 'medium';    // Moderate complementarity
+  return 'low';                        // Low complementarity
 };
-
-// This function is no longer needed as we have removed the match level display
 
 interface MBTIRelationshipMatrixProps extends BaseComponentProps {
   currentType: string;
@@ -61,10 +86,54 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
     if (relationshipCompatibility && relationshipCompatibility[targetType]) {
       return relationshipCompatibility[targetType];
     }
-    // If no AI data, return default value
+    // If no AI data, provide meaningful default descriptions based on MBTI theory
     return {
-      reasons: ['AI analysis data missing'],
+      reasons: getDefaultCompatibilityReasons(currentType, targetType),
     };
+  };
+
+  // Generate default compatibility reasons based on MBTI theory
+  const getDefaultCompatibilityReasons = (current: string, target: string): string[] => {
+    // Add safety checks for string parameters
+    if (!current || !target || typeof current !== 'string' || typeof target !== 'string') {
+      return ['Compatibility analysis unavailable'];
+    }
+    
+    // Extract individual preferences
+    const currentE = current.includes('E');
+    const currentS = current.includes('S');
+    const currentT = current.includes('T');
+    const currentJ = current.includes('J');
+    
+    const targetE = target.includes('E');
+    const targetS = target.includes('S');
+    const targetT = target.includes('T');
+    const targetJ = target.includes('J');
+    
+    const reasons: string[] = [];
+    
+    // Analyze compatibility based on MBTI theory
+    if (currentE !== targetE) {
+      reasons.push('Complementary energy levels');
+    }
+    if (currentS !== targetS) {
+      reasons.push('Balanced perception styles');
+    }
+    if (currentT !== targetT) {
+      reasons.push('Diverse decision-making approaches');
+    }
+    if (currentJ !== targetJ) {
+      reasons.push('Flexible planning preferences');
+    }
+    
+    // Add general compatibility insights
+    if (reasons.length === 0) {
+      reasons.push('Similar cognitive preferences');
+    }
+    
+    reasons.push('Potential for mutual growth');
+    
+    return reasons;
   };
   
   return (
@@ -84,7 +153,7 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter((_type, index) => getCompatibilityLevel(index) === 'high')
+              .filter((_type) => getCompatibilityLevel(currentType, _type.type) === 'high')
               .map((_type) => {
                 const matchData = getAIMatchData(_type.type);
                 
@@ -125,7 +194,7 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter((_type, index) => getCompatibilityLevel(index) === 'medium')
+              .filter((_type) => getCompatibilityLevel(currentType, _type.type) === 'medium')
               .map((_type) => {
                 const matchData = getAIMatchData(_type.type);
                 
@@ -166,7 +235,7 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter((_type, index) => getCompatibilityLevel(index) === 'low')
+              .filter((_type) => getCompatibilityLevel(currentType, _type.type) === 'low')
               .map((_type) => {
                 const matchData = getAIMatchData(_type.type);
                 

@@ -1,11 +1,23 @@
-# GetYourLuck 综合测试平台
+# SelfAtlas 综合测试平台
 
 基于 Cloudflare 全栈架构的现代化在线测试平台，提供心理测试、占星分析、塔罗占卜等多种测试服务。
+
+## 🌍 语言要求
+
+**重要说明：** 本项目的所有用户界面、内容展示、API响应等均使用英文作为主要语言。
+
+- **用户界面**: 所有前端组件、页面标题、按钮文字、提示信息等必须使用英文
+- **内容展示**: 测试题目、结果分析、推荐内容、博客文章等必须使用英文  
+- **API接口**: 所有API响应中的message、error等字段必须使用英文
+- **数据库内容**: 存储的测试题目、结果模板、内容配置等必须使用英文
+- **错误信息**: 所有错误提示、验证消息等必须使用英文
+
+详细的语言使用规范请参考 [开发规范文档](./comprehensive-testing-platform/.kiro/specs/comprehensive-testing-platform/development-guide.md#0-项目语言要求)。
 
 ## 🏗️ 项目架构
 
 ```
-getyourluck/
+selfatlas/
 ├── comprehensive-testing-platform/     # 主要项目目录
 │   ├── frontend/                      # 前端应用 (React + TypeScript)
 │   ├── backend/                       # 后端服务 (Cloudflare Workers)
@@ -36,13 +48,21 @@ getyourluck/
 ## 🌐 部署环境
 
 ### Cloudflare Pages (前端)
-- **项目名称**: `getyourluck-testing-platform`
-- **生产环境**: https://getyourluck-testing-platform.pages.dev
+- **项目名称**: `selfatlas-testing-platform`
+- **生产环境**: https://selfatlas-testing-platform.pages.dev
 - **预览环境**: 每次 PR 自动生成预览链接
+- **状态**: ✅ 已部署并正常运行
 
 ### Cloudflare Workers (后端)
-- **项目名称**: `getyourluck-backend`
-- **环境**: 开发/测试/生产
+- **项目名称**: `selfatlas-backend`
+- **测试环境**: `selfatlas-backend-staging`
+  - **URL**: https://selfatlas-backend-staging.cyberlina.workers.dev
+  - **状态**: ✅ 已部署并正常运行
+  - **数据库**: D1 数据库已配置
+  - **缓存**: KV 存储已配置
+  - **存储**: R2 存储桶已配置
+- **生产环境**: 待配置 (需要正式域名)
+- **开发环境**: 本地开发支持
 
 ## 🔧 本地开发
 
@@ -113,7 +133,7 @@ npm run deploy       # 部署到 Cloudflare Workers
 
 ### 前端配置 (`frontend/wrangler.toml`)
 ```toml
-name = "getyourluck-frontend"
+name = "selfatlas-frontend"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
@@ -123,32 +143,42 @@ pages_build_output_dir = "dist"
 # 环境变量配置
 [env.production.vars]
 NODE_ENV = "production"
-API_BASE_URL = "https://api.getyourluck.com"
-CDN_BASE_URL = "https://cdn.getyourluck.com"
+API_BASE_URL = "https://api.selfatlas.net"
+CDN_BASE_URL = "https://cdn.selfatlas.net"
 
 [env.preview.vars]
 NODE_ENV = "staging"
-API_BASE_URL = "https://staging-api.getyourluck.com"
-CDN_BASE_URL = "https://staging-cdn.getyourluck.com"
+API_BASE_URL = "https://selfatlas-backend-staging.cyberlina.workers.dev"
+CDN_BASE_URL = "https://staging-cdn.selfatlas.net"
 ```
 
 ### 后端配置 (`backend/wrangler.toml`)
 ```toml
-name = "getyourluck-backend"
+name = "selfatlas-backend"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 # 环境配置
+[env.staging]
+name = "selfatlas-backend-staging"
+# 测试环境已配置 D1、KV、R2 等资源
+
 [env.development]
-name = "getyourluck-backend-dev"
-vars = { NODE_ENV = "development" }
+name = "selfatlas-backend-dev"
+# 本地开发环境配置
 
 [env.production]
-name = "getyourluck-backend-prod"
-vars = { NODE_ENV = "production" }
+name = "selfatlas-backend-prod"
+# 生产环境配置 (需要正式域名)
 ```
 
 ## 🔄 部署流程
+
+### 当前部署状态
+- **✅ 前端**: 生产环境和预览环境已部署并正常运行
+- **✅ 后端测试环境**: 已部署并正常运行，API 端点已验证
+- **⏳ 后端生产环境**: 等待正式域名配置
+- **✅ 前后端集成**: 测试环境集成验证成功
 
 ### 前端部署流程
 1. **开发阶段**: 本地 `npm run dev` 进行开发
@@ -203,11 +233,23 @@ npm run build
 npx tsc --noEmit
 
 # 本地部署测试
-npx wrangler pages deploy dist --project-name getyourluck-testing-platform
+npx wrangler pages deploy dist --project-name selfatlas-testing-platform
 
 # 查看 Workers 日志
 npx wrangler tail
+
+# 测试 API 端点 (测试环境)
+curl https://selfatlas-backend-staging.cyberlina.workers.dev/health
+curl https://selfatlas-backend-staging.cyberlina.workers.dev/api
+curl https://selfatlas-backend-staging.cyberlina.workers.dev/api/tests
 ```
+
+### 已验证的 API 端点
+- **健康检查**: `GET /health` ✅
+- **API 信息**: `GET /api` ✅
+- **测试模块**: `GET /api/tests` ✅
+- **博客模块**: `GET /api/blog` ✅
+- **首页模块**: `GET /api/homepage` ✅
 
 ## 📚 相关链接
 
@@ -228,9 +270,22 @@ npx wrangler tail
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
+## 📊 项目状态
+
+### 开发进度
+- **前端**: 100% 完成 ✅
+- **后端**: 80% 完成 (测试环境完成，生产环境待配置)
+- **前后端集成**: 100% 完成 ✅
+- **部署自动化**: 100% 完成 ✅
+
+### 下一步计划
+1. 配置正式域名 (selfatlas.net)
+2. 部署后端生产环境
+3. 完善数据库内容和测试数据
+4. 性能优化和监控
+
 ---
 
-**最后更新**: 2024-08-18
-**维护者**: GetYourLuck 开发团队
-## Test Preview Environment
-This is a test branch for preview deployment.
+**最后更新**: 2025-08-18
+**维护者**: SelfAtlas 开发团队
+**当前状态**: 测试环境完全可用，生产环境部署中

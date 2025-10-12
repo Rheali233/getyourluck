@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
@@ -37,82 +38,97 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
     {
       id: 'mbti-personality',
       name: 'MBTI Personality Test',
-      description: 'Want to know your personality type? This interesting test will tell you whether you are introverted or extroverted, rational or emotional.',
+      description: 'Discover your true personality type! Are you an INTJ strategist or an ENFP enthusiast? Find out in just 10 minutes with our scientifically-backed assessment.',
       icon: '🧠',
       category: 'Psychology',
       rating: 4.9,
       testCount: 12500,
       isHot: true,
-      route: '/tests/mbti'
+      route: '/psychology/mbti'
     },
     {
-      id: 'daily-horoscope',
-      name: 'Daily Horoscope',
-      description: 'What should you do today? How is your love fortune? Will work go smoothly? Spend 1 minute each day checking your zodiac fortune.',
+      id: 'birth-chart',
+      name: 'Birth Chart Analysis',
+      description: 'Unlock the secrets of your cosmic blueprint! Get personalized insights about your personality, relationships, and life path based on your exact birth details.',
       icon: '⭐',
       category: 'Astrology',
       rating: 4.8,
       testCount: 8900,
       isHot: true,
-      route: '/tests/horoscope'
+      route: '/astrology/birth-chart'
     },
     {
-      id: 'tarot-love',
-      name: 'Tarot Love Reading',
-      description: 'Have someone in mind but don\'t know how they feel about you? Confused about relationships? Let the mysterious tarot cards guide you.',
-      icon: '🎴',
+      id: 'tarot-reading',
+      name: 'Tarot Card Reading',
+      description: 'Seek guidance from the ancient wisdom of tarot! Get answers to your burning questions about love, career, and life decisions through mystical card interpretations.',
+      icon: '🔮',
       category: 'Tarot',
       rating: 4.7,
       testCount: 6700,
       isHot: true,
-      route: '/tests/tarot'
+      route: '/tarot'
     },
     {
-      id: 'mental-health',
-      name: 'Mental Health Assessment',
-      description: 'Feeling tired lately? Emotions not great? This gentle test helps you understand your mental state.',
+      id: 'emotional-intelligence',
+      name: 'Emotional Intelligence Test',
+      description: 'Master your emotions and relationships! Assess your EQ with our comprehensive test that measures self-awareness, empathy, and social skills.',
       icon: '💚',
-      category: 'Mental Health',
+      category: 'Psychology',
       rating: 4.8,
       testCount: 5400,
       isHot: false,
-      route: '/tests/mental-health'
+      route: '/psychology/eq'
     },
     {
-      id: 'career-interest',
-      name: 'Career Interest Exploration',
-      description: 'Don\'t know what job suits you? Confused about future career planning? This test will help you discover your interests and talents.',
+      id: 'career-assessment',
+      name: 'Career Path Discovery',
+      description: 'Find your perfect career match! Discover which professions align with your interests, skills, and values through our comprehensive career assessment.',
       icon: '💼',
-      category: 'Career Planning',
+      category: 'Career',
       rating: 4.6,
       testCount: 4800,
       isHot: false,
-      route: '/tests/career'
+      route: '/career/holland'
+    },
+    {
+      id: 'love-language',
+      name: 'Love Language Test',
+      description: 'Transform your relationships! Discover how you and your partner express and receive love to build deeper, more meaningful connections.',
+      icon: '💕',
+      category: 'Relationship',
+      rating: 4.7,
+      testCount: 3200,
+      isHot: false,
+      route: '/relationship/love_language'
     }
   ];
 
   const displayTests = tests.length > 0 ? tests : defaultTests;
+  const navigate = useNavigate();
 
   const handleTestClick = (test: PopularTest) => {
     if (onTestClick) {
       onTestClick(test);
+    } else {
+      // 直接导航到对应的测试页面
+      navigate(test.route);
     }
   };
 
   return (
     <section
-      className={cn("popular-tests py-16 bg-white", className)}
+      className={cn("popular-tests py-16 relative overflow-hidden", className)}
       data-testid={testId}
       {...props}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Title section */}
         <div className="text-left mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            🔥 Popular Tests
+            Popular Tests
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl">
-            Try our most popular tests and discover your true self
+            Handpicked by our experts - these are the most insightful and transformative tests that our users love
           </p>
         </div>
 
@@ -121,7 +137,7 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
           {displayTests.map((test) => (
             <div
               key={test.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+              className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
               onClick={() => handleTestClick(test)}
             >
               {/* 热门标识 */}
@@ -145,12 +161,12 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
                 </div>
 
                 {/* 测试名称 */}
-                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                   {test.name}
                 </h3>
 
                 {/* 测试描述 */}
-                <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+                <p className="text-gray-600 mb-3 text-xs line-clamp-3 leading-relaxed">
                   {test.description}
                 </p>
 
@@ -161,40 +177,33 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
                       <span
                         key={i}
                         className={cn(
-                          "text-lg",
+                          "text-sm",
                           i < Math.floor(test.rating) ? "text-yellow-400" : "text-gray-300"
                         )}
                       >
                         ⭐
                       </span>
                     ))}
-                    <span className="text-sm text-gray-500 ml-2">
+                    <span className="text-xs text-gray-500 ml-2">
                       {test.rating}
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-xs text-gray-500">
                     {test.testCount.toLocaleString()} tests
                   </span>
                 </div>
 
                 {/* 行动按钮 */}
-                <button className="w-full bg-primary-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-primary-700 transition-colors duration-200 focus:outline-none focus:ring-0">
-                  Start Test
-                </button>
+                <div className="text-center">
+                  <button className="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors duration-200 focus:outline-none focus:ring-0">
+                    Take Test Now →
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* 查看更多按钮 */}
-        <div className="text-center mt-12">
-          <button className="inline-flex items-center px-6 py-3 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors duration-200 focus:outline-none focus:ring-0">
-            View More Tests
-            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
       </div>
     </section>
   );

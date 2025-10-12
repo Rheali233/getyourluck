@@ -93,10 +93,10 @@ export const TestModuleStats: React.FC<TestModuleStatsProps> = ({
   };
 
   const getPopularityText = (score: number): string => {
-    if (score >= 80) return '非常热门';
-    if (score >= 60) return '比较热门';
-    if (score >= 40) return '一般';
-    return '较少使用';
+    if (score >= 80) return 'Very Popular';
+    if (score >= 60) return 'Popular';
+    if (score >= 40) return 'Average';
+    return 'Less Used';
   };
 
   // 内联变体
@@ -123,7 +123,7 @@ export const TestModuleStats: React.FC<TestModuleStatsProps> = ({
   if (variant === 'minimal') {
     return (
       <div className={cn("flex items-center space-x-2 text-xs text-gray-600", className)} data-testid={testId} {...props}>
-        <span>{formatNumber(localStats.totalUsers)}人测试</span>
+        <span>{formatNumber(localStats.totalUsers)} users tested</span>
         <span>•</span>
         <span>⭐ {formatRating(localStats.averageRating)}</span>
       </div>
@@ -139,7 +139,7 @@ export const TestModuleStats: React.FC<TestModuleStatsProps> = ({
           <div className="text-2xl font-bold text-blue-600">
             {formatNumber(localStats.totalUsers)}
           </div>
-          <div className="text-sm text-gray-600">总用户数</div>
+          <div className="text-sm text-gray-600">Total Users</div>
         </div>
 
         {/* 平均评分 */}
@@ -147,7 +147,7 @@ export const TestModuleStats: React.FC<TestModuleStatsProps> = ({
           <div className="text-2xl font-bold text-yellow-600">
             {formatRating(localStats.averageRating)}
           </div>
-          <div className="text-sm text-gray-600">平均评分</div>
+          <div className="text-sm text-gray-600">Average Rating</div>
         </div>
 
         {/* 完成率 */}
@@ -155,7 +155,7 @@ export const TestModuleStats: React.FC<TestModuleStatsProps> = ({
           <div className="text-2xl font-bold text-green-600">
             {formatPercentage(localStats.completionRate)}
           </div>
-          <div className="text-sm text-gray-600">完成率</div>
+          <div className="text-sm text-gray-600">Completion Rate</div>
         </div>
 
         {/* 热门程度 */}
@@ -170,12 +170,12 @@ export const TestModuleStats: React.FC<TestModuleStatsProps> = ({
       {showDetails && (
         <div className="mt-4 pt-4 border-t border-gray-100">
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>最后更新: {new Date(localStats.lastUpdated).toLocaleDateString()}</span>
+            <span>Last Updated: {new Date(localStats.lastUpdated).toLocaleDateString()}</span>
             <button
               onClick={loadStats}
               className="text-blue-600 hover:text-blue-800 transition-colors"
             >
-              刷新
+              Refresh
             </button>
           </div>
         </div>

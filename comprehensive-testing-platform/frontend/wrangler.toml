@@ -1,17 +1,36 @@
-name = "getyourluck-frontend"
+name = "selfatlas-frontend"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 # Cloudflare Pages 构建产物目录
 pages_build_output_dir = "dist"
 
-# Pages 仅支持 preview / production 环境变量
+# Pages 项目配置
+[env.production]
+name = "selfatlas-frontend-prod"
+project_name = "selfatlas-testing-platform"
+route = "api.selfatlas.net/*"
+zone_id = "your-zone-id"
+
+[env.preview]
+name = "selfatlas-frontend-preview"
+project_name = "selfatlas-testing-platform"
+route = "dev-api.selfatlas.net/*"
+zone_id = "your-zone-id"
+
+# 环境变量配置
 [env.production.vars]
 NODE_ENV = "production"
-API_BASE_URL = "https://api.getyourluck.com"
-CDN_BASE_URL = "https://cdn.getyourluck.com"
+API_BASE_URL = "https://api.selfatlas.net"
+CDN_BASE_URL = "https://cdn.selfatlas.net"
+PAGES_PROJECT_NAME = "selfatlas-testing-platform"
 
 [env.preview.vars]
 NODE_ENV = "staging"
-API_BASE_URL = "https://getyourluck-backend-staging.cyberlina.workers.dev"
-CDN_BASE_URL = "https://staging-cdn.getyourluck.com"
+API_BASE_URL = "https://selfatlas-backend-staging.cyberlina.workers.dev"
+CDN_BASE_URL = "https://staging-cdn.selfatlas.net"
+PAGES_PROJECT_NAME = "selfatlas-testing-platform"
+
+# 当前可用的Pages域名
+# 主要域名: https://7614e3a6.selfatlas-testing-platform.pages.dev
+# 分支别名: https://feature-test-preview.selfatlas-testing-platform.pages.dev

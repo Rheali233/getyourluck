@@ -1,16 +1,18 @@
 /**
  * 博客推荐组件
- * 展示热门文章和最新内容
+ * 展示热门文章和最新内容 - 左右滑动轮播
  */
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { useNavigate } from 'react-router-dom';
+import { blogService } from '@/services/blogService';
 
 
 export interface BlogArticle {
   id: string;
+  slug?: string;
   title: string;
   excerpt: string;
   coverImage: string;
@@ -26,25 +28,78 @@ export interface BlogRecommendationsProps extends BaseComponentProps {
   articles?: BlogArticle[];
   title?: string;
   subtitle?: string;
-  showFeatured?: boolean;
-  onArticleClick?: (article: BlogArticle) => void;
+  onArticleClick?: (article: BlogArticle) => void; // eslint-disable-line no-unused-vars
 }
 
 export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
   className,
   testId = 'blog-recommendations',
-  articles = [],
+  articles,
   title,
   subtitle,
-  showFeatured = true,
   onArticleClick,
   ...props
 }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  // 当未传入 articles 时，从 blog 模块实时拉取
+  const [loadedArticles, setLoadedArticles] = useState<BlogArticle[]>(articles || []);
+
+  useEffect(() => {
+    if (articles && articles.length > 0) {
+      setLoadedArticles(articles);
+      return;
+    }
+    
+    // 延迟加载，避免阻塞首屏
+    const timer = setTimeout(async () => {
+      try {
+        const resp = await blogService.getArticles(1, 6);
+        const list = (resp as any).data || [];
+        const mapped: BlogArticle[] = list.map((a: any) => ({
+          id: a.id,
+          slug: a.slug || a.id,
+          title: a.title,
+          excerpt: a.excerpt || '',
+          coverImage: a.coverImage || '',
+          category: a.category || 'Blog',
+          readTime: a.readTime || '',
+          publishDate: a.publishedAt || a.publishDate || '',
+          author: a.author || '',
+          readCount: a.readCount || 0,
+          tags: a.tags || [],
+        }));
+        setLoadedArticles(mapped);
+      } catch (error) {
+        console.warn('Failed to load blog articles, using fallback:', error);
+        // 使用默认文章作为降级方案
+        setLoadedArticles([
+          {
+            id: '1',
+            slug: 'welcome-to-our-platform',
+            title: 'Welcome to Our Testing Platform',
+            excerpt: 'Discover the power of self-discovery through our comprehensive testing platform.',
+            coverImage: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80',
+            category: 'Platform',
+            readTime: '2 min read',
+            publishDate: new Date().toISOString(),
+            author: 'Platform Team',
+            readCount: 0,
+            tags: ['welcome', 'platform'],
+          }
+        ]);
+      }
+    }, 1000); // 延迟1秒加载
+
+    return () => clearTimeout(timer);
+  }, [articles]);
+
   // Title and subtitle configuration
   const displayTitle = title || 'Latest Insights & Articles';
   const displaySubtitle = subtitle || 'Discover valuable insights about psychology, career, and personal development';
 
-  // Default blog articles data
+  // 默认兜底数据
   const defaultArticles: BlogArticle[] = [
     {
       id: 'mbti-guide',
@@ -97,18 +152,23 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
   ];
 
   // 按日期排序，新到旧
-  const sortedArticles = articles.length > 0 ? articles : defaultArticles;
-  const blogArticles = sortedArticles.sort((a, b) => 
+  const baseArticles = loadedArticles.length > 0 ? loadedArticles : defaultArticles;
+  const blogArticles = baseArticles.sort((a, b) =>
     new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
   );
 
+  // 轮播控制函数
+  // 简化：暂不渲染左右按钮，仅依赖容器自然滚动
+
+  // 预留轮播控制（当前未显示箭头按钮）
+
   return (
     <section
-      className={cn("blog-recommendations py-16 bg-gray-50", className)}
+      className={cn("blog-recommendations py-16 relative overflow-hidden", className)}
       data-testid={testId}
       {...props}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Title section */}
         <div className="text-left mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -119,66 +179,34 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
           </p>
         </div>
 
-        {/* 博客文章内容 */}
+        {/* 博客文章轮播 */}
         {blogArticles.length > 0 ? (
           <>
-            {/* 特色文章 */}
-            {showFeatured && (
-              <div className="mb-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {blogArticles.slice(0, 2).map((article) => (
-                    <article
-                      key={article.id}
-                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-                      onClick={() => onArticleClick?.(article)}
-                    >
-                      <div className="aspect-video bg-gray-200 overflow-hidden">
-                        <img
-                          src={article.coverImage}
-                          alt={article.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                      <div className="p-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="px-3 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
-                            {article.category}
-                          </span>
-                          <span className="text-sm text-gray-500">{article.readTime}</span>
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                          {article.title}
-                        </h3>
-                        <p className="text-gray-600 mb-4 line-clamp-3">
-                          {article.excerpt}
-                        </p>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>{article.author}</span>
-                          <span>{article.readCount.toLocaleString()} 阅读</span>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 文章列表 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blogArticles.slice(2).map((article) => (
+          <div className="relative">
+            {/* 轮播容器 */}
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {blogArticles.map((a) => (
                 <article
-                  key={article.id}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
-                  onClick={() => onArticleClick?.(article)}
+                  key={a.id}
+                  className="flex-shrink-0 w-80 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition cursor-pointer"
+                  onClick={() => {
+                    if (onArticleClick) {
+                      onArticleClick(a);
+                    }
+                    // 无论是否有回调函数，都要进行导航
+                    if (a.slug) {
+                      navigate(`/blog/${a.slug}`);
+                    }
+                  }}
                 >
-                  <div className="aspect-square bg-gray-200 overflow-hidden">
+                  <div className="aspect-video bg-gray-200 overflow-hidden">
                     <img
-                      src={article.coverImage}
-                      alt={article.title}
+                      src={a.coverImage}
+                      alt={a.title}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -186,46 +214,44 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
                       }}
                     />
                   </div>
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
-                        {article.category}
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="px-3 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
+                        {a.category}
                       </span>
-                      <span className="text-xs text-gray-500">{article.readTime}</span>
+                      <span className="text-xs text-gray-500">{a.readTime}</span>
                     </div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                      {article.title}
-                    </h4>
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                      {article.excerpt}
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                      {a.title}
+                    </h3>
+                    <p className="text-gray-600 mb-3 text-xs line-clamp-3">
+                      {a.excerpt}
                     </p>
                     <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>{article.author}</span>
-                      <span>{article.readCount.toLocaleString()} 阅读</span>
+                      <span>{a.author}</span>
+                      <span>{a.readCount.toLocaleString()} reads</span>
                     </div>
                   </div>
                 </article>
               ))}
             </div>
 
-            {/* 查看更多按钮 */}
-            <div className="text-center mt-12">
-              <Link
-                to="/blog"
-                className="inline-flex items-center px-6 py-3 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors duration-200"
-              >
-                查看更多文章
-                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
+          </div>
+          <div className="mt-10 text-center">
+            <button
+              type="button"
+              className="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white hover:bg-gray-800 transition"
+              onClick={() => navigate('/blog/')}
+            >
+              View more articles
+            </button>
+          </div>
           </>
         ) : (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">暂无博客文章</h3>
-            <p className="text-gray-600">我们正在准备精彩的内容，敬请期待！</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Blog Articles Available</h3>
+            <p className="text-gray-600">We are preparing exciting content, stay tuned!</p>
           </div>
         )}
       </div>

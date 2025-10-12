@@ -1,6 +1,20 @@
 {
+  "name": "comprehensive-testing-platform",
+  "version": "1.0.0",
+  "description": "Comprehensive Testing Platform - Main Package",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
   "devDependencies": {
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.1"
+    "concurrently": "^8.2.0"
   }
 }

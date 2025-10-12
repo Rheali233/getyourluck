@@ -59,11 +59,11 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
             
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              出现了一些问题
+              Something went wrong
             </h2>
             
             <p className="text-gray-600 mb-6">
-              很抱歉，页面遇到了错误。请刷新页面重试。
+              Sorry, the page encountered an error. Please refresh the page and try again.
             </p>
             
             <div className="space-y-3">
@@ -72,7 +72,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="w-full px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
                 data-testid="refresh-button"
               >
-                刷新页面
+                Refresh Page
               </button>
               
               <button
@@ -80,14 +80,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
                 data-testid="back-button"
               >
-                返回上一页
+                Go Back
               </button>
             </div>
             
             {import.meta.env.DEV && this.state.error && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                  错误详情 (开发模式)
+                  Error Details (Development Mode)
                 </summary>
                 <pre className="mt-2 text-xs text-red-600 bg-red-50 p-3 rounded overflow-auto">
                   {this.state.error.stack}

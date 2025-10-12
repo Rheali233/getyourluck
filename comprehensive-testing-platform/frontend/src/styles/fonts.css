@@ -3,9 +3,10 @@
  * 提供多种现代化的字体选择，提升网站视觉效果
  */
 
-/* 导入 Google Fonts - 使用预加载策略 */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+/* 字体配置 - 使用系统字体回退策略，避免网络依赖 */
+/* 注释掉Google Fonts导入，使用系统字体 */
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); */
+/* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap'); */
 
 /* 字体预加载优化 */
 @font-face {
@@ -65,18 +66,18 @@
   src: local('Noto Sans SC'), local('PingFang SC'), local('Hiragino Sans GB'), local('Microsoft YaHei');
 }
 
-/* 字体变量定义 - 优化回退字体链 */
+/* 字体变量定义 - 使用系统字体，避免网络依赖 */
 :root {
-  /* 主要字体 - Inter (现代、清晰、易读) */
-  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  /* 主要字体 - 系统字体链 */
+  --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   
-  /* 中文优化字体 - Noto Sans SC (Google 专门为中文优化的字体) */
-  --font-chinese: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', 'SimSun', '宋体', sans-serif;
+  /* 中文优化字体 - 系统字体链 */
+  --font-chinese: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', 'SimSun', '宋体', -apple-system, BlinkMacSystemFont, sans-serif;
   
-  /* 标题字体 - Inter (现代、优雅) */
-  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* 标题字体 - 系统字体链 */
+  --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   
-  /* 等宽字体 - 用于代码和技术内容 */
+  /* 等宽字体 - 系统字体链 */
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', 'Courier New', monospace;
 }
 

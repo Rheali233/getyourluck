@@ -1,11 +1,11 @@
 /**
  * 推荐系统API路由
- * 提供个性化推荐和测试模块统计功能
+ * Provides personalized recommendations and test module statistics
  */
 
 import { Hono } from 'hono';
 import { HomepageModuleModel } from '../models/HomepageModuleModel';
-// import { SearchIndexModel } from '../models/SearchIndexModel'; // 未使用，暂时注释
+
 import { UserPreferencesModel } from '../models/UserPreferencesModel';
 import type { Context } from 'hono';
 
@@ -30,8 +30,7 @@ recommendationsRoutes.get('/', async (c: Context) => {
     // 获取搜索历史（如果有sessionId）
     let searchHistory: any[] = [];
     if (sessionId) {
-      // const searchModel = new SearchIndexModel(c.env.DB); // 未使用，暂时注释
-      // searchHistory = await searchModel.getSearchHistory(sessionId, 10); // 方法不存在，暂时注释
+  
     }
 
     // 生成推荐逻辑
@@ -45,13 +44,13 @@ recommendationsRoutes.get('/', async (c: Context) => {
     return c.json({
       success: true,
       data: recommendations,
-      message: '推荐获取成功'
+      message: 'Recommendations retrieved successfully'
     });
   } catch (error) {
     console.error('Failed to get recommendations:', error);
     return c.json({
       success: false,
-      error: '获取推荐失败',
+      error: 'Failed to get recommendations',
       message: '服务器内部错误'
     }, 500);
   }
@@ -64,8 +63,8 @@ recommendationsRoutes.get('/modules/:moduleId/stats', async (c: Context) => {
     if (!moduleId) {
       return c.json({
         success: false,
-        error: '模块ID不能为空',
-        message: '请提供有效的模块ID'
+        error: 'Module ID cannot be empty',
+        message: 'Please provide a valid module ID'
       }, 400);
     }
     
@@ -75,21 +74,21 @@ recommendationsRoutes.get('/modules/:moduleId/stats', async (c: Context) => {
     if (!stats) {
       return c.json({
         success: false,
-        error: '模块不存在',
-        message: '指定的测试模块不存在'
+        error: 'Module does not exist',
+        message: '指定的测试Module does not exist'
       }, 404);
     }
 
     return c.json({
       success: true,
       data: stats,
-      message: '统计数据获取成功'
+      message: 'Statistics retrieved successfully'
     });
   } catch (error) {
     console.error('Failed to get module stats:', error);
     return c.json({
       success: false,
-      error: '获取统计数据失败',
+      error: 'Failed to get statistics',
       message: '服务器内部错误'
     }, 500);
   }
@@ -316,7 +315,7 @@ function calculateRelevanceScore(module: any, userPreferences: any, searchHistor
 }
 
 /**
- * 获取推荐原因（中文）
+       * Get recommendation reason (English)
  */
 function getRecommendationReason(score: number, _module: any): string {
   if (score >= 0.8) return '高度匹配您的兴趣';

@@ -9,7 +9,7 @@ import type { Env } from "../index";
 export interface LearningSessionData {
   id: string;
   testSessionId: string;
-  testSubtype: "vark" | "raven" | "learning_strategies";
+  testSubtype: "vark" | "learning_strategies";
   learningStyle?: "visual" | "auditory" | "reading" | "kinesthetic" | "multimodal";
   cognitiveScore?: number;
   percentileRank?: number;
@@ -20,7 +20,7 @@ export interface LearningSessionData {
 
 export interface CreateLearningSessionData {
   testSessionId: string;
-  testSubtype: "vark" | "raven" | "learning_strategies";
+  testSubtype: "vark" | "learning_strategies";
   learningStyle?: "visual" | "auditory" | "reading" | "kinesthetic" | "multimodal";
   cognitiveScore?: number;
   percentileRank?: number;
@@ -36,7 +36,7 @@ export class LearningSessionModel extends BaseModel {
   async create(data: CreateLearningSessionData): Promise<string> {
     const id = this.generateId();
 
-    const result = await this.db
+    const result = await this.safeDB
       .prepare(`
         INSERT INTO learning_sessions (
           id, test_session_id, test_subtype, learning_style,
@@ -65,7 +65,7 @@ export class LearningSessionModel extends BaseModel {
   }
 
   async findByTestSessionId(testSessionId: string): Promise<LearningSessionData | null> {
-    const result = await this.db
+    const result = await this.safeDB
       .prepare("SELECT * FROM learning_sessions WHERE test_session_id = ?")
       .bind(testSessionId)
       .first();
@@ -78,7 +78,7 @@ export class LearningSessionModel extends BaseModel {
   }
 
   async findBySubtype(subtype: string): Promise<LearningSessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM learning_sessions WHERE test_subtype = ? ORDER BY created_at DESC")
       .bind(subtype)
       .all();
@@ -87,7 +87,7 @@ export class LearningSessionModel extends BaseModel {
   }
 
   async getLearningStyleDistribution(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT learning_style, COUNT(*) as count 
         FROM learning_sessions 
@@ -112,7 +112,7 @@ export class LearningSessionModel extends BaseModel {
     max: number;
     count: number;
   }> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT 
           AVG(cognitive_score) as avg_score,
@@ -125,7 +125,7 @@ export class LearningSessionModel extends BaseModel {
       .first();
 
     // 获取中位数需要额外查询
-    const medianResult = await this.db
+    const medianResult = await this.safeDB
       .prepare(`
         SELECT cognitive_score
         FROM learning_sessions 
@@ -149,7 +149,7 @@ export class LearningSessionModel extends BaseModel {
   }
 
   async getPercentileDistribution(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT 
           CASE 
@@ -179,7 +179,7 @@ export class LearningSessionModel extends BaseModel {
     return {
       id: row.id as string,
       testSessionId: row.test_session_id as string,
-      testSubtype: row.test_subtype as "vark" | "raven" | "learning_strategies",
+      testSubtype: row.test_subtype as "vark" | "learning_strategies",
       learningStyle: (row.learning_style as "visual" | "auditory" | "reading" | "kinesthetic" | "multimodal") ?? "visual",
       cognitiveScore: (row.cognitive_score as number) ?? 0,
       percentileRank: (row.percentile_rank as number) ?? 0,

@@ -6,11 +6,11 @@
 import { create } from 'zustand'
 import type { ModuleState, ModuleActions } from '../../../shared/types/moduleState'
 import type { PaginatedResponse } from '../../../shared/types/apiResponse'
-import { blogService } from '@/services/blogService'
+import { blogService, type BlogArticleDetail, type BlogArticleSummary } from '@/services/blogService'
 
 interface BlogState extends ModuleState {
-  articles: any[]
-  currentArticle: any | null
+  articles: BlogArticleSummary[]
+  currentArticle: BlogArticleDetail | null
   pagination: {
     page: number
     limit: number
@@ -25,7 +25,7 @@ interface BlogState extends ModuleState {
 
 interface BlogActions extends ModuleActions {
   fetchArticles: (page?: number, category?: string) => Promise<void>
-  fetchArticle: (id: string) => Promise<void>
+  fetchArticle: (idOrSlug: string) => Promise<void>
   setSelectedCategory: (category: string | null) => void
   incrementViewCount: (id: string) => Promise<void>
 }
@@ -69,13 +69,13 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
         throw new Error(response.error || 'Failed to fetch articles')
       }
 
-      const paginatedResponse = response as PaginatedResponse
+      const paginatedResponse = response as PaginatedResponse<BlogArticleSummary[]>
       
       set({
         articles: paginatedResponse.data || [],
         pagination: paginatedResponse.pagination,
         isLoading: false,
-        data: paginatedResponse.data,
+        data: paginatedResponse.data || [],
         lastUpdated: new Date(),
       })
     } catch (error) {
@@ -87,18 +87,18 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
     }
   },
 
-  fetchArticle: async (id: string) => {
+  fetchArticle: async (idOrSlug: string) => {
     set({ isLoading: true, error: null })
     
     try {
-      const response = await blogService.getArticle(id)
+      const response = await blogService.getArticle(idOrSlug)
       
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Article not found')
       }
 
       set({
-        currentArticle: response.data,
+        currentArticle: response.data as BlogArticleDetail,
         isLoading: false,
         data: response.data,
         lastUpdated: new Date(),

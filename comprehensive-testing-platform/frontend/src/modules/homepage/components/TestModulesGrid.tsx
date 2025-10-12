@@ -13,66 +13,138 @@ export interface TestModulesGridProps {
   className?: string;
   testId?: string;
   modules?: TestModule[];
+  // eslint-disable-next-line no-unused-vars
   onModuleClick?: (module: TestModule) => void;
 }
+
+// 主题色彩映射配置 - 匹配对应模块页面的渐变背景色
+const getThemeColors = (theme: TestModule['theme']) => {
+  const themeConfigs = {
+    psychology: {
+      // 白色背景，黑色文字，蓝色主题圆点
+      background: 'bg-white',
+      title: 'text-black group-hover:text-gray-800',
+      description: 'text-gray-700',
+      stats: 'text-gray-600',
+      features: 'bg-white text-gray-800 border border-gray-200',
+      primaryDot: 'bg-blue-600',
+      secondaryDot: 'bg-blue-500'
+    },
+    astrology: {
+      // 白色背景，黑色文字，紫色主题圆点
+      background: 'bg-white',
+      title: 'text-black group-hover:text-gray-800',
+      description: 'text-gray-700',
+      stats: 'text-gray-600',
+      features: 'bg-white text-gray-800 border border-gray-200',
+      primaryDot: 'bg-purple-600',
+      secondaryDot: 'bg-purple-500'
+    },
+    career: {
+      // 白色背景，黑色文字，绿色主题圆点
+      background: 'bg-white',
+      title: 'text-black group-hover:text-gray-800',
+      description: 'text-gray-700',
+      stats: 'text-gray-600',
+      features: 'bg-white text-gray-800 border border-gray-200',
+      primaryDot: 'bg-green-600',
+      secondaryDot: 'bg-green-500'
+    },
+    relationship: {
+      // 白色背景，黑色文字，粉色主题圆点
+      background: 'bg-white',
+      title: 'text-black group-hover:text-gray-800',
+      description: 'text-gray-700',
+      stats: 'text-gray-600',
+      features: 'bg-white text-gray-800 border border-gray-200',
+      primaryDot: 'bg-pink-600',
+      secondaryDot: 'bg-pink-500'
+    },
+    learning: {
+      // 白色背景，黑色文字，黄色主题圆点
+      background: 'bg-white',
+      title: 'text-black group-hover:text-gray-800',
+      description: 'text-gray-700',
+      stats: 'text-gray-600',
+      features: 'bg-white text-gray-800 border border-gray-200',
+      primaryDot: 'bg-yellow-600',
+      secondaryDot: 'bg-yellow-500'
+    },
+    tarot: {
+      // 白色背景，黑色文字，灰色主题圆点
+      background: 'bg-white',
+      title: 'text-black group-hover:text-gray-800',
+      description: 'text-gray-700',
+      stats: 'text-gray-600',
+      features: 'bg-white text-gray-800 border border-gray-200',
+      primaryDot: 'bg-gray-600',
+      secondaryDot: 'bg-gray-500'
+    },
+    numerology: {
+      // 白色背景，黑色文字，橙色主题圆点
+      background: 'bg-white',
+      title: 'text-black group-hover:text-gray-800',
+      description: 'text-gray-700',
+      stats: 'text-gray-600',
+      features: 'bg-white text-gray-800 border border-gray-200',
+      primaryDot: 'bg-orange-600',
+      secondaryDot: 'bg-orange-500'
+    }
+  };
+
+  return themeConfigs[theme] || themeConfigs.psychology;
+};
 
 // 测试模块卡片组件
 const TestModuleCard: React.FC<{
   module: TestModule;
+  // eslint-disable-next-line no-unused-vars
   onClick: (module: TestModule) => void;
 }> = ({ module, onClick }) => {
+  const themeColors = getThemeColors(module.theme);
+  
   return (
     <Card
       className={cn(
-        "group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
-        "border-2 hover:border-primary-200",
+        "group cursor-pointer transition-all duration-300 hover:-translate-y-1 border-0",
+        themeColors.background,
         !module.isActive && "opacity-60"
       )}
       onClick={() => onClick(module)}
     >
       <div className="p-6 text-center">
-        {/* 图标 */}
-        <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-          {module.icon}
-        </div>
-        
         {/* 标题 */}
-        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-200">
+        <h3 className={cn("text-lg font-bold mb-2 transition-colors duration-200", themeColors.title)}>
           {module.name}
         </h3>
         
         {/* 描述 */}
-        <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+        <p className={cn("mb-3 text-xs leading-relaxed", themeColors.description)}>
           {module.description}
         </p>
         
         {/* Statistics */}
-        <div className="flex justify-center items-center space-x-4 text-xs text-gray-500 mb-4">
+        <div className={cn("flex justify-center items-center space-x-4 text-xs mb-3", themeColors.stats)}>
           <span className="flex items-center">
-            <span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
+            <span className={cn("w-2 h-2 rounded-full mr-1", themeColors.primaryDot)}></span>
             {module.testCount} tests
           </span>
           <span className="flex items-center">
-            <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
+            <span className={cn("w-2 h-2 rounded-full mr-1", themeColors.secondaryDot)}></span>
             {module.rating} rating
           </span>
         </div>
         
         {/* 特色功能 */}
-        <div className="flex flex-wrap justify-center gap-1 mb-4">
+        <div className="flex flex-wrap justify-center gap-2 mb-3">
           {module.features.slice(0, 2).map((feature, index) => (
             <span
               key={index}
-              className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
+              className={cn("px-3 py-1 text-xs rounded-full", themeColors.features)}
             >
               {feature}
             </span>
           ))}
-        </div>
-        
-        {/* Estimated time */}
-        <div className="text-xs text-gray-500">
-          Estimated time: {module.estimatedTime}
         </div>
         
         {/* Status indicator */}
@@ -110,11 +182,11 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       description: 'Professional psychological assessments to help you understand your personality, emotions, and cognitive traits',
       icon: '🧠',
       theme: 'psychology',
-      testCount: 15,
+      testCount: 4,
       rating: 4.8,
       isActive: true,
       route: '/psychology',
-      features: ['MBTI Personality Test', 'Depression Screening', 'EQ Assessment'],
+      features: ['🧠 Personality Discovery', '💙 Mental Wellness', '❤️ Emotional Intelligence'],
       estimatedTime: '10-15 minutes'
     },
     {
@@ -123,11 +195,11 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       description: 'Professional astrological analysis, decode your zodiac secrets and predict future fortune',
       icon: '⭐',
       theme: 'astrology',
-      testCount: 12,
+      testCount: 6,
       rating: 4.7,
       isActive: true,
-      route: '/tests/astrology',
-      features: ['Horoscope', 'Chart Reading', 'Fortune Prediction'],
+      route: '/astrology',
+      features: ['⭐ Daily Guidance', '🔮 Future Insights', '✨ Cosmic Wisdom'],
       estimatedTime: '5-8 minutes'
     },
     {
@@ -136,11 +208,11 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       description: 'Scientific career assessment to help you find the most suitable career development direction',
       icon: '💼',
       theme: 'career',
-      testCount: 18,
+      testCount: 3,
       rating: 4.9,
       isActive: true,
-      route: '/tests/career',
-      features: ['Career Interests', 'Ability Assessment', 'Career Planning'],
+      route: '/career',
+      features: ['💼 Dream Job Match', '🚀 Leadership Skills', '🎯 Career Path'],
       estimatedTime: '15-20 minutes'
     },
     {
@@ -149,11 +221,11 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       description: 'In-depth analysis of your interpersonal relationship patterns to improve social skills',
       icon: '❤️',
       theme: 'relationship',
-      testCount: 10,
+      testCount: 3,
       rating: 4.6,
       isActive: true,
       route: '/relationship',
-      features: ['Love Type', 'Communication Style', 'Relationship Pattern'],
+      features: ['💕 Love Language', '💝 Relationship Style', '🤝 Social Skills'],
       estimatedTime: '8-12 minutes'
     },
     {
@@ -162,12 +234,25 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       description: 'Assess your learning style and cognitive abilities to optimize learning methods',
       icon: '📚',
       theme: 'learning',
-      testCount: 14,
+      testCount: 3,
       rating: 4.5,
       isActive: true,
-      route: '/tests/learning',
-      features: ['Learning Style', 'Cognitive Ability', 'Learning Method'],
+      route: '/learning',
+      features: ['🎓 Learning Style', '🧩 Intelligence Test', '⚡ Brain Power'],
       estimatedTime: '12-18 minutes'
+    },
+    {
+      id: 'tarot',
+      name: 'Tarot Reading',
+      description: 'Discover your destiny through ancient tarot card wisdom and mystical insights',
+      icon: '🔮',
+      theme: 'tarot',
+      testCount: 6,
+      rating: 4.6,
+      isActive: true,
+      route: '/tarot',
+      features: ['🔮 Mystical Cards', '✨ Future Vision', '🌟 Spiritual Journey'],
+      estimatedTime: '8-12 minutes'
     },
     {
       id: 'numerology',
@@ -175,11 +260,11 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       description: 'Combining traditional culture to decode your numerological code and life trajectory',
       icon: '🔢',
       theme: 'numerology',
-      testCount: 8,
+      testCount: 5,
       rating: 4.4,
-      isActive: false,
-      route: '/tests/numerology',
-      features: ['Eight Characters', 'Zodiac Reading', 'Name Study'],
+      isActive: true,
+      route: '/numerology',
+      features: [ '🐲 Zodiac Fortune', '📝 Name Magic'],
       estimatedTime: '10-15 minutes'
     }
   ];
@@ -189,7 +274,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
 
   const handleModuleClick = (module: TestModule) => {
     // 检查是否有对应的测试界面
-    if (module.route && module.route !== '/tests/placeholder') {
+    if (module.route && module.isActive) {
       if (onModuleClick) {
         onModuleClick(module);
       } else {
@@ -205,10 +290,10 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
 
   return (
     <section
-      className={cn("py-16 px-4 sm:px-6 lg:px-8 bg-gray-50", className)}
+      className={cn("py-16 relative overflow-hidden", className)}
       data-testid={testId}
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Title */}
         <div className="text-left mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -230,12 +315,6 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
           ))}
         </div>
 
-        {/* Bottom notice */}
-        <div className="text-center mt-12">
-          <p className="text-gray-500 text-sm">
-            More test modules are under development, stay tuned!
-          </p>
-        </div>
 
         {/* Friendly notice popup */}
         {showModal && (

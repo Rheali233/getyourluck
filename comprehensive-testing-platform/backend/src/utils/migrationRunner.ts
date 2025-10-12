@@ -14,19 +14,29 @@ export interface Migration {
 }
 
 export class MigrationRunner {
-  private db: D1Database
+  private db: D1Database | null = null
+  private env: Env
 
   constructor(env: Env) {
-    if (!env.DB) {
+    this.env = env
+  }
+
+  /**
+   * 初始化数据库连接
+   */
+  private initializeDB(): void {
+    if (!this.env.DB) {
       throw new ModuleError('Database connection not available', ERROR_CODES.DATABASE_ERROR, 500)
     }
-    this.db = env.DB as D1Database
+    this.db = this.env.DB as D1Database
   }
 
   /**
    * 初始化迁移表
    */
   private async initMigrationTable(): Promise<void> {
+    this.initializeDB()
+    
     const createTableSQL = `
       CREATE TABLE IF NOT EXISTS migrations (
         id TEXT PRIMARY KEY,
@@ -36,7 +46,7 @@ export class MigrationRunner {
     `
 
     try {
-      const result = await this.db.prepare(createTableSQL).run()
+      const result = await this.db!.prepare(createTableSQL).run()
       if (!result.success) {
         throw new Error(result.error || 'Failed to create migrations table')
       }
@@ -54,7 +64,8 @@ export class MigrationRunner {
    */
   private async getAppliedMigrations(): Promise<string[]> {
     try {
-      const result = await this.db.prepare('SELECT id FROM migrations ORDER BY applied_at ASC').all()
+      this.initializeDB();
+      const result = await this.db!.prepare('SELECT id FROM migrations ORDER BY applied_at ASC').all()
       
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch applied migrations')
@@ -76,14 +87,15 @@ export class MigrationRunner {
   private async applyMigration(migration: Migration): Promise<void> {
     try {
       // 执行迁移SQL
-      const migrationResult = await this.db.prepare(migration.sql).run()
+      this.initializeDB();
+      const migrationResult = await this.db!.prepare(migration.sql).run()
       
       if (!migrationResult.success) {
         throw new Error(migrationResult.error || 'Migration SQL execution failed')
       }
 
       // 记录迁移
-      const recordResult = await this.db
+      const recordResult = await this.db!
         .prepare('INSERT INTO migrations (id, name, applied_at) VALUES (?, ?, ?)')
         .bind(migration.id, migration.name, new Date().toISOString())
         .run()

@@ -44,7 +44,7 @@ export class TarotSessionModel extends BaseModel {
   async create(data: CreateTarotSessionData): Promise<string> {
     const id = this.generateId();
 
-    const result = await this.db
+    const result = await this.safeDB
       .prepare(`
         INSERT INTO tarot_sessions (
           id, test_session_id, spread_type, cards_drawn,
@@ -70,8 +70,21 @@ export class TarotSessionModel extends BaseModel {
     return id;
   }
 
+  async findById(id: string): Promise<TarotSessionData | null> {
+    const result = await this.safeDB
+      .prepare("SELECT * FROM tarot_sessions WHERE id = ?")
+      .bind(id)
+      .first();
+
+    if (!result) {
+      return null;
+    }
+
+    return this.mapToData(result);
+  }
+
   async findByTestSessionId(testSessionId: string): Promise<TarotSessionData | null> {
-    const result = await this.db
+    const result = await this.safeDB
       .prepare("SELECT * FROM tarot_sessions WHERE test_session_id = ?")
       .bind(testSessionId)
       .first();
@@ -84,7 +97,7 @@ export class TarotSessionModel extends BaseModel {
   }
 
   async findBySpreadType(spreadType: string): Promise<TarotSessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM tarot_sessions WHERE spread_type = ? ORDER BY created_at DESC")
       .bind(spreadType)
       .all();
@@ -93,7 +106,7 @@ export class TarotSessionModel extends BaseModel {
   }
 
   async findByQuestionCategory(category: string): Promise<TarotSessionData[]> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare("SELECT * FROM tarot_sessions WHERE question_category = ? ORDER BY created_at DESC")
       .bind(category)
       .all();
@@ -102,7 +115,7 @@ export class TarotSessionModel extends BaseModel {
   }
 
   async getSpreadTypeStats(): Promise<Record<string, number>> {
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT spread_type, COUNT(*) as count 
         FROM tarot_sessions 
@@ -122,7 +135,7 @@ export class TarotSessionModel extends BaseModel {
   async getPopularCards(limit: number = 10): Promise<Array<{ cardName: string; count: number }>> {
     // 这需要更复杂的查询来分析JSON数组中的卡牌
     // 简化版本，实际实现可能需要更复杂的JSON查询
-    const results = await this.db
+    const results = await this.safeDB
       .prepare(`
         SELECT cards_drawn, COUNT(*) as session_count
         FROM tarot_sessions 

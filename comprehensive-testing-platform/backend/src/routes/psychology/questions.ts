@@ -1,12 +1,12 @@
 /**
  * 心理测试题目API路由
- * 提供题目数据的CRUD操作
+ * Provides CRUD operations for question data
  */
 
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { PsychologyQuestionBankModel } from '../../models/PsychologyQuestionBankModel';
+import { QuestionBankModel } from '../../models/QuestionBankModel';
 import type { AppContext } from '../../types/env';
 
 const questionsRouter = new Hono<AppContext>();
@@ -15,7 +15,7 @@ const questionsRouter = new Hono<AppContext>();
 questionsRouter.get('/', async (c) => {
   try {
     const dbService = c.get('dbService');
-    const questionModel = new PsychologyQuestionBankModel(dbService.env);
+    const questionModel = new QuestionBankModel(dbService.env);
     
     // 获取所有分类的题目
     const categories = ['mbti', 'phq9', 'eq', 'happiness'];
@@ -79,7 +79,7 @@ questionsRouter.get('/:testType', async (c) => {
     }
     
     const dbService = c.get('dbService');
-    const questionModel = new PsychologyQuestionBankModel(dbService.env);
+    const questionModel = new QuestionBankModel(dbService.env);
     
     // 映射testType到category_id
     const categoryIdMap: { [key: string]: string } = {
@@ -211,7 +211,7 @@ questionsRouter.get('/:testType/versions', async (c) => {
   }
 });
 
-// 创建新题目（管理员功能）
+      // Create new question (admin function)
 const createQuestionSchema = z.object({
   categoryId: z.string(),
   questionText: z.string().min(1),
@@ -263,7 +263,7 @@ questionsRouter.post('/', zValidator('json', createQuestionSchema), async (c) =>
   }
 });
 
-// 更新题目（管理员功能）
+      // Update question (admin function)
 const updateQuestionSchema = z.object({
   questionText: z.string().min(1).optional(),
   questionTextEn: z.string().optional(),
@@ -307,7 +307,7 @@ questionsRouter.put('/:id', zValidator('json', updateQuestionSchema), async (c) 
   }
 });
 
-// 删除题目（管理员功能）
+      // Delete question (admin function)
 questionsRouter.delete('/:id', async (c) => {
   try {
     const questionId = c.req.param('id');

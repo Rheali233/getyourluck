@@ -24,7 +24,7 @@ const defaultSecurityConfig: SecurityConfig = {
   enableHsts: true,
   enableContentSecurityPolicy: true,
   maxRequestSize: 1024 * 1024, // 1MB
-  allowedOrigins: ['https://getyourluck.com', 'https://www.getyourluck.com'],
+  allowedOrigins: ['https://selfatlas.net', 'https://www.selfatlas.net'],
   rateLimitWindow: 60 * 1000, // 1分钟
   rateLimitMax: 100 // 每分钟最多100个请求
 };
@@ -105,7 +105,7 @@ export const securityMiddleware = (config: Partial<SecurityConfig> = {}) => {
           "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
           "img-src 'self' data: https:",
           "font-src 'self' https://cdn.jsdelivr.net",
-          "connect-src 'self' https://api.getyourluck.com",
+          "connect-src 'self' https://api.selfatlas.net",
           "frame-ancestors 'none'",
           "base-uri 'self'",
           "form-action 'self'"
@@ -137,7 +137,7 @@ export const securityMiddleware = (config: Partial<SecurityConfig> = {}) => {
       if (error instanceof HTTPException) {
         throw error;
       }
-      throw new HTTPException(500, { message: '安全中间件错误' });
+              throw new HTTPException(500, { message: 'Security middleware error' });
     }
   };
 };
@@ -169,7 +169,7 @@ export const inputValidationMiddleware = () => {
       if (error instanceof HTTPException) {
         throw error;
       }
-      throw new HTTPException(400, { message: '输入验证失败' });
+              throw new HTTPException(400, { message: 'Input validation failed' });
     }
   };
 };
@@ -186,7 +186,7 @@ export const authMiddleware = () => {
 
       // 验证JWT token格式
       if (!authHeader.startsWith('Bearer ')) {
-        throw new HTTPException(401, { message: '认证格式错误' });
+        throw new HTTPException(401, { message: 'Authentication format error' });
       }
 
       const token = authHeader.substring(7);
@@ -202,7 +202,7 @@ export const authMiddleware = () => {
       if (error instanceof HTTPException) {
         throw error;
       }
-      throw new HTTPException(401, { message: '认证失败' });
+              throw new HTTPException(401, { message: 'Authentication failed' });
     }
   };
 };

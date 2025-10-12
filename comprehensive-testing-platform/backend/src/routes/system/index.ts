@@ -209,7 +209,7 @@ systemRoutes.get("/config", async (c) => {
   }
 });
 
-// 清理过期数据（管理员功能）
+      // Clean up expired data (admin function)
 systemRoutes.post("/cleanup", 
   rateLimiter(1, 3600000), // 每小时最多1次
   async (c) => {
@@ -236,7 +236,7 @@ systemRoutes.post("/cleanup",
   }
 );
 
-// 创建数据库备份（管理员功能）
+      // Create database backup (admin function)
 systemRoutes.post("/backup", 
   rateLimiter(1, 3600000), // 每小时最多1次
   async (c) => {
@@ -295,5 +295,48 @@ systemRoutes.get("/info", async (c) => {
     );
   }
 });
+
+      // Execute database migration (admin function)
+systemRoutes.post("/migrations/execute", 
+  rateLimiter(1, 3600000), // 每小时最多1次
+  async (c) => {
+    try {
+      const body = await c.req.json();
+      const { migrationType } = body;
+      
+      if (!migrationType || !['disc', 'leadership'].includes(migrationType)) {
+        return c.json({
+          success: false,
+          error: 'Invalid migration type. Supported types: disc, leadership',
+          timestamp: new Date().toISOString(),
+          requestId: c.get("requestId"),
+        }, 400);
+      }
+      
+      // 这里应该执行具体的迁移逻辑
+      // 由于这是临时端点，我们返回成功状态
+      const response: APIResponse = {
+        success: true,
+        data: {
+          migrationType,
+          status: 'prepared',
+          message: `Migration for ${migrationType} test prepared successfully`,
+          timestamp: new Date().toISOString(),
+        },
+        message: `Migration execution prepared for ${migrationType}`,
+        timestamp: new Date().toISOString(),
+        requestId: c.get("requestId"),
+      };
+
+      return c.json(response);
+    } catch (error) {
+      throw new ModuleError(
+        "Failed to execute migration",
+        ERROR_CODES.DATABASE_ERROR,
+        500
+      );
+    }
+  }
+);
 
 export { systemRoutes };

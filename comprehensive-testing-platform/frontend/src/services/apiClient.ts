@@ -16,16 +16,20 @@ class ApiClient {
 
   async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: Record<string, any> = {}
   ): Promise<APIResponse<T>> {
     const url = `${this.baseURL}${endpoint}`
     const requestId = crypto.randomUUID()
 
-    const config: RequestInit = {
+    const config: {
+      headers: Record<string, string>;
+      method?: string;
+      body?: string;
+    } = {
       headers: {
         'Content-Type': 'application/json',
         'X-Request-ID': requestId,
-        ...options.headers,
+        ...(options['headers'] || {}),
       },
       ...options,
     }

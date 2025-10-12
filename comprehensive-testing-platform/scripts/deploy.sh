@@ -166,7 +166,7 @@ deploy_frontend() {
     
     # 部署到Cloudflare Pages
     wrangler pages deploy dist \
-        --project-name="getyourluck-frontend-$ENVIRONMENT" \
+        --project-name="selfatlas-frontend-$ENVIRONMENT" \
         --branch="$ENVIRONMENT" \
         --commit-dirty=true
     
@@ -196,7 +196,7 @@ migrate_database() {
     cd comprehensive-testing-platform/backend
     
     # 执行数据库迁移
-    wrangler d1 execute "getyourluck-$ENVIRONMENT" \
+    wrangler d1 execute "selfatlas-$ENVIRONMENT" \
         --file="./scripts/setup-production-db.sql" \
         --env $ENVIRONMENT
     
@@ -212,7 +212,7 @@ setup_kv_storage() {
     cd comprehensive-testing-platform/backend
     
     # 创建KV命名空间（如果不存在）
-    wrangler kv:namespace create "getyourluck-$ENVIRONMENT-cache" \
+    wrangler kv:namespace create "selfatlas-$ENVIRONMENT-cache" \
         --env $ENVIRONMENT || true
     
     # 设置KV配置
@@ -234,13 +234,13 @@ setup_r2_storage() {
     cd comprehensive-testing-platform/backend
     
     # 创建R2存储桶（如果不存在）
-    wrangler r2 bucket create "getyourluck-$ENVIRONMENT-storage" \
+    wrangler r2 bucket create "selfatlas-$ENVIRONMENT-storage" \
         --env $ENVIRONMENT || true
     
     # 设置R2策略
     wrangler r2 bucket put-bucket-policy \
         --env $ENVIRONMENT \
-        "getyourluck-$ENVIRONMENT-storage" \
+        "selfatlas-$ENVIRONMENT-storage" \
         ./scripts/r2-policy.json
     
     cd ../..
@@ -255,13 +255,13 @@ health_check() {
     local base_url=""
     case $ENVIRONMENT in
         "development")
-            base_url="https://dev.getyourluck.com"
+            base_url="https://dev.selfatlas.net"
             ;;
         "staging")
-            base_url="https://staging.getyourluck.com"
+            base_url="https://staging.selfatlas.net"
             ;;
         "production")
-            base_url="https://getyourluck.com"
+            base_url="https://selfatlas.net"
             ;;
     esac
     

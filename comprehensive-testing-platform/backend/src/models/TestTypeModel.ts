@@ -83,25 +83,29 @@ export class TestTypeModel extends BaseModel {
    * 获取所有活跃的测试类型
    */
   async getAllActive(): Promise<TestType[]> {
-    const cacheKey = 'active_test_types'
-    const cached = await this.getCache<TestType[]>(cacheKey)
-    
-    if (cached) {
-      return cached
+    try {
+      const cacheKey = 'active_test_types'
+      const cached = await this.getCache<TestType[]>(cacheKey)
+      
+      if (cached) {
+        return cached
+      }
+
+      const query = `
+        SELECT * FROM ${this.tableName} 
+        WHERE is_active = 1 
+        ORDER BY sort_order ASC, name ASC
+      `
+
+      const results = await this.executeQuery<TestType>(query)
+
+      // 缓存结果
+      await this.setCache(cacheKey, results, 1800) // 30分钟缓存
+
+      return results
+    } catch (error) {
+      throw error;
     }
-
-    const query = `
-      SELECT * FROM ${this.tableName} 
-      WHERE is_active = 1 
-      ORDER BY sort_order ASC, name ASC
-    `
-
-    const results = await this.executeQuery<TestType>(query)
-
-    // 缓存结果
-    await this.setCache(cacheKey, results, 1800) // 30分钟缓存
-
-    return results
   }
 
   /**

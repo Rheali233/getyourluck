@@ -119,7 +119,7 @@ export class AnalyticsService {
         event.performanceMetrics ? JSON.stringify(event.performanceMetrics) : null
       ).run();
     } catch (error) {
-      console.error('记录分析事件失败:', error);
+      console.error('Failed to record analytics event:', error);
       throw new Error('无法记录分析事件');
     }
   }
@@ -152,7 +152,7 @@ export class AnalyticsService {
 
       await this.db.batch(batch);
     } catch (error) {
-      console.error('批量记录分析事件失败:', error);
+      console.error('批量Failed to record analytics event:', error);
       throw new Error('无法批量记录分析事件');
     }
   }
