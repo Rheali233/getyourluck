@@ -1,4 +1,4 @@
-name = "selfatlas-frontend"
+name = "getyourluck-frontend"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
@@ -8,13 +8,13 @@ pages_build_output_dir = "dist"
 # Pages 项目配置
 [env.production]
 name = "selfatlas-frontend-prod"
-project_name = "selfatlas-testing-platform"
+project_name = "getyourluck-testing-platform"
 route = "api.selfatlas.net/*"
 zone_id = "your-zone-id"
 
 [env.preview]
 name = "selfatlas-frontend-preview"
-project_name = "selfatlas-testing-platform"
+project_name = "getyourluck-testing-platform"
 route = "dev-api.selfatlas.net/*"
 zone_id = "your-zone-id"
 
