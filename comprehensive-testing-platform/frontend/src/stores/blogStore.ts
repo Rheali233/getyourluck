@@ -24,9 +24,9 @@ interface BlogState extends ModuleState {
 }
 
 interface BlogActions extends ModuleActions {
-  fetchArticles: (page?: number, category?: string) => Promise<void>
-  fetchArticle: (idOrSlug: string) => Promise<void>
-  setSelectedCategory: (category: string | null) => void
+  fetchArticles: (_page?: number, _category?: string) => Promise<void>
+  fetchArticle: (_idOrSlug: string) => Promise<void>
+  setSelectedCategory: (_category: string | null) => void
   incrementViewCount: (_id: string) => Promise<void>
 }
 
