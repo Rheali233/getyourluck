@@ -109,14 +109,14 @@ install_dependencies() {
     log_info "安装项目依赖..."
     
     # 安装前端依赖
-    cd comprehensive-testing-platform/frontend
-    pnpm install --frozen-lockfile
-    cd ../..
+    cd frontend
+    npm install
+    cd ..
     
     # 安装后端依赖
-    cd comprehensive-testing-platform/backend
-    pnpm install --frozen-lockfile
-    cd ../..
+    cd backend
+    npm install
+    cd ..
     
     log_success "依赖安装完成"
 }
@@ -126,12 +126,12 @@ run_tests() {
     log_info "运行测试..."
     
     # 前端测试
-    cd comprehensive-testing-platform/frontend
+    cd frontend
     pnpm test:ci
     cd ../..
     
     # 后端测试
-    cd comprehensive-testing-platform/backend
+    cd backend
     pnpm test:ci
     cd ../..
     
@@ -143,12 +143,12 @@ build_project() {
     log_info "构建项目..."
     
     # 构建前端
-    cd comprehensive-testing-platform/frontend
+    cd frontend
     pnpm build
     cd ../..
     
     # 构建后端
-    cd comprehensive-testing-platform/backend
+    cd backend
     pnpm build
     cd ../..
     
@@ -159,7 +159,7 @@ build_project() {
 deploy_frontend() {
     log_info "部署前端到 Cloudflare Pages..."
     
-    cd comprehensive-testing-platform/frontend
+    cd frontend
     
     # 设置环境变量
     export NODE_ENV=$ENVIRONMENT
@@ -179,7 +179,7 @@ deploy_frontend() {
 deploy_backend() {
     log_info "部署后端到 Cloudflare Workers..."
     
-    cd comprehensive-testing-platform/backend
+    cd backend
     
     # 部署到Cloudflare Workers
     wrangler deploy --env $ENVIRONMENT
@@ -193,7 +193,7 @@ deploy_backend() {
 migrate_database() {
     log_info "执行数据库迁移..."
     
-    cd comprehensive-testing-platform/backend
+    cd backend
     
     # 执行数据库迁移
     wrangler d1 execute "selfatlas-$ENVIRONMENT" \
@@ -209,7 +209,7 @@ migrate_database() {
 setup_kv_storage() {
     log_info "配置KV存储..."
     
-    cd comprehensive-testing-platform/backend
+    cd backend
     
     # 创建KV命名空间（如果不存在）
     wrangler kv:namespace create "selfatlas-$ENVIRONMENT-cache" \
@@ -231,7 +231,7 @@ setup_kv_storage() {
 setup_r2_storage() {
     log_info "配置R2存储..."
     
-    cd comprehensive-testing-platform/backend
+    cd backend
     
     # 创建R2存储桶（如果不存在）
     wrangler r2 bucket create "selfatlas-$ENVIRONMENT-storage" \
@@ -292,8 +292,8 @@ cleanup() {
     log_info "清理临时文件..."
     
     # 清理构建产物
-    rm -rf comprehensive-testing-platform/frontend/dist
-    rm -rf comprehensive-testing-platform/backend/dist
+    rm -rf frontend/dist
+    rm -rf backend/dist
     
     log_success "清理完成"
 }
