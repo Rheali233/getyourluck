@@ -43,8 +43,8 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v pnpm &> /dev/null; then
-        log_error "pnpm 未安装，请先安装 pnpm"
+    if ! command -v npm &> /dev/null; then
+        log_error "npm 未安装，请先安装 npm"
         exit 1
     fi
     
@@ -127,13 +127,13 @@ run_tests() {
     
     # 前端测试
     cd frontend
-    pnpm test:ci
-    cd ../..
+    npm run test -- --run
+    cd ..
     
     # 后端测试
     cd backend
-    pnpm test:ci
-    cd ../..
+    npm run test -- --run
+    cd ..
     
     log_success "测试完成"
 }
@@ -144,12 +144,12 @@ build_project() {
     
     # 构建前端
     cd frontend
-    pnpm build
+    npm build
     cd ../..
     
     # 构建后端
     cd backend
-    pnpm build
+    npm build
     cd ../..
     
     log_success "构建完成"
