@@ -144,13 +144,13 @@ build_project() {
     
     # 构建前端
     cd frontend
-    npm build
-    cd ../..
+    npm run build
+    cd ..
     
     # 构建后端
     cd backend
-    npm build
-    cd ../..
+    npm run build
+    cd ..
     
     log_success "构建完成"
 }
