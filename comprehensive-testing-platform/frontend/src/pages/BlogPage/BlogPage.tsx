@@ -74,7 +74,18 @@ const BlogList: React.FC = () => {
   const onTypingChange = (v: string) => {
     setTyping(v);
     if (debounceRef.current) window.clearTimeout(debounceRef.current);
-    debounceRef.current = window.setTimeout(() => fetchSuggestions(v.trim()), 250);
+    const trimmed = v.trim();
+    // 当用户清空搜索框时，自动返回到列表页（保留当前分类上下文）
+    if (trimmed.length === 0) {
+      setSuggestions([]);
+      if (category) {
+        navigate(`/blog/category/${category}/page/1`);
+      } else {
+        navigate('/blog/');
+      }
+      return;
+    }
+    debounceRef.current = window.setTimeout(() => fetchSuggestions(trimmed), 250);
   };
 
   React.useEffect(() => {
@@ -115,20 +126,42 @@ const BlogList: React.FC = () => {
     return defs;
   }, [pagination, category, tag, keyword]);
 
-  const structuredSearch = React.useMemo(() => {
-    if (!keyword) return [] as any[];
-    const target = `${window.location.origin}/blog/search/{search_term_string}/page/1`;
-    return [{
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      url: `${window.location.origin}/blog/`,
-      potentialAction: {
-        '@type': 'SearchAction',
-        target,
-        'query-input': 'required name=search_term_string'
-      }
-    }];
-  }, [keyword]);
+  const structuredData = React.useMemo(() => {
+    // 有搜索时：注入 SearchAction
+    if (keyword && keyword.trim().length > 0) {
+      const target = `${window.location.origin}/blog/search/{search_term_string}/page/1`;
+      return [{
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        url: `${window.location.origin}/blog/`,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target,
+          'query-input': 'required name=search_term_string'
+        }
+      }];
+    }
+    // 无搜索时：注入 CollectionPage + ItemList（基于当前页文章）
+    if (Array.isArray(articles) && articles.length > 0) {
+      return [{
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: 'Blog Articles',
+        description: UI_TEXT.blog.list.subtitle,
+        url: `${window.location.origin}/blog/`,
+        hasPart: {
+          '@type': 'ItemList',
+          itemListElement: articles.map((a: any, idx: number) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            name: a.title,
+            url: `${window.location.origin}/blog/${a.slug || a.id}`
+          }))
+        }
+      }];
+    }
+    return [] as any[];
+  }, [keyword, articles]);
 
   return (
     <div className="min-h-screen relative">
@@ -143,7 +176,7 @@ const BlogList: React.FC = () => {
           canonicalUrl: canonical,
         }}
         links={links}
-        structuredData={structuredSearch as any}
+        structuredData={structuredData as any}
       />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28">
         {/* 面包屑导航 */}

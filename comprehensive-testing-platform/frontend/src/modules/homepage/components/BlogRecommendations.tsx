@@ -27,7 +27,6 @@ export interface BlogArticle {
 export interface BlogRecommendationsProps extends BaseComponentProps {
   articles?: BlogArticle[];
   title?: string;
-  subtitle?: string;
   onArticleClick?: (article: BlogArticle) => void; // eslint-disable-line no-unused-vars
 }
 
@@ -36,17 +35,20 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
   testId = 'blog-recommendations',
   articles,
   title,
-  subtitle,
   onArticleClick,
   ...props
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
 
   // 当未传入 articles 时，从 blog 模块实时拉取
   const [loadedArticles, setLoadedArticles] = useState<BlogArticle[]>(articles || []);
 
   useEffect(() => {
+    // 标记已挂载，用于触发进入动画
+    setMounted(true);
+
     if (articles && articles.length > 0) {
       setLoadedArticles(articles);
       return;
@@ -72,7 +74,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
         }));
         setLoadedArticles(mapped);
       } catch (error) {
-        console.warn('Failed to load blog articles, using fallback:', error);
+        // Failed to load blog articles, using fallback
         // 使用默认文章作为降级方案
         setLoadedArticles([
           {
@@ -95,9 +97,8 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
     return () => clearTimeout(timer);
   }, [articles]);
 
-  // Title and subtitle configuration
-  const displayTitle = title || 'Latest Insights & Articles';
-  const displaySubtitle = subtitle || 'Discover valuable insights about psychology, career, and personal development';
+  // Title configuration
+  const displayTitle = title || 'Blog Recommendations';
 
   // 默认兜底数据
   const defaultArticles: BlogArticle[] = [
@@ -164,19 +165,16 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
 
   return (
     <section
-      className={cn("blog-recommendations py-16 relative overflow-hidden", className)}
+      className={cn("blog-recommendations py-12 relative overflow-hidden", className)}
       data-testid={testId}
       {...props}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Title section */}
-        <div className="text-left mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        {/* Title section with action on the right */}
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
             {displayTitle}
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl">
-            {displaySubtitle}
-          </p>
         </div>
 
         {/* 博客文章轮播 */}
@@ -189,47 +187,52 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
               className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {blogArticles.map((a) => (
+              {blogArticles.map((a, idx) => (
                 <article
                   key={a.id}
-                  className="flex-shrink-0 w-80 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition cursor-pointer"
+                  className={
+                    "group relative flex-shrink-0 w-80 h-72 rounded-xl overflow-hidden shadow-sm transition duration-300 ease-out will-change-transform cursor-pointer " +
+                    (mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2")
+                  }
+                  style={{ transitionDelay: `${Math.min(idx * 80, 240)}ms` }}
                   onClick={() => {
                     if (onArticleClick) {
                       onArticleClick(a);
                     }
-                    // 无论是否有回调函数，都要进行导航
                     if (a.slug) {
                       navigate(`/blog/${a.slug}`);
                     }
                   }}
                 >
-                  <div className="aspect-video bg-gray-200 overflow-hidden">
+                  {/* 背景大图填满 */}
+                  <div className="absolute inset-0">
                     <img
                       src={a.coverImage}
                       alt={a.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
                       }}
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="px-3 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
-                        {a.category}
-                      </span>
-                      <span className="text-xs text-gray-500">{a.readTime}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                      {a.title}
-                    </h3>
-                    <p className="text-gray-600 mb-3 text-xs line-clamp-3">
-                      {a.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>{a.author}</span>
-                      <span>{a.readCount.toLocaleString()} reads</span>
+
+                  {/* 文字半透明覆盖层（等宽并贴底） */}
+                  <div className="absolute inset-x-0 bottom-0">
+                    <div className="bg-black/55 backdrop-blur-sm px-4 py-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2.5 py-0.5 text-[11px] font-medium bg-white/20 text-white rounded-full">
+                          {a.category}
+                        </span>
+                        <span className="text-[11px] text-white/80">{a.readTime}</span>
+                      </div>
+                      <h3 className="text-base font-bold text-white mb-1 line-clamp-2">
+                        {a.title}
+                      </h3>
+                      <p className="text-white/85 text-[12px] line-clamp-2 leading-snug">
+                        {a.excerpt}
+                      </p>
                     </div>
                   </div>
                 </article>
@@ -237,15 +240,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
             </div>
 
           </div>
-          <div className="mt-10 text-center">
-            <button
-              type="button"
-              className="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white hover:bg-gray-800 transition"
-              onClick={() => navigate('/blog/')}
-            >
-              View more articles
-            </button>
-          </div>
+          
           </>
         ) : (
           <div className="text-center py-12">

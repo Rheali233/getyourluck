@@ -119,6 +119,23 @@ html {
   scroll-behavior: smooth;
 }
 
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
 /* 响应式字体大小 */
 @media (max-width: 640px) {
   html {

@@ -12,7 +12,7 @@ export const CareerTestTypeEnum = {
   LEADERSHIP: 'leadership',
 } as const;
 
-export type CareerTestTypeEnum = typeof CareerTestTypeEnum[keyof typeof CareerTestTypeEnum];
+export type CareerTestType = typeof CareerTestTypeEnum[keyof typeof CareerTestTypeEnum];
 
 // Test Status Constants
 export const CareerTestStatusEnum = {
@@ -22,7 +22,7 @@ export const CareerTestStatusEnum = {
   PAUSED: 'paused',
 } as const;
 
-export type CareerTestStatusEnum = typeof CareerTestStatusEnum[keyof typeof CareerTestStatusEnum];
+export type CareerTestStatus = typeof CareerTestStatusEnum[keyof typeof CareerTestStatusEnum];
 
 // Question Type Constants
 export const CareerQuestionTypeEnum = {
@@ -31,13 +31,13 @@ export const CareerQuestionTypeEnum = {
   MULTIPLE_CHOICE: 'multiple_choice',
 } as const;
 
-export type CareerQuestionTypeEnum = typeof CareerQuestionTypeEnum[keyof typeof CareerQuestionTypeEnum];
+export type CareerQuestionType = typeof CareerQuestionTypeEnum[keyof typeof CareerQuestionTypeEnum];
 
 // Base Question Interface
 export interface BaseQuestion {
   id: string;
   text: string;
-  type: CareerQuestionTypeEnum;
+  type: CareerQuestionType;
   required: boolean;
   order: number;
   category?: string;
@@ -91,8 +91,8 @@ export interface UserAnswer {
 // Test Session Interface
 export interface TestSession {
   id: string;
-  testType: CareerTestTypeEnum;
-  status: CareerTestStatusEnum;
+  testType: CareerTestType;
+  status: CareerTestStatus;
   startTime: Date;
   endTime?: Date;
   currentQuestionIndex: number;
@@ -104,7 +104,7 @@ export interface TestSession {
 // Test Result Interface
 export interface TestResult {
   sessionId: string;
-  testType: CareerTestTypeEnum;
+  testType: CareerTestType;
   scores: Record<string, number>;
   primaryType?: string;
   secondaryType?: string;
@@ -170,17 +170,17 @@ export interface QuestionDisplayProps extends BaseComponentProps {
   currentIndex: number;
   totalQuestions: number;
   isAnswered: boolean;
-  testType: CareerTestTypeEnum;
+  testType: CareerTestType;
   isCompleting?: boolean;
 }
 
 export interface TestContainerProps extends BaseComponentProps {
-  testType: CareerTestTypeEnum;
+  testType: CareerTestType;
 }
 
 export interface TestResultsProps extends BaseComponentProps {
   result: TestResult;
-  testType: CareerTestTypeEnum;
+  testType: CareerTestType;
   onRetakeTest: () => void;
   onShareResult: () => void;
 }
@@ -203,7 +203,7 @@ export interface CareerModuleState {
     [CareerTestTypeEnum.LEADERSHIP]: TestResult | null;
   };
   currentTestResult: TestResult | null;
-  currentTestType: CareerTestTypeEnum| null;
+  currentTestType: CareerTestType| null;
   showResults: boolean;
   questionsLoaded: boolean;
 }
@@ -226,7 +226,7 @@ export interface CareerModuleActions {
   setError: (error: string | null) => void;
   clearError: () => void;
   updateLastUpdated: () => void;
-  startTest: (testType: CareerTestTypeEnum) => Promise<void>;
+  startTest: (testType: CareerTestType) => Promise<void>;
   submitAnswer: (questionId: string, answer: string | number) => Promise<void>;
   goToNextQuestion: () => void;
   goToPreviousQuestion: () => void;
@@ -235,8 +235,8 @@ export interface CareerModuleActions {
   getTestResult: (sessionId: string) => Promise<void>;
   submitFeedback: (sessionId: string, feedback: 'like' | 'dislike') => Promise<void>;
   resetTest: () => void;
-  loadQuestionsFromAPI: (testType: CareerTestTypeEnum) => Promise<void>;
-  setCurrentTestType: (testType: CareerTestTypeEnum | null) => void;
+  loadQuestionsFromAPI: (testType: CareerTestType) => Promise<void>;
+  setCurrentTestType: (testType: CareerTestType | null) => void;
   setShowResults: (show: boolean) => void;
   setCurrentTestResult: (result: TestResult | null) => void;
 }

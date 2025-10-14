@@ -54,7 +54,21 @@ export const ArticleContent: React.FC<ArticleContentProps> = ({ html, className 
     return img.replace(/\[(.*?)\]\((.*?)\)/g, (_m, text, url) => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(text)}</a>`);
   };
 
-  const computedHtml = React.useMemo(() => toHtml(html), [html, toHtml]);
+  const decodeEntities = React.useCallback((src: string): string => {
+    // 仅解码常见实体，防止标签被错误以文本显示（内容来源受控于后台导入脚本）
+    return src
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+  }, []);
+
+  const computedHtml = React.useMemo(() => {
+    const raw = toHtml(html);
+    // 若后端内容带有实体（例如 &lt;img ...&gt;），进行一次解码以正确渲染
+    return raw ? decodeEntities(raw) : '';
+  }, [html, toHtml, decodeEntities]);
 
   return (
     <div className={cn('grid grid-cols-1 gap-8', className)}>

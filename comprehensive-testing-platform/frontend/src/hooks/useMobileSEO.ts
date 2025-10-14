@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { MOBILE_BREAKPOINTS, MOBILE_PERFORMANCE_MONITORING } from '@/config/mobileSEO';
+import { MOBILE_PERFORMANCE_MONITORING } from '@/config/mobileSEO';
 
 export interface MobileSEOState {
   isMobile: boolean;
@@ -83,13 +83,15 @@ export const useMobileSEO = (): MobileSEOState => {
     const lcpObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
       const lastEntry = entries[entries.length - 1];
-      setState(prev => ({
-        ...prev,
-        performance: {
-          ...prev.performance,
-          lcp: lastEntry.startTime
-        }
-      }));
+      if (lastEntry) {
+        setState(prev => ({
+          ...prev,
+          performance: {
+            ...prev.performance,
+            lcp: lastEntry.startTime
+          }
+        }));
+      }
     });
     lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 

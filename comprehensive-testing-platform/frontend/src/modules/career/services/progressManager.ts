@@ -4,10 +4,10 @@
  */
 
 import { frontendCacheService } from './frontendCacheService';
-import type { CareerTestTypeEnum, UserAnswer } from '../types';
+import type { CareerTestType, UserAnswer } from '../types';
 
 export interface TestProgress {
-  testType: CareerTestTypeEnum;
+  testType: CareerTestType;
   sessionId: string;
   currentQuestionIndex: number;
   answers: UserAnswer[];
@@ -34,7 +34,7 @@ export class CareerProgressManager {
   /**
    * Generate progress storage key
    */
-  private generateProgressKey(testType: CareerTestTypeEnum, sessionId: string): string {
+  private generateProgressKey(testType: CareerTestType, sessionId: string): string {
     return `progress:${testType}:${sessionId}`;
   }
 
@@ -62,7 +62,7 @@ export class CareerProgressManager {
   /**
    * Load answer progress
    */
-  loadProgress(testType: CareerTestTypeEnum, sessionId: string): TestProgress | null {
+  loadProgress(testType: CareerTestType, sessionId: string): TestProgress | null {
     try {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.get<TestProgress>(key, 'career-test-progress');
@@ -75,7 +75,7 @@ export class CareerProgressManager {
   /**
    * Delete answer progress
    */
-  deleteProgress(testType: CareerTestTypeEnum, sessionId: string): boolean {
+  deleteProgress(testType: CareerTestType, sessionId: string): boolean {
     try {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.delete(key, 'career-test-progress');
@@ -89,7 +89,7 @@ export class CareerProgressManager {
    * Update answer progress
    */
   updateProgress(
-    testType: CareerTestTypeEnum, 
+    testType: CareerTestType, 
     sessionId: string, 
     updates: Partial<TestProgress>
   ): boolean {
@@ -116,7 +116,7 @@ export class CareerProgressManager {
    * Add answer
    */
   addAnswer(
-    testType: CareerTestTypeEnum,
+    testType: CareerTestType,
     sessionId: string,
     answer: UserAnswer
   ): boolean {

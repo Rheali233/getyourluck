@@ -61,15 +61,17 @@ export const blogService = {
   async searchArticles(keyword: string, limit = 24): Promise<APIResponse<{ results: BlogArticleSummary[] }>> {
     const q = encodeURIComponent(keyword);
     const resp = await apiClient.get(`/api/search?q=${q}&lang=en-US&limit=${limit}`) as APIResponse<any>;
-    // 兼容：筛选出博客类型结果并映射为 BlogArticleSummary（后端需提供相应字段）
-    const mapped: BlogArticleSummary[] = (resp.data?.results || [])
-      .filter((r: any) => r.type === 'blog')
+
+    // 兼容不同后端字段：type 或 contentType；字段命名采用多源回退
+    const raw = Array.isArray(resp.data?.results) ? resp.data.results : [];
+    let mapped: BlogArticleSummary[] = raw
+      .filter((r: any) => (r.type || r.contentType) === 'blog')
       .map((r: any) => ({
-        id: r.id,
-        slug: r.slug || r.id,
+        id: r.id || r.contentId || r.slug,
+        slug: r.slug || r.contentId || r.id,
         title: r.title,
-        excerpt: r.excerpt || '',
-        coverImage: r.coverImage,
+        excerpt: r.excerpt || r.description || '',
+        coverImage: r.coverImage || r.cover_image,
         category: r.category,
         tags: r.tags || [],
         author: r.author,
@@ -78,7 +80,23 @@ export const blogService = {
         readTime: r.readTime,
         readCount: r.readCount,
       }));
-    return { ...(resp as any), data: { results: mapped } } as APIResponse<{ results: BlogArticleSummary[] }>;
+
+    // Fallback：若统一搜索无结果，降级到文章列表做前端包含匹配（title/excerpt/category）
+    if (mapped.length === 0) {
+      try {
+        const listResp = await blogService.getArticles(1, Math.max(30, limit));
+        const list = (listResp.data || []) as BlogArticleSummary[];
+        const kw = keyword.trim().toLowerCase();
+        mapped = list.filter((a) => {
+          const t = `${a.title || ''} ${a.excerpt || ''} ${a.category || ''}`.toLowerCase();
+          return kw && t.includes(kw);
+        });
+      } catch {
+        // noop: 返回空结果
+      }
+    }
+
+    return { success: true, data: { results: mapped }, timestamp: new Date().toISOString() } as APIResponse<{ results: BlogArticleSummary[] }>;
   },
 
   /**

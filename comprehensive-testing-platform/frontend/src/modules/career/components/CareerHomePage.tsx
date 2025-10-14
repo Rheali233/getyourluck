@@ -10,7 +10,7 @@ import { Card, Button } from '@/components/ui';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
-import { CareerTestTypeEnum } from '../types';
+import { CareerTestTypeEnum, CareerTestType } from '../types';
 import { CareerTestContainer } from './CareerTestContainer';
 import { ProgressRecoveryPrompt } from './ProgressRecoveryPrompt';
 import { useSEO } from '@/hooks/useSEO';
@@ -19,7 +19,7 @@ import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface CareerHomePageProps extends BaseComponentProps {
-  onTestSelect?: (testType: CareerTestTypeEnum) => void;
+  onTestSelect?: (testType: CareerTestType) => void;
 }
 
 export const CareerHomePage: React.FC<CareerHomePageProps> = ({
@@ -31,7 +31,7 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
   const navigate = useNavigate();
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'module',
     moduleType: 'career',
     customKeywords: ['career guidance', 'job assessment', 'professional development']
@@ -121,7 +121,7 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
     }
   ];
 
-  const handleTestSelect = (testType: CareerTestTypeEnum) => {
+  const handleTestSelect = (testType: CareerTestType) => {
     if (onTestSelect) {
       onTestSelect(testType);
     } else {

@@ -37,8 +37,8 @@ class LazyErrorBoundary extends React.Component<
     return { hasError: true };
   }
 
-  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Lazy component error:', error, errorInfo);
+  override componentDidCatch(_error: Error, _errorInfo: React.ErrorInfo) {
+    // console.error('Lazy component error:', _error, _errorInfo);
   }
 
   override render() {
@@ -66,7 +66,7 @@ class LazyErrorBoundary extends React.Component<
 // 懒加载组件包装器
 export function createLazyComponent<T = {}>(
   importFunc: () => Promise<{ default: ComponentType<T> }>,
-  _options: LazyComponentProps = {}
+  // _options: LazyComponentProps = {}
 ) {
   const LazyComponent = lazy(importFunc);
 
@@ -94,8 +94,8 @@ export function createLazyComponent<T = {}>(
 // 预加载函数
 export function preloadComponent(importFunc: () => Promise<any>) {
   return () => {
-    importFunc().catch(error => {
-      console.warn('Failed to preload component:', error);
+    importFunc().catch(_error => {
+      // console.warn('Failed to preload component:', _error);
     });
   };
 }
@@ -125,10 +125,10 @@ export function useSmartPreload() {
     importFunc()
       .then(() => {
         setPreloadedComponents(prev => new Set([...prev, name]));
-        console.log(`Preloaded component: ${name}`);
+        // console.log(`Preloaded component: ${name}`);
       })
-      .catch(error => {
-        console.warn(`Failed to preload component ${name}:`, error);
+      .catch(_error => {
+        // console.warn(`Failed to preload component ${name}:`, _error);
       });
   };
 

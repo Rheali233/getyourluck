@@ -3,7 +3,7 @@
  * 提供各种SEO工具和监控功能
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Button } from '@/components/ui';
 import { SEODashboard } from '@/components/SEODashboard';
 import { generateSEOReport, exportSEOReport, exportSEOReportCSV } from '@/utils/seoReportGenerator';

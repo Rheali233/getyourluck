@@ -28,18 +28,19 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
   const navigate = useNavigate();
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'module',
     moduleType: 'astrology',
-    customKeywords: ['horoscope reading', 'zodiac analysis', 'astrological guidance']
+    customKeywords: ['horoscope reading', 'zodiac analysis', 'astrological guidance', 'astrologer bot', 'AI astrologer bot']
   });
 
   // SEO配置
   const seoConfig = useSEO({
     testType: 'astrology',
     testId: 'home',
-    title: optimizedTitle,
-    description: optimizedDescription,
+    title: `${optimizedTitle} | Astrologer Bot`,
+    description: `${optimizedDescription} Experience guided, AI‑assisted readings powered by our astrologer bot for horoscope, compatibility, and birth chart insights.`,
+    keywords: ['astrology reading','horoscope reading','zodiac compatibility','birth chart analysis','astrologer bot','AI astrologer bot'],
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
@@ -150,8 +151,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
           </button>
         </div>
         <p className="text-xl text-gray-200 max-w-3xl">
-          Discover the mysteries of the stars with professional astrological analysis. 
-          Explore your horoscope, compatibility, and birth chart insights.
+          Explore the stars with our astrologer bot delivering guided, AI‑assisted readings for horoscope, compatibility, and birth charts, combining traditional insight with fast, privacy‑first analysis across modules.
         </p>
       </div>
 
@@ -214,7 +214,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">Choose Your Analysis</h3>
               <p className="text-gray-700 text-sm">
-                Select from horoscope reading, compatibility analysis, or birth chart generation.
+                Select horoscope, compatibility, or birth chart. Our astrologer bot clarifies your intent and recommends a focused starting path.
               </p>
             </div>
             <div className="text-center">
@@ -223,7 +223,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">Provide Information</h3>
               <p className="text-gray-700 text-sm">
-                Enter your zodiac sign, birth details, or compatibility preferences as needed.
+                Enter zodiac sign, birth details, or partner data. The astrologer bot validates inputs and adapts prompts for precision.
               </p>
             </div>
             <div className="text-center">
@@ -232,7 +232,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">Get Insights</h3>
               <p className="text-gray-700 text-sm">
-                Receive detailed astrological analysis and personalized recommendations.
+                Receive structured insights and next steps. The astrologer bot explains reasoning, timing windows, and optional follow‑up recommendations.
               </p>
             </div>
           </div>
@@ -248,9 +248,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
           <div className="ml-4">
             <h3 className="text-lg font-bold text-gray-900 mb-2">About Astrological Analysis</h3>
             <p className="text-gray-700 text-sm leading-relaxed">
-              Our astrological analyses are based on traditional astrological principles and are provided for entertainment and self-reflection purposes. 
-              While we strive for accuracy and insight, these readings should not be used as the sole basis for important life decisions. 
-              Astrology is a tool for guidance and self-understanding, encouraging personal growth and awareness.
+              Readings are guidance, not directives; our astrologer bot augments human tradition with transparent reasoning, respectful boundaries, and optional follow‑ups—use insights thoughtfully and consult professionals when necessary.
             </p>
           </div>
         </div>

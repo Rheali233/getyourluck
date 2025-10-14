@@ -40,7 +40,7 @@ export const CardDrawingPage: React.FC = () => {
   const [showLoadingModal, setShowLoadingModal] = useState(false);
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'test',
     testType: 'tarot',
     customKeywords: ['tarot card reading', 'divination', 'spiritual guidance']

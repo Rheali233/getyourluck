@@ -36,7 +36,7 @@ export const TarotHomePage: React.FC = () => {
   const { isLoading } = useUnifiedTestStore();
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'module',
     moduleType: 'tarot',
     customKeywords: ['tarot guidance', 'card reading', 'divination']

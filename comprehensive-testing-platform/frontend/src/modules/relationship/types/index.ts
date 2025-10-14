@@ -12,7 +12,7 @@ export const TestType = {
   INTERPERSONAL: 'interpersonal',
 } as const;
 
-export type TestType = typeof TestType[keyof typeof TestType];
+export type RelationshipTestType = typeof TestType[keyof typeof TestType];
 
 // Test Status Constants
 export const TestStatus = {
@@ -22,7 +22,7 @@ export const TestStatus = {
   PAUSED: 'paused',
 } as const;
 
-export type TestStatus = typeof TestStatus[keyof typeof TestStatus];
+export type RelationshipTestStatus = typeof TestStatus[keyof typeof TestStatus];
 
 // Question Type Constants
 export const QuestionType = {
@@ -31,13 +31,13 @@ export const QuestionType = {
   MULTIPLE_CHOICE: 'multiple_choice',
 } as const;
 
-export type QuestionType = typeof QuestionType[keyof typeof QuestionType];
+export type RelationshipQuestionType = typeof QuestionType[keyof typeof QuestionType];
 
 // Base Question Interface
 export interface BaseQuestion {
   id: string;
   text: string;
-  type: QuestionType;
+  type: RelationshipQuestionType;
   required: boolean;
   order: number;
   category?: string;
@@ -93,8 +93,8 @@ export interface UserAnswer {
 // Test Session Interface
 export interface TestSession {
   id: string;
-  testType: TestType;
-  status: TestStatus;
+  testType: RelationshipTestType;
+  status: RelationshipTestStatus;
   startTime: Date;
   endTime?: Date;
   currentQuestionIndex: number;
@@ -106,7 +106,7 @@ export interface TestSession {
 // Test Result Interface
 export interface TestResult {
   sessionId: string;
-  testType: TestType;
+  testType: RelationshipTestType;
   scores: Record<string, number>;
   primaryType?: string;
   secondaryType?: string;
@@ -129,17 +129,17 @@ export interface QuestionDisplayProps extends BaseComponentProps {
   currentIndex: number;
   totalQuestions: number;
   isAnswered: boolean;
-  testType: TestType;
+  testType: RelationshipTestType;
   isCompleting?: boolean;
 }
 
 export interface TestContainerProps extends BaseComponentProps {
-  testType: TestType;
+  testType: RelationshipTestType;
 }
 
 export interface TestResultsProps extends BaseComponentProps {
   result: TestResult;
-  testType: TestType;
+  testType: RelationshipTestType;
   onRetakeTest: () => void;
   onShareResult: () => void;
 }
@@ -162,7 +162,7 @@ export interface RelationshipModuleState {
     [TestType.INTERPERSONAL]: TestResult | null;
   };
   currentTestResult: TestResult | null;
-  currentTestType: TestType | null;
+  currentTestType: RelationshipTestType | null;
   showResults: boolean;
   questionsLoaded: boolean;
 }
@@ -185,7 +185,7 @@ export interface RelationshipModuleActions {
   setError: (error: string | null) => void;
   clearError: () => void;
   updateLastUpdated: () => void;
-  startTest: (testType: TestType) => Promise<void>;
+  startTest: (testType: RelationshipTestType) => Promise<void>;
   submitAnswer: (questionId: string, answer: string | number) => Promise<void>;
   goToNextQuestion: () => void;
   goToPreviousQuestion: () => void;
@@ -194,8 +194,8 @@ export interface RelationshipModuleActions {
   getTestResult: (sessionId: string) => Promise<void>;
   submitFeedback: (sessionId: string, feedback: 'like' | 'dislike') => Promise<void>;
   resetTest: () => void;
-  loadQuestionsFromAPI: (testType: TestType) => Promise<void>;
-  setCurrentTestType: (testType: TestType | null) => void;
+  loadQuestionsFromAPI: (testType: RelationshipTestType) => Promise<void>;
+  setCurrentTestType: (testType: RelationshipTestType | null) => void;
   setShowResults: (show: boolean) => void;
   setCurrentTestResult: (result: TestResult | null) => void;
 }

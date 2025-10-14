@@ -18,7 +18,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
   position = 'top-right',
   collapsed = false
 }) => {
-  const { metrics, getPerformanceScore, getPerformanceStatus, thresholds } = usePerformance();
+  const { metrics, score, suggestions } = usePerformance();
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
   // 只在开发环境显示
@@ -26,7 +26,13 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
     return null;
   }
 
-  const score = getPerformanceScore();
+  const getPerformanceStatus = () => {
+    if (score >= 90) return 'excellent';
+    if (score >= 70) return 'good';
+    if (score >= 50) return 'needs-improvement';
+    return 'poor';
+  };
+
   const status = getPerformanceStatus();
 
   const getStatusColor = (status: string) => {
@@ -42,6 +48,15 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
   const getMetricColor = (value: number | null, threshold: number) => {
     if (value === null) return 'text-gray-400';
     return value <= threshold ? 'text-green-600' : 'text-red-600';
+  };
+
+  // 性能阈值定义
+  const thresholds = {
+    lcp: 2500, // 2.5s
+    fid: 100,  // 100ms
+    cls: 0.1,  // 0.1
+    fcp: 1800, // 1.8s
+    ttfb: 600  // 600ms
   };
 
   const positionClasses = {
@@ -109,13 +124,13 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-gray-700">LCP</span>
-                <span className="text-xs text-gray-500">(≤{thresholds.LCP}ms)</span>
+                <span className="text-xs text-gray-500">(≤{thresholds.lcp}ms)</span>
               </div>
               <span className={cn(
                 'text-sm font-mono',
-                getMetricColor(metrics.LCP, thresholds.LCP)
+                getMetricColor(metrics.lcp, thresholds.lcp)
               )}>
-                {metrics.LCP ? `${metrics.LCP.toFixed(0)}ms` : '--'}
+                {metrics.lcp ? `${metrics.lcp.toFixed(0)}ms` : '--'}
               </span>
             </div>
 
@@ -123,13 +138,13 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-gray-700">FID</span>
-                <span className="text-xs text-gray-500">(≤{thresholds.FID}ms)</span>
+                <span className="text-xs text-gray-500">(≤{thresholds.fid}ms)</span>
               </div>
               <span className={cn(
                 'text-sm font-mono',
-                getMetricColor(metrics.FID, thresholds.FID)
+                getMetricColor(metrics.fid, thresholds.fid)
               )}>
-                {metrics.FID ? `${metrics.FID.toFixed(0)}ms` : '--'}
+                {metrics.fid ? `${metrics.fid.toFixed(0)}ms` : '--'}
               </span>
             </div>
 
@@ -137,13 +152,13 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-gray-700">CLS</span>
-                <span className="text-xs text-gray-500">(≤{thresholds.CLS})</span>
+                <span className="text-xs text-gray-500">(≤{thresholds.cls})</span>
               </div>
               <span className={cn(
                 'text-sm font-mono',
-                getMetricColor(metrics.CLS, thresholds.CLS)
+                getMetricColor(metrics.cls, thresholds.cls)
               )}>
-                {metrics.CLS ? metrics.CLS.toFixed(3) : '--'}
+                {metrics.cls ? metrics.cls.toFixed(3) : '--'}
               </span>
             </div>
 
@@ -151,13 +166,13 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-gray-700">FCP</span>
-                <span className="text-xs text-gray-500">(≤{thresholds.FCP}ms)</span>
+                <span className="text-xs text-gray-500">(≤{thresholds.fcp}ms)</span>
               </div>
               <span className={cn(
                 'text-sm font-mono',
-                getMetricColor(metrics.FCP, thresholds.FCP)
+                getMetricColor(metrics.fcp, thresholds.fcp)
               )}>
-                {metrics.FCP ? `${metrics.FCP.toFixed(0)}ms` : '--'}
+                {metrics.fcp ? `${metrics.fcp.toFixed(0)}ms` : '--'}
               </span>
             </div>
 
@@ -165,13 +180,13 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-gray-700">TTFB</span>
-                <span className="text-xs text-gray-500">(≤{thresholds.TTFB}ms)</span>
+                <span className="text-xs text-gray-500">(≤{thresholds.ttfb}ms)</span>
               </div>
               <span className={cn(
                 'text-sm font-mono',
-                getMetricColor(metrics.TTFB, thresholds.TTFB)
+                getMetricColor(metrics.ttfb, thresholds.ttfb)
               )}>
-                {metrics.TTFB ? `${metrics.TTFB.toFixed(0)}ms` : '--'}
+                {metrics.ttfb ? `${metrics.ttfb.toFixed(0)}ms` : '--'}
               </span>
             </div>
           </div>
@@ -180,17 +195,12 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
           <div className="mt-4 p-3 bg-gray-50 rounded-lg">
             <h4 className="text-sm font-medium text-gray-700 mb-2">Recommendations</h4>
             <div className="text-xs text-gray-600 space-y-1">
-              {score < 75 && (
-                <div>• Optimize images and use WebP format</div>
-              )}
-              {metrics.LCP && metrics.LCP > thresholds.LCP && (
-                <div>• Optimize largest contentful paint</div>
-              )}
-              {metrics.CLS && metrics.CLS > thresholds.CLS && (
-                <div>• Fix layout shifts</div>
-              )}
-              {metrics.FID && metrics.FID > thresholds.FID && (
-                <div>• Reduce JavaScript execution time</div>
+              {suggestions.length > 0 ? (
+                suggestions.map((suggestion, index) => (
+                  <div key={index}>• {suggestion}</div>
+                ))
+              ) : (
+                <div>• Performance looks good!</div>
               )}
             </div>
           </div>

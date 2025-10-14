@@ -7,7 +7,7 @@ import React from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { UI_TEXT } from '@/shared/configs/UI_TEXT';
 import { SEOManager } from '@/modules/homepage/components/SEOManager';
-import { Navigation, Breadcrumb } from '@/components/ui';
+import { Navigation, Breadcrumb, Footer } from '@/components/ui';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
 
@@ -89,6 +89,30 @@ export const AboutPage: React.FC<AboutPageProps> = ({
             </ul>
           </section>
 
+          {/* How It Works */}
+          <section aria-labelledby="howitworks-title" className="mb-12">
+            <h2 id="howitworks-title" className="text-2xl font-semibold text-gray-900 mb-4">
+              {UI_TEXT.about.sections.howItWorks.title}
+            </h2>
+            <ol className="list-decimal pl-6 space-y-2 text-gray-700">
+              {UI_TEXT.about.sections.howItWorks.steps.map((step, idx) => (
+                <li key={`how-${idx}`}>{step}</li>
+              ))}
+            </ol>
+          </section>
+
+          {/* Data & Privacy */}
+          <section aria-labelledby="privacy-title" className="mb-12">
+            <h2 id="privacy-title" className="text-2xl font-semibold text-gray-900 mb-4">
+              {UI_TEXT.about.sections.privacy.title}
+            </h2>
+            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              {UI_TEXT.about.sections.privacy.points.map((pt, idx) => (
+                <li key={`pv-${idx}`}>{pt}</li>
+              ))}
+            </ul>
+          </section>
+
           {/* Modules */}
           <section aria-labelledby="modules-title" className="mb-12">
             <h2 id="modules-title" className="text-2xl font-semibold text-gray-900 mb-4">
@@ -106,9 +130,24 @@ export const AboutPage: React.FC<AboutPageProps> = ({
               ))}
             </div>
           </section>
-
+          {/* CTA Buttons */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/tests"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-500 text-white font-semibold shadow-sm hover:from-indigo-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {UI_TEXT.about.cta.startTestCenter}
+            </Link>
+            <Link
+              to="/blog"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-900 text-white font-semibold shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700"
+            >
+              {UI_TEXT.about.cta.exploreBlog}
+            </Link>
+          </div>
         
         </div>
+        <Footer className="mt-16" />
       </div>
     </div>
   );

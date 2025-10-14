@@ -34,9 +34,9 @@ export function createLazyComponent<T extends ComponentType<any>>(
 ) {
   const LazyComponent = lazy(importFunc);
   
-  return React.forwardRef<any, React.ComponentProps<T>>((props, ref) => (
+  return React.forwardRef<any, any>((props, ref) => (
     <LazyLoad fallback={fallback}>
-      <LazyComponent {...props} ref={ref} />
+      <LazyComponent {...(props as any)} ref={ref as any} />
     </LazyLoad>
   ));
 }

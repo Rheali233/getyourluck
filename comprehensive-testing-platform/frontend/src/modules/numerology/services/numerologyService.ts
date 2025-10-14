@@ -6,7 +6,7 @@
 import { apiClient } from '@/services/apiClient';
 import type {
   NumerologyBasicInfo,
-  NumerologyAnalysis,
+  // NumerologyAnalysis,
   NumerologyAnalysisRequest,
   NumerologyAnalysisResponse,
   NumerologySession

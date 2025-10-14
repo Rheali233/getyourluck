@@ -66,7 +66,7 @@ export const PHQ9ResultDisplay: React.FC<PHQ9ResultDisplayProps> = ({
                 {safeResult.severity === 'minimal' ? '😊' : 
                  safeResult.severity === 'mild' ? '😐' : 
                  safeResult.severity === 'moderate' ? '😔' : 
-                 safeResult.severity === 'moderately-severe' || safeResult.severity === 'moderately_severe' ? '😢' : 
+                 safeResult.severity === 'moderately_severe' ? '😢' : 
                  safeResult.severity === 'severe' ? '😭' : '😊'}
               </div>
             </div>

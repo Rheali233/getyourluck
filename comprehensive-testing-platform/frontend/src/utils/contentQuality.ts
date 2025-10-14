@@ -123,7 +123,7 @@ const countSyllables = (word: string): number => {
   let previousWasVowel = false;
   
   for (let i = 0; i < word.length; i++) {
-    const isVowel = vowels.includes(word[i].toLowerCase());
+    const isVowel = vowels.includes(word[i]?.toLowerCase() || '');
     if (isVowel && !previousWasVowel) {
       count++;
     }

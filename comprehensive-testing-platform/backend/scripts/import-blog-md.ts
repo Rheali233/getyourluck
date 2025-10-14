@@ -141,17 +141,20 @@ async function upsertArticle(fm: FrontMatter, html: string, local: boolean, dbBi
   const sql = `
   INSERT INTO blog_articles (
     id, title, content, excerpt, category, tags_data,
+    slug, cover_image,
     view_count, like_count, is_published, is_featured,
-    published_at, created_at, updated_at, slug
+    published_at, created_at, updated_at
   ) VALUES (
     '${id}', '${safeTitle}', '${safeHtml}', '${safeExcerpt}', '${safeCategory}', '${tagsJson}',
+    '${safeSlug}', '${safeCover}',
     0, 0, ${isPublished}, ${fm.isFeatured ? 1 : 0},
-    ${publishedAt}, '${now}', ${updatedAt}, '${safeSlug}'
+    ${publishedAt}, '${now}', ${updatedAt}
   )
   ON CONFLICT(id) DO UPDATE SET
     title='${safeTitle}', content='${safeHtml}', excerpt='${safeExcerpt}', category='${safeCategory}',
-    tags_data='${tagsJson}', is_published=${isPublished}, is_featured=${fm.isFeatured ? 1 : 0},
-    published_at=${publishedAt}, updated_at=${updatedAt}, slug='${safeSlug}'
+    tags_data='${tagsJson}', slug='${safeSlug}', cover_image='${safeCover}',
+    is_published=${isPublished}, is_featured=${fm.isFeatured ? 1 : 0},
+    published_at=${publishedAt}, updated_at=${updatedAt}
   ;`.trim();
 
   if (dryRun) {

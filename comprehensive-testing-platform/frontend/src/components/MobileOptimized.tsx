@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/utils/classNames';
 import { useMobileSEO } from '@/hooks/useMobileSEO';
-import { MOBILE_TOUCH_TARGETS, MOBILE_UX_CONFIG } from '@/config/mobileSEO';
+import { MOBILE_TOUCH_TARGETS } from '@/config/mobileSEO';
 
 interface MobileOptimizedProps {
   children: React.ReactNode;
@@ -26,7 +26,7 @@ export const MobileOptimized: React.FC<MobileOptimizedProps> = ({
   enablePerformanceOptimization = true,
   enableResponsiveImages = true,
 }) => {
-  const { isMobile, isTablet, touchSupport } = useMobileSEO();
+  const { touchSupport } = useMobileSEO();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export const GestureHandler: React.FC<GestureHandlerProps> = ({
 }) => {
   const { touchSupport } = useMobileSEO();
   const [touchStart, setTouchStart] = useState<{ x: number; y: number; time: number } | null>(null);
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [longPressTimer, setLongPressTimer] = useState<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!touchSupport) return;
@@ -193,18 +193,20 @@ export const GestureHandler: React.FC<GestureHandlerProps> = ({
     const touch = e.touches[0];
     const startTime = Date.now();
     
-    setTouchStart({
-      x: touch.clientX,
-      y: touch.clientY,
-      time: startTime
-    });
+    if (touch) {
+      setTouchStart({
+        x: touch.clientX,
+        y: touch.clientY,
+        time: startTime
+      });
+    }
 
     // 长按检测
     if (onLongPress) {
       const timer = setTimeout(() => {
         onLongPress();
       }, 500);
-      setLongPressTimer(timer);
+      setLongPressTimer(timer as unknown as number);
     }
   };
 
@@ -218,9 +220,10 @@ export const GestureHandler: React.FC<GestureHandlerProps> = ({
     }
 
     const touch = e.changedTouches[0];
-    const deltaX = touch.clientX - touchStart.x;
-    const deltaY = touch.clientY - touchStart.y;
-    const deltaTime = Date.now() - touchStart.time;
+    if (touch && touchStart) {
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = touch.clientY - touchStart.y;
+      const deltaTime = Date.now() - touchStart.time;
 
     // 检测滑动
     const minSwipeDistance = 50;
@@ -244,12 +247,13 @@ export const GestureHandler: React.FC<GestureHandlerProps> = ({
       }
     }
 
-    // 检测点击
-    if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10 && deltaTime < 200 && onTap) {
-      onTap();
-    }
+      // 检测点击
+      if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10 && deltaTime < 200 && onTap) {
+        onTap();
+      }
 
-    setTouchStart(null);
+      setTouchStart(null);
+    }
   };
 
   const handleTouchMove = () => {

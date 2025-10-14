@@ -9,8 +9,7 @@ import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 import { Navigation } from '@/components/ui';
 import { Footer } from '@/components/ui';
-import { SEOHead } from '@/components/SEOHead';
-import { BASE_SEO } from '@/config/seo';
+import { SEOManager } from './SEOManager';
 import { PerformanceOptimizer } from '@/components/PerformanceOptimizer';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
@@ -74,20 +73,22 @@ export const Homepage: React.FC<HomepageProps> = ({
     // 模块点击处理
   };
 
-  const handleArticleClick = (article: any) => {
+  const handleArticleClick = (_article: any) => {
     // 可以在这里添加文章点击的统计或分析逻辑
-    console.log('Article clicked:', article.title);
+    // console.log('Article clicked:', article.title);
+    // 引用以避免未使用变量的 ESLint 报错
+    void _article;
   };
 
   
 
   // 处理滚动到指定区域
-  const handleScrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+  // const handleScrollToSection = (sectionId: string) => {
+  //   const element = document.getElementById(sectionId);
+  //   if (element) {
+  //     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  //   }
+  // };
 
   return (
     <div
@@ -95,12 +96,103 @@ export const Homepage: React.FC<HomepageProps> = ({
       data-testid={testId}
       {...props}
     >
-      <SEOHead config={{
-        ...BASE_SEO,
-        title: optimizedTitle,
-        description: optimizedDescription,
-        keywords: baseKeywords.join(', ')
-      }} />
+      <SEOManager
+        pageType="homepage"
+        metadata={{
+          title: optimizedTitle,
+          description: optimizedDescription,
+          keywords: baseKeywords.join(', '),
+          ogTitle: optimizedTitle,
+          ogDescription: optimizedDescription,
+          ogImage: `${window.location.origin}/og-image.jpg`,
+        }}
+        robots="index,follow"
+        structuredData={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Comprehensive Testing Platform',
+            description: 'Personality, psychology, career, astrology and more tests',
+            url: window.location.origin
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'Comprehensive Testing Platform',
+            description: 'A modern online testing platform offering psychology, astrology, tarot and career tests',
+            url: window.location.origin
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: 'Test Modules',
+            description: 'A curated list of test modules including psychology, astrology, tarot, career and more',
+            url: window.location.href,
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Personality & Mind', url: `${window.location.origin}/psychology` },
+              { '@type': 'ListItem', position: 2, name: 'Astrology & Fortune', url: `${window.location.origin}/astrology` },
+              { '@type': 'ListItem', position: 3, name: 'Tarot & Divination', url: `${window.location.origin}/tarot` },
+              { '@type': 'ListItem', position: 4, name: 'Career & Development', url: `${window.location.origin}/career` },
+              { '@type': 'ListItem', position: 5, name: 'Numerology & Destiny', url: `${window.location.origin}/numerology` },
+              { '@type': 'ListItem', position: 6, name: 'Learning & Intelligence', url: `${window.location.origin}/learning` },
+              { '@type': 'ListItem', position: 7, name: 'Relationships & Communication', url: `${window.location.origin}/relationship` }
+            ]
+          },
+          // CollectionPage JSON-LD 已添加
+          {
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'SelfAtlas Test Center & Modules',
+            description: 'Collection of psychology, career, numerology and tarot modules (MBTI, EQ, Holland, BaZi, Chinese Name, Tarot Reading) to start your tests quickly.',
+            url: window.location.origin,
+            hasPart: {
+              '@type': 'ItemList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'MBTI Personality Test', url: `${window.location.origin}/psychology/mbti` },
+                { '@type': 'ListItem', position: 2, name: 'Emotional Intelligence Test', url: `${window.location.origin}/psychology/eq` },
+                { '@type': 'ListItem', position: 3, name: 'Holland Code Career Interest Assessment', url: `${window.location.origin}/career` },
+                { '@type': 'ListItem', position: 4, name: 'Tarot Reading', url: `${window.location.origin}/tarot` },
+                { '@type': 'ListItem', position: 5, name: 'BaZi Analysis', url: `${window.location.origin}/numerology/bazi` },
+                { '@type': 'ListItem', position: 6, name: 'Chinese Name Recommendation', url: `${window.location.origin}/numerology/name` }
+              ]
+            }
+          },
+          // FAQPage JSON-LD（从默认 FAQ 列表生成）
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            name: 'Homepage FAQ',
+            description: 'Answers to common questions about SelfAtlas tests and features',
+            url: window.location.origin,
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'What makes SelfAtlas different from other testing platforms?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'SelfAtlas uniquely combines Western psychology (MBTI, Big Five) with Eastern wisdom (Astrology, Tarot, Numerology). Our 7 comprehensive test categories provide multiple perspectives on your personality, career, and relationships.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'How accurate are the test results?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Psychology tests are based on validated theories like MBTI and Big Five. Traditional modules follow established wisdom systems. Our AI analysis provides personalized insights beyond generic results.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'How long do the tests take?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Most tests take 5–15 minutes. Psychology tests are typically 10–15 minutes, while Astrology or Tarot take 5–10 minutes.'
+                }
+              }
+            ]
+          }
+        ]}
+      />
       {/* 浅蓝紫色渐变背景 - 使用CSS而不是复杂的渐变 */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div>
       {/* 导航栏 */}

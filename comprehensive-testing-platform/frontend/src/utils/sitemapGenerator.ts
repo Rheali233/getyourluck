@@ -187,10 +187,10 @@ export const generateSitemapUrl = (
   const mergedConfig = { ...pageConfig, ...customConfig };
   
   return {
-    loc: `${config.baseUrl}${path}`,
-    lastmod: new Date().toISOString().split('T')[0],
-    changefreq: mergedConfig.changefreq || config.defaultChangeFreq,
-    priority: mergedConfig.priority || config.defaultPriority
+    loc: `${config.baseUrl || 'https://example.com'}${path}` as string,
+    lastmod: new Date().toISOString().split('T')[0] as string,
+    changefreq: (mergedConfig.changefreq || config.defaultChangeFreq || 'weekly') as 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never',
+    priority: parseFloat(String(mergedConfig.priority || config.defaultPriority || '0.5'))
   };
 };
 
@@ -216,7 +216,7 @@ export const generateSitemap = (
  */
 export const generateSitemapXML = (
   urls: SitemapUrl[],
-  config: SitemapConfig = DEFAULT_CONFIG
+  _config: SitemapConfig = DEFAULT_CONFIG
 ): string => {
   const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
   const urlsetOpen = `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;

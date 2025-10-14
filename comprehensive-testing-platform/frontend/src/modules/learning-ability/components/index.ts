@@ -5,7 +5,6 @@
 
 // Main test page components - using unified architecture
 export { VARKTestPage } from './VARKTestPage';
-export { RavenTestPage } from './RavenTestPage';
 export { CognitiveTestPage } from './CognitiveTestPage';
 export { LearningAbilityHomePage } from './LearningAbilityHomePage';
 export { LearningTestContainer } from './LearningTestContainer';

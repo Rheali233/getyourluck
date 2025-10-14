@@ -12,7 +12,7 @@ interface InternalLinkProps {
   href: string;
   children: React.ReactNode;
   className?: string;
-  keywords?: string[];
+  keywords?: string[] | undefined;
   title?: string;
   rel?: string;
 }
@@ -24,7 +24,7 @@ export const InternalLink: React.FC<InternalLinkProps> = ({
   href,
   children,
   className,
-  keywords,
+  // keywords,
   title,
   rel,
   ...props
@@ -220,11 +220,18 @@ export const ContextualLinks: React.FC<ContextualLinksProps> = ({
 
   switch (context) {
     case 'homepage':
-      links = INTERNAL_LINKING_CONFIG.HOMEPAGE_LINKS.primaryModules;
+      links = INTERNAL_LINKING_CONFIG.HOMEPAGE_LINKS.primaryModules.map(item => ({
+        ...item,
+        keywords: [...item.keywords]
+      }));
       break;
     case 'module':
       if (moduleType) {
-        links = INTERNAL_LINKING_CONFIG.MODULE_PAGE_LINKS[moduleType as keyof typeof INTERNAL_LINKING_CONFIG.MODULE_PAGE_LINKS] || [];
+        const moduleLinks = INTERNAL_LINKING_CONFIG.MODULE_PAGE_LINKS[moduleType as keyof typeof INTERNAL_LINKING_CONFIG.MODULE_PAGE_LINKS];
+        links = moduleLinks ? moduleLinks.map(item => ({
+          ...item,
+          keywords: [...item.keywords]
+        })) : [];
       }
       break;
     case 'test':
@@ -249,15 +256,15 @@ export const ContextualLinks: React.FC<ContextualLinksProps> = ({
       break;
   }
 
+  // 当 context 为 homepage 或 module 时，不渲染该块（按需移除 Popular Tests）
+  if (context === 'homepage' || context === 'module') return null;
+
   if (links.length === 0) return null;
 
   return (
     <div className={cn('space-y-3', className)}>
       <h3 className="text-lg font-semibold text-gray-900">
-        {context === 'homepage' ? 'Explore Our Tests' :
-         context === 'module' ? 'Popular Tests' :
-         context === 'test' ? 'Related Content' :
-         'You Might Also Like'}
+        {context === 'test' ? 'Related Content' : 'You Might Also Like'}
       </h3>
       <div className="flex flex-wrap gap-2">
         {links.map((link, index) => (

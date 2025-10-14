@@ -83,13 +83,14 @@ export const UI_TEXT = {
     cta: {
       backHome: 'Back to Home',
       exploreBlog: 'Explore Blog',
+      startTestCenter: 'Start at Test Center',
     },
     sections: {
       overview: {
         title: 'What We Do',
         paragraphs: [
-          'Our platform brings together scientific psychology assessments and traditional wisdom modules into one unified experience — all in English.',
-          'You can explore MBTI, Big Five, learning styles, career planning, astrology, tarot, numerology, and more — with consistent UI, fast performance, and clear guidance.'
+          'Our platform brings together scientific psychology assessments and traditional wisdom modules into one unified, English‑only experience.',
+          'Explore MBTI, PHQ‑9, EQ, learning styles, career planning, astrology, tarot, numerology, and more — with consistent UI, fast performance, and clear guidance across modules.'
         ],
       },
       capabilities: {
@@ -97,9 +98,9 @@ export const UI_TEXT = {
         items: [
           'Discover your personality and strengths',
           'Evaluate emotional intelligence and mental wellness',
-          'Plan your career path with evidence-based frameworks',
+          'Plan your career path using proven frameworks',
           'Explore astrology insights and tarot readings',
-          'Connect test results to practical next steps'
+          'Turn test results into practical next steps'
         ],
       },
       quality: {
@@ -108,7 +109,24 @@ export const UI_TEXT = {
           'Unified design system and consistent UX',
           'Verified test models and structured data',
           'Mobile-first performance and fast responses',
-          'Privacy-first approach, no forced sign-in'
+          'Privacy-first approach with no forced sign-in'
+        ],
+      },
+      howItWorks: {
+        title: 'How It Works',
+        steps: [
+          'Step 1 — Pick a module or go to Test Center',
+          'Step 2 — Take a guided assessment with clear progress',
+          'Step 3 — Get structured results, insights, and next steps'
+        ],
+      },
+      privacy: {
+        title: 'Data & Privacy',
+        points: [
+          'English-only interface and content for clarity',
+          'We collect limited test/session and technical data to operate the service',
+          'Results are for personal reference; no forced account creation',
+          'See our Privacy Policy for details'
         ],
       },
       modules: {
@@ -125,8 +143,8 @@ export const UI_TEXT = {
       },
     },
     seo: {
-      title: 'About - Comprehensive Testing Platform',
-      description: 'Learn about our unified, English-only platform for psychology tests, career planning, astrology, tarot, and more.',
+      title: 'About — SelfAtlas Testing Platform',
+      description: 'Learn how our English-only, unified testing platform helps you explore psychology, career, astrology, tarot, and more — fast, privacy-first, and consistent by design.',
     }
   },
   testCenter: {
@@ -149,39 +167,36 @@ export const UI_TEXT = {
     },
     tests: [
       // Psychology
-      { id: 'mbti', module: 'psychology', title: 'MBTI Personality Test', description: 'Discover your Myers-Briggs personality type.', href: '/psychology/mbti' },
-      { id: 'phq9', module: 'psychology', title: 'PHQ-9 Depression Screening', description: 'A brief screening tool for depression assessment.', href: '/psychology/phq9' },
-      { id: 'eq', module: 'psychology', title: 'Emotional Intelligence Test', description: 'Assess your emotional intelligence and self-awareness.', href: '/psychology/eq' },
-      { id: 'happiness', module: 'psychology', title: 'Happiness Assessment', description: 'Measure current happiness and life satisfaction.', href: '/psychology/happiness' },
+      { id: 'mbti', module: 'psychology', title: 'MBTI Personality Test', description: 'Discover your Myers-Briggs personality type and understand your natural preferences', href: '/psychology/mbti', duration: '15', questions: '20', rating: '4.8', participants: '12500', isHot: true },
+      { id: 'phq9', module: 'psychology', title: 'PHQ-9 Depression Screening', description: 'A brief screening tool for depression assessment and mental health awareness', href: '/psychology/phq9', duration: '10', questions: '9', rating: '4.6', participants: '8900' },
+      { id: 'eq', module: 'psychology', title: 'Emotional Intelligence Test', description: 'Assess your emotional intelligence and self-awareness skills', href: '/psychology/eq', duration: '20', questions: '40', rating: '4.7', participants: '10200', isHot: true },
+      { id: 'happiness', module: 'psychology', title: 'Happiness Assessment', description: 'Measure current happiness and life satisfaction levels', href: '/psychology/happiness', duration: '12', questions: '25', rating: '4.5', participants: '7600' },
 
       // Learning
-      { id: 'vark', module: 'learning', title: 'VARK Learning Style', description: 'Identify your preferred learning styles.', href: '/learning/vark' },
-      // cognitive removed
+      { id: 'vark', module: 'learning', title: 'VARK Learning Style', description: 'Identify your preferred learning styles and optimize your study methods', href: '/learning/vark', duration: '15', questions: '16', rating: '4.4', participants: '6800' },
 
       // Relationship
-      { id: 'love_language', module: 'relationship', title: 'Love Language Test', description: 'Discover how you give and receive love.', href: '/relationship/love_language' },
-      { id: 'love_style', module: 'relationship', title: 'Relationship Style Test', description: 'Understand your relationship attachment style.', href: '/relationship/love_style' },
-      { id: 'interpersonal', module: 'relationship', title: 'Interpersonal Skills Test', description: 'Assess communication and social skills.', href: '/relationship/interpersonal' },
+      { id: 'love_language', module: 'relationship', title: 'Love Language Test', description: 'Discover how you give and receive love in relationships', href: '/relationship/love_language', duration: '10', questions: '30', rating: '4.9', participants: '15200', isHot: true },
+      { id: 'love_style', module: 'relationship', title: 'Relationship Style Test', description: 'Understand your relationship attachment style and patterns', href: '/relationship/love_style', duration: '15', questions: '18', rating: '4.6', participants: '9400' },
+      { id: 'interpersonal', module: 'relationship', title: 'Interpersonal Skills Test', description: 'Assess communication and social skills for better relationships', href: '/relationship/interpersonal', duration: '18', questions: '22', rating: '4.5', participants: '8200' },
 
       // Career
-      { id: 'holland', module: 'career', title: 'Holland Code Test', description: 'Assess vocational interests using the RIASEC model.', href: '/career' },
-      { id: 'disc', module: 'career', title: 'DISC Personality Assessment', description: 'Understand your dominant behavior style at work.', href: '/career' },
-      { id: 'leadership', module: 'career', title: 'Leadership Skills Assessment', description: 'Evaluate leadership tendencies and skills.', href: '/career' },
+      { id: 'holland', module: 'career', title: 'Holland Code Career Interest Assessment', description: 'Assess vocational interests using the RIASEC model for career guidance', href: '/career', duration: '15', questions: '60', rating: '4.7', participants: '11800', isHot: true },
+      { id: 'disc', module: 'career', title: 'DISC Personality Assessment', description: 'Understand your dominant behavior style at work and in teams.', href: '/career', duration: '12-18', questions: '24', rating: '4.6', participants: '9600' },
+      { id: 'leadership', module: 'career', title: 'Leadership Skills Assessment', description: 'Evaluate leadership tendencies and management skills.', href: '/career', duration: '15-25', questions: '28', rating: '4.5', participants: '7800' },
 
       // Astrology
-      { id: 'birth_chart', module: 'astrology', title: 'Birth Chart Analysis', description: 'Unlock insights from your natal chart.', href: '/astrology' },
-      { id: 'compatibility', module: 'astrology', title: 'Compatibility Test', description: 'Explore compatibility through astrological indicators.', href: '/astrology' },
-      { id: 'fortune', module: 'astrology', title: 'Fortune Forecast', description: 'Check daily and monthly fortune trends.', href: '/astrology' },
+      { id: 'birth_chart', module: 'astrology', title: 'Birth Chart Analysis', description: 'Unlock insights from your natal chart and cosmic blueprint', href: '/astrology', duration: '5', questions: 'Birth data', rating: '4.8', participants: '13400', isHot: true },
+      { id: 'compatibility', module: 'astrology', title: 'Compatibility Test', description: 'Explore compatibility through astrological indicators and synastry', href: '/astrology', duration: '8', questions: 'Birth data', rating: '4.6', participants: '9200' },
+      { id: 'fortune', module: 'astrology', title: 'Fortune Forecast', description: 'Check daily and monthly fortune trends and cosmic guidance', href: '/astrology', duration: '3', questions: 'Birth data', rating: '4.4', participants: '6800' },
 
       // Tarot
-      { id: 'tarot_recommend', module: 'tarot', title: 'Tarot Recommendation', description: 'Get recommended spreads based on your question.', href: '/tarot/recommendation' },
-      { id: 'tarot_drawing', module: 'tarot', title: 'Tarot Card Drawing', description: 'Draw cards and reveal guidance.', href: '/tarot/drawing' },
-      { id: 'tarot_reading', module: 'tarot', title: 'Tarot Reading', description: 'Comprehensive interpretation of your spread.', href: '/tarot/reading' },
+      { id: 'tarot_reading', module: 'tarot', title: 'Tarot Reading', description: 'Comprehensive interpretation of your spread with detailed insights', href: '/tarot', duration: '8', questions: 'Question', rating: '4.8', participants: '10500', isHot: true },
 
       // Numerology
-      { id: 'zodiac', module: 'numerology', title: 'Chinese Zodiac Analysis', description: 'Get insights from your zodiac sign.', href: '/numerology' },
-      { id: 'name', module: 'numerology', title: 'Name Analysis', description: 'Analyze your name for personality and destiny clues.', href: '/numerology' },
-      { id: 'bazi', module: 'numerology', title: 'BaZi (Four Pillars) Analysis', description: 'Comprehensive life analysis from birth data.', href: '/numerology' },
+      { id: 'zodiac', module: 'numerology', title: 'Chinese Zodiac Fortune', description: 'Get insights from your zodiac sign and animal characteristics', href: '/numerology/zodiac', duration: '5', questions: 'Birth data', rating: '4.6', participants: '9800' },
+      { id: 'name', module: 'numerology', title: 'Chinese Name Recommendation', description: 'Analyze your name for personality and destiny clues through numerology', href: '/numerology/name', duration: '8', questions: 'Name', rating: '4.5', participants: '7600' },
+      { id: 'bazi', module: 'numerology', title: 'BaZi Analysis', description: 'Comprehensive life analysis from birth data using ancient Chinese wisdom', href: '/numerology/bazi', duration: '10', questions: 'Birth data', rating: '4.7', participants: '11200', isHot: true },
     ],
   },
   numerology: {

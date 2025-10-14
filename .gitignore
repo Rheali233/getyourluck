@@ -64,3 +64,16 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Temporary SQL files (imported data)
+complete-*.sql
+*-import.sql
+*-batch-import.sql
+tarot-cards-*.sql
+
+# Test files
+test-*.js
+test-*.ts
+
+# Development logs
+dev.log

@@ -41,7 +41,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'test',
     testType: 'fortune',
     customKeywords: ['horoscope reading', 'zodiac fortune', 'astrological guidance']

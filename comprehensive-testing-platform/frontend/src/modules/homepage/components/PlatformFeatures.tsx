@@ -6,6 +6,7 @@
 import React from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { Card } from '@/components/ui';
 
 
 export interface PlatformFeature {
@@ -31,43 +32,43 @@ export const PlatformFeatures: React.FC<PlatformFeaturesProps> = ({
     {
       id: 'comprehensive',
       icon: '🌟',
-      title: '7 Comprehensive Test Modules',
-      description: 'Psychology, Astrology, Career, Relationship, Learning, Tarot, and Numerology - covering all aspects of personal development',
+      title: 'Discover Every Side of You',
+      description: '7 comprehensive test categories with multiple assessments revealing your complete personality, career path, and life purpose',
       color: 'blue'
     },
     {
       id: 'professional',
       icon: '🔬',
-      title: 'Professional & Scientific',
-      description: 'Based on MBTI, Big Five, VARK learning styles, and traditional Chinese numerology - ensuring accurate and reliable results',
+      title: 'Scientifically Proven Results',
+      description: 'Built on decades of research - MBTI, Big Five, and ancient wisdom combined',
       color: 'purple'
     },
     {
       id: 'instant',
       icon: '⚡',
-      title: 'Instant AI Analysis',
-      description: 'Get detailed personality reports, career guidance, and life insights in minutes with our advanced AI analysis engine',
+      title: 'Get Answers in Minutes',
+      description: 'Advanced AI instantly analyzes your responses and delivers personalized insights',
       color: 'green'
     },
     {
-      id: 'privacy',
-      icon: '🔒',
-      title: '100% Anonymous',
-      description: 'No registration required, no data collection, completely private testing experience that respects your privacy',
+      id: 'personalized',
+      icon: '🎯',
+      title: 'Your Personal Journey',
+      description: 'Track your growth over time with detailed reports and personalized recommendations',
       color: 'yellow'
     },
     {
       id: 'multicultural',
       icon: '🌍',
-      title: 'East Meets West',
-      description: 'Combining Western psychology with Eastern wisdom - from MBTI to BaZi, Tarot to Zodiac, offering unique insights',
+      title: 'Ancient Wisdom, Modern Science',
+      description: 'Where Western psychology meets Eastern philosophy for deeper understanding',
       color: 'indigo'
     },
     {
       id: 'accessible',
       icon: '📱',
-      title: 'Accessible Anywhere',
-      description: 'Perfect mobile experience, works on all devices - discover yourself during coffee breaks, commutes, or quiet moments',
+      title: 'Test Anytime, Anywhere',
+      description: 'Perfect mobile experience - discover yourself during any moment',
       color: 'pink'
     }
   ];
@@ -77,27 +78,24 @@ export const PlatformFeatures: React.FC<PlatformFeaturesProps> = ({
 
   return (
     <section
-      className={cn("platform-features py-16 relative overflow-hidden", className)}
+      className={cn("platform-features py-12 relative overflow-hidden", className)}
       data-testid={testId}
       {...props}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Title section */}
-        <div className="text-left mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">
             Why Choose Us
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl">
-            Discover yourself through our comprehensive testing platform - where science meets wisdom, and East meets West
-          </p>
         </div>
 
         {/* 特色功能网格 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayFeatures.map((feature) => (
-            <div
+            <Card
               key={feature.id}
-              className="bg-white rounded-xl p-8 border border-gray-200 hover:transition-all duration-300 transform hover:-translate-y-1"
+              className="bg-gradient-to-br from-white/70 via-white/60 to-white/50 backdrop-blur-lg p-8 border-0 before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-white/30 before:to-transparent before:pointer-events-none"
             >
               {/* 图标和标题 */}
               <div className="flex items-center gap-3 mb-3">
@@ -111,7 +109,7 @@ export const PlatformFeatures: React.FC<PlatformFeaturesProps> = ({
               <p className="text-gray-600 text-xs leading-relaxed">
                 {feature.description}
               </p>
-            </div>
+            </Card>
           ))}
         </div>
       </div>

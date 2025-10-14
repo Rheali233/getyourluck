@@ -3,7 +3,7 @@
  * 提供首屏性能优化和错误处理
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface PerformanceOptimizerProps {
   children: React.ReactNode;
@@ -20,25 +20,40 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
 }) => {
   const [isReady, setIsReady] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const timeoutIdRef = useRef<number | null>(null);
+  const delayIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     // 延迟渲染，让首屏内容先加载
-    const timer = setTimeout(() => {
+    delayIdRef.current = window.setTimeout(() => {
       setIsReady(true);
+      // 一旦内容就绪，确保不触发超时占位
+      if (timeoutIdRef.current !== null) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
+      }
+      setHasError(false);
     }, delay);
 
-    // 超时处理
-    const timeoutTimer = setTimeout(() => {
-      setHasError(true);
+    // 超时处理（仅在尚未就绪时生效）
+    timeoutIdRef.current = window.setTimeout(() => {
+      // 只有在未就绪的情况下才标记为超时
+      setHasError(prev => (!isReady ? true : prev));
     }, timeout);
 
     return () => {
-      clearTimeout(timer);
-      clearTimeout(timeoutTimer);
+      if (delayIdRef.current !== null) {
+        clearTimeout(delayIdRef.current);
+        delayIdRef.current = null;
+      }
+      if (timeoutIdRef.current !== null) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
+      }
     };
-  }, [delay, timeout]);
+  }, [delay, timeout, isReady]);
 
-  if (hasError) {
+  if (hasError && !isReady) {
     return <div className="text-center text-gray-500 py-8">Loading content...</div>;
   }
 
@@ -55,7 +70,7 @@ export const LazyImage: React.FC<{
   alt: string;
   className?: string;
   placeholder?: string;
-}> = ({ src, alt, className, placeholder }) => {
+}> = ({ src, alt, className }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 

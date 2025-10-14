@@ -28,7 +28,7 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
   const navigate = useNavigate();
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'module',
     moduleType: 'learning',
     customKeywords: ['learning assessment', 'cognitive test', 'intelligence evaluation']

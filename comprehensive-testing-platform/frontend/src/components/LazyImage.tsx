@@ -9,12 +9,13 @@ import { cn } from '@/utils/classNames';
 interface LazyImageProps {
   src: string;
   alt: string;
-  className?: string;
+  className?: string | undefined;
   placeholder?: string;
   fallback?: string;
   loading?: 'lazy' | 'eager';
   onLoad?: () => void;
   onError?: () => void;
+  sizes?: string;
 }
 
 export const LazyImage: React.FC<LazyImageProps> = ({
@@ -26,6 +27,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   loading = 'lazy',
   onLoad,
   onError,
+  sizes,
   ...props
 }) => {
   const [imageSrc, setImageSrc] = useState(placeholder);
@@ -80,6 +82,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       loading={loading}
       onLoad={handleLoad}
       onError={handleError}
+      sizes={sizes}
       {...props}
     />
   );

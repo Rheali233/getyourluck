@@ -6,7 +6,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { NumerologyHomePage } from './components/NumerologyHomePage';
-import { NumerologyAnalysisPage } from './components/NumerologyAnalysisPage';
+// import { NumerologyAnalysisPage } from './components/NumerologyAnalysisPage';
 import { BaZiAnalysisPage } from './components/BaZiAnalysisPage';
 import { BaZiResultPage } from './components/BaZiResultPage';
 import { ZodiacAnalysisPage } from './components/ZodiacAnalysisPage';

@@ -20,8 +20,8 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
   className,
   testId = 'love-style-result-display',
   result,
-  onReset,
-  onShare,
+  // onReset,
+  // onShare,
   ...props
 }) => {
   // Extract data from TestResult format
@@ -30,13 +30,6 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
   const rootScores: Record<string, number> = (result as any).scores || (result as any).allScores || result.data?.allScores || {};
   const analysis = (result as any).analysis || result.data?.analysis || '';
   const meta = (result as any).metadata || result.data?.metadata || {};
-  const allStyles = (result as any).allStyles || result.data?.allStyles || [];
-  const loveStyleDetails = (result as any).loveStyleDetails || result.data?.loveStyleDetails || {};
-  const relationshipDynamics = (result as any).relationshipDynamics || result.data?.relationshipDynamics || [];
-  const communicationPatterns = (result as any).communicationPatterns || result.data?.communicationPatterns || [];
-  const compatibilityInsights = (result as any).compatibilityInsights || result.data?.compatibilityInsights || [];
-  const growthAreas = (result as any).growthAreas || result.data?.growthAreas || [];
-  const relationshipAdvice = (result as any).relationshipAdvice || result.data?.relationshipAdvice || [];
   
   // 新增专业解读字段
   const psychologicalProfile = (result as any).psychologicalProfile || result.data?.psychologicalProfile || {};
@@ -44,19 +37,13 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
   const relationshipDynamicsDetailed = (result as any).relationshipDynamics || result.data?.relationshipDynamics || {};
   const predictiveInsights = (result as any).predictiveInsights || result.data?.predictiveInsights || {};
 
-  // 去重策略：Guidance 仅保留“行动项”，与上方四个模块的叙述性内容避免重复
-  const toArray = (value: unknown): string[] => {
-    if (Array.isArray(value)) return value as string[];
-    if (typeof value === 'string') return [value];
-    return [];
-  };
 
-  const normalizeText = (text: string) =>
-    (text || '')
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .replace(/[.,;:!?'"()\[\]{}]/g, '')
-      .trim();
+  // const normalizeText = (text: string) =>
+  //   (text || '')
+  //     .toLowerCase()
+  //     .replace(/\s+/g, ' ')
+  //     .replace(/[.,;:!?'"()\[\]{}]/g, '')
+  //     .trim();
 
   const professionalContextTexts: string[] = [];
   // Psychological Profile
@@ -76,26 +63,8 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
     if (typeof v === 'string') professionalContextTexts.push(v);
   });
 
-  const professionalContextCombined = normalizeText(professionalContextTexts.join(' '));
-  const isActionItem = (item: string) => /\b(try|practice|schedule|set|use|ask|share|express|plan|agree|review|reflect|limit|balance|prioritize|acknowledge|negotiate|check-in|weekly|daily|monthly|step|goal|action|exercise|tip|strategy)\b/i.test(item);
-  const isDuplicateWithProfessional = (item: string) => {
-    const n = normalizeText(item);
-    if (!n) return false;
-    // 认为与专业解读明显重复：完全包含或长度>12且作为子串出现
-    return professionalContextCombined.includes(n) && n.length > 12;
-  };
+  // const professionalContextCombined = normalizeText(professionalContextTexts.join(' '));
 
-  // 过滤 Guidance 的条目：优先保留可执行项；剔除与专业解读重复的描述性语句
-  const filterGuidance = (items: unknown) =>
-    toArray(items)
-      .filter((t) => typeof t === 'string')
-      .filter((t) => !isDuplicateWithProfessional(t))
-      .filter((t, idx, arr) => {
-        // 去除同数组内重复/高度相似项
-        const n = normalizeText(t);
-        return idx === arr.findIndex((x) => normalizeText(x) === n);
-      })
-      .sort((a, b) => Number(!isActionItem(b)) - Number(!isActionItem(a))); // 将可执行项排前
 
   const getStyleIcon = (style: string) => {
     switch (style) {
@@ -144,21 +113,6 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
     'Low alignment'
   );
 
-  // 限制描述长度（100个单词以内）
-  const limitWords = (text: string | null | undefined, maxWords = 100): string => {
-    const s = (text || '').trim();
-    if (!s) return '';
-    const words = s.split(/\s+/);
-    if (words.length <= maxWords) return s;
-    return words.slice(0, maxWords).join(' ') + '…';
-  };
-
-  // 去除与level词不一致风险：清理描述中的程度词（low/moderate/high/very high）
-  const sanitizeAlignmentDescriptors = (text: string, styleName: string): string => {
-    if (!text) return '';
-    const pattern = new RegExp(`((your\\s+)?)(very\\s+high|high|moderate|low)\\s+${styleName}\\s+alignment`, 'ig');
-    return text.replace(pattern, (_m, _p1) => `${_p1 ? 'Your ' : ''}${styleName} alignment`).replace(/\b(very\s+high|high|moderate|low)\s+alignment\b/ig, 'alignment');
-  };
 
   // 专业科学描述 - 根据评分结果描述特征和倾向
   const getProfessionalDescription = (name: string, percent: number): string => {
@@ -413,7 +367,7 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
 
       </div>
 
-      <FeedbackFloatingWidget />
+      <FeedbackFloatingWidget testContext={{ testType: "love-style" }} />
     </div>
   );
 };

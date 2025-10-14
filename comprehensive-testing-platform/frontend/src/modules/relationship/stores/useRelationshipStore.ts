@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useUnifiedTestStore } from '../../../stores/unifiedTestStore';
-import { TestType } from '../types';
+import { TestType, RelationshipTestType } from '../types';
 import { questionService } from '@/modules/testing/services/QuestionService';
 
 // Default question data (temporary, will be loaded from API)
@@ -64,7 +64,7 @@ export const useRelationshipStore = () => {
   } = unifiedStore;
   
   // Relationship特有的方法
-  const loadQuestionsFromAPI = async (testType: TestType) => {
+  const loadQuestionsFromAPI = async (testType: RelationshipTestType) => {
     try {
       setLoading(true);
       setError(null);
@@ -87,17 +87,17 @@ export const useRelationshipStore = () => {
   };
   
   // 重构后的startTest方法
-  const startTest = async (testType: TestType) => {
+  const startTest = async (testType: RelationshipTestType) => {
     try {
       // 使用统一Store的startTest
       await unifiedStartTest(testType);
       
       // 加载问题
-      if (!questionsLoaded || !questions[testType]?.length) {
+      if (!questionsLoaded || !questions[testType as keyof typeof questions]?.length) {
         await loadQuestionsFromAPI(testType);
       }
       
-      const currentQuestions = questions[testType];
+      const currentQuestions = questions[testType as keyof typeof questions];
       if (!currentQuestions || currentQuestions.length === 0) {
         throw new Error(`Unable to load ${testType} test questions`);
       }

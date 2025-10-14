@@ -22,7 +22,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
   const navigate = useNavigate();
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'module',
     moduleType: 'numerology',
     customKeywords: ['bazi analysis', 'chinese zodiac', 'destiny analysis']

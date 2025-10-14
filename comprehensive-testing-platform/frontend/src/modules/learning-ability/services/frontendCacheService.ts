@@ -3,7 +3,7 @@
  * Handles caching of test data and results
  */
 
-import type { VarkResult, RavenResult, CognitiveResult, LearningTestType } from '../types';
+import type { VarkResult, CognitiveResult, LearningTestType } from '../types';
 
 export interface CacheOptions {
   ttl: number; // Time to live in milliseconds
@@ -105,7 +105,7 @@ export class FrontendCacheService {
   /**
    * Cache test result
    */
-  cacheResult(testType: LearningTestType, sessionId: string, result: VarkResult | RavenResult | CognitiveResult): void {
+  cacheResult(testType: LearningTestType, sessionId: string, result: VarkResult | CognitiveResult): void {
     const key = `result_${testType}_${sessionId}`;
     this.set(key, result, 3600000); // 1 hour TTL for results
   }
@@ -113,7 +113,7 @@ export class FrontendCacheService {
   /**
    * Get cached test result
    */
-  getCachedResult(testType: LearningTestType, sessionId: string): VarkResult | RavenResult | CognitiveResult | null {
+  getCachedResult(testType: LearningTestType, sessionId: string): VarkResult | CognitiveResult | null {
     const key = `result_${testType}_${sessionId}`;
     return this.get(key);
   }

@@ -24,8 +24,7 @@ export const MobileSEOHead: React.FC<MobileSEOHeadProps> = ({
   keywords = 'mobile psychological tests, smartphone personality test, mobile career assessment, mobile astrology, mobile tarot',
   canonicalUrl,
   ogImage = 'https://selfatlas.com/images/mobile-og-image.jpg',
-  structuredData,
-  className
+  structuredData
 }) => {
   const { isMobile, isTablet, touchSupport } = useMobileSEO();
 
@@ -204,7 +203,7 @@ export const MobilePerformanceHead: React.FC<MobilePerformanceHeadProps> = ({
   enableMonitoring = true,
   enableOptimization = true
 }) => {
-  const { isMobile, performance } = useMobileSEO();
+  const { isMobile } = useMobileSEO();
 
   if (!isMobile) return null;
 

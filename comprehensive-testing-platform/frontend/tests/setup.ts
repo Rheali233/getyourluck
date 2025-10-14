@@ -129,5 +129,5 @@ declare global {
     testUtils: any
   }
   
-  var testUtils: any
+  // var testUtils: any
 }

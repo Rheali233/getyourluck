@@ -33,7 +33,7 @@ export const PsychologyHomePage: React.FC<PsychologyHomePageProps> = ({
   const navigate = useNavigate();
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'module',
     moduleType: 'psychology',
     customKeywords: ['mental health', 'personality assessment', 'psychological evaluation']

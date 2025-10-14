@@ -11,87 +11,66 @@ import type {
 export const TEST_MODULES = {
   psychology: {
     id: 'psychology',
-    name: '心理健康测试',
-    nameEn: 'Psychology Tests',
-    description: '揭秘你的性格密码',
-    descriptionEn: 'Discover your personality secrets',
+    name: 'Psychology Tests',
+    description: 'Discover your personality secrets',
     icon: '🧠',
     color: 'blue',
     route: '/psychology',
-    features: ['MBTI', '抑郁', '情商'],
-    featuresEn: ['MBTI', 'Depression', 'EQ']
+    features: ['MBTI', 'Depression', 'EQ']
   },
   astrology: {
     id: 'astrology',
-    name: '星座运势分析',
-    nameEn: 'Astrology Analysis',
-    description: '今日运势早知道',
-    descriptionEn: 'Know your daily fortune',
+    name: 'Astrology Analysis',
+    description: 'Know your daily fortune',
     icon: '⭐',
     color: 'purple',
     route: '/astrology',
-    features: ['星座配对', '运势'],
-    featuresEn: ['Zodiac Matching', 'Fortune']
+    features: ['Zodiac Matching', 'Fortune']
   },
   tarot: {
     id: 'tarot',
-    name: '塔罗牌占卜',
-    nameEn: 'Tarot Reading',
-    description: '神秘塔罗解心事',
-    descriptionEn: 'Mysterious tarot reveals your heart',
+    name: 'Tarot Reading',
+    description: 'Mysterious tarot reveals your heart',
     icon: '🔮',
     color: 'indigo',
     route: '/tarot',
-    features: ['在线抽牌', '解读'],
-    featuresEn: ['Online Drawing', 'Interpretation']
+    features: ['Online Drawing', 'Interpretation']
   },
   career: {
     id: 'career',
-    name: '职业规划测试',
-    nameEn: 'Career Planning',
-    description: '找到最适合的工作',
-    descriptionEn: 'Find your perfect career path',
+    name: 'Career Planning',
+    description: 'Find your perfect career path',
     icon: '💼',
     color: 'green',
     route: '/career',
-    features: ['霍兰德', 'DISC测试'],
-    featuresEn: ['Holland Code', 'DISC Test']
+    features: ['Holland Code', 'DISC Test']
   },
   numerology: {
     id: 'numerology',
-    name: '传统命理分析',
-    nameEn: 'Numerology Analysis',
-    description: '算出你的好运气',
-    descriptionEn: 'Calculate your good fortune',
+    name: 'Numerology Analysis',
+    description: 'Calculate your good fortune',
     icon: '🔢',
     color: 'orange',
     route: '/numerology',
-    features: ['八字', '生肖', '姓名'],
-    featuresEn: ['BaZi', 'Chinese Zodiac', 'Name Analysis']
+    features: ['BaZi', 'Chinese Zodiac', 'Name Analysis']
   },
   learning: {
     id: 'learning',
-    name: '学习能力评估',
-    nameEn: 'Learning Assessment',
-    description: '发现学习超能力',
-    descriptionEn: 'Discover your learning superpowers',
+    name: 'Learning Assessment',
+    description: 'Discover your learning superpowers',
     icon: '📚',
     color: 'teal',
     route: '/learning',
-    features: ['学习风格', '认知能力'],
-    featuresEn: ['Learning Style', 'Cognitive Ability']
+    features: ['Learning Style', 'Cognitive Ability']
   },
   relationship: {
     id: 'relationship',
-    name: '情感关系测试',
-    nameEn: 'Relationship Tests',
-    description: '了解你的爱情密码',
-    descriptionEn: 'Understand your love code',
+    name: 'Relationship Tests',
+    description: 'Understand your love code',
     icon: '💕',
     color: 'pink',
     route: '/relationship',
-    features: ['恋爱类型', '沟通方式'],
-    featuresEn: ['Love Type', 'Communication Style']
+    features: ['Love Type', 'Communication Style']
   }
 } as const;
 
@@ -112,7 +91,7 @@ export const getAllTestModules = (): TestModule[] => {
     isActive: true,
     route: module.route,
     features: [...module.features],
-    estimatedTime: '10-15分钟'
+    estimatedTime: '10-15 minutes'
   }));
 };
 
@@ -134,7 +113,7 @@ export const getTestModuleById = (id: TestModuleId): TestModule | null => {
     isActive: true,
     route: module.route,
     features: [...module.features],
-    estimatedTime: '10-15分钟'
+    estimatedTime: '10-15 minutes'
   };
 };
 
@@ -149,7 +128,11 @@ export const getTestModuleStats = async (moduleId: TestModuleId): Promise<any | 
     const data = await response.json();
     return data.success ? data.data : null;
   } catch (error) {
-    console.error(`Failed to fetch stats for module ${moduleId}:`, error);
+    // 使用受控错误输出，避免直接使用 console
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to fetch stats for module ${moduleId}:`, error);
+    }
     return null;
   }
 };
@@ -182,7 +165,10 @@ export const getTestModuleRating = async (moduleId: TestModuleId): Promise<any |
     const data = await response.json();
     return data.success ? data.data : null;
   } catch (error) {
-    console.error(`Failed to fetch rating for module ${moduleId}:`, error);
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to fetch rating for module ${moduleId}:`, error);
+    }
     return null;
   }
 };
@@ -198,7 +184,10 @@ export const getTestModuleUsage = async (moduleId: TestModuleId): Promise<any | 
     const data = await response.json();
     return data.success ? data.data : null;
   } catch (error) {
-    console.error(`Failed to fetch usage for module ${moduleId}:`, error);
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to fetch usage for module ${moduleId}:`, error);
+    }
     return null;
   }
 };
@@ -214,7 +203,10 @@ export const getPersonalizedRecommendations = async (): Promise<any[]> => {
     const data = await response.json();
     return data.success ? data.data : [];
   } catch (error) {
-    console.error('Failed to fetch personalized recommendations:', error);
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Failed to fetch personalized recommendations:', error);
+    }
     return [];
   }
 };
@@ -239,7 +231,10 @@ export const recordModuleVisit = async (moduleId: TestModuleId): Promise<boolean
     
     return response.ok;
   } catch (error) {
-    console.error(`Failed to record visit for module ${moduleId}:`, error);
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to record visit for module ${moduleId}:`, error);
+    }
     return false;
   }
 };
@@ -267,7 +262,10 @@ export const checkModuleAvailability = async (moduleId: TestModuleId): Promise<b
     const data = await response.json();
     return data.success ? data.data.isAvailable : false;
   } catch (error) {
-    console.error(`Failed to check availability for module ${moduleId}:`, error);
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to check availability for module ${moduleId}:`, error);
+    }
     return false;
   }
 };
@@ -283,7 +281,10 @@ export const getPopularTestModules = async (limit: number = 6): Promise<TestModu
     const data = await response.json();
     return data.success ? data.data : [];
   } catch (error) {
-    console.error('Failed to fetch popular test modules:', error);
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Failed to fetch popular test modules:', error);
+    }
     return [];
   }
 };
@@ -299,7 +300,10 @@ export const getNewTestModules = async (limit: number = 4): Promise<TestModule[]
     const data = await response.json();
     return data.success ? data.data : [];
   } catch (error) {
-    console.error('Failed to fetch new test modules:', error);
+    if (process.env['NODE_ENV'] === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Failed to fetch new test modules:', error);
+    }
     return [];
   }
 };

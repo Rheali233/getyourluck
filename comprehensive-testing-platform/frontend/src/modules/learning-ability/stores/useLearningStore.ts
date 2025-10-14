@@ -17,9 +17,10 @@ export const useLearningStore = () => {
   const unifiedStore = useUnifiedTestStore();
   
   // Learning特有的问题数据
-  const [questions, setQuestions] = useState({
+  const [questions, setQuestions] = useState<{
+    [key in LearningTestType]: any[]
+  }>({
     [LearningTestTypes.VARK]: [],
-    [LearningTestTypes.RAVEN]: [],
     [LearningTestTypes.COGNITIVE]: [],
   });
   
@@ -38,9 +39,10 @@ export const useLearningStore = () => {
   } = unifiedStore;
   
   // Learning特有的结果数据
-  const [results, setResults] = useState({
+  const [results, setResults] = useState<{
+    [key in LearningTestType]: any | null
+  }>({
     [LearningTestTypes.VARK]: null,
-    [LearningTestTypes.RAVEN]: null,
     [LearningTestTypes.COGNITIVE]: null,
   });
   
@@ -71,7 +73,7 @@ export const useLearningStore = () => {
       if (response.success && response.data) {
         setQuestions(prev => ({
           ...prev,
-          [testType]: response.data
+          [testType]: response.data || []
         }));
         setQuestionsLoaded(true);
       }
@@ -175,7 +177,6 @@ export const useLearningStore = () => {
     setQuestionsLoaded(false);
     setResults({
       [LearningTestTypes.VARK]: null,
-      [LearningTestTypes.RAVEN]: null,
       [LearningTestTypes.COGNITIVE]: null,
     });
   };

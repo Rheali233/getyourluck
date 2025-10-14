@@ -9,6 +9,7 @@ import type { TestStatus, QuestionFormat } from '@/modules/testing/types/TestTyp
 // Learning-specific test type constants
 export const LearningTestTypes = {
   VARK: 'vark',
+  COGNITIVE: 'cognitive',
 } as const;
 
 export type LearningTestType = typeof LearningTestTypes[keyof typeof LearningTestTypes];
@@ -36,11 +37,19 @@ export interface VarkQuestion extends BaseQuestion {
   }[];
 }
 
-// Raven Progressive Matrices question interface
- 
+// Raven Progressive Matrices question interface (removed)
 
 // Cognitive ability question interface
-// Cognitive removed
+export interface CognitiveQuestion extends BaseQuestion {
+  category: 'memory' | 'attention' | 'processing' | 'reasoning';
+  timeLimit?: number;
+  options: {
+    id: string;
+    text: string;
+    value: string | number;
+    correct?: boolean;
+  }[];
+}
 
 // User answer interface
 export interface UserAnswer {
@@ -252,7 +261,22 @@ export interface VarkResultsProps extends BaseComponentProps {
   onRetake: () => void;
 }
 
-// Raven removed
+// Raven Progressive Matrices result interface (removed)
+
+// Cognitive ability result interface
+export interface CognitiveResult {
+  overallScore: number;
+  categoryScores: {
+    memory: number;
+    attention: number;
+    processing: number;
+    reasoning: number;
+  };
+  level: 'below_average' | 'average' | 'above_average' | 'excellent';
+  strengths: string[];
+  improvements: string[];
+  recommendations: string[];
+}
 
 export interface CognitiveResultsProps extends BaseComponentProps {
   results: CognitiveResult;

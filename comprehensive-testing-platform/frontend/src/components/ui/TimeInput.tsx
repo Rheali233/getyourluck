@@ -3,12 +3,11 @@
  * 自定义时间输入组件，支持自动跳转到下一个输入单位
  */
 
-/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/utils/classNames';
 
 export interface TimeInputProps {
-  value: string; // eslint-disable-line no-unused-vars
+  value: string;
   onChange: (value: string) => void;
   className?: string;
   placeholder?: string;

@@ -44,7 +44,6 @@ export interface TestResult<T = any> {
 }
 
 // 测试类型枚举（保留但标记为未使用，避免破坏现有导入）
-// eslint-disable-next-line no-unused-vars
 export enum TestType {
   // Psychology模块
   MBTI = 'mbti',
@@ -86,7 +85,6 @@ export enum TestType {
 }
 
 // 测试状态枚举（保留但标记为未使用，避免破坏现有导入）
-// eslint-disable-next-line no-unused-vars
 export enum TestStatus {
   NOT_STARTED = 'not_started',
   IN_PROGRESS = 'in_progress',

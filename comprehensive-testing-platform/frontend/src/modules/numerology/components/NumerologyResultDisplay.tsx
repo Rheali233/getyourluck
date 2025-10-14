@@ -38,8 +38,8 @@ export const NumerologyResultDisplay: React.FC<NumerologyResultDisplayProps> = (
                 {element === 'fire' && '🔥'}
                 {element === 'earth' && '🏔️'}
               </div>
-              <div className="text-red-900 font-medium capitalize">{element}</div>
-              <div className="text-red-800">{value}</div>
+              <div className="text-red-900 font-medium capitalize">{String(element)}</div>
+              <div className="text-red-800">{String(value)}</div>
             </div>
           ))}
         </div>

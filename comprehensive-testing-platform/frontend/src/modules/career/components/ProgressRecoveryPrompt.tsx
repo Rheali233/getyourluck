@@ -9,11 +9,11 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { progressManager } from '../services/progressManager';
 import type { BaseComponentProps } from '@/types/componentTypes';
-import { CareerTestTypeEnum } from '../types';
+import { CareerTestTypeEnum, CareerTestType } from '../types';
 import type { TestProgress } from '../services/progressManager';
 
 interface ProgressRecoveryPromptProps extends BaseComponentProps {
-  testType: CareerTestTypeEnum;
+  testType: CareerTestType;
   onRecover?: () => void;
   onDismiss?: () => void;
 }
@@ -81,13 +81,13 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
     return null;
   }
 
-  const getTestTypeName = (type: CareerTestTypeEnum): string => {
+  const getTestTypeName = (type: CareerTestType): string => {
     const names = {
       [CareerTestTypeEnum.HOLLAND]: 'Holland Career Interest Test',
       [CareerTestTypeEnum.DISC]: 'DISC Behavioral Style Assessment',
       [CareerTestTypeEnum.LEADERSHIP]: 'Leadership Assessment'
     };
-    return names[type] || type;
+    return names[type as keyof typeof names] || type;
   };
 
   const formatTime = (timeString: string): string => {

@@ -10,7 +10,7 @@ import { Button, Card } from '@/components/ui';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
-import { TestType } from '../types';
+import { TestType, RelationshipTestType } from '../types';
 import { RelationshipTestContainer } from './RelationshipTestContainer';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
@@ -19,7 +19,7 @@ import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface RelationshipHomePageProps extends BaseComponentProps {
   // eslint-disable-next-line no-unused-vars
-  onTestSelect?: (testType: TestType) => void;
+  onTestSelect?: (testType: RelationshipTestType) => void;
 }
 
 export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
@@ -31,7 +31,7 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
   const navigate = useNavigate();
 
   // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
+  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'module',
     moduleType: 'relationship',
     customKeywords: ['love language test', 'relationship advice', 'compatibility analysis']
@@ -120,7 +120,7 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
     }
   ];
 
-  const handleTestSelect = (testType: TestType) => {
+  const handleTestSelect = (testType: RelationshipTestType) => {
     if (onTestSelect) {
       onTestSelect(testType);
     } else {

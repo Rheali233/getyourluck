@@ -122,7 +122,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
     
     // 根据类型进行导航
     switch (item.type) {
-      case 'test':
+      case 'test': {
         // 使用正确的模块路由
         const routeMap: Record<string, string> = {
           'psychology': '/psychology',
@@ -136,12 +136,14 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
         const moduleRoute = routeMap[item.category] || `/${item.category}`;
         window.location.href = moduleRoute;
         break;
+      }
       case 'article':
         window.location.href = `/blog/${item.id}`;
         break;
-      case 'feature':
+      case 'feature': {
         // 处理功能推荐
         break;
+      }
     }
   };
 

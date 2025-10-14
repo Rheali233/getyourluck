@@ -67,7 +67,9 @@ homepageRoutes.get("/modules", async (c) => {
     const moduleModel = new HomepageModuleModel(dbService.env);
     
     const modules = await moduleModel.getAllActiveModules();
-    
+    // short-term caching headers
+    c.header('Cache-Control', 'public, max-age=60, s-maxage=60');
+
     return c.json({
       success: true,
       data: modules,

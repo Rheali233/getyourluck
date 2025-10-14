@@ -27,7 +27,7 @@ interface BlogActions extends ModuleActions {
   fetchArticles: (page?: number, category?: string) => Promise<void>
   fetchArticle: (idOrSlug: string) => Promise<void>
   setSelectedCategory: (category: string | null) => void
-  incrementViewCount: (id: string) => Promise<void>
+  incrementViewCount: (_id: string) => Promise<void>
 }
 
 export const useBlogStore = create<BlogState & BlogActions>((set) => ({
@@ -59,11 +59,11 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
   setData: (data: any) => set({ data, lastUpdated: new Date() }),
 
   // 博客专用操作
-  fetchArticles: async (page = 1, category: string | undefined = undefined) => {
+  fetchArticles: async (page = 1, category?: string) => {
     set({ isLoading: true, error: null })
     
     try {
-      const response = await blogService.getArticles(page, 10, category)
+      const response = await blogService.getArticles(page, 12, category)
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch articles')
@@ -119,9 +119,8 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
   incrementViewCount: async (id: string) => {
     try {
       await blogService.incrementViewCount(id)
-    } catch (error) {
-      // 浏览量更新失败不影响用户体验，只记录错误
-      console.warn('Failed to increment view count:', error)
+    } catch {
+      /* noop */
     }
   },
 

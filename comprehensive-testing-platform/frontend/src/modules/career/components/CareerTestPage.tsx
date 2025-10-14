@@ -14,7 +14,7 @@ import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { CareerTestContainer } from './CareerTestContainer';
-import { CareerTestTypeEnum } from '../types';
+import { CareerTestTypeEnum, CareerTestType } from '../types';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
@@ -40,7 +40,7 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
 
   // Validate test type
   const validTestTypes = Object.values(CareerTestTypeEnum);
-  const isValidTestType = testType && validTestTypes.includes(testType as CareerTestTypeEnum);
+  const isValidTestType = testType && validTestTypes.includes(testType as CareerTestType);
 
   // Get test title and description
   const getTestInfo = (testType: string) => {
@@ -58,7 +58,7 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
         description: 'Evaluate your leadership potential and development areas'
       }
     };
-    return testInfo[testType as CareerTestTypeEnum] || { title: 'Career Test', description: '' };
+    return testInfo[testType as keyof typeof testInfo] || { title: 'Career Test', description: '' };
   };
 
   const testInfo = getTestInfo(testType || '');

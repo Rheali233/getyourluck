@@ -12,7 +12,8 @@ import { useUnifiedTestStore } from '../../../stores/unifiedTestStore';
 //   TestResult
 // } from '../types';
 import {
-  CareerTestTypeEnum
+  CareerTestTypeEnum,
+  CareerTestType
 } from '../types';
 import { questionService } from '@/modules/testing/services/QuestionService';
 
@@ -72,7 +73,7 @@ export const useCareerStore = () => {
   } = unifiedStore;
   
   // Career特有的方法
-  const loadQuestionsFromAPI = async (testType: CareerTestTypeEnum) => {
+  const loadQuestionsFromAPI = async (testType: CareerTestType) => {
     try {
       setLoading(true);
       setError(null);
@@ -95,17 +96,17 @@ export const useCareerStore = () => {
   };
   
   // 重构后的startTest方法
-  const startTest = async (testType: CareerTestTypeEnum) => {
+  const startTest = async (testType: CareerTestType) => {
     try {
       // 使用统一Store的startTest
       await unifiedStartTest(testType);
       
       // 加载问题
-      if (!questionsLoaded || !questions[testType]?.length) {
+      if (!questionsLoaded || !questions[testType as keyof typeof questions]?.length) {
         await loadQuestionsFromAPI(testType);
       }
       
-      const currentQuestions = questions[testType];
+      const currentQuestions = questions[testType as keyof typeof questions];
       if (!currentQuestions || currentQuestions.length === 0) {
         throw new Error(`Unable to load ${testType} test questions`);
       }
