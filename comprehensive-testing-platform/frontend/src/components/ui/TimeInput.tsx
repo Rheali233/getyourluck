@@ -32,8 +32,8 @@ export const TimeInput: React.FC<TimeInputProps> = ({
 
   // 解析初始值
   useEffect(() => {
-    if (_value) {
-      const timeParts = _value.split(':');
+    if (value) {
+      const timeParts = value.split(':');
       if (timeParts.length === 2) {
         setHour(timeParts[0] || '');
         setMinute(timeParts[1] || '');

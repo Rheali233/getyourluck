@@ -131,8 +131,7 @@ export const getTestModuleStats = async (moduleId: TestModuleId): Promise<any | 
     // 使用受控错误输出，避免直接使用 console
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error(`Failed to fetch stats for module ${moduleId}:`, error);
-    }
+      }
     return null;
   }
 };
@@ -167,8 +166,7 @@ export const getTestModuleRating = async (moduleId: TestModuleId): Promise<any |
   } catch (error) {
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error(`Failed to fetch rating for module ${moduleId}:`, error);
-    }
+      }
     return null;
   }
 };
@@ -186,8 +184,7 @@ export const getTestModuleUsage = async (moduleId: TestModuleId): Promise<any | 
   } catch (error) {
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error(`Failed to fetch usage for module ${moduleId}:`, error);
-    }
+      }
     return null;
   }
 };
@@ -205,8 +202,7 @@ export const getPersonalizedRecommendations = async (): Promise<any[]> => {
   } catch (error) {
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Failed to fetch personalized recommendations:', error);
-    }
+      }
     return [];
   }
 };
@@ -233,8 +229,7 @@ export const recordModuleVisit = async (moduleId: TestModuleId): Promise<boolean
   } catch (error) {
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error(`Failed to record visit for module ${moduleId}:`, error);
-    }
+      }
     return false;
   }
 };
@@ -264,8 +259,7 @@ export const checkModuleAvailability = async (moduleId: TestModuleId): Promise<b
   } catch (error) {
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error(`Failed to check availability for module ${moduleId}:`, error);
-    }
+      }
     return false;
   }
 };
@@ -283,8 +277,7 @@ export const getPopularTestModules = async (limit: number = 6): Promise<TestModu
   } catch (error) {
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Failed to fetch popular test modules:', error);
-    }
+      }
     return [];
   }
 };
@@ -302,8 +295,7 @@ export const getNewTestModules = async (limit: number = 4): Promise<TestModule[]
   } catch (error) {
     if (process.env['NODE_ENV'] === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Failed to fetch new test modules:', error);
-    }
+      }
     return [];
   }
 };

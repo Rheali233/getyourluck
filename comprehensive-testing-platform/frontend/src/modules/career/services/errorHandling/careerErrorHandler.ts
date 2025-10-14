@@ -109,13 +109,7 @@ export class CareerErrorHandler {
   private static logError(error: CareerError): void {
     // In production, this would send to a logging service
     // For now, just console.error for development
-    console.error('Career Module Error:', {
-      type: error.type,
-      message: error.message,
-      timestamp: error.timestamp,
-      context: error.context
-    });
-  }
+    }
 
   /**
    * Create error from exception

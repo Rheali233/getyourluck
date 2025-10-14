@@ -153,22 +153,22 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter((_type) => getCompatibilityLevel(currentType, _type.type) === 'high')
-              .map((_type) => {
-                const matchData = getAIMatchData(_type.type);
+              .filter((type) => getCompatibilityLevel(currentType.type) === 'high')
+              .map((type) => {
+                const matchData = getAIMatchData(type.type);
                 
                 return (
-                  <div key={_type.type} className="p-4 rounded-lg bg-white">
+                  <div key={type.type} className="p-4 rounded-lg bg-white">
                     {/* Type Information */}
                     <div className="flex items-center gap-3 mb-3">
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm",
-                        `bg-gradient-to-r ${_type.color}`
+                        `bg-gradient-to-r ${type.color}`
                       )}>
-                        {_type.type}
+                        {type.type}
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-base">{_type.name}</div>
+                        <div className="font-semibold text-gray-900 text-base">{type.name}</div>
                       </div>
                     </div>
                     
@@ -194,22 +194,22 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter((_type) => getCompatibilityLevel(currentType, _type.type) === 'medium')
-              .map((_type) => {
-                const matchData = getAIMatchData(_type.type);
+              .filter(() => getCompatibilityLevel(currentType.type) === 'medium')
+              .map(() => {
+                const matchData = getAIMatchData(type.type);
                 
                 return (
-                  <div key={_type.type} className="p-4 rounded-lg bg-white">
+                  <div key={type.type} className="p-4 rounded-lg bg-white">
                     {/* Type Information */}
                     <div className="flex items-center gap-3 mb-3">
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm",
-                        `bg-gradient-to-r ${_type.color}`
+                        `bg-gradient-to-r ${type.color}`
                       )}>
-                        {_type.type}
+                        {type.type}
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-base">{_type.name}</div>
+                        <div className="font-semibold text-gray-900 text-base">{type.name}</div>
                       </div>
                     </div>
                     
@@ -235,22 +235,22 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter((_type) => getCompatibilityLevel(currentType, _type.type) === 'low')
-              .map((_type) => {
-                const matchData = getAIMatchData(_type.type);
+              .filter(() => getCompatibilityLevel(currentType.type) === 'low')
+              .map(() => {
+                const matchData = getAIMatchData(type.type);
                 
                 return (
-                  <div key={_type.type} className="p-4 rounded-lg bg-white">
+                  <div key={type.type} className="p-4 rounded-lg bg-white">
                     {/* Type Information */}
                     <div className="flex items-center gap-3 mb-3">
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm",
-                        `bg-gradient-to-r ${_type.color}`
+                        `bg-gradient-to-r ${type.color}`
                       )}>
-                        {_type.type}
+                        {type.type}
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-base">{_type.name}</div>
+                        <div className="font-semibold text-gray-900 text-base">{type.name}</div>
                       </div>
                     </div>
                     

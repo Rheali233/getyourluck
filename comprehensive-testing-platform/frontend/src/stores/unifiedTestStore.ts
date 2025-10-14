@@ -777,7 +777,7 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
           }
 
           const result = await response.json();
-          // console.log('API Response:', result); // 调试日志
+          // // 调试日志
           
           if (!result.success) {
             throw new Error(result.error || 'Test result generation failed');
@@ -792,12 +792,10 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
             }
           };
           
-          // console.log('Generated TestResult:', testResult); // 调试日志
+          // // 调试日志
           return testResult;
         } catch (error) {
-          // console.error('Error generating test results:', error);
-          
-          // 如果API调用失败，返回模拟结果
+          // // 如果API调用失败，返回模拟结果
           const mockResult: TestResult = {
             testType,
             result: {

@@ -308,13 +308,6 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   if (!isTestStarted && !showResults && !isLoading && !currentTestResult) {
     // 添加调试信息
     // eslint-disable-next-line no-console
-    console.debug('[TestContainer] Redirecting due to state check:', {
-      testType,
-      isTestStarted,
-      showResults,
-      isLoading,
-      currentTestResult: !!currentTestResult
-    });
     // 根据测试类型确定正确的重定向路径
     const redirectPath = ['vark'].includes(testType) 
       ? `/learning/${testType}` 

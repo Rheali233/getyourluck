@@ -63,8 +63,11 @@ export class QuestionService {
       if (['vark'].includes(testType)) {
         questions = this.convertLearningQuestions(questions, testType);
       }
-      // eslint-disable-next-line no-console
-      console.debug('[QuestionService] normalized questions', { testType, count: Array.isArray(questions) ? questions.length : 0, sample: Array.isArray(questions) ? questions[0] : questions });
+      
+      console.log('Questions loaded:', { 
+        count: Array.isArray(questions) ? questions.length : 0, 
+        sample: Array.isArray(questions) ? questions[0] : questions 
+      });
       
       return {
         success: true,

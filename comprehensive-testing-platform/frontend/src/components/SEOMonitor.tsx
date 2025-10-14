@@ -21,24 +21,18 @@ export const SEOMonitor: React.FC<SEOMonitorProps> = ({
   useEffect(() => {
     // 监控页面标题和描述
     if (document.title !== pageTitle) {
-      console.warn('SEO Warning: Page title mismatch', {
-        expected: pageTitle,
-        actual: document.title
-      });
+      document.title = pageTitle;
     }
 
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription && metaDescription.getAttribute('content') !== pageDescription) {
-      console.warn('SEO Warning: Meta description mismatch', {
-        expected: pageDescription,
-        actual: metaDescription.getAttribute('content')
-      });
+      metaDescription.setAttribute('content', pageDescription);
     }
 
     // 监控Core Web Vitals
     if ('web-vital' in window) {
       // 这里可以集成web-vitals库
-      console.log('Core Web Vitals monitoring enabled');
+      console.log('Web Vitals monitoring available');
     }
 
     // 监控页面加载性能
@@ -46,12 +40,7 @@ export const SEOMonitor: React.FC<SEOMonitorProps> = ({
       for (const entry of list.getEntries()) {
         if (entry.entryType === 'navigation') {
           const navEntry = entry as PerformanceNavigationTiming;
-          console.log('Page Load Performance:', {
-            domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.domContentLoadedEventStart,
-            loadComplete: navEntry.loadEventEnd - navEntry.loadEventStart,
-            totalTime: navEntry.loadEventEnd - navEntry.fetchStart
-          });
-        }
+          }
       }
     });
 
@@ -61,16 +50,14 @@ export const SEOMonitor: React.FC<SEOMonitorProps> = ({
     const images = document.querySelectorAll('img');
     images.forEach((img, index) => {
       if (!img.alt) {
-        console.warn(`SEO Warning: Image ${index} missing alt attribute`);
-      }
+        }
     });
 
     // 监控链接可访问性
     const links = document.querySelectorAll('a');
     links.forEach((link, index) => {
       if (!link.textContent?.trim() && !link.getAttribute('aria-label')) {
-        console.warn(`SEO Warning: Link ${index} missing accessible text`);
-      }
+        }
     });
 
     return () => {

@@ -133,8 +133,7 @@ export class InterpersonalProcessor {
   private static generateInterpretation(
     _scores: InterpersonalScores,
     overallScore: number,
-    strengths: string[],
-    _areasForGrowth: string[]
+    strengths: string[]: string[]
   ): string {
     let interpretation = `Your overall interpersonal skills score is ${overallScore.toFixed(1)}/5. `;
 
@@ -163,8 +162,7 @@ export class InterpersonalProcessor {
    * Generate recommendations based on scores
    */
   private static generateRecommendations(
-    scores: InterpersonalScores,
-    _areasForGrowth: string[]
+    scores: InterpersonalScores: string[]
   ): string[] {
     const recommendations: string[] = [];
 

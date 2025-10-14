@@ -23,8 +23,7 @@ export const SEOToolsPage: React.FC = () => {
       const report = await generateSEOReport();
       setSeoReport(report);
     } catch (error) {
-      console.error('Error generating SEO report:', error);
-    } finally {
+      } finally {
       setIsGenerating(false);
     }
   };
@@ -69,8 +68,7 @@ export const SEOToolsPage: React.FC = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error generating sitemap:', error);
-    }
+      }
   };
 
   const handleGenerateRobots = async () => {
@@ -87,8 +85,7 @@ export const SEOToolsPage: React.FC = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error generating robots.txt:', error);
-    }
+      }
   };
 
   const handleGenerateSearchConsoleCode = () => {

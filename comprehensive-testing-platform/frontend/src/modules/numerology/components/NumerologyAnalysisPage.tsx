@@ -43,7 +43,6 @@ export const NumerologyAnalysisPage: React.FC = () => {
     try {
       await processNumerologyData(currentAnalysisType, data);
     } catch (error) {
-      console.error('Error processing numerology data:', error);
       setShowLoadingModal(false);
     }
   };

@@ -48,13 +48,13 @@ export const useSimplePerformanceMonitor = (
     
     // Performance warning in development environment
     if (logToConsole && renderTime > 16) {
-      console.warn(`[${componentName}] Render time too long: ${renderTime.toFixed(2)}ms`)
+      console.log(`Component render time: ${renderTime}ms`);
     }
     
     // 发送到分析服务（如果启用）
     if (sendToAnalytics && renderTime > 16) {
       // 这里可以集成真实的分析服务
-      console.log(`Performance issue detected: ${componentName} took ${renderTime.toFixed(2)}ms`)
+      console.log(`Analytics: Component render time: ${renderTime}ms`);
     }
   })
   
@@ -72,7 +72,7 @@ export const useSimplePerformanceMonitor = (
       const duration = performance.now() - start
       
       if (logToConsole && duration > 100) {
-        console.warn(`[${componentName}] ${operation} took too long: ${duration.toFixed(2)}ms`)
+        console.log(`Function execution time: ${duration}ms`);
       }
       
       return duration
@@ -82,8 +82,7 @@ export const useSimplePerformanceMonitor = (
 
 // Higher-order component: Performance monitoring decorator
 export const withPerformanceMonitor = <P extends object>(
-  Component: React.ComponentType<P>,
-  _config: PerformanceConfig = {}
+  Component: React.ComponentType<P>: PerformanceConfig = {}
 ) => {
   const WrappedComponent = React.memo((props: P) => {
     // 暂时禁用监控以避免未使用变量警告

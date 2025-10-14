@@ -20,7 +20,7 @@ export const PsychologyTestContainer: React.FC<PsychologyTestContainerProps> = (
 }) => {
   return (
     <div 
-      className={cn("min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-100 via-blue-200 to-blue-400", className)} 
+      className={cn("min-h-screen bg-[radial-gradient(circle_at_center(--tw-gradient-stops))] from-blue-100 via-blue-200 to-blue-400", className)} 
       data-testid={testId}
       {...props}
     >

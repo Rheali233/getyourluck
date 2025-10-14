@@ -205,8 +205,6 @@ export const commonBenchmarks = {
 
 // 使用示例
 export const runPerformanceTests = async () => {
-  console.log('Starting performance benchmarks...')
-  
   const benchmark = new PerformanceBenchmark()
   
   // 测试基础操作性能
@@ -238,7 +236,5 @@ export const runPerformanceTests = async () => {
   ])
   
   const report = benchmark.generateReport(results)
-  console.log(report)
-  
   return results
 }

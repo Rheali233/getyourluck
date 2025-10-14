@@ -27,8 +27,6 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('Error caught by boundary:', error, errorInfo);
-    
     // 这里可以添加错误报告服务
     // errorReportingService.captureException(error, errorInfo)
   }

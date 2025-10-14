@@ -75,8 +75,7 @@ export const Homepage: React.FC<HomepageProps> = ({
 
   const handleArticleClick = (_article: any) => {
     // 可以在这里添加文章点击的统计或分析逻辑
-    // console.log('Article clicked:', article.title);
-    // 引用以避免未使用变量的 ESLint 报错
+    // // 引用以避免未使用变量的 ESLint 报错
     void _article;
   };
 

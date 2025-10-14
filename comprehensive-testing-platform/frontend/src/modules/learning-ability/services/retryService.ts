@@ -49,7 +49,6 @@ export class RetryService {
           retryOptions.maxDelay
         );
 
-        console.warn(`Attempt ${attempt} failed, retrying in ${delay}ms:`, lastError.message);
         await this.delay(delay);
       }
     }
@@ -87,7 +86,6 @@ export class RetryService {
           retryOptions.maxDelay
         );
 
-        console.warn(`Attempt ${attempt} failed, retrying in ${delay}ms:`, lastError.message);
         await this.delay(delay);
       }
     }

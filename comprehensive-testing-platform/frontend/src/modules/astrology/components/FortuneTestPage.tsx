@@ -135,8 +135,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
     } catch (error) {
       // 错误时关闭弹窗
       setShowLoadingModal(false);
-      // console.error('Fortune analysis failed:', error);
-    } finally {
+      // } finally {
       setIsSubmitting(false);
     }
   };

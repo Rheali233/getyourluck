@@ -52,8 +52,7 @@ export const TestModuleStats: React.FC<TestModuleStatsProps> = ({
       };
       setLocalStats(mockStats);
     } catch (error) {
-      console.error('Failed to load stats:', error);
-    } finally {
+      } finally {
       setIsLoading(false);
     }
   };

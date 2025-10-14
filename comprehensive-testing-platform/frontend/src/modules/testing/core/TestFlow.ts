@@ -156,7 +156,6 @@ export abstract class BaseTestFlow<T extends TestType> implements ITestFlow<T> {
       localStorage.setItem(`test_progress_${progress.sessionId}`, JSON.stringify(progress));
       return true;
     } catch (error) {
-      console.error('Failed to save progress:', error);
       return false;
     }
   }
@@ -181,7 +180,6 @@ export abstract class BaseTestFlow<T extends TestType> implements ITestFlow<T> {
       }
       return false;
     } catch (error) {
-      console.error('Failed to load progress:', error);
       return false;
     }
   }

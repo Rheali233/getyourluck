@@ -22,7 +22,6 @@ export class ProgressManager {
       localStorage.setItem(this.storageKey, JSON.stringify(existingProgress));
       return true;
     } catch (error) {
-      console.error('Failed to save progress:', error);
       return false;
     }
   }
@@ -41,7 +40,6 @@ export class ProgressManager {
       
       return null;
     } catch (error) {
-      console.error('Failed to load progress:', error);
       return null;
     }
   }
@@ -54,7 +52,6 @@ export class ProgressManager {
       const stored = localStorage.getItem(this.storageKey);
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
-      console.error('Failed to parse progress data:', error);
       return {};
     }
   }
@@ -70,7 +67,6 @@ export class ProgressManager {
       localStorage.setItem(this.storageKey, JSON.stringify(allProgress));
       return true;
     } catch (error) {
-      console.error('Failed to clear progress:', error);
       return false;
     }
   }
@@ -83,7 +79,6 @@ export class ProgressManager {
       localStorage.removeItem(this.storageKey);
       return true;
     } catch (error) {
-      console.error('Failed to clear all progress:', error);
       return false;
     }
   }
@@ -96,7 +91,6 @@ export class ProgressManager {
       const allProgress = this.getAllProgress();
       return Object.values(allProgress).filter(progress => progress.testType === testType);
     } catch (error) {
-      console.error('Failed to get progress by test type:', error);
       return [];
     }
   }
@@ -109,7 +103,6 @@ export class ProgressManager {
       const allProgress = this.getAllProgress();
       return sessionId in allProgress;
     } catch (error) {
-      console.error('Failed to check progress existence:', error);
       return false;
     }
   }

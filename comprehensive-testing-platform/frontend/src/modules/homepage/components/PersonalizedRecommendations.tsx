@@ -74,8 +74,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Failed to fetch personalized recommendations:', err);
-    } finally {
+      } finally {
       setIsLoading(false);
     }
   };
@@ -164,8 +163,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
         })
       });
     } catch (error) {
-      console.error('Failed to record recommendation click:', error);
-    }
+      }
   };
 
   // 加载状态

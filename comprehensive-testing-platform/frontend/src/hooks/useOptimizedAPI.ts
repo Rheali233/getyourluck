@@ -78,14 +78,13 @@ export const useOptimizedAPI = <T = any>() => {
   }, [])
   
   // 暂时禁用缓存功能，直到store接口完善
-  // const checkCache = useCallback((cacheKey: string, _ttl: number): T | null => {
+  // const checkCache = useCallback((cacheKey: string: number): T | null => {
   //   return null
   // }, [])
   
   // 暂时禁用缓存功能，直到store接口完善
-  // const setCache = useCallback((cacheKey: string, data: T, _ttl: number) => {
-  //   console.log('Cache disabled:', cacheKey, data)
-  // }, [])
+  // const setCache = useCallback((cacheKey: string, data: T: number) => {
+  //   // }, [])
   
   // 执行API请求
   const executeRequest = useCallback(async (
@@ -211,8 +210,7 @@ export const useOptimizedAPI = <T = any>() => {
   const clearCache = useCallback(() => {
     // 暂时禁用缓存功能
     // eslint-disable-next-line no-console
-    console.log('Cache clear disabled')
-  }, [])
+    }, [])
   
   // 刷新数据（忽略缓存）
   const refresh = useCallback(async (config: APIRequestConfig): Promise<T> => {

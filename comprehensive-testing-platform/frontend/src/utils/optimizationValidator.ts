@@ -163,9 +163,7 @@ export class OptimizationValidator {
   
   // 验证组件渲染优化效果
   async validateComponentOptimization(
-    _beforeComponent: any,
-    _afterComponent: any,
-    _props: any
+    _beforeComponent: any: any: any
   ): Promise<OptimizationValidationResult> {
     const result: OptimizationValidationResult = {
       success: false,
@@ -298,8 +296,6 @@ export class OptimizationValidator {
 
 // 使用示例
 export const validateOptimizations = async () => {
-  console.log('Starting optimization validation...')
-  
   const validator = new OptimizationValidator({
     enableBenchmarks: true,
     enableMemoryProfiling: false,
@@ -308,8 +304,6 @@ export const validateOptimizations = async () => {
   
   const results = await validator.runFullValidation()
   const report = validator.generateValidationReport(results)
-  
-  console.log(report)
   
   return results
 }

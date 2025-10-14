@@ -247,7 +247,6 @@ export const useHomepageStore = create<HomepageModuleState>()(
             throw new Error(result.error || 'Failed to load config');
           }
         } catch (error) {
-          console.error('Failed to load homepage config:', error);
           set({ 
             error: error instanceof Error ? error.message : 'Failed to load config',
             isLoading: false 
@@ -276,7 +275,6 @@ export const useHomepageStore = create<HomepageModuleState>()(
             throw new Error(result.error || 'Failed to load stats');
           }
         } catch (error) {
-          console.error('Failed to load homepage stats:', error);
           set({ 
             error: error instanceof Error ? error.message : 'Failed to load stats',
             isLoading: false 
@@ -311,7 +309,6 @@ export const useHomepageStore = create<HomepageModuleState>()(
             throw new Error(result.error || 'Failed to save preferences');
           }
         } catch (error) {
-          console.error('Failed to save user preferences:', error);
           set({ 
             error: error instanceof Error ? error.message : 'Failed to save preferences'
           });
@@ -330,7 +327,6 @@ export const useHomepageStore = create<HomepageModuleState>()(
             set({ userPreferences: { ...defaultUserPreferences, ...result.data } });
           }
         } catch (error) {
-          console.error('Failed to load user preferences:', error);
           // 使用默认偏好，不设置错误状态
         }
       },

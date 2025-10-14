@@ -61,7 +61,6 @@ export class PsychologyAIService {
         error: result.error || 'MBTI analysis failed'
       };
     } catch (error) {
-      console.error('MBTI analysis error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -101,7 +100,6 @@ export class PsychologyAIService {
         error: result.error || 'PHQ-9 analysis failed'
       };
     } catch (error) {
-      console.error('PHQ-9 analysis error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -141,7 +139,6 @@ export class PsychologyAIService {
         error: result.error || 'EQ analysis failed'
       };
     } catch (error) {
-      console.error('EQ analysis error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -181,7 +178,6 @@ export class PsychologyAIService {
         error: result.error || 'Happiness index analysis failed'
       };
     } catch (error) {
-      console.error('Happiness index analysis error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'

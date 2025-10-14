@@ -198,16 +198,12 @@ export class CareerLogger {
 
     switch (level) {
       case LogLevel.DEBUG:
-        console.debug(logMessage, logData);
         break;
       case LogLevel.INFO:
-        console.info(logMessage, logData);
         break;
       case LogLevel.WARN:
-        console.warn(logMessage, logData);
         break;
       case LogLevel.ERROR:
-        console.error(logMessage, logData);
         break;
     }
 

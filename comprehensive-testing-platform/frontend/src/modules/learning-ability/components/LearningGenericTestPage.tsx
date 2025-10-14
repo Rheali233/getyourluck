@@ -36,11 +36,6 @@ export const LearningGenericTestPage: React.FC<LearningGenericTestPageProps> = (
 
         if (response.success && response.data && Array.isArray(response.data)) {
           // eslint-disable-next-line no-console
-          console.debug('[LearningGenericTestPage] fetched questions', {
-            testType,
-            count: response.data.length,
-            sample: response.data?.[0]
-          });
           setQuestions(response.data);
         } else {
           setError(response.error || 'Failed to load questions');
@@ -59,7 +54,6 @@ export const LearningGenericTestPage: React.FC<LearningGenericTestPageProps> = (
   useEffect(() => {
     if (questions.length > 0) {
       // eslint-disable-next-line no-console
-      console.debug('[LearningGenericTestPage] setStoreQuestions', { count: questions.length });
       setStoreQuestions(questions);
     }
   }, [questions, setStoreQuestions]);
@@ -115,12 +109,6 @@ export const LearningGenericTestPage: React.FC<LearningGenericTestPageProps> = (
   if (testStarted || showResults) {
     // 添加调试信息
     // eslint-disable-next-line no-console
-    console.debug('[LearningGenericTestPage] Rendering TestContainer:', {
-      testType,
-      testStarted,
-      showResults,
-      questionsCount: questions.length
-    });
     return (
       <LearningTestContainer>
         {/* 顶部标题 + 返回首页按钮 */}
@@ -248,7 +236,6 @@ export const LearningGenericTestPage: React.FC<LearningGenericTestPageProps> = (
             onClick={async () => {
               try {
                 // eslint-disable-next-line no-console
-                console.debug('[LearningGenericTestPage] startTest click', { testType, count: questions.length });
                 await startTest(testType, questions);
                 setTestStarted(true);
               } catch (error) {

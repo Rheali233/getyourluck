@@ -206,8 +206,7 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
         onDataCollected?.(data);
       }
     } catch (error) {
-      console.error('Failed to send behavior data:', error);
-    }
+      }
   }, [onDataCollected]);
 
   // 开始跟踪

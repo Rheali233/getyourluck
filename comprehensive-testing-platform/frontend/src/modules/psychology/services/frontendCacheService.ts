@@ -50,7 +50,6 @@ export class FrontendCacheService {
       
       return true;
     } catch (error) {
-      console.error('Failed to set cache:', error);
       return false;
     }
   }
@@ -79,7 +78,6 @@ export class FrontendCacheService {
 
       return entry.data;
     } catch (error) {
-      console.error('Failed to get cache:', error);
       return null;
     }
   }
@@ -93,7 +91,6 @@ export class FrontendCacheService {
       this.storage.removeItem(cacheKey);
       return true;
     } catch (error) {
-      console.error('Failed to delete cache:', error);
       return false;
     }
   }
@@ -116,7 +113,6 @@ export class FrontendCacheService {
       keysToRemove.forEach(key => this.storage.removeItem(key));
       return true;
     } catch (error) {
-      console.error('Failed to clear namespace:', error);
       return false;
     }
   }
@@ -148,7 +144,6 @@ export class FrontendCacheService {
       
       return { totalKeys, totalSize };
     } catch (error) {
-      console.error('Failed to get cache stats:', error);
       return { totalKeys: 0, totalSize: 0 };
     }
   }

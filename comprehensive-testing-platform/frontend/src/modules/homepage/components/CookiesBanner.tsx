@@ -85,8 +85,7 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
         ...consentData,
       }),
     }).catch(error => {
-      console.error('保存Cookies同意状态失败:', error);
-    });
+      });
   };
 
   if (!isVisible) return null;

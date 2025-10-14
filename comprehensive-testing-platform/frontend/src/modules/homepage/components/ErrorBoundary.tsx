@@ -75,12 +75,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   // 记录错误信息
   private logError(error: Error, errorInfo: ErrorInfo, errorId: string) {
-    console.error('Error Boundary caught an error:', {
-      errorId,
-      error: error.message,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack,
-      timestamp: new Date().toISOString(),
+    .toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href
     });
@@ -112,8 +107,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         })
       });
     } catch (reportError) {
-      console.error('Failed to report error:', reportError);
-    }
+      }
   }
 
   // 获取用户ID

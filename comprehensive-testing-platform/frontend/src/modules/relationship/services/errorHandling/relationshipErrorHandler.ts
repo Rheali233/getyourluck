@@ -118,14 +118,6 @@ export class RelationshipErrorHandler {
    * Log error for debugging
    */
   private static logError(error: RelationshipError): void {
-    console.error('Relationship Module Error:', {
-      type: error.type,
-      message: error.message,
-      context: error.context,
-      timestamp: error.timestamp,
-      originalError: error.originalError
-    });
-
     // TODO: Send to error tracking service (e.g., Sentry)
     // TODO: Send to analytics service
   }

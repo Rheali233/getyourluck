@@ -54,7 +54,6 @@ export class CareerProgressManager {
         ttl: 24 * 60 * 60 * 1000 // 24 hours expiration
       });
     } catch (error) {
-      console.error('Failed to save career test progress:', error);
       return false;
     }
   }
@@ -67,7 +66,6 @@ export class CareerProgressManager {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.get<TestProgress>(key, 'career-test-progress');
     } catch (error) {
-      console.error('Failed to load career test progress:', error);
       return null;
     }
   }
@@ -80,7 +78,6 @@ export class CareerProgressManager {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.delete(key, 'career-test-progress');
     } catch (error) {
-      console.error('Failed to delete career test progress:', error);
       return false;
     }
   }
@@ -107,7 +104,6 @@ export class CareerProgressManager {
 
       return this.saveProgress(updatedProgress);
     } catch (error) {
-      console.error('Failed to update career test progress:', error);
       return false;
     }
   }
@@ -135,7 +131,6 @@ export class CareerProgressManager {
 
       return this.saveProgress(updatedProgress);
     } catch (error) {
-      console.error('Failed to add career test answer:', error);
       return false;
     }
   }
@@ -162,7 +157,6 @@ export class CareerProgressManager {
         new Date(b.lastUpdateTime).getTime() - new Date(a.lastUpdateTime).getTime()
       );
     } catch (error) {
-      console.error('Failed to get all career test progress:', error);
       return [];
     }
   }
@@ -189,7 +183,6 @@ export class CareerProgressManager {
       
       return cleanedCount;
     } catch (error) {
-      console.error('Failed to cleanup expired career test progress:', error);
       return 0;
     }
   }
@@ -247,7 +240,6 @@ export class CareerProgressManager {
         averageCompletionTime
       };
     } catch (error) {
-      console.error('Failed to get career test progress stats:', error);
       return {
         totalTests: 0,
         completedTests: 0,

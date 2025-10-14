@@ -189,8 +189,10 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       setIsValid(false);
     }
     // Debug current question text/format for diagnostics
-    // eslint-disable-next-line no-console
-    console.debug('[QuestionDisplay] render', { id: question.id, format: question.format, text: (question as any)?.text });
+    console.log('Question debug:', { 
+      questionId: question.id, 
+      text: question.text 
+    });
   }, [currentAnswer, question.id]);
 
   // Validate answer based on question format

@@ -20,7 +20,7 @@ export const CareerTestContainer: React.FC<CareerTestContainerProps> = ({
 }) => {
   return (
     <div 
-      className={cn("min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-green-100 via-emerald-200 to-teal-400", className)} 
+      className={cn("min-h-screen bg-[radial-gradient(circle_at_center(--tw-gradient-stops))] from-green-100 via-emerald-200 to-teal-400", className)} 
       data-testid={testId}
       {...props}
     >

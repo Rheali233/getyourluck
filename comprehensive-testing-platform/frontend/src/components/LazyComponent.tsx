@@ -38,7 +38,7 @@ class LazyErrorBoundary extends React.Component<
   }
 
   override componentDidCatch(_error: Error, _errorInfo: React.ErrorInfo) {
-    // console.error('Lazy component error:', _error, _errorInfo);
+    // Error boundary implementation
   }
 
   override render() {
@@ -95,7 +95,7 @@ export function createLazyComponent<T = {}>(
 export function preloadComponent(importFunc: () => Promise<any>) {
   return () => {
     importFunc().catch(_error => {
-      // console.warn('Failed to preload component:', _error);
+      console.error('Failed to preload component:', _error);
     });
   };
 }
@@ -125,10 +125,9 @@ export function useSmartPreload() {
     importFunc()
       .then(() => {
         setPreloadedComponents(prev => new Set([...prev, name]));
-        // console.log(`Preloaded component: ${name}`);
       })
       .catch(_error => {
-        // console.warn(`Failed to preload component ${name}:`, _error);
+        console.error('Failed to preload component:', _error);
       });
   };
 

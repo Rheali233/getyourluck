@@ -283,7 +283,7 @@ export class CareerAIService {
   /**
    * Get DISC communication style
    */
-  private getDISCCommunicationStyle(primary: string, _secondary: string): string {
+  private getDISCCommunicationStyle(primary: string, secondary: string): string {
     const styles: Record<string, string> = {
       'D': 'Direct and concise, prefers clear and actionable information',
       'I': 'Enthusiastic and engaging, uses stories and examples',
@@ -296,7 +296,7 @@ export class CareerAIService {
   /**
    * Get DISC leadership style
    */
-  private getDISCLeadershipStyle(primary: string, _secondary: string): string {
+  private getDISCLeadershipStyle(primary: string, secondary: string): string {
     const styles: Record<string, string> = {
       'D': 'Directive and results-oriented, sets clear goals and expectations',
       'I': 'Inspirational and motivating, builds enthusiasm and engagement',
@@ -309,7 +309,7 @@ export class CareerAIService {
   /**
    * Get DISC team collaboration style
    */
-  private getDISCTeamCollaboration(primary: string, _secondary: string): string {
+  private getDISCTeamCollaboration(primary: string, secondary: string): string {
     const styles: Record<string, string> = {
       'D': 'Goal-focused collaborator, drives team toward objectives',
       'I': 'Relationship builder, creates positive team dynamics',
@@ -322,7 +322,7 @@ export class CareerAIService {
   /**
    * Get DISC stress response
    */
-  private getDISCStressResponse(primary: string, _secondary: string): string {
+  private getDISCStressResponse(primary: string, secondary: string): string {
     const responses: Record<string, string> = {
       'D': 'Becomes more direct and demanding, focuses on quick solutions',
       'I': 'May become scattered or overly optimistic, needs structure',
@@ -562,7 +562,7 @@ export class CareerAIService {
   /**
    * Generate comprehensive Leadership analysis based on scores
    */
-  private generateLeadershipAnalysis(_scores: Record<string, number>, primaryType: string, _secondaryType: string): any {
+  private generateLeadershipAnalysis(_scores: Record<string, number>, primaryType: string, secondaryType: string): any {
     const leadershipTypes = {
       transformational: { 
         name: 'Transformational', 

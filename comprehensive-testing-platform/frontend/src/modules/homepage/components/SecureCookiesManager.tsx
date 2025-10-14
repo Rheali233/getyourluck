@@ -112,7 +112,6 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
         }
       }
     } catch (err) {
-      console.error('加载用户同意状态失败:', err);
       setError('Failed to load user consent settings.');
     } finally {
       setIsLoading(false);
@@ -152,7 +151,6 @@ export const SecureCookiesManager: React.FC<SecureCookiesManagerProps> = ({
       // 应用cookies设置
       applyCookieSettings(newConsent);
     } catch (err) {
-      console.error('保存用户同意失败:', err);
       setError('Failed to save user consent settings.');
     } finally {
       setIsLoading(false);

@@ -353,7 +353,6 @@ export const useTestStore = create<TestStoreState>()(
                 throw new Error(response.error || 'Failed to get test results from backend');
               }
             } catch (apiError) {
-              console.warn('Failed to get test results from backend:', apiError);
               const errorMessage = apiError instanceof Error ? apiError.message : 'Failed to get test results from backend';
               set({ error: errorMessage });
               
@@ -504,7 +503,6 @@ export const useTestStore = create<TestStoreState>()(
           localStorage.setItem(`test_progress_${progress.sessionId}`, JSON.stringify(progress));
           return true;
         } catch (error) {
-          console.error('Failed to save progress:', error);
           return false;
         }
       },
@@ -526,7 +524,6 @@ export const useTestStore = create<TestStoreState>()(
           }
           return false;
         } catch (error) {
-          console.error('Failed to load progress:', error);
           return false;
         }
       },

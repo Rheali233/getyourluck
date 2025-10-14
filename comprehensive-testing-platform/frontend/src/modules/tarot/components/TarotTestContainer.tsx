@@ -24,7 +24,7 @@ export const TarotTestContainer: React.FC<TarotTestContainerProps> = ({
 
   return (
     <div 
-      className={cn("min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-violet-200 via-violet-300 to-violet-500", className)} 
+      className={cn("min-h-screen bg-[radial-gradient(circle_at_center(--tw-gradient-stops))] from-violet-200 via-violet-300 to-violet-500", className)} 
       data-testid={testId}
       {...props}
     >

@@ -23,7 +23,6 @@ class NumerologyService {
       const response = await apiClient.post(`${this.baseUrl}/analyze`, request);
       return response.data as NumerologyAnalysisResponse;
     } catch (error) {
-      console.error('Error starting numerology analysis:', error);
       throw error;
     }
   }
@@ -36,7 +35,6 @@ class NumerologyService {
       const response = await apiClient.post(`${this.baseUrl}/submit`, data);
       return response.data as NumerologyAnalysisResponse;
     } catch (error) {
-      console.error('Error submitting numerology data:', error);
       throw error;
     }
   }
@@ -49,7 +47,6 @@ class NumerologyService {
       const response = await apiClient.get(`${this.baseUrl}/analysis/${sessionId}`);
       return response.data as NumerologyAnalysisResponse;
     } catch (error) {
-      console.error('Error getting numerology analysis:', error);
       throw error;
     }
   }
@@ -62,7 +59,6 @@ class NumerologyService {
       const response = await apiClient.get(`${this.baseUrl}/sessions`);
       return response.data as NumerologySession[];
     } catch (error) {
-      console.error('Error getting numerology sessions:', error);
       throw error;
     }
   }
@@ -75,7 +71,6 @@ class NumerologyService {
       await apiClient.delete(`${this.baseUrl}/sessions/${sessionId}`);
       return true;
     } catch (error) {
-      console.error('Error deleting numerology session:', error);
       return false;
     }
   }
@@ -88,7 +83,6 @@ class NumerologyService {
       const response = await apiClient.get(`${this.baseUrl}/zodiac/${animal}/fortune?period=${period}`);
       return response.data as NumerologyAnalysisResponse;
     } catch (error) {
-      console.error('Error getting zodiac fortune:', error);
       throw error;
     }
   }
@@ -101,7 +95,6 @@ class NumerologyService {
       const response = await apiClient.post(`${this.baseUrl}/name/analyze`, { name });
       return response.data as NumerologyAnalysisResponse;
     } catch (error) {
-      console.error('Error analyzing name:', error);
       throw error;
     }
   }
@@ -114,7 +107,6 @@ class NumerologyService {
       const response = await apiClient.post(`${this.baseUrl}/ziwei/analyze`, birthInfo);
       return response.data as NumerologyAnalysisResponse;
     } catch (error) {
-      console.error('Error getting ZiWei analysis:', error);
       throw error;
     }
   }
@@ -127,7 +119,6 @@ class NumerologyService {
       const response = await apiClient.post(`${this.baseUrl}/bazi/analyze`, birthInfo);
       return response.data as NumerologyAnalysisResponse;
     } catch (error) {
-      console.error('Error getting BaZi analysis:', error);
       throw error;
     }
   }
@@ -135,7 +126,7 @@ class NumerologyService {
   /**
    * 验证出生日期
    */
-  validateBirthDate(date: string, _calendarType: 'solar' | 'lunar'): boolean {
+  validateBirthDate(date: string: 'solar' | 'lunar'): boolean {
     const dateObj = new Date(date);
     const now = new Date();
     

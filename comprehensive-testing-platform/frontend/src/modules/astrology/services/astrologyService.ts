@@ -29,12 +29,10 @@ export const astrologyService = {
 
   // 获取运势
   async getFortune(sign: string, timeframe: string, date?: string): Promise<APIResponse<FortuneReading>> {
-    console.log('Frontend getFortune called with:', { sign, timeframe, date });
     const params = new URLSearchParams({
       timeframe,
       ...(date && { date })
     });
-    console.log('API URL:', `/api/astrology/fortune/${sign}?${params}`);
     return apiClient.get(`/api/astrology/fortune/${sign}?${params}`);
   },
 

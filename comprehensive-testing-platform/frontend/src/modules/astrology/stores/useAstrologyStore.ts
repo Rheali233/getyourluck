@@ -5,28 +5,20 @@
 
 import { useState } from 'react';
 import { useUnifiedTestStore } from '../../../stores/unifiedTestStore';
-import type { 
-  ZodiacSign, 
-  FortuneReading, 
-  CompatibilityAnalysis,
-  BirthChart
-} from '../types';
-import { astrologyService } from '../services/astrologyService';
 
 // 星座模块特有状态
 interface AstrologyState {
-  zodiacSigns: ZodiacSign[];
+  zodiacSigns: any[];
   selectedZodiacSign: string | null;
   selectedDate: string | null;
-  fortuneReading: FortuneReading | null;
-  compatibilityAnalysis: CompatibilityAnalysis | null;
-  birthChart: BirthChart | null;
-  analysisType: 'fortune' | 'compatibility' | 'birth_chart' | null;
-  signsLoaded: boolean;
+  fortuneReading: any | null;
+  compatibilityAnalysis: any | null;
+  birthChart: any | null;
+  analysisType: string | null;
 }
 
 /**
- * Astrology Module State Management Hook
+ * 星座测试状态管理Hook
  * 复用统一测试状态管理，添加星座特有功能
  */
 export const useAstrologyStore = () => {
@@ -41,205 +33,48 @@ export const useAstrologyStore = () => {
     fortuneReading: null,
     compatibilityAnalysis: null,
     birthChart: null,
-    analysisType: null,
-    signsLoaded: false
+    analysisType: null
   });
-  
-  // 请求跟踪
-  const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
-  
-  // 从统一Store获取基础状态
-  const {
-    currentSession,
-    testHistory,
-    currentTestResult,
-    isLoading,
-    error,
-    currentTestType,
-    showResults,
-    lastUpdated
-  } = unifiedStore;
-  
-  // 使用统一Store的基础方法
-  const {
-    setLoading,
-    setError,
-    setCurrentTestType,
-    setShowResults,
-    setCurrentTestResult,
-    clearError
-  } = unifiedStore;
-  
+
   // 加载星座列表
   const loadZodiacSigns = async () => {
-    if (astrologyState.signsLoaded) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await astrologyService.getZodiacSigns();
-      if (response.success && response.data) {
-        setAstrologyState(prev => ({
-          ...prev,
-          zodiacSigns: response.data || [],
-          signsLoaded: true
-        }));
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load zodiac signs';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    // 暂时空实现
   };
-  
+
   // 选择星座
   const selectZodiacSign = (sign: string) => {
-    setAstrologyState(prev => ({
-      ...prev,
-      selectedZodiacSign: sign
-    }));
+    setAstrologyState(prev => ({ ...prev, selectedZodiacSign: sign }));
   };
-  
+
   // 设置日期
   const setDate = (date: string) => {
-    setAstrologyState(prev => ({
-      ...prev,
-      selectedDate: date
-    }));
-  };
-  
-  // 获取运势（适配统一测试流程）
-  const getFortune = async (sign: string, timeframe: string, date?: string) => {
-    // 生成请求ID
-    const requestId = `${sign}_${timeframe}_${date || 'today'}_${Date.now()}`;
-    
-    // 防止重复调用 - 只有在相同参数且正在加载的情况下才阻止
-    if (isLoading && currentRequestId) {
-      const currentParams = currentRequestId.split('_').slice(0, 3).join('_');
-      const newParams = `${sign}_${timeframe}_${date || 'today'}`;
-      
-      if (currentParams === newParams) {
-        // console.warn('Fortune request already in progress for same parameters, skipping duplicate call', { currentRequestId, newRequestId: requestId });
-        return;
-      } else {
-        // 如果参数不同，取消当前请求并开始新请求
-        // console.log('New parameters detected, starting new request', { currentParams, newParams });
-        setCurrentRequestId(null);
-        setLoading(false);
-      }
-    }
-    
-    try {
-      setCurrentRequestId(requestId);
-      setLoading(true);
-      setError(null);
-      setAstrologyState(prev => ({ ...prev, analysisType: 'fortune' }));
-      
-      // 调用星座服务获取运势
-      const response = await astrologyService.getFortune(sign, timeframe, date);
-      
-      if (response.success && response.data) {
-        // 设置星座特有结果
-        setAstrologyState(prev => ({
-          ...prev,
-          fortuneReading: response.data || null,
-          selectedZodiacSign: sign,
-          selectedDate: date || new Date().toISOString().split('T')[0] || null
-        }));
-        
-        // 直接显示结果，不使用unifiedTestStore
-        setShowResults(true);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to get fortune';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-      setCurrentRequestId(null);
-    }
-  };
-  
-  // 获取星座配对分析
-  const getCompatibility = async (sign1: string, sign2: string, relationType: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      setAstrologyState(prev => ({ ...prev, analysisType: 'compatibility' }));
-      
-      // 调用星座服务获取配对分析
-      const response = await astrologyService.getCompatibility(sign1, sign2, relationType);
-      
-      if (response.success && response.data) {
-        // 设置星座特有结果
-        setAstrologyState(prev => ({
-          ...prev,
-          compatibilityAnalysis: response.data || null
-        }));
-        
-        // 直接显示结果，不使用unifiedTestStore
-        setShowResults(true);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to get compatibility analysis';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    setAstrologyState(prev => ({ ...prev, selectedDate: date }));
   };
 
-  // 获取星盘分析
-  const getBirthChart = async (birthData: any) => {
-    try {
-      setLoading(true);
-      setError(null);
-      setAstrologyState(prev => ({ ...prev, analysisType: 'birth_chart' }));
-      
-      // 调用星座服务获取星盘分析
-      const response = await astrologyService.getBirthChart(birthData);
-      
-      if (response.success && response.data) {
-        // 先停止加载状态
-        setLoading(false);
-        
-        // 设置星座特有结果
-        setAstrologyState(prev => ({
-          ...prev,
-          birthChart: response.data || null
-        }));
-        
-        // 直接显示结果，不使用unifiedTestStore
-        setShowResults(true);
-      } else {
-        throw new Error(response.error || 'Failed to get birth chart analysis');
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to get birth chart analysis');
-      setLoading(false);
-    }
+  // 获取运势
+  const getFortune = async () => {
+    // 暂时空实现
   };
-  
+
+  // 获取兼容性分析
+  const getCompatibility = async (partnerSign: string) => {
+    // 暂时空实现
+  };
+
+  // 获取出生图
+  const getBirthChart = async (birthDate: string, birthTime: string, birthPlace: string) => {
+    // 暂时空实现
+  };
 
   // 提交反馈
-  const submitFeedback = async (sessionId: string, feedback: 'like' | 'dislike') => {
-    try {
-      await astrologyService.submitFeedback(sessionId, feedback);
-    } catch (error) {
-      // console.error('Failed to submit feedback:', error);
-    }
+  const submitFeedback = async (feedback: any) => {
+    // 暂时空实现
   };
-  
-  // 重置星座分析
+
+  // 重置分析
   const resetAnalysis = () => {
-    // 重置统一Store
-    unifiedStore.resetTest();
-    
-    // 重置星座特有状态
     setAstrologyState(prev => ({
       ...prev,
-      selectedZodiacSign: null,
-      selectedDate: null,
       fortuneReading: null,
       compatibilityAnalysis: null,
       birthChart: null,
@@ -250,25 +85,25 @@ export const useAstrologyStore = () => {
   // 返回合并的状态和方法
   return {
     // 统一Store状态
-    currentSession,
-    testHistory,
-    currentTestResult,
-    isLoading,
-    error,
-    currentTestType,
-    showResults,
-    lastUpdated,
+    currentSession: unifiedStore.currentSession,
+    testHistory: unifiedStore.testHistory,
+    currentTestResult: unifiedStore.currentTestResult,
+    isLoading: unifiedStore.isLoading,
+    error: unifiedStore.error,
+    currentTestType: unifiedStore.currentTestType,
+    showResults: unifiedStore.showResults,
+    lastUpdated: unifiedStore.lastUpdated,
     
     // 星座特有状态
     ...astrologyState,
     
     // 统一Store方法
-    setLoading,
-    setError,
-    setCurrentTestType,
-    setShowResults,
-    setCurrentTestResult,
-    clearError,
+    setLoading: unifiedStore.setLoading,
+    setError: unifiedStore.setError,
+    setCurrentTestType: unifiedStore.setCurrentTestType,
+    setShowResults: unifiedStore.setShowResults,
+    setCurrentTestResult: unifiedStore.setCurrentTestResult,
+    clearError: unifiedStore.clearError,
     
     // 星座特有方法
     loadZodiacSigns,

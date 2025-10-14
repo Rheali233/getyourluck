@@ -54,7 +54,6 @@ export class ProgressManager {
         ttl: 24 * 60 * 60 * 1000 // 24 hours expiration
       });
     } catch (error) {
-      console.error('Failed to save progress:', error);
       return false;
     }
   }
@@ -67,7 +66,6 @@ export class ProgressManager {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.get<TestProgress>(key, 'test-progress');
     } catch (error) {
-      console.error('Failed to load progress:', error);
       return null;
     }
   }
@@ -80,7 +78,6 @@ export class ProgressManager {
       const key = this.generateProgressKey(testType, sessionId);
       return frontendCacheService.delete(key, 'test-progress');
     } catch (error) {
-      console.error('Failed to delete progress:', error);
       return false;
     }
   }
@@ -107,7 +104,6 @@ export class ProgressManager {
 
       return this.saveProgress(updatedProgress);
     } catch (error) {
-      console.error('Failed to update progress:', error);
       return false;
     }
   }
@@ -135,7 +131,6 @@ export class ProgressManager {
 
       return this.saveProgress(updatedProgress);
     } catch (error) {
-      console.error('Failed to add answer:', error);
       return false;
     }
   }
@@ -163,7 +158,6 @@ export class ProgressManager {
         new Date(b.lastUpdateTime).getTime() - new Date(a.lastUpdateTime).getTime()
       );
     } catch (error) {
-      console.error('Failed to get all progress:', error);
       return [];
     }
   }
@@ -190,7 +184,6 @@ export class ProgressManager {
       
       return cleanedCount;
     } catch (error) {
-      console.error('Failed to cleanup expired progress:', error);
       return 0;
     }
   }
@@ -248,7 +241,6 @@ export class ProgressManager {
         averageCompletionTime
       };
     } catch (error) {
-      console.error('Failed to get progress stats:', error);
       return {
         totalTests: 0,
         completedTests: 0,

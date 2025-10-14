@@ -49,8 +49,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Failed to update performance statistics:', error);
-    }
+      }
   };
 
   const formatBytes = (bytes: number): string => {
@@ -74,8 +73,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       frontendCacheService.clearNamespace('test-progress');
       updateStats();
     } catch (error) {
-      console.error('Failed to clear cache:', error);
-    }
+      }
   };
 
   const handleCleanupProgress = () => {
@@ -84,8 +82,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       // Cleaned up expired progress records
       updateStats();
     } catch (error) {
-      console.error('Failed to clean up progress records:', error);
-    }
+      }
   };
 
   if (!showDetailsState) {

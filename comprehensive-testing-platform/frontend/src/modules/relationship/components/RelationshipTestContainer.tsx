@@ -20,7 +20,7 @@ export const RelationshipTestContainer: React.FC<RelationshipTestContainerProps>
 }) => {
   return (
     <div 
-      className={cn("min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-100 via-rose-200 to-pink-400", className)} 
+      className={cn("min-h-screen bg-[radial-gradient(circle_at_center(--tw-gradient-stops))] from-pink-100 via-rose-200 to-pink-400", className)} 
       data-testid={testId}
       {...props}
     >

@@ -50,7 +50,6 @@ export class CareerFrontendCacheService {
       
       return true;
     } catch (error) {
-      console.error('Failed to set career cache:', error);
       return false;
     }
   }
@@ -79,7 +78,6 @@ export class CareerFrontendCacheService {
 
       return entry.data;
     } catch (error) {
-      console.error('Failed to get career cache:', error);
       return null;
     }
   }
@@ -93,7 +91,6 @@ export class CareerFrontendCacheService {
       this.storage.removeItem(cacheKey);
       return true;
     } catch (error) {
-      console.error('Failed to delete career cache:', error);
       return false;
     }
   }
@@ -116,7 +113,6 @@ export class CareerFrontendCacheService {
       keysToRemove.forEach(key => this.storage.removeItem(key));
       return true;
     } catch (error) {
-      console.error('Failed to clear career namespace:', error);
       return false;
     }
   }
@@ -148,7 +144,6 @@ export class CareerFrontendCacheService {
       
       return { totalKeys, totalSize };
     } catch (error) {
-      console.error('Failed to get career cache stats:', error);
       return { totalKeys: 0, totalSize: 0 };
     }
   }

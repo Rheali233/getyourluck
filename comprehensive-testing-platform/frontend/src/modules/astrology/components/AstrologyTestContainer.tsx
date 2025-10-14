@@ -21,7 +21,7 @@ export const AstrologyTestContainer: React.FC<AstrologyTestContainerProps> = ({
 }) => {
   return (
     <div 
-      className={cn("min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0B132B] via-[#1C2541] to-[#5F0F40]", className)} 
+      className={cn("min-h-screen bg-[radial-gradient(circle_at_center(--tw-gradient-stops))] from-[#0B132B] via-[#1C2541] to-[#5F0F40]", className)} 
       data-testid={testId}
       {...props}
     >

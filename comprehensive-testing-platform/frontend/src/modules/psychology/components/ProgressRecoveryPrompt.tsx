@@ -56,8 +56,7 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
       }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Failed to check progress:', error);
-    }
+      }
   };
 
   const handleRecover = () => {

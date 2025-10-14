@@ -25,7 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public override componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {
-    // console.error('ErrorBoundary caught an error:', _error, _errorInfo);
+    // Error boundary implementation
   }
 
   public override render() {
