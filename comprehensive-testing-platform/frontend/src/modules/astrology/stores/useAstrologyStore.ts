@@ -57,17 +57,17 @@ export const useAstrologyStore = () => {
   };
 
   // 获取兼容性分析
-  const getCompatibility = async (_partnerSign: string) => {
+  const getCompatibility = async () => {
     // 暂时空实现
   };
 
   // 获取出生图
-  const getBirthChart = async (_birthDate: string, _birthTime: string, _birthPlace: string) => {
+  const getBirthChart = async () => {
     // 暂时空实现
   };
 
   // 提交反馈
-  const submitFeedback = async (_feedback: any) => {
+  const submitFeedback = async () => {
     // 暂时空实现
   };
 

@@ -24,10 +24,10 @@ interface BlogState extends ModuleState {
 }
 
 interface BlogActions extends ModuleActions {
-  fetchArticles: (_page?: number, _category?: string) => Promise<void>
-  fetchArticle: (_idOrSlug: string) => Promise<void>
-  setSelectedCategory: (_category: string | null) => void
-  incrementViewCount: (_id: string) => Promise<void>
+  fetchArticles: () => Promise<void>
+  fetchArticle: () => Promise<void>
+  setSelectedCategory: () => void
+  incrementViewCount: () => Promise<void>
 }
 
 export const useBlogStore = create<BlogState & BlogActions>((set) => ({
