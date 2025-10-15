@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { HomepageModuleState } from '../types';
+import { getApiBaseUrl } from '@/config/environment';
 
 // 默认用户偏好
 const defaultUserPreferences = {
@@ -236,7 +237,7 @@ export const useHomepageStore = create<HomepageModuleState>()(
       loadConfig: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await fetch('/api/homepage/config');
+          const response = await fetch(`${getApiBaseUrl()}/api/homepage/config`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -264,7 +265,7 @@ export const useHomepageStore = create<HomepageModuleState>()(
       loadStats: async () => {
         try {
           set({ isLoading: true, error: null });
-          const response = await fetch('/api/homepage/stats');
+          const response = await fetch(`${getApiBaseUrl()}/api/homepage/stats`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -292,7 +293,7 @@ export const useHomepageStore = create<HomepageModuleState>()(
       saveUserPreferences: async () => {
         try {
           const { userPreferences } = get();
-          const response = await fetch('/api/user/preferences', {
+          const response = await fetch(`${getApiBaseUrl()}/api/user/preferences`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -317,7 +318,7 @@ export const useHomepageStore = create<HomepageModuleState>()(
 
       loadUserPreferences: async () => {
         try {
-          const response = await fetch('/api/user/preferences');
+          const response = await fetch(`${getApiBaseUrl()}/api/user/preferences`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }

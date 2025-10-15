@@ -163,7 +163,9 @@ export class OptimizationValidator {
   
   // 验证组件渲染优化效果
   async validateComponentOptimization(
-    _beforeComponent: any: any: any
+    _beforeComponent: any,
+    _afterComponent: any,
+    _config: any
   ): Promise<OptimizationValidationResult> {
     const result: OptimizationValidationResult = {
       success: false,

@@ -133,7 +133,8 @@ export class InterpersonalProcessor {
   private static generateInterpretation(
     _scores: InterpersonalScores,
     overallScore: number,
-    strengths: string[]: string[]
+    strengths: string[],
+    weaknesses: string[]
   ): string {
     let interpretation = `Your overall interpersonal skills score is ${overallScore.toFixed(1)}/5. `;
 

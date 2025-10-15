@@ -7,6 +7,8 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
+
+import { getApiBaseUrl } from '@/config/environment';
 export interface UserBehaviorTrackerProps extends BaseComponentProps {
   sessionId?: string;
   userId?: string;
@@ -191,7 +193,7 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
   // 发送数据到服务器
   const sendBehaviorData = useCallback(async (data: UserBehaviorData) => {
     try {
-      const response = await fetch('/api/homepage/analytics', {
+      const response = await fetch(`${getApiBaseUrl()}/api/homepage/analytics`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

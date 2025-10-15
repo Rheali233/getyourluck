@@ -39,7 +39,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
         setMinute(timeParts[1] || '');
       }
     }
-  }, [_value]);
+  }, [value]);
 
   // 更新父组件的值 - 只在完整输入时更新
   useEffect(() => {

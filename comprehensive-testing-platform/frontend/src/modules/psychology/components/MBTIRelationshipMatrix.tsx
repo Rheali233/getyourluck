@@ -194,8 +194,8 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter(() => getCompatibilityLevel(currentType.type) === 'medium')
-              .map(() => {
+              .filter((type) => getCompatibilityLevel(currentType.type) === 'medium')
+              .map((type) => {
                 const matchData = getAIMatchData(type.type);
                 
                 return (
@@ -235,8 +235,8 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTypes
-              .filter(() => getCompatibilityLevel(currentType.type) === 'low')
-              .map(() => {
+              .filter((type) => getCompatibilityLevel(currentType.type) === 'low')
+              .map((type) => {
                 const matchData = getAIMatchData(type.type);
                 
                 return (

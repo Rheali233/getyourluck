@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { getApiBaseUrl } from '@/config/environment';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
@@ -77,7 +78,7 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
     
     // 发送到后端API
     const sessionId = crypto.randomUUID();
-    fetch('/api/cookies/consent', {
+    fetch(`${getApiBaseUrl()}/api/cookies/consent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

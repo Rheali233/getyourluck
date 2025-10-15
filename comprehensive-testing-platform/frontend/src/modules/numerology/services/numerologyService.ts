@@ -126,7 +126,7 @@ class NumerologyService {
   /**
    * 验证出生日期
    */
-  validateBirthDate(date: string: 'solar' | 'lunar'): boolean {
+  validateBirthDate(date: string, type: 'solar' | 'lunar'): boolean {
     const dateObj = new Date(date);
     const now = new Date();
     

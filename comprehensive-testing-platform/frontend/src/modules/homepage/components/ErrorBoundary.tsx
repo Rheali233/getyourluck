@@ -5,6 +5,7 @@
 
 import { Component, ErrorInfo, ReactNode } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
+import { getApiBaseUrl } from '@/config/environment';
 
 export interface ErrorBoundaryProps extends BaseComponentProps {
   children: ReactNode;
@@ -75,7 +76,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   // 记录错误信息
   private logError(error: Error, errorInfo: ErrorInfo, errorId: string) {
-    .toISOString(),
+    console.error('Error logged:', {
+      errorId,
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href
     });
@@ -96,7 +102,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         sessionId: this.getSessionId()
       };
 
-      await fetch('/api/analytics/errors', {
+      await fetch(`${getApiBaseUrl()}/api/analytics/errors`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

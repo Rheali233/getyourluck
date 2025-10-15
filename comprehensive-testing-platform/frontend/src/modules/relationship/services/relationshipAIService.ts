@@ -4,6 +4,7 @@
  */
 
 import type { TestSession, TestResult } from '../types';
+import { getApiBaseUrl } from '@/config/environment';
 
 export class RelationshipAIService {
   private baseURL: string;
@@ -49,7 +50,7 @@ export class RelationshipAIService {
     try {
       // Implementation: Actual result retrieval
       // This would typically call the backend result endpoint
-      const response = await fetch(`/api/v1/relationship/results/${sessionId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/v1/relationship/results/${sessionId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ export class RelationshipAIService {
     try {
       // Implementation: Actual feedback submission
       // This would typically call the backend feedback endpoint
-      const response = await fetch('/api/v1/relationship/feedback', {
+      const response = await fetch(`${getApiBaseUrl()}/api/v1/relationship/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

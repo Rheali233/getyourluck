@@ -1,4 +1,5 @@
 import { Question, QuestionFormat } from '../types/TestTypes';
+import { getApiBaseUrl } from '@/config/environment';
 
 /**
  * Unified Question Service
@@ -20,8 +21,8 @@ export class QuestionService {
   private baseUrl: string;
 
   constructor(baseUrl?: string) {
-    // 优先使用传入的baseUrl，否则使用相对路径（通过Vite代理）
-    this.baseUrl = baseUrl || '/api';
+    // 优先使用传入的baseUrl，否则使用环境配置的API地址
+    this.baseUrl = baseUrl || getApiBaseUrl();
   }
 
   /**

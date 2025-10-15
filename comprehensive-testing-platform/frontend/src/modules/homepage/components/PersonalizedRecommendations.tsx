@@ -8,6 +8,8 @@ import React, { useState, useEffect } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
+
+import { getApiBaseUrl } from '@/config/environment';
 export interface PersonalizedRecommendationsProps extends BaseComponentProps {
   userId?: string;
   sessionId?: string;
@@ -61,7 +63,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
       if (sessionId) params.append('sessionId', sessionId);
       params.append('limit', maxItems.toString());
 
-      const response = await fetch(`/api/homepage/recommendations?${params}`);
+      const response = await fetch(`${getApiBaseUrl()}/api/homepage/recommendations?${params}`);
       if (!response.ok) {
         throw new Error('Failed to fetch recommendations');
       }
@@ -149,7 +151,7 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
   // 记录推荐项点击
   const recordRecommendationClick = async (item: RecommendationItem) => {
     try {
-      await fetch('/api/homepage/analytics', {
+      await fetch(`${getApiBaseUrl()}/api/homepage/analytics`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

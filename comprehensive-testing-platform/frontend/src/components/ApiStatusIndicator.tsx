@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/utils/classNames';
+import { getApiBaseUrl } from '@/config/environment';
 
 interface ApiStatusIndicatorProps {
   className?: string;
@@ -20,7 +21,10 @@ export const ApiStatusIndicator: React.FC<ApiStatusIndicatorProps> = ({
 
   const checkApiStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8787/health', {
+      const apiBaseUrl = getApiBaseUrl();
+      console.log('API Status Check - Base URL:', apiBaseUrl);
+      console.log('API Status Check - Full URL:', `${apiBaseUrl}/health`);
+      const response = await fetch(`${apiBaseUrl}/health`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache'

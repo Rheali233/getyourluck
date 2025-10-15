@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from '@/config/environment';
+
 /**
  * 测试模块集成服务
  * 负责与7个测试模块的数据接口集成和状态管理
@@ -122,7 +124,7 @@ export const getTestModuleById = (id: TestModuleId): TestModule | null => {
  */
 export const getTestModuleStats = async (moduleId: TestModuleId): Promise<any | null> => {
   try {
-    const response = await fetch(`/api/homepage/modules/${moduleId}/stats`);
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/modules/${moduleId}/stats`);
     if (!response.ok) return null;
     
     const data = await response.json();
@@ -158,7 +160,7 @@ export const getAllTestModuleStats = async (): Promise<Record<TestModuleId, any>
  */
 export const getTestModuleRating = async (moduleId: TestModuleId): Promise<any | null> => {
   try {
-    const response = await fetch(`/api/homepage/modules/${moduleId}/rating`);
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/modules/${moduleId}/rating`);
     if (!response.ok) return null;
     
     const data = await response.json();
@@ -176,7 +178,7 @@ export const getTestModuleRating = async (moduleId: TestModuleId): Promise<any |
  */
 export const getTestModuleUsage = async (moduleId: TestModuleId): Promise<any | null> => {
   try {
-    const response = await fetch(`/api/homepage/modules/${moduleId}/usage`);
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/modules/${moduleId}/usage`);
     if (!response.ok) return null;
     
     const data = await response.json();
@@ -194,7 +196,7 @@ export const getTestModuleUsage = async (moduleId: TestModuleId): Promise<any | 
  */
 export const getPersonalizedRecommendations = async (): Promise<any[]> => {
   try {
-    const response = await fetch('/api/homepage/recommendations');
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/recommendations`);
     if (!response.ok) return [];
     
     const data = await response.json();
@@ -212,7 +214,7 @@ export const getPersonalizedRecommendations = async (): Promise<any[]> => {
  */
 export const recordModuleVisit = async (moduleId: TestModuleId): Promise<boolean> => {
   try {
-    const response = await fetch('/api/homepage/analytics', {
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/analytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -251,7 +253,7 @@ const getSessionId = (): string => {
  */
 export const checkModuleAvailability = async (moduleId: TestModuleId): Promise<boolean> => {
   try {
-    const response = await fetch(`/api/homepage/modules/${moduleId}/status`);
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/modules/${moduleId}/status`);
     if (!response.ok) return false;
     
     const data = await response.json();
@@ -269,7 +271,7 @@ export const checkModuleAvailability = async (moduleId: TestModuleId): Promise<b
  */
 export const getPopularTestModules = async (limit: number = 6): Promise<TestModule[]> => {
   try {
-    const response = await fetch(`/api/homepage/modules/popular?limit=${limit}`);
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/modules/popular?limit=${limit}`);
     if (!response.ok) return [];
     
     const data = await response.json();
@@ -287,7 +289,7 @@ export const getPopularTestModules = async (limit: number = 6): Promise<TestModu
  */
 export const getNewTestModules = async (limit: number = 4): Promise<TestModule[]> => {
   try {
-    const response = await fetch(`/api/homepage/modules/new?limit=${limit}`);
+    const response = await fetch(`${getApiBaseUrl()}/api/homepage/modules/new?limit=${limit}`);
     if (!response.ok) return [];
     
     const data = await response.json();

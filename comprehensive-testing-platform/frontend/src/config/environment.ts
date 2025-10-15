@@ -12,17 +12,71 @@ export interface EnvironmentConfig {
   PAGES_BRANCH_ALIAS_URL: string;
 }
 
-// 从环境变量读取配置
+// 运行时动态判断环境配置
 const getEnvironmentConfig = (): EnvironmentConfig => {
   const env = (import.meta as any).env;
   
+  console.log('环境配置调试 - VITE_API_BASE_URL:', env.VITE_API_BASE_URL);
+  console.log('环境配置调试 - window.location.hostname:', typeof window !== 'undefined' ? window.location.hostname : 'undefined');
+  
+  // 优先使用环境变量（构建时设置）
+  if (env.VITE_API_BASE_URL) {
+    return {
+      API_BASE_URL: env.VITE_API_BASE_URL,
+      CDN_BASE_URL: env.VITE_CDN_BASE_URL || env.VITE_API_BASE_URL,
+      ENVIRONMENT: (env.VITE_ENVIRONMENT as 'development' | 'production' | 'staging') || 'staging',
+      PAGES_PROJECT_NAME: env.VITE_PAGES_PROJECT_NAME || 'getyourluck-testing-platform',
+      PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+      PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+    };
+  }
+  
+  // 运行时根据域名判断环境
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    if (hostname.includes('selfatlas.net')) {
+      return {
+        API_BASE_URL: 'https://api.selfatlas.net',
+        CDN_BASE_URL: 'https://cdn.selfatlas.net',
+        ENVIRONMENT: 'production',
+        PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
+        PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+      };
+    }
+    
+    if (hostname.includes('pages.dev')) {
+      return {
+        API_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+        CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+        ENVIRONMENT: 'staging',
+        PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
+        PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+      };
+    }
+    
+    if (hostname.includes('localhost')) {
+      return {
+        API_BASE_URL: 'http://localhost:8787',
+        CDN_BASE_URL: 'http://localhost:8787',
+        ENVIRONMENT: 'development',
+        PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
+        PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+      };
+    }
+  }
+  
+  // 默认返回staging环境
   return {
-    API_BASE_URL: env.VITE_API_BASE_URL || 'http://localhost:8787',
-    CDN_BASE_URL: env.VITE_CDN_BASE_URL || 'http://localhost:8787',
-    ENVIRONMENT: (env.VITE_ENVIRONMENT as 'development' | 'production' | 'staging') || 'development',
-    PAGES_PROJECT_NAME: env.VITE_PAGES_PROJECT_NAME || 'selfatlas-testing-platform',
-    PAGES_DEPLOYMENT_URL: 'https://7614e3a6.selfatlas-testing-platform.pages.dev',
-    PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.selfatlas-testing-platform.pages.dev'
+    API_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+    CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+    ENVIRONMENT: 'staging',
+    PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
+    PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+    PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
   };
 };
 
@@ -43,41 +97,56 @@ const validateEnvironmentConfig = (config: EnvironmentConfig): void => {
   }
 };
 
-// 导出环境配置
-export const environmentConfig = getEnvironmentConfig();
-
-// 验证配置
-validateEnvironmentConfig(environmentConfig);
+// 调试信息 - 在开发环境和staging环境中启用
+if (typeof window !== 'undefined' && (window.location.hostname.includes('localhost') || window.location.hostname.includes('pages.dev'))) {
+  const config = getEnvironmentConfig();
+  console.log('Environment Config Debug:', {
+    hostname: window.location.hostname,
+    isStaging: window.location.hostname.includes('pages.dev'),
+    isProduction: window.location.hostname.includes('selfatlas.net'),
+    API_BASE_URL: config.API_BASE_URL,
+    ENVIRONMENT: config.ENVIRONMENT
+  });
+}
 
 // 环境工具函数
 export const getCurrentEnvironment = (): string => {
-  return environmentConfig.ENVIRONMENT;
+  const config = getEnvironmentConfig();
+  return config.ENVIRONMENT;
 };
 
 export const isProduction = (): boolean => {
-  return environmentConfig.ENVIRONMENT === 'production';
+  const config = getEnvironmentConfig();
+  return config.ENVIRONMENT === 'production';
 };
 
 export const isDevelopment = (): boolean => {
-  return environmentConfig.ENVIRONMENT === 'development';
+  const config = getEnvironmentConfig();
+  return config.ENVIRONMENT === 'development';
 };
 
 export const isStaging = (): boolean => {
-  return environmentConfig.ENVIRONMENT === 'staging';
+  const config = getEnvironmentConfig();
+  return config.ENVIRONMENT === 'staging';
 };
 
 export const getApiBaseUrl = (): string => {
-  return environmentConfig.API_BASE_URL;
+  // 每次调用都重新判断环境，确保运行时动态判断
+  const config = getEnvironmentConfig();
+  return config.API_BASE_URL;
 };
 
 export const getCdnBaseUrl = (): string => {
-  return environmentConfig.CDN_BASE_URL;
+  const config = getEnvironmentConfig();
+  return config.CDN_BASE_URL;
 };
 
 export const getPagesDeploymentUrl = (): string => {
-  return environmentConfig.PAGES_DEPLOYMENT_URL;
+  const config = getEnvironmentConfig();
+  return config.PAGES_DEPLOYMENT_URL;
 };
 
 export const getPagesBranchAliasUrl = (): string => {
-  return environmentConfig.PAGES_BRANCH_ALIAS_URL;
+  const config = getEnvironmentConfig();
+  return config.PAGES_BRANCH_ALIAS_URL;
 };

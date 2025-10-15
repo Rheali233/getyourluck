@@ -82,7 +82,8 @@ export const useSimplePerformanceMonitor = (
 
 // Higher-order component: Performance monitoring decorator
 export const withPerformanceMonitor = <P extends object>(
-  Component: React.ComponentType<P>: PerformanceConfig = {}
+  Component: React.ComponentType<P>,
+  config: PerformanceConfig = {}
 ) => {
   const WrappedComponent = React.memo((props: P) => {
     // 暂时禁用监控以避免未使用变量警告

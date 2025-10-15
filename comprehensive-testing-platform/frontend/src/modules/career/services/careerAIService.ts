@@ -4,6 +4,7 @@
  */
 
 import type { TestSession, TestResult } from '../types';
+import { getApiBaseUrl } from '@/config/environment';
 
 export class CareerAIService {
   private baseURL: string;
@@ -49,7 +50,7 @@ export class CareerAIService {
     try {
       // Implementation: Actual result retrieval
       // This would typically call the backend result endpoint
-      const response = await fetch(`/api/v1/career/results/${sessionId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/v1/career/results/${sessionId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ export class CareerAIService {
     try {
       // Implementation: Actual feedback submission
       // This would typically call the backend feedback endpoint
-      const response = await fetch('/api/v1/career/feedback', {
+      const response = await fetch(`${getApiBaseUrl()}/api/v1/career/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -283,7 +284,7 @@ export class CareerAIService {
   /**
    * Get DISC communication style
    */
-  private getDISCCommunicationStyle(primary: string, secondary: string): string {
+  private getDISCCommunicationStyle(primary: string, _secondary: string): string { // eslint-disable-line no-unused-vars
     const styles: Record<string, string> = {
       'D': 'Direct and concise, prefers clear and actionable information',
       'I': 'Enthusiastic and engaging, uses stories and examples',
@@ -296,7 +297,7 @@ export class CareerAIService {
   /**
    * Get DISC leadership style
    */
-  private getDISCLeadershipStyle(primary: string, secondary: string): string {
+  private getDISCLeadershipStyle(primary: string, _secondary: string): string { // eslint-disable-line no-unused-vars
     const styles: Record<string, string> = {
       'D': 'Directive and results-oriented, sets clear goals and expectations',
       'I': 'Inspirational and motivating, builds enthusiasm and engagement',
@@ -309,7 +310,7 @@ export class CareerAIService {
   /**
    * Get DISC team collaboration style
    */
-  private getDISCTeamCollaboration(primary: string, secondary: string): string {
+  private getDISCTeamCollaboration(primary: string, _secondary: string): string { // eslint-disable-line no-unused-vars
     const styles: Record<string, string> = {
       'D': 'Goal-focused collaborator, drives team toward objectives',
       'I': 'Relationship builder, creates positive team dynamics',
@@ -322,7 +323,7 @@ export class CareerAIService {
   /**
    * Get DISC stress response
    */
-  private getDISCStressResponse(primary: string, secondary: string): string {
+  private getDISCStressResponse(primary: string, _secondary: string): string { // eslint-disable-line no-unused-vars
     const responses: Record<string, string> = {
       'D': 'Becomes more direct and demanding, focuses on quick solutions',
       'I': 'May become scattered or overly optimistic, needs structure',
@@ -431,7 +432,7 @@ export class CareerAIService {
   /**
    * Generate Holland career matches
    */
-  private generateHollandCareerMatches(primary: string, secondary: string): Array<{
+  private generateHollandCareerMatches(primary: string, _secondary: string): Array<{
     title: string;
     matchScore: number;
     description: string;
@@ -545,7 +546,7 @@ export class CareerAIService {
     };
 
     const primaryCareers = careerMap[primary] || [];
-    const secondaryCareers = careerMap[secondary] || [];
+    const secondaryCareers = careerMap[_secondary] || [];
     
     return [
       ...primaryCareers.map(career => ({
@@ -562,7 +563,7 @@ export class CareerAIService {
   /**
    * Generate comprehensive Leadership analysis based on scores
    */
-  private generateLeadershipAnalysis(_scores: Record<string, number>, primaryType: string, secondaryType: string): any {
+  private generateLeadershipAnalysis(_scores: Record<string, number>, primaryType: string, _secondaryType: string): any { // eslint-disable-line no-unused-vars
     const leadershipTypes = {
       transformational: { 
         name: 'Transformational', 

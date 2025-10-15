@@ -5,13 +5,15 @@
 
 import type { APIResponse } from '../../../shared/types/apiResponse'
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
-import { environmentConfig } from '../config/environment'
+import { getApiBaseUrl } from '../config/environment'
 
 class ApiClient {
   private baseURL: string
 
   constructor() {
-    this.baseURL = environmentConfig.API_BASE_URL
+    console.log('VITE_API_BASE_URL =', import.meta.env.VITE_API_BASE_URL);
+    this.baseURL = getApiBaseUrl()
+    console.log('最终 baseURL =', this.baseURL);
   }
 
   async request<T>(

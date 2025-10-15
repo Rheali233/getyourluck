@@ -6,6 +6,7 @@
 import { useCallback } from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { getApiBaseUrl } from '@/config/environment';
 import type {
   NumerologyStore,
   NumerologyAnalysis,
@@ -113,7 +114,7 @@ export const useNumerologyStore = (): {
       ];
 
       // 调用API进行分析
-      const response = await fetch('/api/test-results', {
+      const response = await fetch(`${getApiBaseUrl()}/api/test-results`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -7,6 +7,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { getApiBaseUrl } from '@/config/environment'
 
 // 基础测试会话接口
 export interface TestSession {
@@ -675,7 +676,7 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
 
         try {
           // 调用后端统一测试结果处理服务
-          const response = await fetch(`/api/v1/tests/${testType}/submit`, {
+          const response = await fetch(`${getApiBaseUrl()}/api/v1/tests/${testType}/submit`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
