@@ -48,7 +48,7 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true, // 移除console.log
+        drop_console: false, // 调试阶段保留console.log
         drop_debugger: true, // 移除debugger
       },
     },

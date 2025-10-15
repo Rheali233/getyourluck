@@ -3,6 +3,11 @@ main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+[observability]
+# 开启 Workers Logs，便于线上快速定位 500 报错
+enabled = true
+head_sampling_rate = 1
+
 [env.production]
 name = "selfatlas-backend-prod"
 # route = "api.selfatlas.net/*"
@@ -10,6 +15,10 @@ name = "selfatlas-backend-prod"
 
 [env.staging]
 name = "selfatlas-backend-staging"
+
+[env.staging.observability]
+enabled = true
+head_sampling_rate = 1
 
 [env.development]
 name = "selfatlas-backend-dev"

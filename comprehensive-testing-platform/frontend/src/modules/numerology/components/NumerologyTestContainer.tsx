@@ -23,7 +23,7 @@ export const NumerologyTestContainer: React.FC<NumerologyTestContainerProps> = (
 
   return (
     <div 
-      className={cn("min-h-screen bg-[radial-gradient(circle_at_center(--tw-gradient-stops))] from-red-600 via-red-700 to-red-900", className)} 
+      className={cn("min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-600 via-red-700 to-red-900", className)} 
       data-testid={testId}
     >
       {/* 内容区域 - 与tarot模块保持一致的容器宽度 */}
