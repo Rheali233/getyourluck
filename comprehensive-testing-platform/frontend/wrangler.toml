@@ -19,14 +19,14 @@ project_name = "getyourluck-testing-platform"
 NODE_ENV = "production"
 API_BASE_URL = "https://api.selfatlas.net"
 CDN_BASE_URL = "https://cdn.selfatlas.net"
-PAGES_PROJECT_NAME = "selfatlas-testing-platform"
+PAGES_PROJECT_NAME = "getyourluck-testing-platform"
 
 [env.preview.vars]
 NODE_ENV = "staging"
 API_BASE_URL = "https://selfatlas-backend-staging.cyberlina.workers.dev"
 CDN_BASE_URL = "https://staging-cdn.selfatlas.net"
-PAGES_PROJECT_NAME = "selfatlas-testing-platform"
+PAGES_PROJECT_NAME = "getyourluck-testing-platform"
 
-# 当前可用的Pages域名
-# 主要域名: https://7614e3a6.selfatlas-testing-platform.pages.dev
-# 分支别名: https://feature-test-preview.selfatlas-testing-platform.pages.dev
+# 当前可用的Pages域名（项目：getyourluck-testing-platform）
+# 主要域名: https://<hash>.getyourluck-testing-platform.pages.dev
+# 分支别名: https://feature-test-preview.getyourluck-testing-platform.pages.dev
