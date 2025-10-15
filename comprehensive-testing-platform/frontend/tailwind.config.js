@@ -4,6 +4,14 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  safelist: [
+    // Ensure arbitrary background gradients are preserved in production build
+    'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))]',
+    'bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]',
+    'from-blue-100','from-blue-200','from-blue-400','from-blue-500','from-indigo-300','from-violet-200','from-green-100','from-emerald-200','from-pink-100','from-rose-200','from-sky-100','from-cyan-200','from-red-600','from-red-700',
+    'via-blue-200','via-violet-300','via-white/60','via-indigo-300','via-pink-300','via-rose-200','via-cyan-200','via-sky-300','via-red-700',
+    'to-blue-400','to-indigo-500','to-violet-500','to-teal-400','to-rose-500','to-pink-400','to-sky-300','to-red-900'
+  ],
   theme: {
     screens: {
       'xs': '320px',
