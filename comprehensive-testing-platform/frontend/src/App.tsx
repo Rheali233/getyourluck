@@ -11,6 +11,7 @@ import { PerformancePanel } from '@/components/PerformancePanel';
 import { ApiStatusIndicator } from '@/components/ApiStatusIndicator';
 import { LazyAboutPage, LazyTestCenterPage } from '@/components/LazyComponent';
 import { PreloadCriticalModules } from '@/components/Preload';
+import { LegacyTestsRedirect } from '@/routes/LegacyTestsRedirect';
 import { Homepage } from '@/modules/homepage/components/Homepage';
 import { BlogPage } from '@/pages/BlogPage/BlogPage';
 // 已删除的页面组件：TestPages, ResultPages, ComponentShowcase
@@ -73,7 +74,7 @@ function App() {
             </React.Suspense>
           }
         />
-        {/* Test Center - lazy loaded */}
+        {/* Test Center - lazy loaded (exact) */}
         <Route
           path="/tests"
           element={
@@ -82,6 +83,8 @@ function App() {
             </React.Suspense>
           }
         />
+        {/* Backward compatibility: /tests/* -> strip prefix to new module paths */}
+        <Route path="/tests/*" element={<LegacyTestsRedirect />} />
         {/* 已删除：TestPages路由 */}
         <Route path="/psychology" element={<PsychologyHomePage />} />
         <Route path="/psychology/mbti" element={<GenericTestPage testType="mbti" title="MBTI Personality Test" description="Discover your personality type with the Myers-Briggs Type Indicator test." />} />
