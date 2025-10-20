@@ -19,6 +19,7 @@ import { BlogRecommendations } from './BlogRecommendations';
 import { PopularTests } from './PopularTests';
 import { PlatformFeatures } from './PlatformFeatures';
 import { FAQ } from './FAQ';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export interface HomepageProps extends BaseComponentProps {
   showNavigation?: boolean;
@@ -57,6 +58,18 @@ export const Homepage: React.FC<HomepageProps> = ({
   }, [location.state]);
 
   const handleStartTest = () => {
+    // 记录CTA点击事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'cta_click',
+      ...base,
+      data: {
+        name: 'Begin Your Journey',
+        location: 'hero_section',
+        target: 'test-modules-section'
+      }
+    });
+    
     // 滚动到测试功能区域
     const testModulesSection = document.getElementById('test-modules-section');
     if (testModulesSection) {
@@ -65,6 +78,19 @@ export const Homepage: React.FC<HomepageProps> = ({
   };
 
   const handleModuleClick = (module: any) => {
+    // 记录模块卡片点击事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'module_card_click',
+      ...base,
+      data: {
+        moduleId: module?.id || 'unknown',
+        moduleName: module?.name || 'unknown',
+        moduleRoute: module?.route || 'unknown',
+        location: 'test_modules_grid'
+      }
+    });
+    
     // 直接导航到模块对应路由
     if (module?.route) {
       navigate(module.route);
@@ -73,10 +99,19 @@ export const Homepage: React.FC<HomepageProps> = ({
     // 模块点击处理
   };
 
-  const handleArticleClick = (_article: any) => {
-    // 可以在这里添加文章点击的统计或分析逻辑
-    // // 引用以避免未使用变量的 ESLint 报错
-    void _article;
+  const handleArticleClick = (article: any) => {
+    // 记录文章点击事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'article_click',
+      ...base,
+      data: {
+        articleId: article?.id || 'unknown',
+        articleTitle: article?.title || 'unknown',
+        articleUrl: article?.url || 'unknown',
+        location: 'blog_recommendations'
+      }
+    });
   };
 
   
@@ -207,7 +242,7 @@ export const Homepage: React.FC<HomepageProps> = ({
         <PerformanceOptimizer delay={300}>
           <PopularTests onTestClick={handleModuleClick} />
         </PerformanceOptimizer>
-        <PerformanceOptimizer delay={500}>
+        <PerformanceOptimizer delay={200}>
           <BlogRecommendations onArticleClick={handleArticleClick} />
         </PerformanceOptimizer>
         <PerformanceOptimizer delay={700}>

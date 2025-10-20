@@ -10,6 +10,7 @@ import { SEOManager } from '@/modules/homepage/components/SEOManager';
 import { Navigation, Breadcrumb, Footer } from '@/components/ui';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 interface AboutPageProps extends BaseComponentProps {}
 
@@ -19,6 +20,19 @@ export const AboutPage: React.FC<AboutPageProps> = ({
   ...props
 }) => {
   const canonical = `${typeof window !== 'undefined' ? window.location.origin : ''}/about`;
+  
+  // 记录页面访问事件
+  React.useEffect(() => {
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'page_view',
+      ...base,
+      data: { 
+        route: '/about', 
+        pageType: 'about'
+      },
+    });
+  }, []);
 
   return (
     <div

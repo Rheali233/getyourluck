@@ -17,6 +17,7 @@ import type { DrawnCard } from '../types';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export const CardDrawingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -82,7 +83,20 @@ export const CardDrawingPage: React.FC = () => {
     if (!spreadsLoaded) {
       loadTarotSpreads();
     }
-  }, [cardsLoaded, spreadsLoaded, loadTarotCards, loadTarotSpreads]);
+    
+    // 记录页面访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'page_view',
+      ...base,
+      data: { 
+        route: '/tarot/drawing', 
+        pageType: 'test',
+        testType: 'tarot_drawing',
+        spreadId: spreadId
+      },
+    });
+  }, [cardsLoaded, spreadsLoaded, loadTarotCards, loadTarotSpreads, spreadId]);
 
   const currentSpread = tarotSpreads.find(spread => spread.id === spreadId) || tarotSpreads[0];
 
@@ -96,6 +110,18 @@ export const CardDrawingPage: React.FC = () => {
   }, [showResults, showLoadingModal, navigate]);
 
   const handleCardsSelected = async (drawnCards: DrawnCard[]) => {
+    // 记录抽牌事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_start',
+      ...base,
+      data: { 
+        testType: 'tarot_drawing',
+        spreadId: spreadId,
+        cardCount: drawnCards.length
+      },
+    });
+    
     setIsProcessing(true);
     setShowLoadingModal(true);
     try {

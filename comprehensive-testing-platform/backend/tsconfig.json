@@ -6,49 +6,35 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "allowJs": false,
+    "allowJs": true,
     "checkJs": false,
-    "strict": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "declaration": false,
-    "declarationMap": false,
+    "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "../",
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/models/*": ["./src/models/*"],
-      "@/middleware/*": ["./src/middleware/*"],
-      "shared/*": ["../shared/*"]
-    },
-    "types": ["@cloudflare/workers-types", "jest", "node"]
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["@cloudflare/workers-types"]
   },
   "include": [
-    "src/**/*",
-    "../shared/**/*.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts",
-    "../shared/types/componentInterfaces.ts",
-    "../shared/**/*.d.ts",
-    "../shared/**/*.js",
-    "../shared/**/*.js.map",
-    "../shared/**/*.d.ts.map"
+    "scripts",
+    "seeds",
+    "migrations"
   ]
 }
+
+

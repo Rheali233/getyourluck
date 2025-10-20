@@ -50,6 +50,10 @@ export class AIService {
     this.baseURL = 'https://api.deepseek.com/v1/chat/completions';
     this.maxRetries = 3;
     this.timeout = 60000; // 60 seconds
+    
+    // 调试日志
+    // eslint-disable-next-line no-console
+    console.log('AIService initialized with API key:', this.apiKey ? `${this.apiKey.substring(0, 10)}...` : 'NO API KEY');
   }
 
   /**

@@ -117,4 +117,46 @@ export const blogService = {
   async incrementViewCountBySlug(slug: string): Promise<APIResponse<void>> {
     return apiClient.post(`/api/blog/articles/${slug}/view`, {})
   },
+
+  /**
+   * 增加文章点赞数
+   */
+  async likeArticle(slug: string): Promise<APIResponse<void>> {
+    return apiClient.post(`/api/blog/articles/${slug}/like`, {})
+  },
+
+  /**
+   * 获取文章评论
+   */
+  async getComments(slug: string, page = 1, limit = 10): Promise<PaginatedResponse<BlogComment[]>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    return apiClient.get(`/api/blog/articles/${slug}/comments?${params.toString()}`) as Promise<PaginatedResponse<BlogComment[]>>
+  },
+
+  /**
+   * 添加文章评论
+   */
+  async addComment(slug: string, comment: BlogCommentRequest): Promise<APIResponse<BlogComment>> {
+    return apiClient.post(`/api/blog/articles/${slug}/comments`, comment)
+  },
+}
+
+// 评论相关类型定义
+export interface BlogComment {
+  id: string
+  articleId: string
+  content: string
+  author: string
+  email?: string
+  createdAt: string
+  updatedAt?: string
+}
+
+export interface BlogCommentRequest {
+  content: string
+  author: string
+  email?: string
 }

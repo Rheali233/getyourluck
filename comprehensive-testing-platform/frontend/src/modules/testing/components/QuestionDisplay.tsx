@@ -188,11 +188,7 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       setSelectedAnswer(null);
       setIsValid(false);
     }
-    // Debug current question text/format for diagnostics
-    console.log('Question debug:', { 
-      questionId: question.id, 
-      text: question.text 
-    });
+    // Debug logging removed for production
   }, [currentAnswer, question.id]);
 
   // Validate answer based on question format

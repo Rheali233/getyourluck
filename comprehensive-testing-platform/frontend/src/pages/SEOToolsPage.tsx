@@ -11,13 +11,38 @@ import { generateSitemap, generateSitemapXML } from '@/utils/sitemapGenerator';
 import { generateRobotsTxt } from '@/utils/robotsGenerator';
 import { generateCompleteSearchConsoleCode } from '@/utils/googleSearchConsole';
 import type { SEOReport } from '@/utils/seoReportGenerator';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export const SEOToolsPage: React.FC = () => {
   const [seoReport, setSeoReport] = useState<SEOReport | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'tools' | 'reports'>('dashboard');
+  
+  // 记录页面访问事件
+  React.useEffect(() => {
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'page_view',
+      ...base,
+      data: { 
+        route: '/seo-tools', 
+        pageType: 'seo_tools'
+      },
+    });
+  }, []);
 
   const handleGenerateReport = async () => {
+    // 记录工具使用事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'tool_use',
+      ...base,
+      data: { 
+        toolType: 'seo_report_generator',
+        toolName: 'SEO Report Generator'
+      },
+    });
+    
     setIsGenerating(true);
     try {
       const report = await generateSEOReport();

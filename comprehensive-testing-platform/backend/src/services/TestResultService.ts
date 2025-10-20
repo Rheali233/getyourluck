@@ -82,13 +82,22 @@ export class TestResultService {
       let aiAnalysis = null;
       if (this.aiService) {
         try {
+          // eslint-disable-next-line no-console
+          console.log(`Starting AI analysis for ${testType} with ${answers.length} answers`);
           // AI analysis integration completed
           aiAnalysis = await this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
+          // eslint-disable-next-line no-console
+          console.log(`AI analysis completed for ${testType}:`, JSON.stringify(aiAnalysis, null, 2));
         } catch (aiError) {
           // AI分析失败时记录警告，但不阻止测试结果处理
           // eslint-disable-next-line no-console
-          console.warn(`AI analysis failed for ${testType}:`, aiError instanceof Error ? aiError.message : 'Unknown error');
+          console.error(`AI analysis failed for ${testType}:`, aiError instanceof Error ? aiError.message : 'Unknown error');
+          // eslint-disable-next-line no-console
+          console.error('AI error details:', aiError);
         }
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn(`No AI service available for ${testType}`);
       }
       
       // 将AI分析结果传递给处理器（如果处理器支持）

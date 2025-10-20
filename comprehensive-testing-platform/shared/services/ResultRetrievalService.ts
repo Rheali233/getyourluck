@@ -284,27 +284,11 @@ export class ResultRetrievalService extends BaseErrorHandler {
       // TODO: 实现实际的数据库查询
       // 这里应该调用具体的数据库模型
       
-      // 模拟数据库查询
-      const mockResult: TestResult = {
-        sessionId,
-        testType: 'mock-test',
-        testCategory: 'psychology' as any,
-        completedAt: new Date(),
-        scores: { total: 85 },
-        interpretation: 'Mock interpretation',
-        insights: ['Mock insight 1', 'Mock insight 2'],
-        recommendations: ['Mock recommendation 1', 'Mock recommendation 2'],
-        metadata: {
-          totalTime: 300000,
-          averageTimePerQuestion: 15000,
-          accuracy: 0.85,
-          confidence: 0.9
-        }
-      };
-
+      // Database query will be implemented in future version
+      // Return empty response for now
       return {
-        success: true,
-        data: mockResult
+        success: false,
+        error: 'Database query not implemented yet'
       };
 
     } catch (error) {
@@ -369,49 +353,14 @@ export class ResultRetrievalService extends BaseErrorHandler {
   /**
    * 执行搜索
    */
-  private async executeSearch(_query: any, _options: any): Promise<{ results: TestResult[]; total: number }> {
-    // TODO: 实现实际的搜索逻辑
+  private async executeSearch(query: any, options: any): Promise<{ results: TestResult[]; total: number }> {
+    // 实现实际的搜索逻辑
     // 这里应该调用数据库的搜索功能
     
-    // 模拟搜索结果
-    const mockResults: TestResult[] = [
-      {
-        sessionId: 'session-1',
-        testType: 'mock-test-1',
-        testCategory: 'psychology' as any,
-        completedAt: new Date(),
-        scores: { total: 85 },
-        interpretation: 'Mock interpretation 1',
-        insights: ['Mock insight 1'],
-        recommendations: ['Mock recommendation 1'],
-        metadata: {
-          totalTime: 300000,
-          averageTimePerQuestion: 15000,
-          accuracy: 0.85,
-          confidence: 0.9
-        }
-      },
-      {
-        sessionId: 'session-2',
-        testType: 'mock-test-2',
-        testCategory: 'career' as any,
-        completedAt: new Date(),
-        scores: { total: 92 },
-        interpretation: 'Mock interpretation 2',
-        insights: ['Mock insight 2'],
-        recommendations: ['Mock recommendation 2'],
-        metadata: {
-          totalTime: 250000,
-          averageTimePerQuestion: 12500,
-          accuracy: 0.92,
-          confidence: 0.95
-        }
-      }
-    ];
-
+    // 暂时返回空结果，等待数据库实现
     return {
-      results: mockResults,
-      total: mockResults.length
+      results: [],
+      total: 0
     };
   }
 

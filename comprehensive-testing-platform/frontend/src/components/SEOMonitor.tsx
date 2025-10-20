@@ -32,7 +32,7 @@ export const SEOMonitor: React.FC<SEOMonitorProps> = ({
     // 监控Core Web Vitals
     if ('web-vital' in window) {
       // 这里可以集成web-vitals库
-      console.log('Web Vitals monitoring available');
+      // Debug logging removed for production
     }
 
     // 监控页面加载性能

@@ -23,7 +23,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
 }) => {
   // 添加默认值处理，防止访问 undefined 属性
   const safeResult = {
-    personalityType: result?.personalityType || 'Unknown',
+    personalityType: result?.personalityType || '',
     typeName: result?.typeName || 'Unknown Type',
     typeDescription: result?.typeDescription || 'No description available',
     detailedAnalysis: result?.detailedAnalysis || 'No detailed analysis available',
@@ -223,11 +223,14 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
           </div>
         </Card>
 
-        {/* Relationship Compatibility Matrix */}
-        <MBTIRelationshipMatrix 
-          currentType={safeResult.personalityType} 
-          relationshipCompatibility={safeResult.relationshipCompatibility}
-        />
+        {/* Relationship Compatibility Matrix - Only show if personalityType is valid */}
+        {safeResult.personalityType && safeResult.personalityType.length === 4 && 
+         safeResult.personalityType !== 'Unknown' && (
+          <MBTIRelationshipMatrix 
+            currentType={safeResult.personalityType} 
+            relationshipCompatibility={safeResult.relationshipCompatibility}
+          />
+        )}
 
 
         <div className="text-center text-xs text-gray-500 max-w-2xl mx-auto">

@@ -16,17 +16,17 @@ project_name = "getyourluck-testing-platform"
 
 # 环境变量配置
 [env.production.vars]
-NODE_ENV = "production"
-API_BASE_URL = "https://api.selfatlas.net"
-CDN_BASE_URL = "https://cdn.selfatlas.net"
-PAGES_PROJECT_NAME = "getyourluck-testing-platform"
+VITE_ENVIRONMENT = "production"
+VITE_API_BASE_URL = "https://api.selfatlas.net"
+VITE_CDN_BASE_URL = "https://cdn.selfatlas.net"
+VITE_PAGES_PROJECT_NAME = "getyourluck-testing-platform"
 
 [env.preview.vars]
-NODE_ENV = "staging"
-API_BASE_URL = "https://selfatlas-backend-staging.cyberlina.workers.dev"
-CDN_BASE_URL = "https://staging-cdn.selfatlas.net"
-PAGES_PROJECT_NAME = "getyourluck-testing-platform"
+VITE_ENVIRONMENT = "staging"
+VITE_API_BASE_URL = "https://selfatlas-backend-staging.cyberlina.workers.dev"
+VITE_CDN_BASE_URL = "https://staging-cdn.selfatlas.net"
+VITE_PAGES_PROJECT_NAME = "getyourluck-testing-platform"
 
-# 当前可用的Pages域名（项目：getyourluck-testing-platform）
-# 主要域名: https://<hash>.getyourluck-testing-platform.pages.dev
+# 当前可用的Pages域名（示例，实际以 Cloudflare 控制台为准）
+# 主要域名: https://7614e3a6.getyourluck-testing-platform.pages.dev
 # 分支别名: https://feature-test-preview.getyourluck-testing-platform.pages.dev

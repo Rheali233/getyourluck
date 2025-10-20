@@ -16,6 +16,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export interface RelationshipHomePageProps extends BaseComponentProps {
   // eslint-disable-next-line no-unused-vars
@@ -79,6 +80,18 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
   // Ensure page scrolls to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // 记录模块访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'module_visit',
+      ...base,
+      data: {
+        moduleId: 'relationship',
+        moduleName: 'Relationships & Communication',
+        moduleType: 'test_module'
+      }
+    });
   }, []);
 
   const testTypes = [
@@ -121,6 +134,19 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
   ];
 
   const handleTestSelect = (testType: RelationshipTestType) => {
+    // 记录测试卡片点击事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_card_click',
+      ...base,
+      data: {
+        testType: testType,
+        testName: testTypes.find(t => t.type === testType)?.name || 'Unknown',
+        moduleId: 'relationship',
+        location: 'module_homepage'
+      }
+    });
+    
     if (onTestSelect) {
       onTestSelect(testType);
     } else {

@@ -36,8 +36,13 @@ const testSubmissionSchema = z.object({
 // 分析事件验证模式
 const analyticsEventSchema = z.object({
   eventType: z.string().min(1, "Event type is required"),
+  sessionId: z.string().optional(),
+  pageUrl: z.string().optional(),
+  referrer: z.string().optional(),
+  userId: z.string().optional(),
+  device: z.any().optional(),
+  performance: z.any().optional(),
   data: z.any().optional(),
-  sessionId: z.string().uuid("Invalid session ID format").optional(),
   timestamp: z.string().optional(),
 });
 

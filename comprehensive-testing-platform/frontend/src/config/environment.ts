@@ -16,22 +16,7 @@ export interface EnvironmentConfig {
 const getEnvironmentConfig = (): EnvironmentConfig => {
   const env = (import.meta as any).env;
   
-  console.log('环境配置调试 - VITE_API_BASE_URL:', env.VITE_API_BASE_URL);
-  console.log('环境配置调试 - window.location.hostname:', typeof window !== 'undefined' ? window.location.hostname : 'undefined');
-  
-  // 优先使用环境变量（构建时设置）
-  if (env.VITE_API_BASE_URL) {
-    return {
-      API_BASE_URL: env.VITE_API_BASE_URL,
-      CDN_BASE_URL: env.VITE_CDN_BASE_URL || env.VITE_API_BASE_URL,
-      ENVIRONMENT: (env.VITE_ENVIRONMENT as 'development' | 'production' | 'staging') || 'staging',
-      PAGES_PROJECT_NAME: env.VITE_PAGES_PROJECT_NAME || 'getyourluck-testing-platform',
-      PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
-      PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
-    };
-  }
-  
-  // 运行时根据域名判断环境
+  // 运行时根据域名判断环境（优先级最高）
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     
@@ -41,7 +26,7 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
         CDN_BASE_URL: 'https://cdn.selfatlas.net',
         ENVIRONMENT: 'production',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
-        PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+        PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
         PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
       };
     }
@@ -52,7 +37,7 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
         CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
         ENVIRONMENT: 'staging',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
-        PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+        PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
         PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
       };
     }
@@ -63,10 +48,22 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
         CDN_BASE_URL: 'http://localhost:8787',
         ENVIRONMENT: 'development',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
-        PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+        PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
         PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
       };
     }
+  }
+  
+  // 回退到环境变量（构建时设置）
+  if (env.VITE_API_BASE_URL) {
+    return {
+      API_BASE_URL: env.VITE_API_BASE_URL,
+      CDN_BASE_URL: env.VITE_CDN_BASE_URL || env.VITE_API_BASE_URL,
+      ENVIRONMENT: (env.VITE_ENVIRONMENT as 'development' | 'production' | 'staging') || 'staging',
+      PAGES_PROJECT_NAME: env.VITE_PAGES_PROJECT_NAME || 'getyourluck-testing-platform',
+      PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
+      PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+    };
   }
   
   // 默认返回staging环境
@@ -75,7 +72,7 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
     ENVIRONMENT: 'staging',
     PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
-    PAGES_DEPLOYMENT_URL: 'https://f3ddcdf9.getyourluck-testing-platform.pages.dev',
+    PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
     PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
   };
 };
@@ -100,13 +97,7 @@ const validateEnvironmentConfig = (config: EnvironmentConfig): void => {
 // 调试信息 - 在开发环境和staging环境中启用
 if (typeof window !== 'undefined' && (window.location.hostname.includes('localhost') || window.location.hostname.includes('pages.dev'))) {
   const config = getEnvironmentConfig();
-  console.log('Environment Config Debug:', {
-    hostname: window.location.hostname,
-    isStaging: window.location.hostname.includes('pages.dev'),
-    isProduction: window.location.hostname.includes('selfatlas.net'),
-    API_BASE_URL: config.API_BASE_URL,
-    ENVIRONMENT: config.ENVIRONMENT
-  });
+  // Debug info removed for production
 }
 
 // 环境工具函数

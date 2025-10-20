@@ -32,14 +32,14 @@ export const TimeInput: React.FC<TimeInputProps> = ({
 
   // 解析初始值
   useEffect(() => {
-    if (value) {
-      const timeParts = value.split(':');
+    if (_value) {
+      const timeParts = _value.split(':');
       if (timeParts.length === 2) {
         setHour(timeParts[0] || '');
         setMinute(timeParts[1] || '');
       }
     }
-  }, [value]);
+  }, [_value]);
 
   // 更新父组件的值 - 只在完整输入时更新
   useEffect(() => {

@@ -50,6 +50,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isError, setIsError] = useState(false);
   const [isInView, setIsInView] = useState(!lazy || priority);
   const [currentSrc, setCurrentSrc] = useState<string>('');
+  const [retryCount, setRetryCount] = useState(0);
   const imgRef = useRef<HTMLImageElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -57,23 +58,27 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const generateOptimizedUrl = useCallback((imageSrc: string, targetWidth?: number, targetFormat?: string) => {
     if (!imageSrc) return '';
     
+    // 清理URL，移除可能的无效字符
+    const cleanSrc = imageSrc.trim();
+    if (!cleanSrc) return '';
+    
     // 如果是外部图片，直接返回
-    if (imageSrc.startsWith('http') && !imageSrc.includes('cloudflare.com')) {
-      return imageSrc;
+    if (cleanSrc.startsWith('http') && !cleanSrc.includes('cloudflare.com')) {
+      return cleanSrc;
     }
 
     // 如果是Cloudflare图片，使用图片优化服务
-    if (imageSrc.includes('cloudflare.com') || imageSrc.includes('imagedelivery.net')) {
+    if (cleanSrc.includes('cloudflare.com') || cleanSrc.includes('imagedelivery.net')) {
       const params = new URLSearchParams();
       if (targetWidth) params.append('w', targetWidth.toString());
       if (targetFormat) params.append('f', targetFormat);
       params.append('q', quality.toString());
       
-      return `${imageSrc}?${params.toString()}`;
+      return `${cleanSrc}?${params.toString()}`;
     }
 
     // 本地图片，使用Vite的图片优化
-    return imageSrc;
+    return cleanSrc;
   }, [quality]);
 
   // 生成响应式图片源
@@ -105,16 +110,28 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
   // 处理图片错误
   const handleImageError = useCallback(() => {
-    setIsError(true);
-    setIsLoaded(false);
-    
-    // 尝试使用fallback图片
-    if (fallback && fallback !== src) {
-      setCurrentSrc(fallback);
+    if (retryCount < 2) {
+      // 重试加载
+      setRetryCount(prev => prev + 1);
+      setIsError(false);
+      // 延迟重试
+      setTimeout(() => {
+        if (imgRef.current) {
+          imgRef.current.src = generateOptimizedUrl(src, width, format);
+        }
+      }, 1000 * (retryCount + 1)); // 递增延迟
+    } else {
+      setIsError(true);
+      setIsLoaded(false);
+      
+      // 尝试使用fallback图片
+      if (fallback && fallback !== src) {
+        setCurrentSrc(fallback);
+      }
+      
+      onError?.();
     }
-    
-    onError?.();
-  }, [fallback, src, onError]);
+  }, [retryCount, src, width, format, generateOptimizedUrl, fallback, onError]);
 
   // 设置当前图片源
   useEffect(() => {
@@ -208,7 +225,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       >
         <div className="text-center">
           <div className="text-2xl mb-2">🖼️</div>
-                        <div className="text-sm">Image loading failed</div>
+          <div className="text-sm">Image not available</div>
         </div>
       </div>
     );

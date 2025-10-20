@@ -11,9 +11,7 @@ class ApiClient {
   private baseURL: string
 
   constructor() {
-    console.log('VITE_API_BASE_URL =', import.meta.env.VITE_API_BASE_URL);
     this.baseURL = getApiBaseUrl()
-    console.log('最终 baseURL =', this.baseURL);
   }
 
   async request<T>(

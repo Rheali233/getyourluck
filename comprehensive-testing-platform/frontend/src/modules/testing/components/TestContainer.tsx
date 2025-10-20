@@ -25,6 +25,7 @@ import {
 } from '@/components/LazyLoad';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 interface TestContainerProps {
   testType: string;
@@ -46,8 +47,6 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     questions: storeQuestions,
     isLoading,
     error,
-    showResults,
-    currentTestResult,
     isTestStarted,
     
     // Actions
@@ -57,8 +56,15 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     goToPreviousQuestion,
     submitAnswer,
     getAnswer,
-    setShowResults
+    setShowResults,
+    getTestTypeState
   } = useTestStore();
+  
+  // 获取当前测试类型的特定状态
+  const testTypeState = getTestTypeState(testType);
+  const testTypeShowResults = testTypeState.showResults;
+  const testTypeCurrentTestResult = testTypeState.currentTestResult;
+  const testTypeIsTestStarted = testTypeState.isTestStarted;
 
   // 测试启动逻辑已经移到GenericTestPage中，这里不再需要handleStartTest
 
@@ -68,7 +74,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     testId: testType,
     title: `${testType.toUpperCase()} Test Results - Comprehensive Analysis`,
     description: `Detailed analysis and results for your ${testType.toUpperCase()} test. Get personalized insights and recommendations based on your responses.`,
-    structuredData: showResults && currentTestResult ? {
+    structuredData: testTypeShowResults && testTypeCurrentTestResult ? {
       '@context': 'https://schema.org',
       '@type': 'TestResult',
       name: `${testType.toUpperCase()} Test Results`,
@@ -76,8 +82,8 @@ export const TestContainer: React.FC<TestContainerProps> = ({
       testType: testType,
       result: {
         '@type': 'TestResult',
-        score: currentTestResult.data?.totalScore || currentTestResult.data?.score || currentTestResult.scores?.['total'] || 'N/A',
-        result: currentTestResult.data?.personalityType || currentTestResult.data?.severity || currentTestResult.data?.typeName || 'Analysis Complete',
+        score: testTypeCurrentTestResult.data?.totalScore || testTypeCurrentTestResult.data?.score || testTypeCurrentTestResult.scores?.['total'] || 'N/A',
+        result: testTypeCurrentTestResult.data?.personalityType || testTypeCurrentTestResult.data?.severity || testTypeCurrentTestResult.data?.typeName || 'Analysis Complete',
         dateCompleted: new Date().toISOString(),
         testTaker: {
           '@type': 'Person',
@@ -103,6 +109,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   const handleEndTest = async () => {
     try {
       const result = await endTest();
+      { const base = buildBaseContext(); void trackEvent({ eventType: 'test_submit', ...base, data: { testType, numQuestions: totalQuestions } }).catch(() => {}); }
       if (result && onTestComplete) {
         onTestComplete(result);
       }
@@ -129,6 +136,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   // Handle answer submission
   const handleAnswerSubmit = (questionId: string, answer: any) => {
     submitAnswer(questionId, answer);
+    { const base = buildBaseContext(); void trackEvent({ eventType: 'test_answer', ...base, data: { testType, questionId } }).catch(() => {}); }
   };
 
 
@@ -301,13 +309,9 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     );
   }
 
-  // 测试已经通过GenericTestPage启动，直接进入测试状态
-  // 如果状态异常且不是测试完成状态，直接跳转到测试准备界面
-  // 但是要排除正在加载结果的情况和已经显示结果的情况
-  // 强化：有结果时永不重定向
-  if (!isTestStarted && !showResults && !isLoading && !currentTestResult) {
-    // 添加调试信息
-    // eslint-disable-next-line no-console
+  // 使用测试类型特定的状态进行判断
+  // 如果当前测试类型没有开始且没有显示结果，重定向到测试准备页面
+  if (!testTypeIsTestStarted && !testTypeShowResults && !isLoading && !testTypeCurrentTestResult) {
     // 根据测试类型确定正确的重定向路径
     const redirectPath = ['vark'].includes(testType) 
       ? `/learning/${testType}` 
@@ -317,9 +321,8 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   }
 
   // 检查questions是否有效（在结果页不触发重定向）
-  // 但是要排除正在加载结果的情况和已经显示结果的情况
-  // 强化：有结果时永不重定向
-  if (!showResults && !isLoading && !currentTestResult && (!storeQuestions || storeQuestions.length === 0)) {
+  // 使用测试类型特定的状态
+  if (!testTypeShowResults && !isLoading && !testTypeCurrentTestResult && (!storeQuestions || storeQuestions.length === 0)) {
     // 根据测试类型确定正确的重定向路径
     const redirectPath = ['vark'].includes(testType) 
       ? `/learning/${testType}` 
@@ -328,12 +331,12 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     return null;
   }
 
-  // Render test results
-  if (showResults && currentTestResult) {
+  // Render test results - 使用测试类型特定的状态
+  if (testTypeShowResults && testTypeCurrentTestResult) {
     let view: React.ReactElement | null = null;
     
     // 尝试获取结果数据，优先使用data字段，否则使用整个result
-    const resultData = currentTestResult.data || currentTestResult;
+    const resultData = testTypeCurrentTestResult.data || testTypeCurrentTestResult;
     
     if (resultData) {
       switch (testType) {
@@ -410,7 +413,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         case 'interpersonal':
           view = (
             <LazyInterpersonalResultDisplay
-              result={currentTestResult.data}
+              result={testTypeCurrentTestResult?.data}
               onReset={handleResetTest}
               className={className}
               testId={testId || 'interpersonal-result-display'}
@@ -420,7 +423,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         case 'holland':
           view = (
             <LazyHollandResultDisplay
-              result={currentTestResult.data}
+              result={testTypeCurrentTestResult?.data}
               onReset={handleResetTest}
               className={className}
               testId={testId || 'holland-result-display'}
@@ -430,7 +433,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         case 'disc':
           view = (
             <LazyDISCResultDisplay
-              result={currentTestResult.data}
+              result={testTypeCurrentTestResult?.data}
               onReset={handleResetTest}
               className={className}
               testId={testId || 'disc-result-display'}
@@ -440,7 +443,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         case 'leadership':
           view = (
             <LazyLeadershipResultDisplay
-              result={currentTestResult.data}
+              result={testTypeCurrentTestResult?.data}
               onReset={handleResetTest}
               className={className}
               testId={testId || 'leadership-result-display'}
@@ -460,7 +463,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
                 Your {testType} test has been completed successfully.
               </p>
               <div className={`text-sm text-${theme.textLight} mb-8`}>
-                <p>Analysis: {currentTestResult.analysis || 'Test completed successfully.'}</p>
+                <p>Analysis: {testTypeCurrentTestResult?.analysis || 'Test completed successfully.'}</p>
               </div>
             </Card>
           </div>
@@ -471,13 +474,15 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     return (
       <>
         <SEOHead config={seoConfig} />
+        {/* results view event */}
+        {(() => { const base = buildBaseContext(); void trackEvent({ eventType: 'test_result_view', ...base, data: { testType } }).catch(() => {}); return null })()}
         {view}
       </>
     );
   }
 
-  // Render test in progress
-  if (isTestStarted && !showResults && currentQuestion) {
+  // Render test in progress - 使用测试类型特定的状态
+  if (testTypeIsTestStarted && !testTypeShowResults && currentQuestion) {
     // 检查是否是最后一题且正在加载结果
     const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
     const isGeneratingResults = isLoading && isLastQuestion;
@@ -554,7 +559,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
 
   // Render fallback state
   // 如果到达这里，优先保持结果页停留，避免误跳转
-  if (!showResults) {
+  if (!testTypeShowResults) {
     // 根据测试类型确定正确的重定向路径
     const redirectPath = ['vark'].includes(testType) 
       ? `/learning/${testType}` 

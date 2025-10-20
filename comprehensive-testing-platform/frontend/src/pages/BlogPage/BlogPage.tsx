@@ -13,6 +13,7 @@ import { useBlogStore } from '@/stores/blogStore';
 import { SEOManager } from '@/modules/homepage/components/SEOManager';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 interface BlogPageProps extends BaseComponentProps {}
 
@@ -89,6 +90,20 @@ const BlogList: React.FC = () => {
   };
 
   React.useEffect(() => {
+    // 记录博客列表页面访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'page_view',
+      ...base,
+      data: { 
+        route: '/blog', 
+        pageType: 'blog',
+        category: category || undefined,
+        tag: tag || undefined,
+        keyword: keyword || undefined
+      },
+    });
+    
     if (keyword && keyword.trim().length > 0) {
       (async () => {
         const resp = await import('@/services/blogService').then(m => m.blogService.searchArticles(keyword, 30));
@@ -305,13 +320,35 @@ const BlogArticle: React.FC = () => {
     const slug = params['slug'] as string | undefined;
     if (slug) {
       fetchArticle(slug);
+      // 记录博客文章页面访问事件
+      const base = buildBaseContext();
+      trackEvent({
+        eventType: 'page_view',
+        ...base,
+        data: { 
+          route: `/blog/${slug}`, 
+          pageType: 'blog_article',
+          articleSlug: slug
+        },
+      });
     }
   }, [params['slug']]);
 
   // Increase view count after article is loaded (use slug endpoint)
   React.useEffect(() => {
     if (currentArticle && currentArticle.slug) {
-      // We still call store's increment if it accepts id. Instead, directly hit service here for slug.
+      // 记录文章访问事件
+      const base = buildBaseContext();
+      trackEvent({
+        eventType: 'article_view',
+        ...base,
+        data: { 
+          articleSlug: currentArticle.slug,
+          articleTitle: currentArticle.title
+        },
+      });
+      
+      // 增加阅读次数
       import('@/services/blogService').then(({ blogService }) => {
         blogService.incrementViewCountBySlug?.(currentArticle.slug as string);
       });
@@ -420,6 +457,7 @@ const BlogArticle: React.FC = () => {
                     responsive
                     className="w-full h-full"
                     imgClassName="w-full h-full object-cover"
+                    fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4MCIgaGVpZ2h0PSI3MjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y3ZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBub3QgYXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg=="
                   />
                 </div>
               </>
@@ -433,6 +471,14 @@ const BlogArticle: React.FC = () => {
                 <p className="text-gray-600">{UI_TEXT.blog.detail.notFoundDesc}</p>
               </div>
             )}
+
+            {/* 文章交互功能 - 暂时隐藏 */}
+            {/* <ArticleInteractions
+              slug={currentArticle.slug || currentArticle.id}
+              likeCount={currentArticle.readCount || 0}
+              commentCount={0} // Comment count will be fetched from API
+              className="mt-8"
+            /> */}
           </div>
         ) : (
           <Card title={UI_TEXT.blog.detail.notFoundTitle} description={UI_TEXT.blog.detail.notFoundDesc}>

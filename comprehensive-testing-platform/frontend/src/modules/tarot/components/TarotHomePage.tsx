@@ -17,6 +17,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export const TarotHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -86,9 +87,34 @@ export const TarotHomePage: React.FC = () => {
     if (!cardsLoaded) loadTarotCards();
     if (!categoriesLoaded) loadQuestionCategories();
     if (!spreadsLoaded) loadTarotSpreads();
+    
+    // 记录模块访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'module_visit',
+      ...base,
+      data: {
+        moduleId: 'tarot',
+        moduleName: 'Tarot & Divination',
+        moduleType: 'test_module'
+      }
+    });
   }, [cardsLoaded, categoriesLoaded, spreadsLoaded, loadTarotCards, loadQuestionCategories, loadTarotSpreads]);
 
   const handleCategorySelect = async (categoryId: string) => {
+    // 记录分类选择事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_card_click',
+      ...base,
+      data: {
+        testType: 'tarot_category',
+        testName: questionCategories.find(c => c.id === categoryId)?.name || 'Unknown',
+        moduleId: 'tarot',
+        location: 'module_homepage'
+      }
+    });
+    
     selectCategory(categoryId);
     // 跳转到推荐页面，让用户选择牌型
     navigate('/tarot/recommendation');

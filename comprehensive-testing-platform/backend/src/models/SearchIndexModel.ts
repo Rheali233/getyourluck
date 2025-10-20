@@ -40,47 +40,21 @@ export class SearchIndexModel extends BaseModel {
   /**
    * 搜索内容
    */
-  async search(query: string, language: string = 'zh-CN', limit: number = 20): Promise<SearchResult[]> {
+  async search(query: string, language: string = 'en', limit: number = 20): Promise<SearchResult[]> {
     try {
-      console.log('开始搜索，参数:', { query, language, limit });
+      // 执行数据库查询
+      const result = await this.executeQuery(`
+        SELECT id, content_type, content_id, title, description, relevance_score, search_count
+        FROM search_index 
+        WHERE language = ? AND (title LIKE ? OR description LIKE ?)
+        ORDER BY relevance_score DESC, search_count DESC
+        LIMIT ?
+      `, [language, `%${query}%`, `%${query}%`, limit]);
       
-      // 临时简化：直接返回硬编码结果进行测试
-      const mockResults: SearchResult[] = [
-        {
-          id: 'search-001',
-          contentType: 'test',
-          contentId: 'psychology',
-          title: '心理健康测试',
-          description: '揭秘你的性格密码',
-          relevanceScore: 100,
-          searchCount: 0,
-        },
-        {
-          id: 'search-002',
-          contentType: 'test',
-          contentId: 'astrology',
-          title: '星座运势分析',
-          description: '今日运势早知道',
-          relevanceScore: 95,
-          searchCount: 0,
-        }
-      ];
-      
-      console.log('返回模拟搜索结果:', mockResults);
-      return mockResults;
-      
-      // TODO: 恢复数据库查询
-      // const result = await this.executeQuery(`
-      //   SELECT id, content_type, content_id, title, description, relevance_score, search_count
-      //   FROM search_index 
-      //   WHERE language = ?
-      //   ORDER BY relevance_score DESC, search_count DESC
-      //   LIMIT ?
-      // `, [language, limit]);
-      // return result.map(this.mapDatabaseRowToSearchResult);
+      return result.map(this.mapDatabaseRowToSearchResult);
     } catch (error) {
-      console.error('搜索失败:', error);
-      throw new Error('搜索失败');
+      // 返回空结果而不是抛出错误
+      return [];
     }
   }
 

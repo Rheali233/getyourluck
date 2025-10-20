@@ -270,14 +270,54 @@ export class QuestionBankModel extends BaseModel {
     limit?: number, 
     offset?: number
   ): Promise<any[]> {
+    // 使用JOIN查询一次性获取题目和选项，避免N+1问题
     let sql = `
-      SELECT * FROM psychology_questions 
-      WHERE category_id = ? AND is_active = 1 
-      ORDER BY order_index
+      SELECT 
+        q.id as question_id,
+        q.question_text_en,
+        q.question_text,
+        q.question_type,
+        q.is_required,
+        q.order_index,
+        q.dimension,
+        q.domain,
+        q.weight,
+        o.id as option_id,
+        o.option_text_en,
+        o.option_text,
+        o.option_value,
+        o.order_index as option_order
+      FROM psychology_questions q
+      LEFT JOIN psychology_question_options o ON q.id = o.question_id
+      WHERE q.category_id = ? AND q.is_active = 1 
+      ORDER BY q.order_index, o.order_index
     `;
     
     if (limit !== undefined && offset !== undefined) {
-      sql += ' LIMIT ? OFFSET ?';
+      sql = `
+        SELECT * FROM (
+          SELECT 
+            q.id as question_id,
+            q.question_text_en,
+            q.question_text,
+            q.question_type,
+            q.is_required,
+            q.order_index,
+            q.dimension,
+            q.domain,
+            q.weight,
+            o.id as option_id,
+            o.option_text_en,
+            o.option_text,
+            o.option_value,
+            o.order_index as option_order
+          FROM psychology_questions q
+          LEFT JOIN psychology_question_options o ON q.id = o.question_id
+          WHERE q.category_id = ? AND q.is_active = 1 
+          ORDER BY q.order_index, o.order_index
+        ) 
+        LIMIT ? OFFSET ?
+      `;
     }
     
     const params: any[] = [categoryId];
@@ -290,55 +330,50 @@ export class QuestionBankModel extends BaseModel {
       .bind(...params)
       .all();
 
-    const questions = [];
+    // 将结果按题目分组
+    const questionMap = new Map();
     
-    for (const result of results.results) {
-      // 直接构建前端需要的格式，不使用mapToQuestionData
-      const question = {
-        id: result['id'] as string,
-        text: (result['question_text_en'] as string) || (result['question_text'] as string), // Prefer English, fallback to Chinese if not available
-        type: result['question_type'] as 'single_choice' | 'likert_scale' | 'multiple_choice',
-        required: Boolean(result['is_required']),
-        order: result['order_index'] as number,
-        category: (result['dimension'] as string) ?? "",
-        weight: result['weight'] as number,
-        dimension: (result['dimension'] as string) ?? "",
-        domain: (result['domain'] as string) ?? "",
-      };
+    for (const row of results.results) {
+      const questionId = row['question_id'] as string;
       
-      // 获取该题目的选项
-      const options = await this.getOptionsByQuestion(question.id);
+      if (!questionMap.has(questionId)) {
+        questionMap.set(questionId, {
+          id: questionId,
+          text: (row['question_text_en'] as string) || (row['question_text'] as string),
+          type: row['question_type'] as 'single_choice' | 'likert_scale' | 'multiple_choice',
+          required: Boolean(row['is_required']),
+          order: row['order_index'] as number,
+          category: (row['dimension'] as string) ?? "",
+          weight: row['weight'] as number,
+          dimension: (row['dimension'] as string) ?? "",
+          domain: (row['domain'] as string) ?? "",
+          options: []
+        });
+      }
       
-      // 去重：基于选项文本和值进行去重，避免重复选项
-      const uniqueOptions = options.reduce((acc: any[], option) => {
-        const existingOption = acc.find(existing => 
-          existing.optionText === option.optionText && 
-          existing.optionValue === option.optionValue
+      // 添加选项（如果存在）
+      if (row['option_id']) {
+        const question = questionMap.get(questionId);
+        const option = {
+          id: row['option_id'] as string,
+          text: (row['option_text'] as string) || (row['option_text_en'] as string),
+          value: row['option_value'] as string,
+          order: row['option_order'] as number
+        };
+        
+        // 去重：基于选项文本和值进行去重
+        const existingOption = question.options.find((existing: any) => 
+          existing.text === option.text && existing.value === option.value
         );
         
         if (!existingOption) {
-          acc.push(option);
+          question.options.push(option);
         }
-        
-        return acc;
-      }, []);
-      
-      // 将选项转换为前端需要的格式
-      const formattedOptions = uniqueOptions.map(option => ({
-        id: option.id,
-        text: option.optionText,
-        value: option.optionValue,
-        score: option.optionScore,
-        description: option.optionDescription || ''
-      }));
-      
-      questions.push({
-        ...question,
-        options: formattedOptions
-      });
+      }
     }
 
-    return questions;
+    // 返回题目数组
+    return Array.from(questionMap.values());
   }
 
   /**
@@ -537,10 +572,7 @@ export class QuestionBankModel extends BaseModel {
    */
   async getQuestionCategories(): Promise<QuestionCategoryData[]> {
     try {
-      // eslint-disable-next-line no-console
-      console.log("Debug: Starting getQuestionCategories...");
-      // eslint-disable-next-line no-console
-      console.log("Debug: env.DB available:", !!this.env.DB);
+      // Debug logging removed for production
       
       const results = await this.executeQuery(`
         SELECT * FROM psychology_question_categories 
@@ -548,10 +580,7 @@ export class QuestionBankModel extends BaseModel {
         ORDER BY sort_order, name
       `);
 
-      // eslint-disable-next-line no-console
-      console.log("Debug: Query results:", results);
-      // eslint-disable-next-line no-console
-      console.log("Debug: Results length:", results.length);
+      // Debug logging removed for production
 
       return results.map(result => this.mapToCategoryData(result));
     } catch (error) {
@@ -669,7 +698,7 @@ export class QuestionBankModel extends BaseModel {
       .bind(...params)
       .all();
 
-    const questions = [];
+    const questions: any[] = [];
     for (const result of results.results) {
       const question = await this.getQuestionById(result['id'] as string, language);
       if (question) {
@@ -751,7 +780,7 @@ export class QuestionBankModel extends BaseModel {
     return {
       id: row.id as string,
       questionId: row.question_id as string,
-      optionText: (row.option_text_en as string) || (row.option_text as string), // 优先使用英文，回退到中文
+      optionText: (row.option_text as string) || (row.option_text_en as string), // 优先使用option_text，回退到option_text_en
       optionValue: row.option_value as string,
       optionScore: (row.option_score as number) ?? 0,
       optionDescription: (row.option_description as string) ?? "",

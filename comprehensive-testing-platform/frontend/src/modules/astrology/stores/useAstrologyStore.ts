@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useUnifiedTestStore } from '../../../stores/unifiedTestStore';
+import { astrologyService } from '../services/astrologyService';
 
 // 星座模块特有状态
 interface AstrologyState {
@@ -62,8 +63,36 @@ export const useAstrologyStore = () => {
   };
 
   // 获取出生图
-  const getBirthChart = async () => {
-    // 暂时空实现
+  const getBirthChart = async (birthData: any) => {
+    try {
+      setAstrologyState(prev => ({ ...prev, analysisType: 'birth-chart' }));
+      
+      // 调用API获取出生图分析
+      const response = await astrologyService.getBirthChart(birthData);
+      
+      if (response.success && response.data) {
+        setAstrologyState(prev => ({ 
+          ...prev, 
+          birthChart: response.data,
+          analysisType: 'birth-chart'
+        }));
+        
+        // 更新统一Store状态
+        unifiedStore.setShowResults(true);
+        unifiedStore.setCurrentSession({
+          id: response.data.sessionId || Date.now().toString(),
+          testType: 'birth-chart',
+          startTime: new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          status: 'completed'
+        });
+      } else {
+        throw new Error(response.error || 'Failed to get birth chart analysis');
+      }
+    } catch (error) {
+      console.error('Birth chart analysis error:', error);
+      unifiedStore.setError(error instanceof Error ? error.message : 'Failed to analyze birth chart');
+    }
   };
 
   // 提交反馈

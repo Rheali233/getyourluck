@@ -296,7 +296,7 @@ export class CareerCacheService {
     
     // Log cache performance for debugging
     if (this.config.debug) {
-      console.log(`Cache hit rate: ${(this.stats.hits / (this.stats.hits + this.stats.misses) * 100).toFixed(2)}%`);
+      // Debug logging removed for production
     }
   }
 }

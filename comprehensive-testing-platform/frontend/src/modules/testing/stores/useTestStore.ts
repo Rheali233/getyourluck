@@ -51,6 +51,18 @@ export interface TestStoreState {
   startTime: Date | null;
   timeSpent: number;
   
+  // Test type specific state - 为每个测试类型维护独立的状态
+  testTypeStates: Record<string, {
+    showResults: boolean;
+    currentTestResult: TestResult<any> | null;
+    isTestStarted: boolean;
+    isTestCompleted: boolean;
+    questions: Question[];
+    answers: TestAnswer[];
+    currentQuestionIndex: number;
+    progress: number;
+  }>;
+  
   // Actions
   startTest: (testType: string, questions?: Question[]) => Promise<void>;
   pauseTest: () => void;
@@ -59,34 +71,58 @@ export interface TestStoreState {
   resetTest: () => void;
   
   // Question navigation
-  goToQuestion: (index: number) => void;
+  goToQuestion: (_index: number) => void;
   goToNextQuestion: () => void;
   goToPreviousQuestion: () => void;
   
   // Answer management
-  submitAnswer: (questionId: string, answer: any) => void;
-  getAnswer: (questionId: string) => TestAnswer | undefined;
+  submitAnswer: (_questionId: string, _answer: any) => void;
+  getAnswer: (_questionId: string) => TestAnswer | undefined;
   getAllAnswers: () => TestAnswer[];
   
   // Progress management
   updateProgress: () => void;
   saveProgress: () => boolean;
-  loadProgress: (sessionId: string) => boolean;
+  loadProgress: (_sessionId: string) => boolean;
   
   // Session management
-  createSession: (testType: string, questions: Question[]) => TestSession;
-  updateSession: (updates: Partial<TestSession>) => void;
+  createSession: (_testType: string, _questions: Question[]) => TestSession;
+  updateSession: (_updates: Partial<TestSession>) => void;
   
   // Result management
-  setTestResult: (result: TestResult<any>) => void;
+  setTestResult: (_result: TestResult<any>) => void;
   clearTestResult: () => void;
-  getTestResult: (testType: string, sessionId: string) => Promise<TestResult<any> | null>;
+  getTestResult: (_testType: string, _sessionId: string) => Promise<TestResult<any> | null>;
+  
+  // Test type specific state management
+  getTestTypeState: (testType: string) => {
+    showResults: boolean;
+    currentTestResult: TestResult<any> | null;
+    isTestStarted: boolean;
+    isTestCompleted: boolean;
+    questions: Question[];
+    answers: TestAnswer[];
+    currentQuestionIndex: number;
+    progress: number;
+  };
+  setTestTypeState: (_testType: string, _state: Partial<{
+    showResults: boolean;
+    currentTestResult: TestResult<any> | null;
+    isTestStarted: boolean;
+    isTestCompleted: boolean;
+    questions: Question[];
+    answers: TestAnswer[];
+    currentQuestionIndex: number;
+    progress: number;
+  }>) => void;
+  clearTestTypeState: (_testType: string) => void;
+  clearAllTestTypeStates: () => void;
   
   // Utility actions
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  setQuestions: (questions: Question[]) => void;
-  setShowResults: (show: boolean) => void;
+  setLoading: (_loading: boolean) => void;
+  setError: (_error: string | null) => void;
+  setQuestions: (_questions: Question[]) => void;
+  setShowResults: (_show: boolean) => void;
   
   // Getters
   getCurrentQuestion: () => Question | null;
@@ -119,6 +155,7 @@ export const useTestStore = create<TestStoreState>()(
       isTestCompleted: false,
       startTime: null,
       timeSpent: 0,
+      testTypeStates: {},
       
       // Actions
       startTest: async (testType: string, questions?: Question[]) => {
@@ -134,6 +171,7 @@ export const useTestStore = create<TestStoreState>()(
           // Create new session
           const session = get().createSession(testType, questionsToUse);
           
+          // 更新全局状态
           set({
             currentSession: session,
             currentTestType: testType,
@@ -147,6 +185,18 @@ export const useTestStore = create<TestStoreState>()(
             showResults: false,
             currentTestResult: null,
             isLoading: false
+          });
+          
+          // 更新测试类型特定状态
+          get().setTestTypeState(testType, {
+            showResults: false,
+            currentTestResult: null,
+            isTestStarted: true,
+            isTestCompleted: false,
+            questions: questionsToUse,
+            answers: [],
+            currentQuestionIndex: 0,
+            progress: 0
           });
           
           // Add to history
@@ -371,14 +421,29 @@ export const useTestStore = create<TestStoreState>()(
             }
           }
           
+          // 更新全局状态（不设置showResults和currentTestResult，避免影响其他测试）
           set({
             currentSession: updatedSession,
             isTestCompleted: true,
             isTestStarted: false,
-            showResults: true,
-            currentTestResult: testResult,
+            showResults: false, // 不设置全局showResults
+            currentTestResult: null, // 不设置全局currentTestResult
             isLoading: false
           });
+          
+          // 只更新测试类型特定状态
+          if (currentTestType) {
+            get().setTestTypeState(currentTestType, {
+              showResults: true,
+              currentTestResult: testResult,
+              isTestStarted: false,
+              isTestCompleted: true,
+              questions: get().questions,
+              answers: answers,
+              currentQuestionIndex: get().currentQuestionIndex,
+              progress: 100
+            });
+          }
           
           return testResult;
         } catch (error) {
@@ -391,6 +456,14 @@ export const useTestStore = create<TestStoreState>()(
       },
       
       resetTest: () => {
+        const { currentTestType } = get();
+        
+        // 清理当前测试类型的特定状态
+        if (currentTestType) {
+          get().clearTestTypeState(currentTestType);
+        }
+        
+        // 清理全局状态
         set({
           currentSession: null,
           currentTestType: null,
@@ -644,6 +717,68 @@ export const useTestStore = create<TestStoreState>()(
       
       canGoPrevious: () => {
         return get().currentQuestionIndex > 0;
+      },
+      
+      // Test type specific state management
+      getTestTypeState: (testType: string) => {
+        const state = get();
+        const testTypeState = state.testTypeStates[testType];
+        
+        if (!testTypeState) {
+          return {
+            showResults: false,
+            currentTestResult: null,
+            isTestStarted: false,
+            isTestCompleted: false,
+            questions: [],
+            answers: [],
+            currentQuestionIndex: 0,
+            progress: 0
+          };
+        }
+        
+        return testTypeState;
+      },
+      
+      setTestTypeState: (testType: string, newState: Partial<{
+        showResults: boolean;
+        currentTestResult: TestResult<any> | null;
+        isTestStarted: boolean;
+        isTestCompleted: boolean;
+        questions: Question[];
+        answers: TestAnswer[];
+        currentQuestionIndex: number;
+        progress: number;
+      }>) => {
+        set(state => ({
+          testTypeStates: {
+            ...state.testTypeStates,
+            [testType]: {
+              ...state.testTypeStates[testType],
+              showResults: false,
+              currentTestResult: null,
+              isTestStarted: false,
+              isTestCompleted: false,
+              questions: [],
+              answers: [],
+              currentQuestionIndex: 0,
+              progress: 0,
+              ...newState
+            }
+          }
+        }));
+      },
+      
+      clearTestTypeState: (testType: string) => {
+        set(state => {
+          const newTestTypeStates = { ...state.testTypeStates };
+          delete newTestTypeStates[testType];
+          return { testTypeStates: newTestTypeStates };
+        });
+      },
+      
+      clearAllTestTypeStates: () => {
+        set({ testTypeStates: {} });
       }
     }),
     {

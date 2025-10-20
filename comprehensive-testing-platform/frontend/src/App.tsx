@@ -9,6 +9,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { PerformancePanel } from '@/components/PerformancePanel';
 import { ApiStatusIndicator } from '@/components/ApiStatusIndicator';
+import { GlobalAnalyticsTracker } from '@/components/GlobalAnalyticsTracker';
 import { LazyAboutPage, LazyTestCenterPage } from '@/components/LazyComponent';
 import { PreloadCriticalModules } from '@/components/Preload';
 import { LegacyTestsRedirect } from '@/routes/LegacyTestsRedirect';
@@ -110,6 +111,9 @@ function App() {
         
         {/* 已删除：ResultPages和ComponentShowcase路由 */}
         </Routes>
+        
+        {/* Global analytics tracker - lazy-load wrapper can be added by route-level splitting if needed */}
+        <GlobalAnalyticsTracker />
         
         {/* 性能监控面板 - 仅开发环境 */}
         <PerformancePanel />

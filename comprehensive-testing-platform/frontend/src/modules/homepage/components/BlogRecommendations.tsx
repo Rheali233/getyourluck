@@ -8,6 +8,8 @@ import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 import { useNavigate } from 'react-router-dom';
 import { blogService } from '@/services/blogService';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 
 export interface BlogArticle {
@@ -44,6 +46,8 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
 
   // 当未传入 articles 时，从 blog 模块实时拉取
   const [loadedArticles, setLoadedArticles] = useState<BlogArticle[]>(articles || []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // 标记已挂载，用于触发进入动画
@@ -54,8 +58,29 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
       return;
     }
     
+    // 检查缓存
+    const cacheKey = 'blog_recommendations_homepage';
+    const cachedData = localStorage.getItem(cacheKey);
+    const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+    
+    // 如果缓存存在且未过期（15分钟内）
+    if (cachedData && cacheTimestamp) {
+      const now = Date.now();
+      const cacheTime = parseInt(cacheTimestamp);
+      const isExpired = (now - cacheTime) > 900000; // 15分钟
+      
+      if (!isExpired) {
+        const cached = JSON.parse(cachedData);
+        setLoadedArticles(cached);
+        return;
+      }
+    }
+    
     // 延迟加载，避免阻塞首屏
     const timer = setTimeout(async () => {
+      setIsLoading(true);
+      setError(null);
+      
       try {
         const resp = await blogService.getArticles(1, 6);
         const list = (resp as any).data || [];
@@ -72,8 +97,18 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
           readCount: a.readCount || 0,
           tags: a.tags || [],
         }));
+        
+        // 缓存数据
+        localStorage.setItem(cacheKey, JSON.stringify(mapped));
+        localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+        
         setLoadedArticles(mapped);
+        setIsLoading(false);
       } catch (error) {
+        console.error('Failed to load blog articles:', error);
+        setError('Failed to load blog articles');
+        setIsLoading(false);
+        
         // Failed to load blog articles, using fallback
         // 使用默认文章作为降级方案
         setLoadedArticles([
@@ -177,8 +212,35 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
           </h2>
         </div>
 
-        {/* 博客文章轮播 */}
-        {blogArticles.length > 0 ? (
+        {/* 加载状态 */}
+        {isLoading ? (
+          <div className="flex gap-6 overflow-x-auto">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="flex-shrink-0 w-80 h-72 rounded-xl bg-gray-200 animate-pulse"
+                style={{ animationDelay: `${idx * 100}ms` }}
+              />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-8">
+            <div className="text-red-600 mb-4">⚠️ {error}</div>
+            <button
+              onClick={() => {
+                setError(null);
+                // 重新触发加载
+                const cacheKey = 'blog_recommendations_homepage';
+                localStorage.removeItem(cacheKey);
+                localStorage.removeItem(`${cacheKey}_timestamp`);
+                window.location.reload();
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : blogArticles.length > 0 ? (
           <>
           <div className="relative">
             {/* 轮播容器 */}
@@ -206,10 +268,12 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
                 >
                   {/* 背景大图填满 */}
                   <div className="absolute inset-0">
-                    <img
+                    <LazyLoadImage
                       src={a.coverImage}
                       alt={a.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      effect="blur"
+                      placeholderSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjI4OCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';

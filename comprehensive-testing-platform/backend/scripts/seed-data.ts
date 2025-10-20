@@ -32,7 +32,8 @@ class DatabaseSeeder {
     try {
       // 清理SQL语句，移除多余的空格和换行
       const cleanSql = sql.replace(/\s+/g, ' ').trim();
-      const command = `wrangler d1 execute selfatlas-${this.env} --env ${this.env} --remote --command "${cleanSql}"`;
+      const dbName = this.env === 'staging' ? 'getyourluck-staging' : 'selfatlas-prod';
+      const command = `wrangler d1 execute ${dbName} --env ${this.env} --remote --command "${cleanSql}"`;
       console.log(`执行SQL: ${cleanSql.substring(0, 80)}...`);
       
       const result = execSync(command, { 

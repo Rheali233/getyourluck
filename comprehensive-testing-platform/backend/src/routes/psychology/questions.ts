@@ -11,9 +11,30 @@ import type { AppContext } from '../../types/env';
 
 const questionsRouter = new Hono<AppContext>();
 
-// 获取所有测试类型的题目
+// 获取题目（支持查询参数）
 questionsRouter.get('/', async (c) => {
   try {
+    const category = c.req.query('category');
+    const limit = parseInt(c.req.query('limit') || '10');
+    const offset = parseInt(c.req.query('offset') || '0');
+    
+    if (category) {
+      // 如果指定了category，返回该分类的题目
+      const dbService = c.get('dbService');
+      const questionModel = new QuestionBankModel(dbService.env);
+      
+      const questions = await questionModel.getQuestionsWithOptionsByCategory(category, 'en', limit, offset);
+      
+      return c.json({
+        success: true,
+        data: questions,
+        message: `成功获取${category}分类的题目`,
+        timestamp: new Date().toISOString(),
+        requestId: c.req.header('X-Request-ID')
+      });
+    }
+    
+    // 如果没有指定category，返回所有分类的题目
     const dbService = c.get('dbService');
     const questionModel = new QuestionBankModel(dbService.env);
     
@@ -313,7 +334,7 @@ questionsRouter.delete('/:id', async (c) => {
     const questionId = c.req.param('id');
     
     // Simplified implementation, simulate successful deletion
-    console.log(`Deleting question with ID: ${questionId}`);
+    // Debug logging removed for production
     
     return c.json({
       success: true,

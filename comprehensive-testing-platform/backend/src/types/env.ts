@@ -1,4 +1,4 @@
-import { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
+import type { D1Database, KVNamespace, R2Bucket } from '@cloudflare/workers-types';
 
 // 环境变量接口
 export interface Env {

@@ -22,8 +22,6 @@ export const ApiStatusIndicator: React.FC<ApiStatusIndicatorProps> = ({
   const checkApiStatus = async () => {
     try {
       const apiBaseUrl = getApiBaseUrl();
-      console.log('API Status Check - Base URL:', apiBaseUrl);
-      console.log('API Status Check - Full URL:', `${apiBaseUrl}/health`);
       const response = await fetch(`${apiBaseUrl}/health`, {
         method: 'GET',
         mode: 'cors',

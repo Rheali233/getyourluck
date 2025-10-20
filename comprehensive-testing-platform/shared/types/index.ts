@@ -56,6 +56,15 @@ export type {
   HomepageAnalyticsResponse,
 } from "./homepage";
 
+// 分析埋点类型
+export type {
+  AnalyticsEventType,
+  AnalyticsEventPayload,
+  AnalyticsDeviceInfo,
+  AnalyticsPerformanceMetrics,
+  AnalyticsRecordResponse,
+} from "./analytics";
+
 // 测试相关类型
 export {
   TestCategory,

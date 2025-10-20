@@ -2,6 +2,7 @@ name = "selfatlas-backend"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
+account_id = "257a0c6111ab57bbec3f4e18492c6ac9"
 
 [observability]
 # 开启 Workers Logs，便于线上快速定位 500 报错
@@ -33,7 +34,7 @@ name = "selfatlas-backend-dev"
 
 [[env.staging.d1_databases]]
 binding = "DB"
-database_name = "selfatlas-staging"
+database_name = "getyourluck-staging"
 database_id = "ad5be588-a683-45b5-94b4-47c585abd34f"
 
 # [[env.development.d1_databases]]
@@ -46,6 +47,18 @@ database_id = "ad5be588-a683-45b5-94b4-47c585abd34f"
 binding = "DB"
 database_name = "selfatlas-local"
 database_id = "a9f563cf-ce1b-46f8-adfe-38d58c7686a0"
+
+# Production D1数据库配置（用于迁移）
+[[d1_databases]]
+binding = "selfatlas_prod"
+database_name = "selfatlas-prod"
+database_id = "56cb8ab0-f7da-4ec9-90b7-84dd832e1803"
+
+# Staging D1数据库配置（使用现有的getyourluck-staging）
+[[d1_databases]]
+binding = "getyourluck_staging"
+database_name = "getyourluck-staging"
+database_id = "ad5be588-a683-45b5-94b4-47c585abd34f"
 
 # KV存储配置
 # [[env.production.kv_namespaces]]
@@ -76,6 +89,22 @@ bucket_name = "selfatlas-staging-storage"
 # binding = "STORAGE"
 # bucket_name = "getyourluck-dev-storage"
 
+# Production环境D1数据库配置
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "selfatlas-prod"
+database_id = "56cb8ab0-f7da-4ec9-90b7-84dd832e1803"
+
+# Production环境KV存储配置
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "ea8ee69d73834f1c9d0c791103e191dc"
+
+# Production环境R2存储配置
+[[env.production.r2_buckets]]
+binding = "STORAGE"
+bucket_name = "selfatlas-prod-storage"
+
 # 环境变量
 [env.production.vars]
 NODE_ENV = "production"
@@ -86,18 +115,16 @@ CACHE_TTL = "3600"
 MAX_REQUEST_SIZE = "1048576"
 RATE_LIMIT_WINDOW = "60000"
 RATE_LIMIT_MAX = "100"
-DEEPSEEK_API_KEY = "sk-4e4b5c204fd54073bdcb74b28dcc7413"
 
 [env.staging.vars]
 NODE_ENV = "staging"
-LOG_LEVEL = "debug"
+LOG_LEVEL = "info"
 ENABLE_ANALYTICS = "true"
 ENABLE_CACHE = "true"
 CACHE_TTL = "1800"
 MAX_REQUEST_SIZE = "1048576"
 RATE_LIMIT_WINDOW = "60000"
 RATE_LIMIT_MAX = "200"
-DEEPSEEK_API_KEY = "sk-4e4b5c204fd54073bdcb74b28dcc7413"
 
 [env.development.vars]
 NODE_ENV = "development"
@@ -108,12 +135,9 @@ CACHE_TTL = "300"
 MAX_REQUEST_SIZE = "2097152"
 RATE_LIMIT_WINDOW = "60000"
 RATE_LIMIT_MAX = "1000"
-DEEPSEEK_API_KEY = "sk-4e4b5c204fd54073bdcb74b28dcc7413"
+# DEEPSEEK_API_KEY = "your-api-key-here"  # 通过 wrangler secret put 设置
 
-# 构建配置
-[build]
-command = "npm run build"
-watch_dir = "src"
+# 构建配置 - 使用默认的 TypeScript 构建
 
 # 性能配置
 [env.production.performance]

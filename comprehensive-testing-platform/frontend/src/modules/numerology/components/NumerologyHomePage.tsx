@@ -13,6 +13,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 interface NumerologyHomePageProps {
   className?: string;
@@ -20,6 +21,20 @@ interface NumerologyHomePageProps {
 
 export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ className = '' }) => {
   const navigate = useNavigate();
+  
+  // 记录模块访问事件
+  React.useEffect(() => {
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'module_visit',
+      ...base,
+      data: {
+        moduleId: 'numerology',
+        moduleName: 'Numerology & Destiny',
+        moduleType: 'test_module'
+      }
+    });
+  }, []);
 
   // 关键词优化
   const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
@@ -108,6 +123,19 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
   ];
 
   const handleAnalysisTypeSelect = (analysisType: NumerologyAnalysisType) => {
+    // 记录分析类型选择事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_card_click',
+      ...base,
+      data: {
+        testType: analysisType,
+        testName: analysisTypes.find(a => a.id === analysisType)?.name || 'Unknown',
+        moduleId: 'numerology',
+        location: 'module_homepage'
+      }
+    });
+    
     navigate(`/numerology/${analysisType}`);
   };
 

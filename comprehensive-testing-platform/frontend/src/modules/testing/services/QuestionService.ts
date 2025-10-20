@@ -34,7 +34,7 @@ export class QuestionService {
   ): Promise<QuestionServiceResponse<Question[]>> {
     try {
       // 统一使用 v1 接口
-      const apiPath = `${this.baseUrl}/v1/tests/${testType}/questions`;
+      const apiPath = `${this.baseUrl}/api/v1/tests/${testType}/questions`;
       
       const response = await fetch(`${apiPath}?language=${language}`, {
         method: 'GET',
@@ -65,10 +65,7 @@ export class QuestionService {
         questions = this.convertLearningQuestions(questions, testType);
       }
       
-      console.log('Questions loaded:', { 
-        count: Array.isArray(questions) ? questions.length : 0, 
-        sample: Array.isArray(questions) ? questions[0] : questions 
-      });
+      // Debug logging removed for production
       
       return {
         success: true,
@@ -138,7 +135,7 @@ export class QuestionService {
     language: string = 'en'
   ): Promise<QuestionServiceResponse<Question>> {
     try {
-      const response = await fetch(`${this.baseUrl}/v1/questions/${questionId}?language=${language}`, {
+      const response = await fetch(`${this.baseUrl}/api/v1/questions/${questionId}?language=${language}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

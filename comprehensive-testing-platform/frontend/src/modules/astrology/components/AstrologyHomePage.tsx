@@ -13,6 +13,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export interface AstrologyHomePageProps extends BaseComponentProps {
   // eslint-disable-next-line no-unused-vars
@@ -77,6 +78,18 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
   // 确保页面滚动到顶部
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // 记录模块访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'module_visit',
+      ...base,
+      data: {
+        moduleId: 'astrology',
+        moduleName: 'Astrology & Fortune',
+        moduleType: 'test_module'
+      }
+    });
   }, []);
 
   const astrologyFeatures = [
@@ -122,6 +135,19 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
   ];
 
   const handleFeatureSelect = (feature: { id: string; path: string }) => {
+    // 记录功能卡片点击事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_card_click',
+      ...base,
+      data: {
+        testType: feature.id,
+        testName: astrologyFeatures.find(f => f.id === feature.id)?.name || 'Unknown',
+        moduleId: 'astrology',
+        location: 'module_homepage'
+      }
+    });
+    
     if (onFeatureSelect) {
       onFeatureSelect(feature.id);
     } else {

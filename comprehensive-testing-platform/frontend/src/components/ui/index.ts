@@ -62,3 +62,4 @@ export { ChartComponent } from './common/ChartComponent';
 
 // 反馈组件
 export { FeedbackFloatingWidget } from './FeedbackFloatingWidget';
+export { ArticleInteractions } from './ArticleInteractions';

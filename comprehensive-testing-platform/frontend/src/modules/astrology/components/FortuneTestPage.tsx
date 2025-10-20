@@ -15,6 +15,7 @@ import { AstrologyTestContainer } from './AstrologyTestContainer';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export interface FortuneTestPageProps extends BaseComponentProps {}
 
@@ -98,6 +99,18 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
     window.scrollTo(0, 0);
     // 清除之前的错误
     clearError();
+    
+    // 记录页面访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'page_view',
+      ...base,
+      data: { 
+        route: '/astrology/fortune', 
+        pageType: 'test',
+        testType: 'fortune'
+      },
+    });
   }, [clearError]);
 
   // 监听loading状态变化，同步显示加载弹窗
@@ -121,6 +134,18 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
     if (!selectedSign || isSubmitting) {
       return;
     }
+
+    // 记录测试开始事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_start',
+      ...base,
+      data: { 
+        testType: 'fortune',
+        zodiacSign: selectedSign,
+        fortuneType: selectedFortuneType
+      },
+    });
 
     try {
       // 防止重复提交

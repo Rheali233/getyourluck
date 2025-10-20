@@ -14,6 +14,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export interface LearningAbilityHomePageProps extends BaseComponentProps {
   onTestSelect?: (testType: 'vark') => void;
@@ -68,6 +69,18 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
   // Ensure page scrolls to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // 记录模块访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'module_visit',
+      ...base,
+      data: {
+        moduleId: 'learning',
+        moduleName: 'Learning Ability Tests',
+        moduleType: 'test_module'
+      }
+    });
   }, []);
 
   // Test type information
@@ -86,6 +99,19 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
   ];
 
   const handleTestSelect = (testType: 'vark') => {
+    // 记录测试卡片点击事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_card_click',
+      ...base,
+      data: {
+        testType: testType,
+        testName: 'VARK Learning Style Test',
+        moduleId: 'learning',
+        location: 'module_homepage'
+      }
+    });
+    
     if (onTestSelect) {
       onTestSelect(testType);
     } else {

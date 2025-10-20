@@ -11,6 +11,7 @@ import { PsychologyTestContainer } from './PsychologyTestContainer';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 interface GenericTestPageProps {
   testType: string;
@@ -29,7 +30,13 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
   const [testStarted, setTestStarted] = useState(false);
   
   // 集成useTestStore
-  const { startTest, setQuestions: setStoreQuestions, showResults } = useTestStore();
+  const { 
+    startTest, 
+    setQuestions: setStoreQuestions, 
+    getTestTypeState, 
+    clearAllTestTypeStates,
+    clearTestTypeState
+  } = useTestStore();
   
   // 关键词优化
   const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
@@ -67,6 +74,8 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
       numberOfQuestions: questions.length,
       testFormat: testType === 'mbti' ? 'Single choice' : 
                   testType === 'phq9' ? 'Single choice' : 
+                  testType === 'eq' ? 'Single choice' :
+                  testType === 'happiness' ? 'Single choice' :
                   'Multiple choice',
       about: {
         '@type': 'Thing',
@@ -78,25 +87,79 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
     }
   });
 
+  // 在页面加载时清理其他测试的状态，确保测试之间不会相互影响
+  useEffect(() => {
+    // 清理所有其他测试类型的状态，只保留当前测试类型的状态
+    const currentTestTypeState = getTestTypeState(testType);
+    
+    // 如果当前测试类型没有状态，清理所有状态
+    if (!currentTestTypeState.showResults && !currentTestTypeState.isTestStarted) {
+      clearAllTestTypeStates();
+    } else {
+      // 如果当前测试类型有状态，只清理其他测试类型的状态
+      const allTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'vark', 'love_language', 'love_style', 'interpersonal', 'holland', 'disc', 'leadership'];
+      allTestTypes.forEach(type => {
+        if (type !== testType) {
+          get().clearTestTypeState(type);
+        }
+      });
+    }
+  }, [testType, getTestTypeState, clearAllTestTypeStates, clearTestTypeState]);
+
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-
         setLoading(true);
+        
+        // 检查缓存
+        const cacheKey = `psychology_questions_${testType}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+        
+        // 如果缓存存在且未过期（1小时内）
+        if (cachedData && cacheTimestamp) {
+          const now = Date.now();
+          const cacheTime = parseInt(cacheTimestamp);
+          const isExpired = (now - cacheTime) > 3600000; // 1小时
+          
+          if (!isExpired) {
+            const questions = JSON.parse(cachedData);
+            setQuestions(questions);
+            setLoading(false);
+            
+            // 记录页面访问
+            const base = buildBaseContext();
+            trackEvent({
+              eventType: 'page_view',
+              ...base,
+              data: { route: `/psychology/${testType}`, pageType: 'test' },
+            });
+            return;
+          }
+        }
+        
         // 调用后端API获取测试问题
         const response = await questionService.getQuestionsByType(testType);
-
         
         if (response.success && response.data && Array.isArray(response.data)) {
           setQuestions(response.data);
-
+          
+          // 缓存数据
+          localStorage.setItem(cacheKey, JSON.stringify(response.data));
+          localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+          
+          // 记录页面访问
+          const base = buildBaseContext();
+          trackEvent({
+            eventType: 'page_view',
+            ...base,
+            data: { route: `/psychology/${testType}`, pageType: 'test' },
+          });
         } else {
-
           setError(response.error || 'Failed to load questions');
         }
         setLoading(false);
       } catch (err) {
-
         setError(err instanceof Error ? err.message : 'Failed to load questions');
         setLoading(false);
       }
@@ -117,13 +180,23 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
       <>
         <SEOHead config={seoConfig} />
         <PsychologyTestContainer>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-blue-800">Loading test questions...</p>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center max-w-md mx-auto">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-6"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-blue-900 mb-2">Loading Test Questions</h3>
+              <p className="text-blue-700 mb-4">Preparing your personalized assessment...</p>
+              <div className="w-full bg-blue-100 rounded-full h-2">
+                <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+              </div>
+              <p className="text-sm text-blue-600 mt-2">This will only take a moment</p>
+            </div>
           </div>
-        </div>
-      </PsychologyTestContainer>
+        </PsychologyTestContainer>
       </>
     );
   }
@@ -168,8 +241,13 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
     );
   }
 
-    // 如果测试已开始或显示结果，显示测试容器
-  if (testStarted || showResults) {
+  // 获取当前测试类型的特定状态
+  const testTypeState = getTestTypeState(testType);
+  const testTypeShowResults = testTypeState.showResults;
+  const testTypeIsTestStarted = testTypeState.isTestStarted;
+  
+  // 如果测试已开始或显示结果，显示测试容器
+  if (testStarted || testTypeShowResults || testTypeIsTestStarted) {
     return (
       <>
         <SEOHead config={seoConfig} />
@@ -183,7 +261,7 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-blue-800 mb-2">{title}</h1>
               <p className="text-xl text-blue-700">
-                {showResults 
+                {testTypeShowResults 
                   ? "Your personalized emotional intelligence assessment results"
                   : "Please choose the option that best matches your true thoughts and feelings"
                 }
@@ -247,6 +325,8 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
                   <div className="text-lg font-bold text-blue-900 mb-2">
                     {testType === 'mbti' ? 'Single choice' : 
                      testType === 'phq9' ? 'Single choice' : 
+                     testType === 'eq' ? 'Single choice' :
+                     testType === 'happiness' ? 'Single choice' :
                      'Multiple choice'}
                   </div>
                   <div className="text-sm text-blue-800 font-medium">Test Format</div>
@@ -288,6 +368,12 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
                   try {
                     await startTest(testType, questions);
                     setTestStarted(true);
+                  const base = buildBaseContext();
+                  trackEvent({
+                    eventType: 'test_start',
+                    ...base,
+                    data: { testType },
+                  });
                   } catch (error) {
                     // 静默处理错误，用户界面已经通过状态管理显示错误
                   }

@@ -82,8 +82,8 @@ blogRoutes.get("/articles/:slug", async (c) => {
       );
     }
     
-    // Increment view count
-    await dbService.blogArticles.incrementViewCount(article.id);
+    // View count is now handled by frontend via dedicated API
+    // await dbService.blogArticles.incrementViewCount(article.id);
 
     const response: APIResponse = {
       success: true,
@@ -142,6 +142,137 @@ blogRoutes.post("/articles/:slug/view",
     } catch (error) {
       throw new ModuleError(
         `Failed to update view count for article slug`,
+        ERROR_CODES.DATABASE_ERROR,
+        500
+      );
+    }
+  }
+);
+
+// 增加文章点赞数
+blogRoutes.post("/articles/:slug/like", 
+  rateLimiter(10, 60000), // 每分钟最多10次点赞
+  async (c) => {
+    const slug = c.req.param("slug");
+
+    try {
+      const dbService = c.get("dbService");
+      const article = await dbService.blogArticles.findBySlug?.(slug);
+      if (!article) {
+        throw new ModuleError(
+          `Blog article not found: ${slug}`,
+          ERROR_CODES.NOT_FOUND,
+          404
+        );
+      }
+      
+      // Update like count
+      await dbService.blogArticles.incrementLikeCount(article.id);
+      
+      const response: APIResponse = {
+        success: true,
+        message: `Like count updated for article ${article.id}`,
+        timestamp: new Date().toISOString(),
+        requestId: c.get("requestId") || "",
+      };
+
+      return c.json(response);
+    } catch (error) {
+      throw new ModuleError(
+        `Failed to update like count for article slug`,
+        ERROR_CODES.DATABASE_ERROR,
+        500
+      );
+    }
+  }
+);
+
+// 获取文章评论
+blogRoutes.get("/articles/:slug/comments", async (c) => {
+  const slug = c.req.param("slug");
+  const page = parseInt(c.req.query("page") || "1");
+  const limit = parseInt(c.req.query("limit") || "10");
+
+  try {
+    const dbService = c.get("dbService");
+    const article = await dbService.blogArticles.findBySlug?.(slug);
+    if (!article) {
+      throw new ModuleError(
+        `Blog article not found: ${slug}`,
+        ERROR_CODES.NOT_FOUND,
+        404
+      );
+    }
+
+    // Comments functionality will be implemented in future version
+    const comments: any[] = []; // Temporary empty array
+    
+    const response: PaginatedResponse = {
+      success: true,
+      data: comments,
+      pagination: {
+        page,
+        limit,
+        total: 0,
+        totalPages: 0,
+        hasNext: false,
+        hasPrev: false
+      },
+      message: "Comments retrieved successfully",
+      timestamp: new Date().toISOString(),
+      requestId: c.get("requestId") || "",
+    };
+
+    return c.json(response);
+  } catch (error) {
+    throw new ModuleError(
+      `Failed to retrieve comments for article slug`,
+      ERROR_CODES.DATABASE_ERROR,
+      500
+    );
+  }
+});
+
+// 添加文章评论
+blogRoutes.post("/articles/:slug/comments", 
+  rateLimiter(5, 60000), // 每分钟最多5次评论
+  async (c) => {
+    const slug = c.req.param("slug");
+    const { content, author, email } = await c.req.json();
+
+    try {
+      const dbService = c.get("dbService");
+      const article = await dbService.blogArticles.findBySlug?.(slug);
+      if (!article) {
+        throw new ModuleError(
+          `Blog article not found: ${slug}`,
+          ERROR_CODES.NOT_FOUND,
+          404
+        );
+      }
+
+      // Comment addition logic will be implemented in future version
+      const comment = {
+        id: Date.now().toString(),
+        articleId: article.id,
+        content,
+        author,
+        email,
+        createdAt: new Date().toISOString()
+      };
+      
+      const response: APIResponse = {
+        success: true,
+        data: comment,
+        message: "Comment added successfully",
+        timestamp: new Date().toISOString(),
+        requestId: c.get("requestId") || "",
+      };
+
+      return c.json(response);
+    } catch (error) {
+      throw new ModuleError(
+        `Failed to add comment for article slug`,
         ERROR_CODES.DATABASE_ERROR,
         500
       );

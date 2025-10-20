@@ -1,5 +1,7 @@
 import React from 'react';
 import { cn } from '@/utils/classNames';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 export interface ArticleCardProps {
   id: string;
@@ -40,10 +42,12 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
     >
       <div className="aspect-video bg-gray-100 overflow-hidden">
         {coverImage ? (
-          <img
+          <LazyLoadImage
             src={coverImage}
             alt={title}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            effect="blur"
+            placeholderSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';

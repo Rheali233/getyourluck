@@ -48,13 +48,13 @@ export const useSimplePerformanceMonitor = (
     
     // Performance warning in development environment
     if (logToConsole && renderTime > 16) {
-      console.log(`Component render time: ${renderTime}ms`);
+      // Performance warning removed for production
     }
     
     // 发送到分析服务（如果启用）
     if (sendToAnalytics && renderTime > 16) {
       // 这里可以集成真实的分析服务
-      console.log(`Analytics: Component render time: ${renderTime}ms`);
+      // Analytics logging removed for production
     }
   })
   
@@ -72,7 +72,7 @@ export const useSimplePerformanceMonitor = (
       const duration = performance.now() - start
       
       if (logToConsole && duration > 100) {
-        console.log(`Function execution time: ${duration}ms`);
+        // Performance logging removed for production
       }
       
       return duration

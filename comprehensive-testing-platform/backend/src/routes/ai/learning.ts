@@ -44,22 +44,22 @@ learningAIRoutes.post('/vark', async (c) => {
     const { scores, primaryStyle, secondaryStyles, answers } = await c.req.json();
     const apiKey = c.env.DEEPSEEK_API_KEY;
     
+    // Debug logging removed for production
+    
     if (!apiKey) {
       return c.json({ 
         success: false, 
-        error: 'AI service not configured' 
+        error: 'AI service not configured - DEEPSEEK_API_KEY is missing' 
       }, 500);
     }
     
     const aiService = new AIService(apiKey);
     const result = await aiService.analyzeVARK(scores, primaryStyle, secondaryStyles, answers);
     
-    console.log(`AI Call: ${clientIP} - vark - SUCCESS`);
     return c.json({ success: true, data: result });
   } catch (error) {
     const clientIP = c.req.header('CF-Connecting-IP') || 'unknown';
-    console.error('VARK AI analysis error:', error);
-    console.log(`AI Call: ${clientIP} - vark - FAILED`);
+    // Error logging removed for production
     
     return c.json({ 
       success: false, 

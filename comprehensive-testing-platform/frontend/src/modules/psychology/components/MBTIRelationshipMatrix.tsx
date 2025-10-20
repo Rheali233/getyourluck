@@ -30,6 +30,13 @@ const MBTI_TYPES = [
 
 // Intelligent compatibility grouping based on MBTI theory
 const getCompatibilityLevel = (currentType: string, targetType: string): 'high' | 'medium' | 'low' => {
+  // Validate input types
+  if (!currentType || !targetType || 
+      currentType === 'Unknown' || targetType === 'Unknown' ||
+      typeof currentType !== 'string' || typeof targetType !== 'string') {
+    return 'low';
+  }
+  
   // Extract individual preferences
   const currentE = currentType.includes('E');
   const currentS = currentType.includes('S');

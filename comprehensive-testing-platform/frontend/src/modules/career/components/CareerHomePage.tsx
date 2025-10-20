@@ -17,6 +17,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
+import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 export interface CareerHomePageProps extends BaseComponentProps {
   onTestSelect?: (testType: CareerTestType) => void;
@@ -79,6 +80,18 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
   // Ensure page scrolls to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // 记录模块访问事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'module_visit',
+      ...base,
+      data: {
+        moduleId: 'career',
+        moduleName: 'Career & Development',
+        moduleType: 'test_module'
+      }
+    });
   }, []);
 
   // Test type information
@@ -122,6 +135,19 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
   ];
 
   const handleTestSelect = (testType: CareerTestType) => {
+    // 记录测试卡片点击事件
+    const base = buildBaseContext();
+    trackEvent({
+      eventType: 'test_card_click',
+      ...base,
+      data: {
+        testType: testType,
+        testName: testTypes.find(t => t.type === testType)?.name || 'Unknown',
+        moduleId: 'career',
+        location: 'module_homepage'
+      }
+    });
+    
     if (onTestSelect) {
       onTestSelect(testType);
     } else {

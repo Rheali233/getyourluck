@@ -36,7 +36,13 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
   const [testStarted, setTestStarted] = useState(false);
   
   // 集成useTestStore
-  const { startTest, setQuestions: setStoreQuestions, showResults } = useTestStore();
+  const { 
+    startTest, 
+    setQuestions: setStoreQuestions, 
+    getTestTypeState, 
+    clearAllTestTypeStates,
+    clearTestTypeState
+  } = useTestStore();
 
   // Validate test type
   const validTestTypes = Object.values(CareerTestTypeEnum);
@@ -62,6 +68,27 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
   };
 
   const testInfo = getTestInfo(testType || '');
+
+  // 在页面加载时清理其他测试的状态，确保测试之间不会相互影响
+  useEffect(() => {
+    if (testType) {
+      // 清理所有其他测试类型的状态，只保留当前测试类型的状态
+      const currentTestTypeState = getTestTypeState(testType);
+      
+      // 如果当前测试类型没有状态，清理所有状态
+      if (!currentTestTypeState.showResults && !currentTestTypeState.isTestStarted) {
+        clearAllTestTypeStates();
+      } else {
+        // 如果当前测试类型有状态，只清理其他测试类型的状态
+        const allTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'vark', 'love_language', 'love_style', 'interpersonal', 'holland', 'disc', 'leadership'];
+        allTestTypes.forEach(type => {
+          if (type !== testType) {
+            get().clearTestTypeState(type);
+          }
+        });
+      }
+    }
+  }, [testType, getTestTypeState, clearAllTestTypeStates, clearTestTypeState]);
 
   // 关键词优化
   const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
@@ -114,11 +141,35 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
       
       try {
         setLoading(true);
+        
+        // 检查缓存
+        const cacheKey = `career_questions_${testType}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+        
+        // 如果缓存存在且未过期（1小时内）
+        if (cachedData && cacheTimestamp) {
+          const now = Date.now();
+          const cacheTime = parseInt(cacheTimestamp);
+          const isExpired = (now - cacheTime) > 3600000; // 1小时
+          
+          if (!isExpired) {
+            const questions = JSON.parse(cachedData);
+            setQuestions(questions);
+            setLoading(false);
+            return;
+          }
+        }
+        
         // 调用后端API获取测试问题
         const response = await questionService.getQuestionsByType(testType!);
         
         if (response.success && response.data && Array.isArray(response.data)) {
           setQuestions(response.data);
+          
+          // 缓存数据
+          localStorage.setItem(cacheKey, JSON.stringify(response.data));
+          localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
         } else {
           setError(response.error || 'Failed to load questions');
         }
@@ -224,8 +275,13 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
     );
   }
 
+  // 获取当前测试类型的特定状态
+  const testTypeState = testType ? getTestTypeState(testType) : null;
+  const testTypeShowResults = testTypeState?.showResults || false;
+  const testTypeIsTestStarted = testTypeState?.isTestStarted || false;
+  
   // 如果测试已开始或显示结果，显示测试容器
-  if (testStarted || showResults) {
+  if (testStarted || testTypeShowResults || testTypeIsTestStarted) {
     return (
       <>
         <SEOHead config={seoConfig} />
@@ -239,7 +295,7 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold text-green-800 mb-2">{testInfo.title}</h1>
                 <p className="text-xl text-green-700">
-                  {showResults 
+                  {testTypeShowResults 
                     ? "Your personalized career assessment results"
                     : "Please choose the option that best matches your true thoughts and feelings"
                   }
