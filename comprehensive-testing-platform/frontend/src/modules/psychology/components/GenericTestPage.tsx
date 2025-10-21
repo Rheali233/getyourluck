@@ -12,6 +12,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 interface GenericTestPageProps {
   testType: string;
@@ -409,6 +410,12 @@ export const GenericTestPage: React.FC<GenericTestPageProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Related content - consistent UI spacing */}
+      <ContextualLinks 
+        context="test" 
+        className="mt-8"
+      />
     </PsychologyTestContainer>
     </>
   );

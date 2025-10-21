@@ -89,7 +89,11 @@ export const Footer: React.FC<FooterProps> = ({
             {/* 品牌信息 - 加宽 */}
             <div className="lg:col-span-3">
               <div className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl">🌟</span>
+                <img 
+                  src="/assets/logo.png" 
+                  alt="SelfAtlas Logo" 
+                  className="h-8 w-8 object-contain"
+                />
                 <span className="text-xl font-bold">SelfAtlas</span>
               </div>
               <p className="text-gray-300 text-sm leading-relaxed mb-6">

@@ -8,6 +8,7 @@ import React from 'react';
 import { Card, FeedbackFloatingWidget } from '@/components/ui';
 import { cn } from '@/utils/classNames';
 import type { BaseComponentProps } from '@/types/componentTypes';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface InterpersonalResultDisplayProps extends BaseComponentProps {
   result: any;
@@ -37,6 +38,9 @@ export const InterpersonalResultDisplay: React.FC<InterpersonalResultDisplayProp
 
   // 兼容不同结果结构（root 或 data）
   const data: any = (result as any)?.data || result;
+  
+  // 确保获取AI分析结果
+  const analysis = (result as any).analysis || result.data?.analysis || result.data?.interpretation || (result as any).interpretation || '';
   const overallPct: number = Math.round((data.percentage ?? data.overallScore ?? 0) * 100) / 100;
   const overallLevel: string = (data.level as string) || levelOf(Number(overallPct));
 
@@ -280,6 +284,8 @@ export const InterpersonalResultDisplay: React.FC<InterpersonalResultDisplayProp
         )}
 
         <FeedbackFloatingWidget testContext={{ testType: 'interpersonal' }} />
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="interpersonal" className="mt-4" />
       </div>
     </div>
   );

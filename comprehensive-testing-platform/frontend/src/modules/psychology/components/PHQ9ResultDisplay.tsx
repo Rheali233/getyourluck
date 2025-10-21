@@ -4,6 +4,7 @@ import type { BaseComponentProps } from '@/types/componentTypes';
 import type { PHQ9Result } from '../types';
 import { cn } from '@/utils/classNames';
 import { FeedbackFloatingWidget } from '@/components/ui';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface PHQ9ResultDisplayProps extends BaseComponentProps {
   result: PHQ9Result;
@@ -189,6 +190,8 @@ export const PHQ9ResultDisplay: React.FC<PHQ9ResultDisplayProps> = ({
             Remember, seeking help is a brave act, you are not alone.
           </p>
         </div>
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="phq9" className="mt-4" />
       </div>
       <FeedbackFloatingWidget
         containerSelector="#mainContent"

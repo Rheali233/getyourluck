@@ -268,4 +268,5 @@ export class TestEngineService {
 }
 
 // 导出测试引擎接口和基类
-export { BaseTestEngine, TestConfig, TestSession, TestProcessOptions }; 
+export { BaseTestEngine };
+export type { TestConfig, TestSession, TestProcessOptions }; 

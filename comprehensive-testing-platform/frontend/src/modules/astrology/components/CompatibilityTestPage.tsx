@@ -127,7 +127,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
         </div>
 
         {/* 模块1: Compatibility Overview */}
-        <Card className="bg-white/80 p-8 mb-8">
+        <Card className="bg-white p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Compatibility Overview</h2>
           
           <div className="space-y-6">
@@ -153,7 +153,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
         </Card>
 
         {/* 模块2: Zodiac Signs Comparison */}
-        <Card className="bg-white/80 p-8 mb-8">
+        <Card className="bg-white p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Zodiac Signs Comparison</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -262,7 +262,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
         </Card>
 
         {/* 模块3: Relationship Analysis */}
-        <Card className="bg-white/80 p-8 mb-8">
+        <Card className="bg-white p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Relationship Analysis</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -270,7 +270,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
             <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">💪 Strengths</h3>
               <ul className="space-y-3">
-                {compatibilityAnalysis.strengths.map((strength, index) => (
+                {compatibilityAnalysis.strengths.map((strength: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <span className="text-[#5F0F40] mr-3 mt-1">•</span>
                     <span className="text-gray-700">{strength}</span>
@@ -283,7 +283,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
             <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">⚠️ Challenges</h3>
               <ul className="space-y-3">
-                {compatibilityAnalysis.challenges.map((challenge, index) => (
+                {compatibilityAnalysis.challenges.map((challenge: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <span className="text-orange-500 mr-3 mt-1">•</span>
                     <span className="text-gray-700">{challenge}</span>
@@ -295,7 +295,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
         </Card>
 
         {/* 模块4: Relationship Advice */}
-        <Card className="bg-white/80 p-8 mb-8">
+        <Card className="bg-white p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Relationship Advice</h2>
           
           <div className="space-y-6">
@@ -342,7 +342,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
 
       {/* 错误提示 */}
       {error && (
-        <Card className="bg-white/80 p-4 mb-6">
+        <Card className="bg-white p-4 mb-6">
           <div className="flex items-center">
             <span className="text-red-400 text-xl mr-3">⚠️</span>
             <p className="text-red-300">{error}</p>
@@ -353,7 +353,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
       {/* 选择表单 */}
       <div className="space-y-6">
         {/* 选择关系类型 */}
-        <Card className="bg-white/80 p-6">
+        <Card className="bg-white p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Relationship Type</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {relationTypes.map((type) => (
@@ -382,7 +382,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
         </Card>
 
         {/* 选择第一个星座 */}
-        <Card className="bg-white/80 p-8">
+        <Card className="bg-white p-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Select First Zodiac Sign</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {ZODIAC_SIGNS.map((sign) => (
@@ -429,7 +429,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
         </Card>
 
         {/* 选择第二个星座 */}
-        <Card className="bg-white/80 p-8">
+        <Card className="bg-white p-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Second Zodiac Sign</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {ZODIAC_SIGNS.map((sign) => (

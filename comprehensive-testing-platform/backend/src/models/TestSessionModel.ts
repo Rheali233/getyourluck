@@ -152,22 +152,13 @@ export class TestSessionModel extends BaseModel {
    */
   async getRecentSessions(limit: number = 10): Promise<TestSession[]> {
     try {
-      console.log("Debug: getRecentSessions called, limit:", limit);
-      console.log("Debug: tableName:", this.tableName);
-      
       const query = `
         SELECT * FROM ${this.tableName} 
         ORDER BY created_at DESC 
         LIMIT ?
       `
       
-      console.log("Debug: Executing query:", query);
-
       const results = await this.executeQuery<TestSession>(query, [limit])
-      
-      console.log("Debug: Query results:", results);
-      console.log("Debug: Results length:", results.length);
-
       return results
     } catch (error) {
       console.error("Error in getRecentSessions:", error);

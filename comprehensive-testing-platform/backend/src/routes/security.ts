@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import { PrivacyService, ConsentType } from '../services/PrivacyService';
 import { securityMiddleware, inputValidationMiddleware } from '../middleware/security';
+import type { AppContext } from '../types/env';
 
-const securityRoutes = new Hono();
+const securityRoutes = new Hono<AppContext>();
 
 // 应用安全中间件
 securityRoutes.use('*', securityMiddleware());
@@ -27,7 +28,7 @@ securityRoutes.post('/privacy/consent', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     
     await privacyService.recordUserConsent({
       sessionId,
@@ -43,10 +44,12 @@ securityRoutes.post('/privacy/consent', async (c) => {
       message: '用户同意已记录' 
     });
   } catch (error) {
-    console.error('记录用户同意失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '记录用户同意失败' 
+      error: '记录用户同意失败',
+      details: errorMessage
     }, 500);
   }
 });
@@ -70,7 +73,7 @@ securityRoutes.get('/privacy/consent/:sessionId/:consentType', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     const hasConsent = await privacyService.getUserConsent(sessionId, consentType as ConsentType);
 
     return c.json({ 
@@ -78,10 +81,12 @@ securityRoutes.get('/privacy/consent/:sessionId/:consentType', async (c) => {
       data: { hasConsent } 
     });
   } catch (error) {
-    console.error('获取用户同意状态失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '获取用户同意状态失败' 
+      error: '获取用户同意状态失败',
+      details: errorMessage
     }, 500);
   }
 });
@@ -105,7 +110,7 @@ securityRoutes.get('/privacy/gdpr-compliance/:sessionId', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     const compliance = await privacyService.checkGdprCompliance(sessionId);
 
     return c.json({ 
@@ -113,10 +118,12 @@ securityRoutes.get('/privacy/gdpr-compliance/:sessionId', async (c) => {
       data: compliance 
     });
   } catch (error) {
-    console.error('检查GDPR合规性失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '检查GDPR合规性失败' 
+      error: '检查GDPR合规性失败',
+      details: errorMessage
     }, 500);
   }
 });
@@ -140,7 +147,7 @@ securityRoutes.get('/privacy/report/:sessionId', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     const report = await privacyService.getPrivacyReport(sessionId);
 
     return c.json({ 
@@ -148,10 +155,12 @@ securityRoutes.get('/privacy/report/:sessionId', async (c) => {
       data: report 
     });
   } catch (error) {
-    console.error('获取隐私报告失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '获取隐私报告失败' 
+      error: '获取隐私报告失败',
+      details: errorMessage
     }, 500);
   }
 });
@@ -175,7 +184,7 @@ securityRoutes.get('/privacy/export/:sessionId', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     const userData = await privacyService.exportUserData(sessionId);
 
     return c.json({ 
@@ -183,10 +192,12 @@ securityRoutes.get('/privacy/export/:sessionId', async (c) => {
       data: userData 
     });
   } catch (error) {
-    console.error('导出用户数据失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '导出用户数据失败' 
+      error: '导出用户数据失败',
+      details: errorMessage
     }, 500);
   }
 });
@@ -210,7 +221,7 @@ securityRoutes.delete('/privacy/forget/:sessionId', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     await privacyService.implementRightToBeForgotten(sessionId);
 
     return c.json({ 
@@ -218,10 +229,12 @@ securityRoutes.delete('/privacy/forget/:sessionId', async (c) => {
       message: '用户数据已删除' 
     });
   } catch (error) {
-    console.error('实现被遗忘权失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '删除用户数据失败' 
+      error: '删除用户数据失败',
+      details: errorMessage 
     }, 500);
   }
 });
@@ -246,7 +259,7 @@ securityRoutes.post('/privacy/anonymize/:sessionId', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     await privacyService.anonymizeUserData(sessionId, options);
 
     return c.json({ 
@@ -254,10 +267,12 @@ securityRoutes.post('/privacy/anonymize/:sessionId', async (c) => {
       message: '用户数据已匿名化' 
     });
   } catch (error) {
-    console.error('匿名化用户数据失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '匿名化用户数据失败' 
+      error: '匿名化用户数据失败',
+      details: errorMessage 
     }, 500);
   }
 });
@@ -272,7 +287,7 @@ securityRoutes.post('/privacy/cleanup', async (c) => {
       }, 500);
     }
 
-    const privacyService = new PrivacyService(c.env['DB'] as D1Database);
+    const privacyService = new PrivacyService(c.env.DB);
     const result = await privacyService.cleanupExpiredData();
 
     return c.json({ 
@@ -281,10 +296,12 @@ securityRoutes.post('/privacy/cleanup', async (c) => {
       message: '过期数据清理完成' 
     });
   } catch (error) {
-    console.error('清理过期数据失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '清理过期数据失败' 
+      error: '清理过期数据失败',
+      details: errorMessage 
     }, 500);
   }
 });
@@ -322,10 +339,12 @@ securityRoutes.get('/security/status', async (c) => {
       data: securityStatus 
     });
   } catch (error) {
-    console.error('获取安全状态失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '获取安全状态失败' 
+      error: '获取安全状态失败',
+      details: errorMessage 
     }, 500);
   }
 });
@@ -361,10 +380,12 @@ securityRoutes.post('/security/test', async (c) => {
       message: '安全测试通过' 
     });
   } catch (error) {
-    console.error('安全测试失败:', error);
+    // Log error for monitoring (in production, this would go to a logging service)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return c.json({ 
       success: false, 
-      error: '安全测试失败' 
+      error: '安全测试失败',
+      details: errorMessage 
     }, 500);
   }
 });

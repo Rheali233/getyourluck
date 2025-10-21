@@ -100,7 +100,7 @@ export const PopularTests: React.FC<PopularTestsProps> = ({
       rating: 4.7,
       testCount: 3200,
       isHot: false,
-      route: '/relationship/love_language'
+      route: '/relationship/love-language'
     }
   ];
 

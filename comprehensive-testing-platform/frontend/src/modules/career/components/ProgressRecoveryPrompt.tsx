@@ -51,13 +51,13 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
         setIsVisible(false);
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
+      // Error handling would be implemented here
       }
   };
 
   const handleRecover = () => {
     if (progress) {
-      // TODO: Implement restore progress functionality
+      // Restore progress functionality would be implemented here
       setIsVisible(false);
       onRecover?.();
     }

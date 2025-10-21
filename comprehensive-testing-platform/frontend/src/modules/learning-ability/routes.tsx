@@ -7,7 +7,6 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LearningAbilityHomePage } from './components/LearningAbilityHomePage';
 import { VARKTestPage } from './components/VARKTestPage';
-// import { CognitiveTestPage } from './components/CognitiveTestPage';
 
 export const LearningAbilityRoutes: React.FC = () => {
   return (
@@ -17,7 +16,6 @@ export const LearningAbilityRoutes: React.FC = () => {
       
       {/* Individual test routes */}
       <Route path="/vark" element={<VARKTestPage />} />
-      {/* Cognitive removed */}
       
       {/* Redirect invalid routes to main page */}
       <Route path="*" element={<Navigate to="/" replace />} />

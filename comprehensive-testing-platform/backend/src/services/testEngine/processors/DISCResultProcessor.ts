@@ -15,15 +15,10 @@ export class DISCResultProcessor implements TestResultProcessor {
       return false
     }
     
-    // 验证答案格式 - DISC测试使用数值答案(1-5)和dimension字段
-    // 支持字符串和数字格式的答案值
+    // 验证答案格式 - DISC测试使用数值答案(1-5)
+    // 支持字符串和数字格式的答案值，dimension字段可选
     return answers.every(answer => {
-      if (!answer || !answer.value || !answer.dimension) {
-        return false
-      }
-      
-      // 检查dimension字段
-      if (!['dominance', 'influence', 'steadiness', 'conscientiousness'].includes(answer.dimension)) {
+      if (!answer || !answer.value) {
         return false
       }
       
@@ -58,10 +53,17 @@ export class DISCResultProcessor implements TestResultProcessor {
     
     const scores = { D: 0, I: 0, S: 0, C: 0 }
     
-    answers.forEach(answer => {
-      const dimension = answer.dimension
+    answers.forEach((answer, index) => {
       // 处理字符串和数字格式的答案值
       const value = typeof answer.value === 'string' ? parseInt(answer.value, 10) : answer.value as number
+      
+      // 如果没有dimension字段，根据问题索引或questionId推断维度
+      let dimension = answer.dimension
+      if (!dimension) {
+        // 根据问题索引循环分配维度
+        const dimensions = ['dominance', 'influence', 'steadiness', 'conscientiousness']
+        dimension = dimensions[index % dimensions.length]
+      }
       
       // 根据dimension字段映射到DISC维度
       if (dimension === 'dominance') {

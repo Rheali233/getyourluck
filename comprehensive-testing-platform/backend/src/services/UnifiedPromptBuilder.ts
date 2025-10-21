@@ -65,7 +65,9 @@ Rules:
       instructions: [
         "Analyze based on cognitive function stack and behavioral patterns",
         "Provide detailed relationship performance analysis",
-        "Include career suggestions based on personality type"
+        "Include career suggestions based on personality type",
+        "CRITICAL: For relationshipCompatibility, analyze ALL 15 other MBTI types and group them into three categories: highlyCompatible (4-6 types), moderatelyCompatible (4-6 types), and potentiallyChallenging (3-7 types) based on MBTI compatibility theory",
+        "Each compatibility entry must include type, name, and reasons array with 2-4 specific compatibility factors"
       ],
       schema: {
         type: "INTJ",
@@ -129,10 +131,42 @@ Rules:
           }
         },
         relationshipCompatibility: {
-          ENFP: {"reasons": ["Specific compatibility factors with ENFP type"]},
-          INFJ: {"reasons": ["Specific compatibility factors with INFJ type"]},
-          ENTP: {"reasons": ["Specific compatibility factors with ENTP type"]},
-          INFP: {"reasons": ["Specific compatibility factors with INFP type"]}
+          highlyCompatible: [
+            {
+              type: "INFP",
+              name: "Mediator", 
+              reasons: ["Specific compatibility factors with INFP type"]
+            },
+            {
+              type: "ENFJ",
+              name: "Protagonist",
+              reasons: ["Specific compatibility factors with ENFJ type"]
+            }
+          ],
+          moderatelyCompatible: [
+            {
+              type: "ENTP", 
+              name: "Debater",
+              reasons: ["Specific compatibility factors with ENTP type"]
+            },
+            {
+              type: "INFJ",
+              name: "Advocate", 
+              reasons: ["Specific compatibility factors with INFJ type"]
+            }
+          ],
+          potentiallyChallenging: [
+            {
+              type: "ISTJ",
+              name: "Logistician",
+              reasons: ["Specific compatibility factors with ISTJ type"]
+            },
+            {
+              type: "ESTJ", 
+              name: "Executive",
+              reasons: ["Specific compatibility factors with ESTJ type"]
+            }
+          ]
         }
       }
     },
@@ -763,31 +797,7 @@ Rules:
         metadata: { totalQuestions: 16 }
       }
     },
-    // raven removed
-    cognitive: {
-      testType: "Comprehensive Cognitive Assessment",
-      theory: "cognitive ability assessment",
-      description: "comprehensive cognitive ability test",
-      instructions: [
-        "Analyze comprehensive cognitive abilities across multiple domains",
-        "Provide detailed assessment of cognitive strengths and areas for development",
-        "Include specific recommendations for cognitive enhancement"
-      ],
-      schema: {
-        overallCognitiveLevel: "above_average",
-        analysis: "Comprehensive analysis of cognitive abilities",
-        cognitiveDomains: [
-          {
-            name: "Memory",
-            score: 85,
-            assessment: "Assessment of memory abilities"
-          }
-        ],
-        strengths: ["Strength 1", "Strength 2"],
-        areasForDevelopment: ["Area 1", "Area 2"],
-        recommendations: ["Recommendation 1", "Recommendation 2"]
-      }
-    },
+    // raven and cognitive removed
     // ==================== 占星模块配置 ====================
     fortune: {
       testType: "Astrological Fortune Reading",

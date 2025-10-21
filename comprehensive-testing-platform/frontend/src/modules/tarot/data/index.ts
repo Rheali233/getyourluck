@@ -4,5 +4,4 @@
  */
 
 export { allTarotCards, majorArcanaCards, wandsCards, cupsCards, swordsCards, pentaclesCards } from './tarotCards';
-export { questionCategories } from './questionCategories';
 export { tarotSpreads } from './tarotSpreads';

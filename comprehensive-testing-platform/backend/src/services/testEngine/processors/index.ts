@@ -3,7 +3,8 @@
  * 导出所有处理器和工厂类
  */
 
-export { TestResultProcessor, TestResultProcessorFactory } from '../TestResultProcessor'
+export { TestResultProcessorFactory } from '../TestResultProcessor'
+export type { TestResultProcessor } from '../TestResultProcessor'
 export { MBTIResultProcessor } from './MBTIResultProcessor'
 export { PHQ9ResultProcessor } from './PHQ9ResultProcessor'
 export { EQResultProcessor } from './EQResultProcessor'

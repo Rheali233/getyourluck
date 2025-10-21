@@ -62,9 +62,8 @@ CREATE TABLE IF NOT EXISTS career_sessions (
 CREATE TABLE IF NOT EXISTS learning_sessions (
   id TEXT PRIMARY KEY,
   test_session_id TEXT NOT NULL,
-  test_subtype TEXT NOT NULL, -- 'vark', 'raven', 'learning_strategies'
+  test_subtype TEXT NOT NULL, -- 'vark', 'learning_strategies'
   learning_style TEXT, -- VARK学习风格
-  cognitive_score INTEGER, -- 瑞文测试得分
   percentile_rank INTEGER, -- 百分位排名
   learning_preferences TEXT, -- JSON存储学习偏好
   strategy_recommendations TEXT, -- JSON存储策略建议

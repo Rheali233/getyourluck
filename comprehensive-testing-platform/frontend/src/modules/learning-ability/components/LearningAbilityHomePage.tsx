@@ -5,7 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, FAQ } from '@/components/ui';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
@@ -15,9 +15,10 @@ import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 export interface LearningAbilityHomePageProps extends BaseComponentProps {
-  onTestSelect?: (testType: 'vark') => void;
+  onTestSelect?: () => void;
 }
 
 export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = ({
@@ -88,13 +89,13 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
     {
       type: 'vark',
       title: 'VARK Learning Style Test',
-      description: 'Discover your preferred learning style - Visual, Auditory, Reading/Writing, or Kinesthetic',
-      duration: '10-15 min',
-      questions: 16,
+      description: 'Discover your preferred learning style through a comprehensive assessment of visual, auditory, reading/writing, and kinesthetic preferences. Understand how you process information best and get practical study strategies tailored to your cognitive strengths.',
       icon: '🎓',
       color: 'from-cyan-600 to-sky-500',
       bgColor: 'bg-sky-50',
-      borderColor: 'border-sky-300'
+      borderColor: 'border-sky-300',
+      basis: 'Learning Psychology',
+      tags: ['Learning Psychology', 'Cognitive Styles', 'Study Strategies', 'Learning Efficiency']
     }
   ];
 
@@ -113,7 +114,7 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
     });
     
     if (onTestSelect) {
-      onTestSelect(testType);
+      onTestSelect();
     } else {
       // Default navigation to test page
       navigate(`/learning/${testType}`);
@@ -147,32 +148,25 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
         {/* Test Type Selection */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
           {testTypes.map((test) => (
-            <Card key={test.type} className="border border-sky-200 hover:transition-all duration-300 relative h-[340px]">
+            <Card key={test.type} className="bg-white border border-sky-200 hover:transition-all duration-300 relative h-[360px]">
               {/* Content Area - Fixed height */}
-              <div className="p-4 text-center h-[240px] flex flex-col justify-start">
-                <div className="text-4xl mb-4">{test.icon}</div>
-                <h3 className="text-lg font-bold text-sky-900 mb-3">{test.title}</h3>
-                <p className="text-sm text-sky-800 leading-relaxed mb-3">{test.description}</p>
+              <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+                <div className="text-3xl mb-3">{test.icon}</div>
+                <h3 className="text-base font-bold text-sky-900 mb-3">{test.title}</h3>
+                <p className="text-xs text-sky-800 leading-relaxed mb-4 flex-grow">{test.description}</p>
                 
-                {/* Test Information Tags */}
-                <div className="space-y-2">
-                  {/* Test Basis */}
-                  <div className="flex items-center justify-center">
-                    <span className="px-3 py-1 text-xs bg-sky-50 text-sky-700 rounded-full font-semibold border border-sky-200">
-                      Learning Psychology
-                    </span>
-                  </div>
-                  
-                  {/* Test Stats */}
-                  <div className="flex items-center justify-center space-x-4 text-xs">
-                    <div className="flex items-center space-x-1 bg-sky-50 px-2 py-1 rounded-full">
-                      <span className="text-sky-700">👥</span>
-                      <span className="text-sky-800 font-medium">1.8M+</span>
-                    </div>
-                    <div className="flex items-center space-x-1 bg-sky-50 px-2 py-1 rounded-full">
-                      <span className="text-sky-700">⭐</span>
-                      <span className="text-sky-800 font-medium">4.7</span>
-                    </div>
+                {/* Test Information Tags - Only theoretical basis tags */}
+                <div className="space-y-2 mt-1">
+                  {/* Multiple Tags */}
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {test.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="px-2 py-1 text-xs bg-sky-50 text-sky-700 rounded-full font-semibold border border-sky-200"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -225,6 +219,12 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
             </div>
           </Card>
         </div>
+
+        {/* FAQ Section */}
+        <FAQ 
+          items={FAQ_CONFIG.learning}
+          titleColor="text-sky-900"
+        />
 
         {/* Important Notice */}
         <Card className="p-6 border border-sky-200">

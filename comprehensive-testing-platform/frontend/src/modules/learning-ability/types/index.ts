@@ -3,13 +3,13 @@
  * Follows unified development standard type definition specifications
  */
 
+/* eslint-disable no-unused-vars */
 import type { BaseComponentProps } from '@/types/componentTypes';
 import type { TestStatus, QuestionFormat } from '@/modules/testing/types/TestTypes';
 
 // Learning-specific test type constants
 export const LearningTestTypes = {
   VARK: 'vark',
-  COGNITIVE: 'cognitive',
 } as const;
 
 export type LearningTestType = typeof LearningTestTypes[keyof typeof LearningTestTypes];
@@ -39,17 +39,6 @@ export interface VarkQuestion extends BaseQuestion {
 
 // Raven Progressive Matrices question interface (removed)
 
-// Cognitive ability question interface
-export interface CognitiveQuestion extends BaseQuestion {
-  category: 'memory' | 'attention' | 'processing' | 'reasoning';
-  timeLimit?: number;
-  options: {
-    id: string;
-    text: string;
-    value: string | number;
-    correct?: boolean;
-  }[];
-}
 
 // User answer interface
 export interface UserAnswer {
@@ -119,13 +108,7 @@ export interface VarkResult {
   };
 }
 
-// Raven test result interface
- 
-
-// Cognitive ability test result interface
-// Cognitive removed
-
-// Cognitive removed
+// Raven and Cognitive test interfaces removed - no longer needed
 
 // Test result union type
 export interface TestResult {
@@ -166,47 +149,47 @@ export interface LearningState {
 // Learning module operations
 export interface LearningActions {
   // Test session management
-  startTest: (testType: LearningTestType) => Promise<void>;
+  startTest: (_testType: LearningTestType) => Promise<void>;
   pauseTest: () => void;
   resumeTest: () => void;
   endTest: () => Promise<{ success: boolean; data?: TestResult; error?: string }>;
   resetTest: () => void;
   
   // Answer management
-  submitAnswer: (questionId: string, answer: string | number) => void;
-  goToQuestion: (index: number) => void;
+  submitAnswer: (_questionId: string, _answer: string | number) => void;
+  goToQuestion: (_index: number) => void;
   goToNextQuestion: () => void;
   goToPreviousQuestion: () => void;
   
   // Question bank management
-  loadQuestions: (testType: LearningTestType) => Promise<void>;
-  loadQuestionsFromAPI: (testType: LearningTestType) => Promise<void>;
+  loadQuestions: (_testType: LearningTestType) => Promise<void>;
+  loadQuestionsFromAPI: (_testType: LearningTestType) => Promise<void>;
   getCurrentQuestion: () => VarkQuestion | null;
   
   // Result management
-  generateResults: (testType: LearningTestType) => Promise<TestResult>;
-  saveResults: (testType: LearningTestType, results: TestResult) => Promise<void>;
-  loadResults: (testType: LearningTestType) => Promise<TestResult | null>;
+  generateResults: (_testType: LearningTestType) => Promise<TestResult>;
+  saveResults: (_testType: LearningTestType, _results: TestResult) => Promise<void>;
+  loadResults: (_testType: LearningTestType) => Promise<TestResult | null>;
   
   // Progress management
   saveProgress: () => boolean;
-  loadProgress: (testType: LearningTestType, sessionId: string) => TestProgress | null;
-  restoreProgress: (testType: LearningTestType, sessionId: string) => boolean;
+  loadProgress: (_testType: LearningTestType, _sessionId: string) => TestProgress | null;
+  restoreProgress: (_testType: LearningTestType, _sessionId: string) => boolean;
   
   // AI analysis management
-  analyzeTestResult: (testType: LearningTestType, answers: UserAnswer[]) => Promise<TestResult>;
+  analyzeTestResult: (_testType: LearningTestType, _answers: UserAnswer[]) => Promise<TestResult>;
   getAnalysisStatus: () => { isLoading: boolean; error: string | null; hasResult: boolean };
   clearAnalysisResult: () => void;
   
   // History management
   loadTestHistory: () => Promise<void>;
-  deleteTestSession: (sessionId: string) => Promise<void>;
+  deleteTestSession: (_sessionId: string) => Promise<void>;
   
   // State management
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  setCurrentLearningTestType: (testType: LearningTestType | null) => void;
-  setShowResults: (show: boolean) => void;
+  setLoading: (_loading: boolean) => void;
+  setError: (_error: string | null) => void;
+  setCurrentLearningTestType: (_testType: LearningTestType | null) => void;
+  setShowResults: (_show: boolean) => void;
   reset: () => void;
   
   // Language management
@@ -219,13 +202,13 @@ export interface LearningModuleState extends LearningState, LearningActions {}
 // Component property interface
 export interface TestContainerProps extends BaseComponentProps {
   testType: LearningTestType;
-  onTestComplete: (results: TestResult) => void;
+  onTestComplete: (_results: TestResult) => void;
   onTestPause: () => void;
 }
 
 export interface QuestionDisplayProps extends BaseComponentProps {
-  question: VarkQuestion | CognitiveQuestion;
-  onAnswer: (answer: string | number) => void;
+  question: VarkQuestion;
+  onAnswer: (_answer: string | number) => void;
   onNext: () => void;
   onPrevious: () => void;
   onComplete?: () => void;
@@ -252,7 +235,7 @@ export interface ResultsDisplayProps extends BaseComponentProps {
 }
 
 export interface TestSelectionProps extends BaseComponentProps {
-  onTestSelect: (testType: LearningTestType) => void;
+  onTestSelect: (_testType: LearningTestType) => void;
   testHistory: TestSession[];
 }
 
@@ -264,21 +247,3 @@ export interface VarkResultsProps extends BaseComponentProps {
 // Raven Progressive Matrices result interface (removed)
 
 // Cognitive ability result interface
-export interface CognitiveResult {
-  overallScore: number;
-  categoryScores: {
-    memory: number;
-    attention: number;
-    processing: number;
-    reasoning: number;
-  };
-  level: 'below_average' | 'average' | 'above_average' | 'excellent';
-  strengths: string[];
-  improvements: string[];
-  recommendations: string[];
-}
-
-export interface CognitiveResultsProps extends BaseComponentProps {
-  results: CognitiveResult;
-  onRetake: () => void;
-}

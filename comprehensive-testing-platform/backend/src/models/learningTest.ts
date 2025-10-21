@@ -64,40 +64,7 @@ export interface VARKResult {
 
  
 
-export interface CognitiveResult {
-  id: string;
-  sessionId: string;
-  workingMemory: {
-    score: number;
-    percentile: number;
-    level: string;
-    description: string;
-  };
-  attention: {
-    score: number;
-    percentile: number;
-    level: string;
-    description: string;
-  };
-  processingSpeed: {
-    score: number;
-    percentile: number;
-    level: string;
-    description: string;
-  };
-  executiveFunction: {
-    score: number;
-    percentile: number;
-    level: string;
-    description: string;
-  };
-  overallScore: number;
-  cognitiveProfile: string;
-  strengthAreas: string[];
-  developmentAreas: string[];
-  trainingRecommendations: string;
-  createdAt: string;
-}
+// CognitiveResult interface removed - no longer needed
 
 export interface TestFeedback {
   id: string;
@@ -144,7 +111,7 @@ export class LearningTestModel extends BaseModel {
       // Return the generated TEXT id for FK consistency
       return sessionId;
     } catch (error) {
-      console.error('Error creating test session:', error);
+      // Error logging removed for production
       throw new Error('Failed to create test session');
     }
   }
@@ -174,7 +141,9 @@ export class LearningTestModel extends BaseModel {
         values.push(updates.timeSpent);
       }
       
-      if (updateFields.length === 0) return;
+      if (updateFields.length === 0) {
+        return;
+      }
       
       updateFields.push('updated_at = ?');
       values.push(new Date().toISOString());
@@ -188,7 +157,7 @@ export class LearningTestModel extends BaseModel {
       
       await stmt.bind(...values).run();
     } catch (error) {
-      console.error('Error updating test session:', error);
+      // Error logging removed for production
       throw new Error('Failed to update test session');
     }
   }
@@ -204,7 +173,9 @@ export class LearningTestModel extends BaseModel {
       
       const result = await stmt.bind(sessionId).first();
       
-      if (!result) return null;
+      if (!result) {
+        return null;
+      }
       
       return {
         id: result['id'] as string,
@@ -223,7 +194,7 @@ export class LearningTestModel extends BaseModel {
         updatedAt: result['updated_at'] as string
       } as LearningTestSession;
     } catch (error) {
-      console.error('Error fetching test session:', error);
+      // Error logging removed for production
       throw new Error('Failed to fetch test session');
     }
   }
@@ -248,7 +219,7 @@ export class LearningTestModel extends BaseModel {
       
       return result.meta.last_row_id?.toString() || '';
     } catch (error) {
-      console.error('Error saving VARK answer:', error);
+      // Error logging removed for production
       throw new Error('Failed to save VARK answer');
     }
   }
@@ -279,7 +250,7 @@ export class LearningTestModel extends BaseModel {
       
       return result.meta.last_row_id?.toString() || '';
     } catch (error) {
-      console.error('Error saving cognitive answer:', error);
+      // Error logging removed for production
       throw new Error('Failed to save cognitive answer');
     }
   }
@@ -310,7 +281,7 @@ export class LearningTestModel extends BaseModel {
       
       return resultId.meta.last_row_id?.toString() || '';
     } catch (error) {
-      console.error('Error saving VARK result:', error);
+      // Error logging removed for production
       throw new Error('Failed to save VARK result');
     }
   }
@@ -320,38 +291,7 @@ export class LearningTestModel extends BaseModel {
    */
   
 
-  /**
-   * Save cognitive result
-   */
-  async saveCognitiveResult(result: Omit<CognitiveResult, 'id' | 'createdAt'>): Promise<string> {
-    try {
-      const stmt = this.safeDB.prepare(`
-        INSERT INTO cognitive_results (
-          session_id, working_memory, attention, processing_speed, 
-          executive_function, overall_score, cognitive_profile, 
-          strength_areas, development_areas, training_recommendations
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-      
-      const resultId = await stmt.bind(
-        result.sessionId,
-        JSON.stringify(result.workingMemory),
-        JSON.stringify(result.attention),
-        JSON.stringify(result.processingSpeed),
-        JSON.stringify(result.executiveFunction),
-        result.overallScore,
-        result.cognitiveProfile,
-        JSON.stringify(result.strengthAreas),
-        JSON.stringify(result.developmentAreas),
-        result.trainingRecommendations
-      ).run();
-      
-      return resultId.meta.last_row_id?.toString() || '';
-    } catch (error) {
-      console.error('Error saving cognitive result:', error);
-      throw new Error('Failed to save cognitive result');
-    }
-  }
+  // Cognitive result methods removed - no longer needed
 
   /**
    * Get test result by session ID
@@ -359,7 +299,9 @@ export class LearningTestModel extends BaseModel {
   async getTestResult(sessionId: string): Promise<any> {
     try {
       const session = await this.getTestSession(sessionId);
-      if (!session) return null;
+      if (!session) {
+        return null;
+      }
       
       switch (session.testType) {
         case 'vark':
@@ -368,7 +310,7 @@ export class LearningTestModel extends BaseModel {
           return null;
       }
     } catch (error) {
-      console.error('Error fetching test result:', error);
+      // Error logging removed for production
       throw new Error('Failed to fetch test result');
     }
   }
@@ -383,7 +325,9 @@ export class LearningTestModel extends BaseModel {
       `);
       
       const result = await stmt.bind(sessionId).first();
-      if (!result) return null;
+      if (!result) {
+        return null;
+      }
       
       return {
         id: result['id'] as string,
@@ -399,7 +343,7 @@ export class LearningTestModel extends BaseModel {
         createdAt: result['created_at'] as string
       };
     } catch (error) {
-      console.error('Error fetching VARK result:', error);
+      // Error logging removed for production
       return null;
     }
   }
@@ -424,7 +368,7 @@ export class LearningTestModel extends BaseModel {
       
       await stmt.bind(sessionId, feedback, rating || null, comments || null).run();
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      // Error logging removed for production
       throw new Error('Failed to submit feedback');
     }
   }
@@ -488,7 +432,7 @@ export class LearningTestModel extends BaseModel {
         status: 'completed'
       };
     } catch (error) {
-      console.error('Error processing test submission:', error);
+      // Error logging removed for production
       throw new Error('Failed to process test submission');
     }
   }
@@ -517,14 +461,21 @@ export class LearningTestModel extends BaseModel {
     for (const answer of answers) {
       const optionIds = Array.isArray(answer.selectedOptions) ? answer.selectedOptions : [];
       for (const optionId of optionIds) {
-        if (typeof optionId !== 'string') continue;
+        if (typeof optionId !== 'string') {
+          continue;
+        }
         // Try to infer dimension by suffix _v/_a/_r/_k
         const lower = optionId.toLowerCase();
         let dim: 'V' | 'A' | 'R' | 'K' | null = null;
-        if (lower.endsWith('_v')) dim = 'V';
-        else if (lower.endsWith('_a')) dim = 'A';
-        else if (lower.endsWith('_r')) dim = 'R';
-        else if (lower.endsWith('_k')) dim = 'K';
+        if (lower.endsWith('_v')) {
+          dim = 'V';
+        } else if (lower.endsWith('_a')) {
+          dim = 'A';
+        } else if (lower.endsWith('_r')) {
+          dim = 'R';
+        } else if (lower.endsWith('_k')) {
+          dim = 'K';
+        }
 
         if (dim) {
           scores[dim] += 1; // treat as weight 1 if actual weight is unknown here

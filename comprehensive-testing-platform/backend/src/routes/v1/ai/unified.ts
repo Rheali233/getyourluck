@@ -98,7 +98,7 @@ unifiedAIRoutes.post("/analyze", async (c: Context<AppContext>) => {
         timestamp: new Date().toISOString(),
         requestId: c.req.header('X-Request-ID') || 'unknown',
         version: "1.0.0"
-      }, error.statusCode)
+      }, error.statusCode as any)
     }
 
     return c.json({
@@ -108,7 +108,7 @@ unifiedAIRoutes.post("/analyze", async (c: Context<AppContext>) => {
       timestamp: new Date().toISOString(),
       requestId: c.req.header('X-Request-ID') || 'unknown',
       version: "1.0.0"
-    }, 500)
+    }, 500 as any)
   }
 })
 
@@ -150,7 +150,7 @@ unifiedAIRoutes.get("/templates", async (c: Context<AppContext>) => {
       timestamp: new Date().toISOString(),
       requestId: c.req.header('X-Request-ID') || 'unknown',
       version: "1.0.0"
-    }, 500)
+    }, 500 as any)
   }
 })
 
@@ -206,7 +206,7 @@ unifiedAIRoutes.get("/templates/:testTypeId", async (c: Context<AppContext>) => 
         timestamp: new Date().toISOString(),
         requestId: c.req.header('X-Request-ID') || 'unknown',
         version: "1.0.0"
-      }, error.statusCode)
+      }, error.statusCode as any)
     }
 
     return c.json({
@@ -216,7 +216,7 @@ unifiedAIRoutes.get("/templates/:testTypeId", async (c: Context<AppContext>) => 
       timestamp: new Date().toISOString(),
       requestId: c.req.header('X-Request-ID') || 'unknown',
       version: "1.0.0"
-    }, 500)
+    }, 500 as any)
   }
 })
 
@@ -258,7 +258,7 @@ unifiedAIRoutes.get("/health", async (c: Context<AppContext>) => {
       timestamp: new Date().toISOString(),
       requestId: c.req.header('X-Request-ID') || 'unknown',
       version: "1.0.0"
-    }, 500)
+    }, 500 as any)
   }
 })
 

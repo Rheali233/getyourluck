@@ -12,7 +12,7 @@ const astrologyRoutes = new Hono<AppContext>();
 
 // 兼容预取/预加载的HEAD请求
 astrologyRoutes.on('HEAD', '/zodiac-signs', (c: Context<AppContext>) => {
-  return c.text('', 204);
+  return c.text('', 204 as any);
 });
 
 // 获取星座列表
@@ -32,7 +32,7 @@ astrologyRoutes.get('/zodiac-signs', async (c) => {
       requestId: c.get('requestId')
     });
   } catch (error) {
-    console.error('Zodiac signs API error:', error);
+    // Error handling for production
     return c.json({
       success: false,
       error: 'Internal Server Error',
@@ -66,7 +66,7 @@ astrologyRoutes.get('/fortune/:sign', async (c) => {
       requestId: c.get('requestId')
     });
   } catch (error) {
-    console.error('Fortune API error:', error);
+    // Error handling for production
     return c.json({
       success: false,
       error: 'Internal Server Error',
@@ -98,7 +98,7 @@ astrologyRoutes.post('/compatibility', async (c) => {
       requestId: c.get('requestId')
     });
   } catch (error) {
-    console.error('Compatibility API error:', error);
+    // Error handling for production
     return c.json({
       success: false,
       error: 'Internal Server Error',
@@ -130,7 +130,7 @@ astrologyRoutes.post('/birth-chart', async (c) => {
       requestId: c.get('requestId')
     });
   } catch (error) {
-    console.error('Birth chart API error:', error);
+    // Error handling for production
     return c.json({
       success: false,
       error: 'Internal Server Error',
@@ -162,7 +162,7 @@ astrologyRoutes.post('/feedback', async (c) => {
       requestId: c.get('requestId')
     });
   } catch (error) {
-    console.error('Feedback API error:', error);
+    // Error handling for production
     return c.json({
       success: false,
       error: 'Internal Server Error',

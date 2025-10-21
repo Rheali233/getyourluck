@@ -64,7 +64,6 @@ export enum TestType {
   
   // Learning模块
   VARK = 'vark',
-  COGNITIVE = 'cognitive',
   
   // Astrology模块
   DAILY_FORTUNE = 'daily_fortune',
@@ -206,7 +205,6 @@ const defaultQuestions: Record<string, any[]> = {
   [TestType.LOVE_STYLE]: [],
   [TestType.INTERPERSONAL]: [],
   [TestType.VARK]: [],
-  [TestType.COGNITIVE]: [],
   [TestType.TAROT]: [],
   [TestType.NUMEROLOGY]: [],
   [TestType.BAZI]: [],
@@ -228,7 +226,6 @@ const defaultResults: Record<string, TestResult | null> = {
   [TestType.LOVE_STYLE]: null,
   [TestType.INTERPERSONAL]: null,
   [TestType.VARK]: null,
-  [TestType.COGNITIVE]: null,
   [TestType.TAROT]: null,
   [TestType.NUMEROLOGY]: null,
   [TestType.BAZI]: null,
@@ -250,7 +247,6 @@ const defaultQuestionsLoaded: Record<string, boolean> = {
   [TestType.LOVE_STYLE]: false,
   [TestType.INTERPERSONAL]: false,
   [TestType.VARK]: false,
-  [TestType.COGNITIVE]: false,
   [TestType.TAROT]: false,
   [TestType.NUMEROLOGY]: false,
   [TestType.BAZI]: false,

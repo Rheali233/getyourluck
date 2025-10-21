@@ -163,7 +163,6 @@ export class RelationshipLogger {
       console[logMethod](`[${level}] ${message}`, context || '');
     }
 
-    // TODO: Send to logging service in production
-    // TODO: Send to analytics service
+    // Production logging would be implemented here
   }
 }

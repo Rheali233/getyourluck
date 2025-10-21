@@ -32,9 +32,9 @@ const checkRateLimit = (ip: string): boolean => {
 // VARK AI 分析
 learningAIRoutes.post('/vark', async (c) => {
   try {
-    const clientIP = c.req.header('CF-Connecting-IP') || 'unknown';
+    // const clientIP = c.req.header('CF-Connecting-IP') || 'unknown';
     
-    if (!checkRateLimit(clientIP)) {
+    if (!checkRateLimit('unknown')) {
       return c.json({ 
         success: false, 
         error: 'Rate limit exceeded. Please try again later.' 
@@ -58,7 +58,7 @@ learningAIRoutes.post('/vark', async (c) => {
     
     return c.json({ success: true, data: result });
   } catch (error) {
-    const clientIP = c.req.header('CF-Connecting-IP') || 'unknown';
+    // const clientIP = c.req.header('CF-Connecting-IP') || 'unknown';
     // Error logging removed for production
     
     return c.json({ 
@@ -68,23 +68,6 @@ learningAIRoutes.post('/vark', async (c) => {
   }
 });
 
-// Raven removed
-
-// Cognitive AI 分析
-learningAIRoutes.post('/cognitive', async (c) => {
-  const clientIP = c.req.header('CF-Connecting-IP') || 'unknown';
-  // 保留限流检查以防止滥用
-  if (!checkRateLimit(clientIP)) {
-    return c.json({ 
-      success: false, 
-      error: 'Rate limit exceeded. Please try again later.' 
-    }, 429);
-  }
-  // 模块暂未实现，返回统一错误
-  return c.json({ 
-    success: false, 
-    error: 'Cognitive analysis is not available.' 
-  }, 501);
-});
+// Raven and Cognitive removed
 
 export { learningAIRoutes };

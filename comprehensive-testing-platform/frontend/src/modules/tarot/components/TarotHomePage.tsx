@@ -8,7 +8,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTarotStore } from '../stores/useTarotStore';
 import { useUnifiedTestStore } from '@/stores/unifiedTestStore';
-import { Card, Button, Breadcrumb } from '@/components/ui';
+import { Card, Button, Breadcrumb, FAQ } from '@/components/ui';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/Alert';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
@@ -18,6 +18,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 export const TarotHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -109,7 +110,7 @@ export const TarotHomePage: React.FC = () => {
       ...base,
       data: {
         testType: 'tarot_category',
-        testName: questionCategories.find(c => c.id === categoryId)?.name || 'Unknown',
+        testName: questionCategories.find(c => c.id === categoryId)?.name_en || 'Unknown',
         moduleId: 'tarot',
         location: 'module_homepage'
       }
@@ -196,46 +197,31 @@ export const TarotHomePage: React.FC = () => {
       {/* Question Categories Grid - 三列 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {questionCategories.map((category) => (
-          <Card key={category.id} className="hover:transition-all duration-300 relative h-[340px]">
+          <Card key={category.id} className="bg-white hover:transition-all duration-300 relative h-[360px] border border-violet-200">
             {/* Content Area - Fixed height */}
-            <div className="p-4 text-center h-[240px] flex flex-col justify-start">
-              <div className="text-4xl mb-4">{category.icon}</div>
-              <h3 className="text-lg font-bold text-violet-900 mb-3">{category.name_en}</h3>
-              <p className="text-sm text-violet-800 leading-relaxed mb-3">
+            <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+              <div className="text-3xl mb-3">{category.icon}</div>
+              <h3 className="text-base font-bold text-violet-900 mb-3">{category.name_en}</h3>
+              <p className="text-xs text-violet-800 leading-relaxed mb-4 flex-grow">
                 {category.description_en}
               </p>
               
-              {/* Test Information Tags */}
-              <div className="space-y-2">
-                {/* Test Basis */}
-                <div className="flex items-center justify-center">
-                  <span className="px-3 py-1 text-xs bg-violet-50 text-violet-700 rounded-full font-semibold border border-violet-300">
+              {/* Test Information Tags - Only theoretical basis tags */}
+              <div className="space-y-2 mt-1">
+                {/* Multiple Tags */}
+                <div className="flex flex-wrap gap-1 justify-center">
+                  <span className="px-2 py-1 text-xs bg-violet-50 text-violet-700 rounded-full font-semibold border border-violet-200">
                     {category.name_en.split(' ')[0]} Focus
                   </span>
-                </div>
-                
-                {/* Test Stats */}
-                <div className="flex items-center justify-center space-x-4 text-xs">
-                  <div className="flex items-center space-x-1 bg-violet-50 px-2 py-1 rounded-full">
-                    <span className="text-violet-700">👥</span>
-                    <span className="text-violet-800 font-medium">
-                      {category.id === 'love' ? '850K+' :
-                       category.id === 'career' ? '720K+' :
-                       category.id === 'finance' ? '650K+' :
-                       category.id === 'health' ? '580K+' :
-                       category.id === 'spiritual' ? '920K+' : '1.2M+'}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-1 bg-violet-50 px-2 py-1 rounded-full">
-                    <span className="text-violet-700">⭐</span>
-                    <span className="text-violet-800 font-medium">
-                      {category.id === 'love' ? '4.9' :
-                       category.id === 'career' ? '4.6' :
-                       category.id === 'finance' ? '4.7' :
-                       category.id === 'health' ? '4.8' :
-                       category.id === 'spiritual' ? '4.9' : '4.8'}
-                    </span>
-                  </div>
+                  <span className="px-2 py-1 text-xs bg-violet-50 text-violet-700 rounded-full font-semibold border border-violet-200">
+                    Tarot Reading
+                  </span>
+                  <span className="px-2 py-1 text-xs bg-violet-50 text-violet-700 rounded-full font-semibold border border-violet-200">
+                    Spiritual Guidance
+                  </span>
+                  <span className="px-2 py-1 text-xs bg-violet-50 text-violet-700 rounded-full font-semibold border border-violet-200">
+                    Life Insights
+                  </span>
                 </div>
               </div>
             </div>
@@ -287,7 +273,13 @@ export const TarotHomePage: React.FC = () => {
             </div>
           </div>
         </Card>
-      </div>
+        </div>
+
+        {/* FAQ Section */}
+        <FAQ 
+          items={FAQ_CONFIG.tarot}
+          titleColor="text-violet-900"
+        />
 
       {/* Important Notice */}
       <Card className="p-6">

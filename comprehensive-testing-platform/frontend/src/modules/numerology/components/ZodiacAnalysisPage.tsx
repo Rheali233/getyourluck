@@ -12,19 +12,19 @@ import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 
 export const ZodiacAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
-  const { processNumerologyData, isLoading, error, showResults } = useNumerologyStore();
+  const { processNumerologyData, isLoading, error, showResults, analysisResult } = useNumerologyStore();
   
   const [formData, setFormData] = useState({
     birthDate: '',
     name: '' // Optional for zodiac analysis
   });
 
-  // 监听结果加载完成，跳转到结果页面
+  // 监听结果加载完成，只有当有Zodiac分析数据时才跳转到结果页面
   useEffect(() => {
-    if (showResults) {
+    if (showResults && (analysisResult?.zodiac || analysisResult?.zodiacFortune)) {
       navigate('/numerology/zodiac/result');
     }
-  }, [showResults, navigate]);
+  }, [showResults, analysisResult, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

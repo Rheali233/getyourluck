@@ -8,6 +8,7 @@ import React from 'react';
 import { Card, FeedbackFloatingWidget } from '@/components/ui';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface HappinessDomain {
   name: string;
@@ -237,6 +238,8 @@ export const HappinessResultDisplay: React.FC<HappinessResultDisplayProps> = ({
             we recommend seeking professional psychological counseling or life coaching.
           </p>
         </div>
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="happiness" className="mt-4" />
 
       </div>
       <FeedbackFloatingWidget

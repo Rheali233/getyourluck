@@ -84,16 +84,22 @@ export class TestResultService {
         try {
           // eslint-disable-next-line no-console
           console.log(`Starting AI analysis for ${testType} with ${answers.length} answers`);
+          
+          
           // AI analysis integration completed
           aiAnalysis = await this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
+          
           // eslint-disable-next-line no-console
           console.log(`AI analysis completed for ${testType}:`, JSON.stringify(aiAnalysis, null, 2));
+          
+          
         } catch (aiError) {
           // AI分析失败时记录警告，但不阻止测试结果处理
           // eslint-disable-next-line no-console
           console.error(`AI analysis failed for ${testType}:`, aiError instanceof Error ? aiError.message : 'Unknown error');
           // eslint-disable-next-line no-console
           console.error('AI error details:', aiError);
+          
         }
       } else {
         // eslint-disable-next-line no-console
@@ -187,9 +193,4 @@ export class TestResultService {
 
 }
 
-// 导出单例实例
-export const testResultService = new TestResultService(
-  new DatabaseService({} as any), // 临时传入空对象，实际使用时需要正确的env
-  new CacheService({} as any, 3600), // 临时传入空对象，实际使用时需要正确的KV
-  new AIService('temp-key') // 临时传入空字符串，实际使用时需要正确的API key
-);
+// 单例实例已移除 - 应该通过依赖注入使用

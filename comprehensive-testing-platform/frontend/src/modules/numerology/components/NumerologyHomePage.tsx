@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button, Breadcrumb } from '@/components/ui';
+import { Card, Button, Breadcrumb, FAQ } from '@/components/ui';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { NumerologyTestContainer } from './NumerologyTestContainer';
 import type { NumerologyAnalysisType } from '../types';
@@ -14,6 +14,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 interface NumerologyHomePageProps {
   className?: string;
@@ -91,34 +92,38 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
     {
       id: 'bazi' as NumerologyAnalysisType,
       title: 'BaZi Analysis',
-      description: 'Analyze your birth chart and five elements based on your birth date and time',
+      description: 'Analyze your birth chart and five elements for life insight and guidance.',
       icon: '🌙',
       color: 'from-blue-500 to-cyan-500',
-      features: ['Birth Chart Analysis', 'Five Elements', 'Personality Traits', 'Destiny Guidance']
+      features: ['Birth Chart Analysis', 'Five Elements', 'Personality Traits', 'Destiny Guidance'],
+      tags: ['BaZi', 'Five Elements']
     },
     {
       id: 'zodiac' as NumerologyAnalysisType,
       title: 'Chinese Zodiac Fortune',
-      description: 'Check your Chinese zodiac fortune and get personalized guidance for different periods',
+      description: 'Check your Chinese zodiac fortune and receive period‑based personalized guidance.',
       icon: '🐲',
       color: 'from-purple-500 to-pink-500',
-      features: ['Yearly Fortune', 'Monthly Fortune', 'Weekly Fortune', 'Lucky Elements']
+      features: ['Yearly Fortune', 'Monthly Fortune', 'Weekly Fortune', 'Lucky Elements'],
+      tags: ['Zodiac', 'Luck Insights']
     },
     {
       id: 'name' as NumerologyAnalysisType,
       title: 'Chinese Name Recommendation',
-      description: 'Get personalized Chinese name recommendations based on your characteristics',
+      description: 'Get personalized Chinese name recommendations with cultural meaning and usage advice.',
       icon: '🎯',
       color: 'from-green-500 to-emerald-500',
-      features: ['Personalized Names', 'Cultural Significance', 'Usage Advice', 'Multiple Options']
+      features: ['Personalized Names', 'Cultural Significance', 'Usage Advice', 'Multiple Options'],
+      tags: ['Name Selection', 'Cultural Meaning']
     },
     {
       id: 'ziwei' as NumerologyAnalysisType,
       title: 'ZiWei Analysis',
-      description: 'Get a comprehensive ZiWei chart analysis based on your birth information',
+      description: 'Receive a comprehensive ZiWei chart analysis based on your birth information.',
       icon: '⭐',
       color: 'from-orange-500 to-red-500',
-      features: ['ZiWei Chart', 'Palace Analysis', 'Star Positions', 'Life Guidance']
+      features: ['ZiWei Chart', 'Palace Analysis', 'Star Positions', 'Life Guidance'],
+      tags: ['ZiWei', 'Chart Reading']
     }
   ];
 
@@ -164,47 +169,30 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
         </p>
       </div>
 
-      {/* Analysis Type Cards - 两列 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      {/* Analysis Type Cards - 四列对齐 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
         {analysisTypes.map((analysis) => (
-          <Card key={analysis.id} className="hover:transition-all duration-300 relative h-[340px]">
+          <Card key={analysis.id} className="bg-white hover:transition-all duration-300 relative h-[360px] border border-gray-200">
             {/* Content Area - Fixed height */}
-            <div className="p-4 text-center h-[240px] flex flex-col justify-start">
-              <div className="text-4xl mb-4">{analysis.icon}</div>
-              <h3 className="text-lg font-bold text-red-900 mb-3">{analysis.title}</h3>
-              <p className="text-sm text-red-800 leading-relaxed mb-3">
+            <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+              <div className="text-3xl mb-3">{analysis.icon}</div>
+              <h3 className="text-base font-bold text-red-900 mb-3">{analysis.title}</h3>
+              <p className="text-xs text-red-800 leading-relaxed mb-4 flex-grow">
                 {analysis.description}
               </p>
               
-              {/* Analysis Information Tags */}
-              <div className="space-y-2">
-                {/* Analysis Focus */}
-                <div className="flex items-center justify-center">
-                  <span className="px-3 py-1 text-xs bg-red-50 text-red-700 rounded-full font-semibold border border-red-200">
-                    {analysis.title.split(' ')[0]} Focus
-                  </span>
-                </div>
-                
-                {/* Analysis Stats */}
-                <div className="flex items-center justify-center space-x-4 text-xs">
-                  <div className="flex items-center space-x-1 bg-red-50 px-2 py-1 rounded-full">
-                    <span className="text-red-700">👥</span>
-                    <span className="text-red-800 font-medium">
-                      {analysis.id === 'bazi' ? '650K+' :
-                       analysis.id === 'zodiac' ? '720K+' :
-                       analysis.id === 'name' ? '320K+' :
-                       analysis.id === 'ziwei' ? '420K+' : '1.2M+'}
+              {/* Analysis Information Tags - Only theoretical basis tags */}
+              <div className="space-y-2 mt-1">
+                {/* Multiple Tags */}
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {analysis.tags?.slice(0,2).map((tag, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 text-xs bg-red-50 text-red-700 rounded-full font-semibold border border-red-200"
+                    >
+                      {tag}
                     </span>
-                  </div>
-                  <div className="flex items-center space-x-1 bg-red-50 px-2 py-1 rounded-full">
-                    <span className="text-red-700">⭐</span>
-                    <span className="text-red-800 font-medium">
-                      {analysis.id === 'bazi' ? '4.8' :
-                       analysis.id === 'zodiac' ? '4.6' :
-                       analysis.id === 'name' ? '4.9' :
-                       analysis.id === 'ziwei' ? '4.9' : '4.8'}
-                    </span>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -224,7 +212,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
 
       {/* Analysis Instructions - 与 Choose Analysis Types 同级，单一卡片包裹三列内容 */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-red-900 mb-4">Analysis Instructions</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Analysis Instructions</h2>
         <Card className="p-6">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
@@ -256,7 +244,13 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
             </div>
           </div>
         </Card>
-      </div>
+        </div>
+
+        {/* FAQ Section */}
+        <FAQ 
+          items={FAQ_CONFIG.numerology}
+          titleColor="text-white"
+        />
 
       {/* Important Notice */}
       <Card className="p-6">

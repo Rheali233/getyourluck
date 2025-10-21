@@ -176,8 +176,8 @@ export const UI_TEXT = {
       { id: 'vark', module: 'learning', title: 'VARK Learning Style', description: 'Identify your preferred learning styles and optimize your study methods', href: '/learning/vark', duration: '15', questions: '16', rating: '4.4', participants: '6800' },
 
       // Relationship
-      { id: 'love_language', module: 'relationship', title: 'Love Language Test', description: 'Discover how you give and receive love in relationships', href: '/relationship/love_language', duration: '10', questions: '30', rating: '4.9', participants: '15200', isHot: true },
-      { id: 'love_style', module: 'relationship', title: 'Relationship Style Test', description: 'Understand your relationship attachment style and patterns', href: '/relationship/love_style', duration: '15', questions: '18', rating: '4.6', participants: '9400' },
+      { id: 'love_language', module: 'relationship', title: 'Love Language Test', description: 'Discover how you give and receive love in relationships', href: '/relationship/love-language', duration: '10', questions: '30', rating: '4.9', participants: '15200', isHot: true },
+      { id: 'love_style', module: 'relationship', title: 'Relationship Style Test', description: 'Understand your relationship attachment style and patterns', href: '/relationship/love-style', duration: '15', questions: '18', rating: '4.6', participants: '9400' },
       { id: 'interpersonal', module: 'relationship', title: 'Interpersonal Skills Test', description: 'Assess communication and social skills for better relationships', href: '/relationship/interpersonal', duration: '18', questions: '22', rating: '4.5', participants: '8200' },
 
       // Career
@@ -325,6 +325,24 @@ export const UI_TEXT = {
         strategicRecommendationsDesc: 'Focus on building strong foundations in areas where you have natural advantages, while gradually addressing areas that need development. Timing and patience will be key to your success.',
         backToCenter: 'Back to Center'
       }
+    }
+  },
+  feedback: {
+    errorMessage: 'Please try again later.',
+    ratingLabel: 'Satisfaction',
+    messageLabel: 'Your feedback',
+    messagePlaceholder: 'Tell us what went well and what could be improved',
+    emailLabel: 'Email',
+    cancel: 'Cancel',
+    submitting: 'Submitting...',
+    a11y: {
+      dialogLabel: 'Feedback Form'
+    },
+    validation: {
+      ratingRequired: 'Please provide a rating',
+      categoryRequired: 'Please select a category',
+      messageRequired: 'Please provide feedback (minimum 10 characters)',
+      emailInvalid: 'Please enter a valid email address'
     }
   }
 } as const;

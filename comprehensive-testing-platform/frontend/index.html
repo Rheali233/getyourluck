@@ -2,11 +2,36 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Comprehensive Testing Platform - Professional psychological tests, astrological analysis, tarot reading and other online testing services" />
     <meta name="keywords" content="psychological tests,astrological analysis,tarot reading,career tests,learning ability,emotional relationships" />
     <title>Comprehensive Testing Platform</title>
+    
+    <!-- 性能优化 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="//api.selfatlas.com" />
+    
+    <!-- 关键资源预加载 -->
+    <link rel="preload" href="/assets/logo.png" as="image" />
+    <link rel="preload" href="/src/main.tsx" as="script" />
+    
+    <!-- 关键CSS内联 -->
+    <style>
+      /* 关键渲染路径CSS */
+      #root { min-height: 100vh; }
+      .loading { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        min-height: 100vh; 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

@@ -143,7 +143,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
       data: { 
         testType: 'fortune',
         zodiacSign: selectedSign,
-        fortuneType: selectedFortuneType
+        fortuneType: 'daily' // Default fortune type
       },
     });
 
@@ -186,7 +186,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
         <AstrologyTestContainer className={className} data-testid={testId} {...props}>
         <div id="mainContent" className="max-w-6xl mx-auto space-y-8">
           {/* Main Title and Description + Home button at top-right */}
-          <div className="mb-8">
+          <div className="mb-16">
           <div className="flex items-center justify-between">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
             Horoscope Reading
@@ -248,9 +248,9 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
           </p>
         </div>
 
-        {/* 模块1: Your Horoscope Overview */}
-        <Card className="bg-white/80 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Horoscope Overview</h2>
+        {/* 模块1: Overall Analysis */}
+        <Card className="bg-white p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Overall Analysis</h2>
           
           <div className="space-y-6">
             <div>
@@ -265,31 +265,31 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
         </Card>
 
         {/* 模块2: Core Life Areas */}
-        <Card className="bg-white/80 p-8 mb-8">
+        <Card className="bg-white p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Core Life Areas</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Love */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-3">💕 Love & Relationships</h3>
               <p className="text-gray-700 leading-relaxed">{fortuneReading.love.description}</p>
             </div>
 
             {/* Career */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-3">💼 Career & Work</h3>
               <p className="text-gray-700 leading-relaxed">{fortuneReading.career.description}</p>
             </div>
 
             {/* Wealth */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-3">💰 Wealth & Finance</h3>
               <p className="text-gray-700 leading-relaxed">{fortuneReading.wealth.description}</p>
             </div>
 
             {/* Health (optional) */}
             {fortuneReading.health && (
-              <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+              <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-3">🏥 Health & Wellness</h3>
                 <p className="text-gray-700 leading-relaxed">{fortuneReading.health.description}</p>
               </div>
@@ -298,7 +298,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
         </Card>
 
         {/* 模块3: Personal Guidance */}
-        <Card className="bg-white/80 p-8 mb-8">
+        <Card className="bg-white p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Personal Guidance</h2>
           
           <div className="space-y-6">
@@ -312,7 +312,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
         </Card>
 
         {/* 模块4: Lucky Elements */}
-        <Card className="bg-white/80 p-8 mb-8">
+        <Card className="bg-white p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Lucky Elements</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -320,7 +320,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-4">🎨 Lucky Colors</h3>
               <div className="flex flex-wrap gap-2">
-                {fortuneReading.luckyElements.colors.map((color, index) => (
+                {fortuneReading.luckyElements.colors.map((color: string, index: number) => (
                   <span key={index} className="px-3 py-2 bg-[#5F0F40]/10 text-[#5F0F40] border border-[#5F0F40]/30 rounded-full text-sm font-medium">
                     {color}
                   </span>
@@ -332,7 +332,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-4">🔢 Lucky Numbers</h3>
               <div className="flex flex-wrap gap-2">
-                {fortuneReading.luckyElements.numbers.map((number, index) => (
+                {fortuneReading.luckyElements.numbers.map((number: number, index: number) => (
                   <span key={index} className="px-3 py-2 bg-[#5F0F40]/10 text-[#5F0F40] border border-[#5F0F40]/30 rounded-full text-sm font-medium">
                     {number}
                   </span>
@@ -344,7 +344,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-4">🧭 Lucky Directions</h3>
               <div className="flex flex-wrap gap-2">
-                {fortuneReading.luckyElements.directions.map((direction, index) => (
+                {fortuneReading.luckyElements.directions.map((direction: string, index: number) => (
                   <span key={index} className="px-3 py-2 bg-[#5F0F40]/10 text-[#5F0F40] border border-[#5F0F40]/30 rounded-full text-sm font-medium">
                     {direction}
                   </span>
@@ -391,7 +391,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
 
       {/* 错误提示 */}
       {error && (
-        <Card className="bg-white/80 p-4 mb-6">
+        <Card className="bg-white p-4 mb-6">
           <div className="flex items-center">
             <span className="text-red-500 text-xl mr-3">⚠️</span>
             <p className="text-red-600">{error}</p>
@@ -402,7 +402,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
       {/* 选择表单 */}
       <div className="space-y-6">
         {/* 选择时间范围 */}
-        <Card className="bg-white/80 p-6">
+        <Card className="bg-white p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Time Period</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {timeframes.map((timeframe) => (
@@ -430,7 +430,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
         </Card>
 
         {/* 选择星座 */}
-        <Card className="bg-white/80 p-8">
+        <Card className="bg-white p-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Your Zodiac Sign</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {ZODIAC_SIGNS.map((sign) => (

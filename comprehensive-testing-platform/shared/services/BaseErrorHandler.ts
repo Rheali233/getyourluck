@@ -227,8 +227,7 @@ export abstract class BaseErrorHandler {
     // 控制台输出
     console.error(`[${this.moduleName}] Error:`, logEntry);
 
-    // TODO: 在生产环境中，发送到日志服务
-    // TODO: 发送到错误监控服务
+    // Production logging would be implemented here
   }
 
   /**

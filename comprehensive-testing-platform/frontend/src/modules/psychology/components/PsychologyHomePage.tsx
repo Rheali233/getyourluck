@@ -6,7 +6,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Card } from '@/components/ui';
+import { Button, Card, FAQ } from '@/components/ui';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
@@ -18,6 +18,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 
 export interface PsychologyHomePageProps extends BaseComponentProps {
@@ -105,50 +106,38 @@ export const PsychologyHomePage: React.FC<PsychologyHomePageProps> = ({
     {
       type: PsychologyTestTypes.MBTI,
       name: 'MBTI Personality Test',
-      description: 'Discover your personality type and understand your true self',
+      description: 'Discover your personality type and understand your true self through comprehensive psychological assessment.',
       icon: '🧠',
       color: 'from-blue-500 to-indigo-500',
-      duration: '15-20 min',
-      questions: '64 questions',
       basis: 'Jungian Theory',
-      participants: '2.5M+',
-      rating: 4.8
+      tags: ['Jungian Theory', 'Personality Assessment']
     },
     {
       type: PsychologyTestTypes.PHQ9,
       name: 'PHQ-9 Depression Screening',
-      description: 'Professional depression assessment and mental health evaluation',
+      description: 'Professional depression assessment and mental health evaluation based on clinical standards.',
       icon: '💙',
       color: 'from-blue-500 to-indigo-500',
-      duration: '5-10 min',
-      questions: '9 questions',
       basis: 'DSM-5 Standard',
-      participants: '1.8M+',
-      rating: 4.9
+      tags: ['DSM-5 Standard', 'Clinical Assessment']
     },
     {
       type: PsychologyTestTypes.EQ,
       name: 'Emotional Intelligence Test',
-      description: 'Measure your emotional intelligence and social skills',
+      description: 'Measure your emotional intelligence and social skills through comprehensive evaluation of five key dimensions.',
       icon: '❤️',
       color: 'from-blue-500 to-indigo-500',
-      duration: '10-15 min',
-      questions: '50 questions',
       basis: 'Goleman Model',
-      participants: '1.2M+',
-      rating: 4.7
+      tags: ['Goleman Model', 'Emotional Skills']
     },
     {
       type: PsychologyTestTypes.HAPPINESS,
       name: 'Happiness Index Assessment',
-      description: 'Evaluate your happiness level and life satisfaction',
+      description: 'Evaluate your happiness level and life satisfaction using the PERMA model of well-being.',
       icon: '😊',
       color: 'from-blue-500 to-indigo-500',
-      duration: '15-20 min',
-      questions: '50 questions',
       basis: 'Positive Psychology',
-      participants: '980K+',
-      rating: 4.6
+      tags: ['Positive Psychology', 'PERMA Model']
     }
   ];
 
@@ -212,34 +201,27 @@ export const PsychologyHomePage: React.FC<PsychologyHomePageProps> = ({
         </div>
 
         {/* Test Type Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {testTypes.map((test) => (
-            <Card key={test.type} className="border border-blue-200 hover:transition-all duration-300 relative h-[340px]">
+            <Card key={test.type} className="border border-blue-200 hover:transition-all duration-300 relative h-[360px]">
               {/* Content Area - Fixed height */}
-              <div className="p-4 text-center h-[240px] flex flex-col justify-start">
-                <div className="text-4xl mb-4">{test.icon}</div>
-                <h3 className="text-lg font-bold text-blue-900 mb-3">{test.name}</h3>
-                <p className="text-sm text-blue-800 leading-relaxed mb-3">{test.description}</p>
+              <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+                <div className="text-3xl mb-3">{test.icon}</div>
+                <h3 className="text-base font-bold text-blue-900 mb-3">{test.name}</h3>
+                <p className="text-xs text-blue-800 leading-relaxed mb-4 flex-grow">{test.description}</p>
                 
-                {/* Test Information Tags */}
-                <div className="space-y-2">
-                  {/* Test Basis */}
-                  <div className="flex items-center justify-center">
-                    <span className="px-3 py-1 text-xs bg-blue-50 text-blue-700 rounded-full font-semibold border border-blue-200">
-                      {test.basis}
-                    </span>
-                  </div>
-                  
-                  {/* Test Stats */}
-                  <div className="flex items-center justify-center space-x-4 text-xs">
-                    <div className="flex items-center space-x-1 bg-blue-50 px-2 py-1 rounded-full">
-                      <span className="text-blue-700">👥</span>
-                      <span className="text-blue-800 font-medium">{test.participants}</span>
-                    </div>
-                    <div className="flex items-center space-x-1 bg-blue-50 px-2 py-1 rounded-full">
-                      <span className="text-blue-700">⭐</span>
-                      <span className="text-blue-800 font-medium">{test.rating}</span>
-                    </div>
+                {/* Test Information Tags - Only theoretical basis tags */}
+                <div className="space-y-2 mt-1">
+                  {/* Multiple Tags */}
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {test.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-full font-semibold border border-blue-200"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -292,6 +274,12 @@ export const PsychologyHomePage: React.FC<PsychologyHomePageProps> = ({
             </div>
           </Card>
         </div>
+
+        {/* FAQ Section */}
+        <FAQ 
+          items={FAQ_CONFIG.psychology}
+          titleColor="text-blue-900"
+        />
 
         {/* Important Notice */}
         <Card className="p-6 border border-blue-200">

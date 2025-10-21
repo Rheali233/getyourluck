@@ -22,7 +22,7 @@ systemRoutes.get("/health", async (c) => {
       data: {
         status: healthCheck.status,
         timestamp: new Date().toISOString(),
-        environment: c.env?.['ENVIRONMENT'],
+        environment: (c.env as any)?.['ENVIRONMENT'],
         version: "1.0.0",
         services: {
           database: healthCheck.status,
@@ -139,9 +139,9 @@ systemRoutes.get("/health/cache", async (c) => {
     const testKey = "health_check_cache";
     const testValue = { timestamp: Date.now() };
     
-    await c.env['KV'].put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
-    const retrieved = await c.env['KV'].get(testKey);
-    await c.env['KV'].delete(testKey);
+    await (c.env as any)['KV'].put(testKey, JSON.stringify(testValue), { expirationTtl: 60 });
+    const retrieved = await (c.env as any)['KV'].get(testKey);
+    await (c.env as any)['KV'].delete(testKey);
     
     const isHealthy = retrieved !== null;
     
@@ -179,7 +179,7 @@ systemRoutes.get("/config", async (c) => {
     const response: APIResponse = {
       success: true,
       data: {
-        environment: c.env?.['ENVIRONMENT'],
+        environment: (c.env as any)?.['ENVIRONMENT'],
         version: "1.0.0",
         features: {
           analytics: true,
@@ -274,7 +274,7 @@ systemRoutes.get("/info", async (c) => {
         description: "专业的心理测试、占星分析、塔罗占卜等在线测试服务",
         uptime: "N/A", // Cloudflare Workers不支持process.uptime
         timestamp: new Date().toISOString(),
-        environment: c.env?.['ENVIRONMENT'],
+        environment: (c.env as any)?.['ENVIRONMENT'],
         runtime: "Cloudflare Workers",
         framework: "Hono.js",
         database: "Cloudflare D1",

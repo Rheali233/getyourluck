@@ -3,6 +3,7 @@ import { Card, FeedbackFloatingWidget } from '@/components/ui';
 import { cn } from '@/utils/classNames';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import type { TestResult } from '@/modules/testing/types/TestTypes';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface VARKResultDisplayProps extends BaseComponentProps {
   result: TestResult;
@@ -263,38 +264,46 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
               </h3>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* 核心策略 */}
-                {(learningStrategiesImplementation.coreStrategies || recommendations) && (
-                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
-                      <span className="text-xl mr-2">💡</span>
-                      Core Strategies
-                    </h4>
-                    <div className="space-y-3">
-                      {(learningStrategiesImplementation.coreStrategies || recommendations).slice(0, 6).map((strategy: string, index: number) => (
-                        <p key={index} className="text-sm text-sky-700 leading-relaxed">
-                          {strategy}
-                        </p>
-                      ))}
-                    </div>
+                <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
+                  <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
+                    <span className="text-xl mr-2">💡</span>
+                    Core Strategies
+                  </h4>
+                  <div className="space-y-3">
+                    {(learningStrategiesImplementation.coreStrategies || recommendations || [
+                      `Focus on ${primaryStyle.toLowerCase()} learning methods to maximize your learning efficiency`,
+                      `Create structured study environments that support your ${primaryStyle.toLowerCase()} preferences`,
+                      `Use multi-sensory approaches when possible to reinforce learning`,
+                      `Practice active recall techniques aligned with your learning style`,
+                      `Set up dedicated study spaces optimized for your learning preferences`
+                    ]).slice(0, 6).map((strategy: string, index: number) => (
+                      <p key={index} className="text-sm text-sky-700 leading-relaxed">
+                        {strategy}
+                      </p>
+                    ))}
                   </div>
-                )}
+                </div>
                 
                 {/* 实用技巧 */}
-                {(learningStrategiesImplementation.practicalTips || studyTips) && (
-                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
-                      <span className="text-xl mr-2">📝</span>
-                      Study Tips
-                    </h4>
-                    <div className="space-y-3">
-                      {(learningStrategiesImplementation.practicalTips || studyTips).slice(0, 6).map((tip: string, index: number) => (
-                        <p key={index} className="text-sm text-sky-700 leading-relaxed">
-                          {tip}
-                        </p>
-                      ))}
-                    </div>
+                <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
+                  <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
+                    <span className="text-xl mr-2">📝</span>
+                    Study Tips
+                  </h4>
+                  <div className="space-y-3">
+                    {(learningStrategiesImplementation.practicalTips || studyTips || [
+                      `Break down complex information into ${primaryStyle.toLowerCase()} formats for better comprehension`,
+                      `Use ${primaryStyle.toLowerCase()} study aids and tools to enhance retention`,
+                      `Take regular breaks and vary your study methods to maintain engagement`,
+                      `Review material using ${primaryStyle.toLowerCase()}-preferred techniques`,
+                      `Connect new information to existing knowledge using your learning style strengths`
+                    ]).slice(0, 6).map((tip: string, index: number) => (
+                      <p key={index} className="text-sm text-sky-700 leading-relaxed">
+                        {tip}
+                      </p>
+                    ))}
                   </div>
-                )}
+                </div>
                 
                 {/* 环境设置 */}
                 {learningStrategiesImplementation.environmentSetup && (
@@ -387,6 +396,8 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
             </button>
           )}
         </div>
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="vark" className="mt-4" />
       </div>
       
       <FeedbackFloatingWidget testContext={{ testType: "vark" }} />

@@ -73,13 +73,13 @@ export const KEYWORDS_CONFIG = {
   
   // 学习能力关键词
   LEARNING: {
-    primary: ['learning style test', 'cognitive ability test', 'intelligence test'],
-    secondary: ['VARK test', 'Raven matrices', 'learning assessment'],
+    primary: ['learning style test', 'VARK test'],
+    secondary: ['learning assessment', 'study methods'],
     longTail: [
       'what is my learning style test',
-      'free cognitive ability assessment',
       'learning style analysis online',
-      'intelligence quotient test'
+      'VARK learning style assessment',
+      'study method optimization'
     ]
   },
   
@@ -179,17 +179,67 @@ export const RELATED_CONTENT_CONFIG = {
     mbti: [
       { type: 'test', path: '/psychology/eq', title: 'Emotional Intelligence Test', reason: 'Complete your personality profile' },
       { type: 'test', path: '/career/holland', title: 'Career Interest Test', reason: 'Find your ideal career path' },
-      { type: 'article', path: '/blog/mbti-careers', title: 'MBTI Career Guide', reason: 'Explore career options for your type' }
+      { type: 'article', path: '/blog/mbti-compatibility-personality-relationships', title: 'MBTI Compatibility Guide', reason: 'Explore personality relationships' }
     ],
     eq: [
       { type: 'test', path: '/psychology/mbti', title: 'MBTI Personality Test', reason: 'Understand your personality type' },
       { type: 'test', path: '/relationship/love-language', title: 'Love Language Test', reason: 'Improve your relationships' },
-      { type: 'article', path: '/blog/emotional-intelligence', title: 'EQ Development Guide', reason: 'Learn to enhance your EQ' }
+      { type: 'article', path: '/blog/mbti-compatibility-personality-relationships', title: 'Personality Relationships', reason: 'Learn about emotional connections' }
+    ],
+    phq9: [
+      { type: 'test', path: '/psychology/happiness', title: 'Happiness Test', reason: 'Focus on positive mental health' },
+      { type: 'test', path: '/psychology/eq', title: 'Emotional Intelligence Test', reason: 'Develop emotional awareness' },
+      { type: 'article', path: '/blog/kabbalah-birthday-angels-spiritual-growth', title: 'Spiritual Growth Guide', reason: 'Find inner peace and healing' }
+    ],
+    happiness: [
+      { type: 'test', path: '/psychology/eq', title: 'Emotional Intelligence Test', reason: 'Understand your emotions better' },
+      { type: 'test', path: '/psychology/mbti', title: 'MBTI Personality Test', reason: 'Discover your personality type' },
+      { type: 'article', path: '/blog/kabbalah-birthday-angels-spiritual-growth', title: 'Spiritual Growth Guide', reason: 'Learn about inner happiness' }
     ],
     holland: [
       { type: 'test', path: '/career/disc', title: 'DISC Assessment', reason: 'Understand your work style' },
       { type: 'test', path: '/psychology/mbti', title: 'MBTI Test', reason: 'Discover your personality type' },
-      { type: 'article', path: '/blog/career-planning', title: 'Career Planning Guide', reason: 'Plan your professional future' }
+      { type: 'article', path: '/blog/10th-house-career-status-ambition', title: 'Career & Ambition Guide', reason: 'Plan your professional future' }
+    ],
+    disc: [
+      { type: 'test', path: '/career/holland', title: 'Holland Career Test', reason: 'Find your career interests' },
+      { type: 'test', path: '/career/leadership', title: 'Leadership Test', reason: 'Develop leadership skills' },
+      { type: 'article', path: '/blog/10th-house-career-status-ambition', title: 'Career & Ambition Guide', reason: 'Improve your work relationships' }
+    ],
+    leadership: [
+      { type: 'test', path: '/career/disc', title: 'DISC Assessment', reason: 'Understand your behavioral style' },
+      { type: 'test', path: '/psychology/eq', title: 'Emotional Intelligence Test', reason: 'Develop emotional leadership' },
+      { type: 'article', path: '/blog/10th-house-career-status-ambition', title: 'Career & Ambition Guide', reason: 'Learn effective leadership' }
+    ],
+    vark: [
+      { type: 'test', path: '/psychology/mbti', title: 'MBTI Personality Test', reason: 'Understand your personality type' },
+      { type: 'test', path: '/career/holland', title: 'Career Interest Test', reason: 'Find your ideal career path' },
+      { type: 'article', path: '/blog/astrology-book-recommendations-reading-guide', title: 'Learning Resources Guide', reason: 'Learn effective study methods' }
+    ],
+    'love-language': [
+      { type: 'test', path: '/relationship/love-style', title: 'Love Style Test', reason: 'Understand your relationship patterns' },
+      { type: 'test', path: '/relationship/interpersonal', title: 'Interpersonal Skills Test', reason: 'Improve your social skills' },
+      { type: 'article', path: '/blog/mbti-compatibility-personality-relationships', title: 'Personality Relationships', reason: 'Learn to build better relationships' }
+    ],
+    'love-style': [
+      { type: 'test', path: '/relationship/love-language', title: 'Love Language Test', reason: 'Discover how you express love' },
+      { type: 'test', path: '/relationship/interpersonal', title: 'Interpersonal Skills Test', reason: 'Develop your social skills' },
+      { type: 'article', path: '/blog/mbti-compatibility-personality-relationships', title: 'Personality Relationships', reason: 'Understand relationship patterns' }
+    ],
+    interpersonal: [
+      { type: 'test', path: '/relationship/love-language', title: 'Love Language Test', reason: 'Improve your romantic relationships' },
+      { type: 'test', path: '/psychology/eq', title: 'Emotional Intelligence Test', reason: 'Develop emotional awareness' },
+      { type: 'article', path: '/blog/11th-house-friendships-dreams-community', title: 'Friendships & Community Guide', reason: 'Learn to connect with others' }
+    ],
+    numerology: [
+      { type: 'test', path: '/astrology/fortune', title: 'Horoscope Reading', reason: 'Explore your cosmic destiny' },
+      { type: 'test', path: '/tarot', title: 'Tarot Reading', reason: 'Get spiritual guidance' },
+      { type: 'article', path: '/blog/numerology-power-of-names', title: 'Numerology Guide', reason: 'Learn about number meanings' }
+    ],
+    tarot: [
+      { type: 'test', path: '/astrology/fortune', title: 'Horoscope Reading', reason: 'Explore your cosmic destiny' },
+      { type: 'test', path: '/numerology', title: 'Numerology Analysis', reason: 'Discover your life numbers' },
+      { type: 'article', path: '/blog/kabbalah-birthday-angels-spiritual-growth', title: 'Spiritual Guidance', reason: 'Learn tarot card meanings' }
     ]
   },
   

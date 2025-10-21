@@ -108,4 +108,4 @@ relationshipQuestionsRouter.get('/:testType', async (c) => {
   }
 });
 
-export default relationshipQuestionsRouter;
+export { relationshipQuestionsRouter };

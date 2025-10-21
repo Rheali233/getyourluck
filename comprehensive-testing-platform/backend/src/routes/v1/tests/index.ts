@@ -24,7 +24,7 @@ testRoutes.use("*", rateLimiter());
 
 // 处理OPTIONS预检请求
 testRoutes.options("*", (c) => {
-  return c.text("", 204);
+  return c.text("", 204 as any);
 });
 
 

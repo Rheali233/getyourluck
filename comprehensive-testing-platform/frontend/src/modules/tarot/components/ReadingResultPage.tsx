@@ -9,6 +9,7 @@ import { useTarotStore } from '../stores/useTarotStore';
 import { Card, Button, FeedbackFloatingWidget } from '@/components/ui';
 import ErrorMessage from '@/components/ui/Alert';
 import { TarotTestContainer } from './TarotTestContainer';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export const ReadingResultPage: React.FC = () => {
   const navigate = useNavigate();
@@ -240,6 +241,8 @@ export const ReadingResultPage: React.FC = () => {
           </div>
         </Card>
       )}
+      {/* Related content - consistent UI spacing */}
+      <ContextualLinks context="result" testType="tarot" className="mt-4" />
       <FeedbackFloatingWidget
         testContext={{ testType: 'tarot', testId: 'reading-result' }}
       />

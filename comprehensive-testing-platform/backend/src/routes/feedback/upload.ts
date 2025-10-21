@@ -40,10 +40,10 @@ uploadRoute.post('/', async (c) => {
 
       const arrayBuffer = await file.arrayBuffer()
       const key = `feedback/${nowPrefix}_${i}_${crypto.randomUUID()}`
-      if (!c.env['BUCKET']) {
+      if (!(c.env as any)['BUCKET']) {
         throw new ModuleError('R2 bucket is not bound', ERROR_CODES.INTERNAL_ERROR, 500)
       }
-      await (c.env['BUCKET'] as any).put(key, arrayBuffer, {
+      await ((c.env as any)['BUCKET'] as any).put(key, arrayBuffer, {
         httpMetadata: { contentType: file.type },
       })
       keys.push(key)

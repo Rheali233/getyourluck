@@ -13,7 +13,7 @@ const astrologyRoutes = new Hono<AppContext>();
 
 // 兼容预取/预加载可能触发的HEAD请求（使用 on 注册 HEAD 方法）
 astrologyRoutes.on('HEAD', '/zodiac-signs', (c: Context<AppContext>) => {
-  return c.text('', 204);
+  return c.text('', 204 as any);
 });
 
 // 获取星座列表

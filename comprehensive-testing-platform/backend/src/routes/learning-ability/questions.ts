@@ -11,7 +11,7 @@ const learningQuestionsRoutes = new Hono();
 // Get VARK learning style questions
 learningQuestionsRoutes.get('/vark', async (c) => {
   try {
-    if (!c.env?.['DB']) {
+    if (!(c.env as any)?.['DB']) {
       return c.json({
         success: false,
         error: 'Database not available',
@@ -38,8 +38,6 @@ learningQuestionsRoutes.get('/vark', async (c) => {
   }
 });
 
-// Raven endpoint removed
-
-// Cognitive endpoint removed
+// Raven and Cognitive endpoints removed
 
 export { learningQuestionsRoutes };

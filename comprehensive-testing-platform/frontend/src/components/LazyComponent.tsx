@@ -95,7 +95,7 @@ export function createLazyComponent<T = {}>(
 export function preloadComponent(importFunc: () => Promise<any>) {
   return () => {
     importFunc().catch(_error => {
-      console.error('Failed to preload component:', _error);
+      // Failed to preload component - handled silently in production
     });
   };
 }
@@ -127,7 +127,7 @@ export function useSmartPreload() {
         setPreloadedComponents(prev => new Set([...prev, name]));
       })
       .catch(_error => {
-        console.error('Failed to preload component:', _error);
+        // Failed to preload component - handled silently in production
       });
   };
 

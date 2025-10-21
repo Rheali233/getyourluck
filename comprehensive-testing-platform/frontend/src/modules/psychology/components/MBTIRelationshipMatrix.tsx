@@ -28,6 +28,19 @@ const MBTI_TYPES = [
   { type: 'ESFP', name: 'Entertainer', color: 'from-yellow-500 to-pink-600' }
 ];
 
+// Extract MBTI preferences from type string
+const extractPreferences = (type: string) => {
+  if (!type || typeof type !== 'string') {
+    return { E: false, S: false, T: false, J: false };
+  }
+  return {
+    E: type.includes('E'),
+    S: type.includes('S'),
+    T: type.includes('T'),
+    J: type.includes('J')
+  };
+};
+
 // Intelligent compatibility grouping based on MBTI theory
 const getCompatibilityLevel = (currentType: string, targetType: string): 'high' | 'medium' | 'low' => {
   // Validate input types
@@ -37,31 +50,23 @@ const getCompatibilityLevel = (currentType: string, targetType: string): 'high' 
     return 'low';
   }
   
-  // Extract individual preferences
-  const currentE = currentType.includes('E');
-  const currentS = currentType.includes('S');
-  const currentT = currentType.includes('T');
-  const currentJ = currentType.includes('J');
-  
-  const targetE = targetType.includes('E');
-  const targetS = targetType.includes('S');
-  const targetT = targetType.includes('T');
-  const targetJ = targetType.includes('J');
+  const current = extractPreferences(currentType);
+  const target = extractPreferences(targetType);
   
   // Calculate compatibility score based on MBTI theory
   let score = 0;
   
   // Energy preference (E/I) - opposites often complement well
-  if (currentE !== targetE) score += 2;
+  if (current.E !== target.E) score += 2;
   
   // Sensing preference (S/N) - opposites often complement well
-  if (currentS !== targetS) score += 2;
+  if (current.S !== target.S) score += 2;
   
   // Thinking preference (T/F) - opposites often complement well
-  if (currentT !== targetT) score += 2;
+  if (current.T !== target.T) score += 2;
   
   // Judging preference (J/P) - opposites often complement well
-  if (currentJ !== targetJ) score += 2;
+  if (current.J !== target.J) score += 2;
   
   // Determine compatibility level
   if (score >= 6) return 'high';      // High complementarity
@@ -72,10 +77,17 @@ const getCompatibilityLevel = (currentType: string, targetType: string): 'high' 
 interface MBTIRelationshipMatrixProps extends BaseComponentProps {
   currentType: string;
   relationshipCompatibility?: {
-    [key: string]: {
-      reasons: string[];
-    };
+    highlyCompatible?: CompatibilityEntry[];
+    moderatelyCompatible?: CompatibilityEntry[];
+    potentiallyChallenging?: CompatibilityEntry[];
   };
+}
+
+// Define compatibility entry type
+interface CompatibilityEntry {
+  type: string;
+  name: string;
+  reasons: string[];
 }
 
 export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
@@ -87,15 +99,43 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
 }) => {
   // Filter out current type
   const otherTypes = MBTI_TYPES.filter(type => type.type !== currentType);
-  
-  // Get AI-generated match data
-  const getAIMatchData = (targetType: string) => {
-    if (relationshipCompatibility && relationshipCompatibility[targetType]) {
-      return relationshipCompatibility[targetType];
+
+  // Get AI-generated compatibility groups
+  const getAICompatibilityGroups = (): {
+    highlyCompatible: CompatibilityEntry[];
+    moderatelyCompatible: CompatibilityEntry[];
+    potentiallyChallenging: CompatibilityEntry[];
+  } => {
+    if (relationshipCompatibility && relationshipCompatibility['highlyCompatible']) {
+      return {
+        highlyCompatible: Array.isArray(relationshipCompatibility['highlyCompatible']) 
+          ? relationshipCompatibility['highlyCompatible'] as CompatibilityEntry[] 
+          : [],
+        moderatelyCompatible: Array.isArray(relationshipCompatibility['moderatelyCompatible']) 
+          ? relationshipCompatibility['moderatelyCompatible'] as CompatibilityEntry[] 
+          : [],
+        potentiallyChallenging: Array.isArray(relationshipCompatibility['potentiallyChallenging']) 
+          ? relationshipCompatibility['potentiallyChallenging'] as CompatibilityEntry[] 
+          : []
+      };
     }
-    // If no AI data, provide meaningful default descriptions based on MBTI theory
+    // Fallback to default grouping if no AI data
     return {
-      reasons: getDefaultCompatibilityReasons(currentType, targetType),
+      highlyCompatible: otherTypes.filter(type => getCompatibilityLevel(currentType, type.type) === 'high').map(type => ({
+        type: type.type,
+        name: type.name,
+        reasons: getDefaultCompatibilityReasons(currentType, type.type)
+      })),
+      moderatelyCompatible: otherTypes.filter(type => getCompatibilityLevel(currentType, type.type) === 'medium').map(type => ({
+        type: type.type,
+        name: type.name,
+        reasons: getDefaultCompatibilityReasons(currentType, type.type)
+      })),
+      potentiallyChallenging: otherTypes.filter(type => getCompatibilityLevel(currentType, type.type) === 'low').map(type => ({
+        type: type.type,
+        name: type.name,
+        reasons: getDefaultCompatibilityReasons(currentType, type.type)
+      }))
     };
   };
 
@@ -106,30 +146,22 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
       return ['Compatibility analysis unavailable'];
     }
     
-    // Extract individual preferences
-    const currentE = current.includes('E');
-    const currentS = current.includes('S');
-    const currentT = current.includes('T');
-    const currentJ = current.includes('J');
-    
-    const targetE = target.includes('E');
-    const targetS = target.includes('S');
-    const targetT = target.includes('T');
-    const targetJ = target.includes('J');
+    const currentPrefs = extractPreferences(current);
+    const targetPrefs = extractPreferences(target);
     
     const reasons: string[] = [];
     
     // Analyze compatibility based on MBTI theory
-    if (currentE !== targetE) {
+    if (currentPrefs.E !== targetPrefs.E) {
       reasons.push('Complementary energy levels');
     }
-    if (currentS !== targetS) {
+    if (currentPrefs.S !== targetPrefs.S) {
       reasons.push('Balanced perception styles');
     }
-    if (currentT !== targetT) {
+    if (currentPrefs.T !== targetPrefs.T) {
       reasons.push('Diverse decision-making approaches');
     }
-    if (currentJ !== targetJ) {
+    if (currentPrefs.J !== targetPrefs.J) {
       reasons.push('Flexible planning preferences');
     }
     
@@ -143,6 +175,40 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
     return reasons;
   };
   
+  // Compatibility card component
+  const CompatibilityCard: React.FC<{ compatibility: CompatibilityEntry }> = ({ compatibility }) => {
+    const typeInfo = MBTI_TYPES.find(t => t.type === compatibility.type);
+    const color = typeInfo?.color || 'from-gray-500 to-slate-600';
+    
+    return (
+      <div className="p-4 rounded-lg bg-white">
+        {/* Type Information */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm",
+            `bg-gradient-to-r ${color}`
+          )}>
+            {compatibility.type}
+          </div>
+          <div className="flex-1">
+            <div className="font-semibold text-gray-900 text-base">{compatibility.name}</div>
+          </div>
+        </div>
+        
+        {/* Matching Reason */}
+        {compatibility.reasons && compatibility.reasons.length > 0 && (
+          <div className="space-y-2">
+            {compatibility.reasons.map((reason: string, index: number) => (
+              <div key={index} className="text-sm text-black">{reason}</div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const compatibilityGroups = getAICompatibilityGroups();
+
   return (
     <Card className={cn("p-5 bg-white", className)} data-testid={testId} {...props}>
       <h3 className="text-lg font-semibold mb-4 text-black flex items-center">
@@ -159,37 +225,9 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
             Highly Compatible (Shared values, easy to get along)
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {otherTypes
-              .filter((type) => getCompatibilityLevel(currentType.type) === 'high')
-              .map((type) => {
-                const matchData = getAIMatchData(type.type);
-                
-                return (
-                  <div key={type.type} className="p-4 rounded-lg bg-white">
-                    {/* Type Information */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm",
-                        `bg-gradient-to-r ${type.color}`
-                      )}>
-                        {type.type}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-base">{type.name}</div>
-                      </div>
-                    </div>
-                    
-                    {/* Matching Reason */}
-                    {matchData?.reasons && matchData.reasons.length > 0 && (
-                      <div className="space-y-2">
-                        {matchData.reasons.map((reason, index) => (
-                          <div key={index} className="text-sm text-black">{reason}</div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            {compatibilityGroups.highlyCompatible.map((compatibility: CompatibilityEntry) => (
+              <CompatibilityCard key={compatibility.type} compatibility={compatibility} />
+            ))}
           </div>
         </div>
 
@@ -200,37 +238,9 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
             Moderately Compatible (Complementary but requires adjustment)
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {otherTypes
-              .filter((type) => getCompatibilityLevel(currentType.type) === 'medium')
-              .map((type) => {
-                const matchData = getAIMatchData(type.type);
-                
-                return (
-                  <div key={type.type} className="p-4 rounded-lg bg-white">
-                    {/* Type Information */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm",
-                        `bg-gradient-to-r ${type.color}`
-                      )}>
-                        {type.type}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-base">{type.name}</div>
-                      </div>
-                    </div>
-                    
-                    {/* Matching Reason */}
-                    {matchData?.reasons && matchData.reasons.length > 0 && (
-                      <div className="space-y-2">
-                        {matchData.reasons.map((reason, index) => (
-                          <div key={index} className="text-sm text-black">{reason}</div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            {compatibilityGroups.moderatelyCompatible.map((compatibility: CompatibilityEntry) => (
+              <CompatibilityCard key={compatibility.type} compatibility={compatibility} />
+            ))}
           </div>
         </div>
 
@@ -241,37 +251,9 @@ export const MBTIRelationshipMatrix: React.FC<MBTIRelationshipMatrixProps> = ({
             Potentially Challenging (Different values and thinking patterns)
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {otherTypes
-              .filter((type) => getCompatibilityLevel(currentType.type) === 'low')
-              .map((type) => {
-                const matchData = getAIMatchData(type.type);
-                
-                return (
-                  <div key={type.type} className="p-4 rounded-lg bg-white">
-                    {/* Type Information */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm",
-                        `bg-gradient-to-r ${type.color}`
-                      )}>
-                        {type.type}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-base">{type.name}</div>
-                      </div>
-                    </div>
-                    
-                    {/* Matching Reason */}
-                    {matchData?.reasons && matchData.reasons.length > 0 && (
-                      <div className="space-y-2">
-                        {matchData.reasons.map((reason, index) => (
-                          <div key={index} className="text-sm text-black">{reason}</div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            {compatibilityGroups.potentiallyChallenging.map((compatibility: CompatibilityEntry) => (
+              <CompatibilityCard key={compatibility.type} compatibility={compatibility} />
+            ))}
           </div>
         </div>
       </div>

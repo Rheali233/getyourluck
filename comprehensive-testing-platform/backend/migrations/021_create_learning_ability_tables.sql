@@ -1,5 +1,5 @@
 -- Migration: Create Learning Ability Module Tables
--- Description: Creates tables for VARK, Raven, and Cognitive tests
+-- Description: Creates tables for VARK learning style tests
 -- Date: 2024-01-XX
 
 -- VARK Learning Style Test Tables
@@ -25,40 +25,13 @@ CREATE TABLE IF NOT EXISTS vark_options (
     FOREIGN KEY (question_id) REFERENCES vark_questions(id) ON DELETE CASCADE
 );
 
--- Raven Progressive Matrices Test Tables
-CREATE TABLE IF NOT EXISTS raven_questions (
-    id TEXT PRIMARY KEY,
-    difficulty INTEGER NOT NULL CHECK (difficulty BETWEEN 1 AND 5),
-    pattern TEXT NOT NULL,
-    description TEXT NOT NULL,
-    image_url TEXT NOT NULL,
-    options TEXT NOT NULL, -- JSON array of options
-    correct_answer TEXT NOT NULL,
-    explanation TEXT NOT NULL,
-    is_active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
--- Cognitive Ability Assessment Tables
-CREATE TABLE IF NOT EXISTS cognitive_tasks (
-    id TEXT PRIMARY KEY,
-    type TEXT NOT NULL CHECK (type IN ('working_memory', 'attention', 'processing_speed', 'executive_function')),
-    subtype TEXT NOT NULL,
-    description TEXT NOT NULL,
-    instructions TEXT NOT NULL,
-    duration INTEGER NOT NULL, -- Duration in milliseconds
-    scoring TEXT NOT NULL,
-    is_active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
+-- Raven and Cognitive tests removed - no longer needed
 
 -- Test Sessions Table
 CREATE TABLE IF NOT EXISTS learning_test_sessions (
     id TEXT PRIMARY KEY,
     user_id TEXT, -- Optional, for authenticated users
-    test_type TEXT NOT NULL CHECK (test_type IN ('vark', 'raven', 'cognitive')),
+    test_type TEXT NOT NULL CHECK (test_type IN ('vark')),
     start_time TEXT NOT NULL,
     end_time TEXT,
     status TEXT NOT NULL DEFAULT 'in_progress' CHECK (status IN ('in_progress', 'completed', 'abandoned')),
@@ -84,32 +57,7 @@ CREATE TABLE IF NOT EXISTS vark_answers (
     FOREIGN KEY (question_id) REFERENCES vark_questions(id) ON DELETE CASCADE
 );
 
--- Raven Answers Table
-CREATE TABLE IF NOT EXISTS raven_answers (
-    id TEXT PRIMARY KEY,
-    session_id TEXT NOT NULL,
-    question_id TEXT NOT NULL,
-    selected_answer TEXT NOT NULL,
-    is_correct INTEGER NOT NULL DEFAULT 0,
-    time_spent INTEGER NOT NULL, -- Time spent in milliseconds
-    attempts INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (session_id) REFERENCES learning_test_sessions(id) ON DELETE CASCADE,
-    FOREIGN KEY (question_id) REFERENCES raven_questions(id) ON DELETE CASCADE
-);
-
--- Cognitive Answers Table
-CREATE TABLE IF NOT EXISTS cognitive_answers (
-    id TEXT PRIMARY KEY,
-    session_id TEXT NOT NULL,
-    task_id TEXT NOT NULL,
-    task_type TEXT NOT NULL,
-    results TEXT NOT NULL, -- JSON object with task-specific results
-    time_spent INTEGER NOT NULL, -- Time spent in milliseconds
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (session_id) REFERENCES learning_test_sessions(id) ON DELETE CASCADE,
-    FOREIGN KEY (task_id) REFERENCES cognitive_tasks(id) ON DELETE CASCADE
-);
+-- Raven and Cognitive answers tables removed - no longer needed
 
 -- VARK Results Table
 CREATE TABLE IF NOT EXISTS vark_results (
@@ -127,39 +75,7 @@ CREATE TABLE IF NOT EXISTS vark_results (
     FOREIGN KEY (session_id) REFERENCES learning_test_sessions(id) ON DELETE CASCADE
 );
 
--- Raven Results Table
-CREATE TABLE IF NOT EXISTS raven_results (
-    id TEXT PRIMARY KEY,
-    session_id TEXT NOT NULL UNIQUE,
-    raw_score INTEGER NOT NULL,
-    adjusted_score INTEGER NOT NULL,
-    percentile INTEGER NOT NULL CHECK (percentile BETWEEN 0 AND 100),
-    iq_estimate TEXT NOT NULL, -- JSON object with min, max, confidence
-    ability_level TEXT NOT NULL,
-    difficulty_analysis TEXT NOT NULL, -- JSON object with difficulty level breakdown
-    pattern_recognition TEXT NOT NULL,
-    logical_reasoning TEXT NOT NULL,
-    training_recommendations TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (session_id) REFERENCES learning_test_sessions(id) ON DELETE CASCADE
-);
-
--- Cognitive Results Table
-CREATE TABLE IF NOT EXISTS cognitive_results (
-    id TEXT PRIMARY KEY,
-    session_id TEXT NOT NULL UNIQUE,
-    working_memory TEXT NOT NULL, -- JSON object with score, percentile, level, description
-    attention TEXT NOT NULL, -- JSON object with score, percentile, level, description
-    processing_speed TEXT NOT NULL, -- JSON object with score, percentile, level, description
-    executive_function TEXT NOT NULL, -- JSON object with score, percentile, level, description
-    overall_score INTEGER NOT NULL CHECK (overall_score BETWEEN 0 AND 100),
-    cognitive_profile TEXT NOT NULL,
-    strength_areas TEXT NOT NULL, -- JSON array of strength areas
-    development_areas TEXT NOT NULL, -- JSON array of development areas
-    training_recommendations TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (session_id) REFERENCES learning_test_sessions(id) ON DELETE CASCADE
-);
+-- Raven and Cognitive results tables removed - no longer needed
 
 -- Test Feedback Table
 CREATE TABLE IF NOT EXISTS test_feedback (
@@ -176,14 +92,12 @@ CREATE TABLE IF NOT EXISTS test_feedback (
 CREATE INDEX IF NOT EXISTS idx_vark_questions_dimension ON vark_questions(dimension);
 CREATE INDEX IF NOT EXISTS idx_vark_questions_category ON vark_questions(category);
 CREATE INDEX IF NOT EXISTS idx_vark_options_question_id ON vark_options(question_id);
-CREATE INDEX IF NOT EXISTS idx_raven_questions_difficulty ON raven_questions(difficulty);
-CREATE INDEX IF NOT EXISTS idx_cognitive_tasks_type ON cognitive_tasks(type);
+-- Raven and Cognitive indexes removed - no longer needed
 CREATE INDEX IF NOT EXISTS idx_learning_test_sessions_user_id ON learning_test_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_learning_test_sessions_test_type ON learning_test_sessions(test_type);
 CREATE INDEX IF NOT EXISTS idx_learning_test_sessions_status ON learning_test_sessions(status);
 CREATE INDEX IF NOT EXISTS idx_vark_answers_session_id ON vark_answers(session_id);
-CREATE INDEX IF NOT EXISTS idx_raven_answers_session_id ON raven_answers(session_id);
-CREATE INDEX IF NOT EXISTS idx_cognitive_answers_session_id ON cognitive_answers(session_id);
+-- Raven and Cognitive answer indexes removed - no longer needed
 CREATE INDEX IF NOT EXISTS idx_test_feedback_session_id ON test_feedback(session_id);
 
 -- Insert sample VARK questions
@@ -218,19 +132,4 @@ INSERT INTO vark_options (id, question_id, text, dimension, weight) VALUES
 ('opt_002_r', 'vark_v_002', 'Written text and bullet points', 'R', 1),
 ('opt_002_k', 'vark_v_002', 'Physical demonstrations and activities', 'K', 1);
 
--- Insert sample Raven questions
-INSERT INTO raven_questions (id, difficulty, pattern, description, image_url, options, correct_answer, explanation) VALUES
-('raven_001', 1, 'linear_progression', 'Simple linear progression pattern', '/images/raven/level1/001.png', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'E', 'Each row follows a simple counting pattern'),
-('raven_002', 1, 'rotation', 'Element rotation pattern', '/images/raven/level1/002.png', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'C', 'Elements rotate 90 degrees clockwise in each row'),
-('raven_003', 2, 'transformation', 'Shape transformation pattern', '/images/raven/level2/003.png', '["A", "B", "C", "D", "E", "F", "G", "H"]', 'F', 'Shapes transform systematically across rows and columns');
-
--- Insert sample cognitive tasks
-INSERT INTO cognitive_tasks (id, type, subtype, description, instructions, duration, scoring) VALUES
-('cog_wm_001', 'working_memory', 'digit_span', 'Remember the sequence of numbers', 'Listen to the numbers and repeat them back in the same order', 30000, 'Correct sequence length + accuracy'),
-('cog_wm_002', 'working_memory', 'letter_number_sequencing', 'Remember and reorder mixed letters and numbers', 'Listen to the sequence and repeat back with numbers first, then letters', 45000, 'Correct reordering length + accuracy + time'),
-('cog_att_001', 'attention', 'sustained_attention', 'Maintain focus on a continuous task', 'Press the button when you see the target letter combination', 300000, 'Correct identification rate + reaction time consistency'),
-('cog_att_002', 'attention', 'selective_attention', 'Focus on relevant information while ignoring distractions', 'Name the color of the text, not the word itself', 120000, 'Accuracy + interference effect size + reaction time'),
-('cog_ps_001', 'processing_speed', 'symbol_coding', 'Quickly match symbols to numbers', 'Match each symbol to its corresponding number as quickly as possible', 120000, 'Correct matches + average reaction time + accuracy'),
-('cog_ps_002', 'processing_speed', 'pattern_matching', 'Quickly identify matching patterns', 'Find the pattern that matches the target as quickly as possible', 90000, 'Correct matches + reaction speed + accuracy'),
-('cog_ef_001', 'executive_function', 'cognitive_flexibility', 'Switch between different task rules', 'Switch between sorting by color and shape based on the cue', 180000, 'Switch cost + accuracy + reaction time'),
-('cog_ef_002', 'executive_function', 'inhibitory_control', 'Control automatic responses', 'Press button for green circles, withhold response for red circles', 120000, 'Inhibition error rate + reaction time + accuracy');
+-- Raven and Cognitive sample data removed - no longer needed

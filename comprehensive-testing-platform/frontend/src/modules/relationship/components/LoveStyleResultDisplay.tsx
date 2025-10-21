@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { Card, FeedbackFloatingWidget } from '@/components/ui';
+import { ContextualLinks } from '@/components/InternalLinks';
 import { cn } from '@/utils/classNames';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import type { TestResult } from '@/modules/testing/types/TestTypes';
@@ -24,11 +25,12 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
   // onShare,
   ...props
 }) => {
+  
   // Extract data from TestResult format
   let primaryStyle = (result as any).primaryStyle || (result as any).dominantStyle || result.data?.dominantStyle || 'Unknown';
   let secondaryStyle = (result as any).secondaryStyle || result.data?.secondaryStyle || '';
   const rootScores: Record<string, number> = (result as any).scores || (result as any).allScores || result.data?.allScores || {};
-  const analysis = (result as any).analysis || result.data?.analysis || '';
+  const analysis = (result as any).analysis || result.data?.analysis || result.data?.interpretation || (result as any).interpretation || '';
   const meta = (result as any).metadata || result.data?.metadata || {};
   
   // 新增专业解读字段
@@ -175,6 +177,12 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
               <p className="text-sm text-gray-700 leading-relaxed">
                 {analysis || 'Your love style assessment reveals how you approach romantic relationships and express love.'}
               </p>
+              {/* Debug info */}
+              {!analysis && (
+                <div className="mt-2 text-xs text-red-600 border border-red-200 p-2 rounded bg-red-50">
+                  <strong>Debug:</strong> No analysis found. Available fields: {Object.keys(result).join(', ')}
+                </div>
+              )}
             </div>
           </div>
         </Card>
@@ -367,6 +375,8 @@ export const LoveStyleResultDisplay: React.FC<LoveStyleResultDisplayProps> = ({
 
       </div>
 
+      {/* Related content - consistent UI spacing */}
+      <ContextualLinks context="result" testType="love_style" className="mt-4" />
       <FeedbackFloatingWidget testContext={{ testType: "love-style" }} />
     </div>
   );

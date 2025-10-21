@@ -61,6 +61,14 @@ export class AIService {
    */
   private async callDeepSeek(prompt: string, retryCount = 0): Promise<any> {
     try {
+      // eslint-disable-next-line no-console
+      console.log(`[AI Debug] Calling DeepSeek API (attempt ${retryCount + 1})`, {
+        hasApiKey: !!this.apiKey,
+        apiKeyPrefix: this.apiKey ? this.apiKey.substring(0, 10) + '...' : 'NO KEY',
+        promptLength: prompt.length,
+        baseURL: this.baseURL
+      });
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -93,11 +101,18 @@ export class AIService {
       console.log('AI raw response:', JSON.stringify(data, null, 2));
       return data;
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`[AI Debug] Error in attempt ${retryCount + 1}:`, error);
+
       if (retryCount < this.maxRetries && this.isRetryableError(error)) {
-        // console.log(`Retrying DeepSeek API call (attempt ${retryCount + 1}/${this.maxRetries})`);
+        // eslint-disable-next-line no-console
+        console.log(`[AI Debug] Retrying DeepSeek API call (attempt ${retryCount + 1}/${this.maxRetries})`);
         await this.delay(1000 * Math.pow(2, retryCount)); // Exponential backoff
         return this.callDeepSeek(prompt, retryCount + 1);
       }
+
+      // eslint-disable-next-line no-console
+      console.error('[AI Debug] DeepSeek API call failed after all retries:', error);
       throw error;
     }
   }
@@ -761,13 +776,16 @@ export class AIService {
   private parseLoveStyleResponse(response: any): any {
     try {
       const content = response?.choices?.[0]?.message?.content || '';
+      
       if (!content) {
         throw new Error('Empty response content');
       }
       
       // 处理模型返回中可能包含的 ```json 代码块
       const cleaned = this.sanitizeAIJSON(content);
-      return JSON.parse(cleaned);
+      const parsed = JSON.parse(cleaned);
+      
+      return parsed;
     } catch (error) {
       throw new Error(`Failed to parse Love Style response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

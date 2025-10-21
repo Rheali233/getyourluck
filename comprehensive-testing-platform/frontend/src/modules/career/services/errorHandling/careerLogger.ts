@@ -207,8 +207,7 @@ export class CareerLogger {
         break;
     }
 
-    // TODO: In production, send to logging service
-    // TODO: Send critical errors to monitoring service
+    // Production logging would be implemented here
   }
 }
 

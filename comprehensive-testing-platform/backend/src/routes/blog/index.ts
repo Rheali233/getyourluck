@@ -93,6 +93,7 @@ blogRoutes.get("/articles/:slug", async (c) => {
         coverImage: (article as any).cover_image || (article as any).coverImage,
         slug: (article as any).slug || (article as any).id,
         contentHtml: (article as any).content,
+        readCount: (article as any).view_count || 0, // 映射浏览量字段
       },
       message: `Blog article ${article.id} retrieved successfully`,
       timestamp: new Date().toISOString(),

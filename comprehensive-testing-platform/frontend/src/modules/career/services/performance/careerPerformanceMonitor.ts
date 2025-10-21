@@ -220,7 +220,7 @@ export class CareerPerformanceMonitor {
     switch (metric.name) {
       case 'question_response_time':
         if (metric.value > this.thresholds.maxResponseTime) {
-          console.warn(`Question response time exceeded threshold: ${metric.value}ms`);
+          // Question response time exceeded threshold - monitored in production
         }
         break;
       
@@ -230,7 +230,7 @@ export class CareerPerformanceMonitor {
       
       case 'ai_analysis_time':
         if (metric.value > this.thresholds.maxAIAnalysisTime) {
-          console.warn(`AI analysis time exceeded threshold: ${metric.value}ms`);
+          // AI analysis time exceeded threshold - monitored in production
         }
         break;
     }

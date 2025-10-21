@@ -53,13 +53,87 @@ export const useAstrologyStore = () => {
   };
 
   // 获取运势
-  const getFortune = async () => {
-    // 暂时空实现
+  const getFortune = async (sign: string, timeframe: string, date?: string) => {
+    try {
+      // 使用统一状态管理设置loading状态
+      unifiedStore.setLoading(true);
+      unifiedStore.clearError();
+      
+      // 调用实际的API获取运势数据
+      const response = await astrologyService.getFortune(sign, timeframe, date);
+      
+      if (response.success && response.data) {
+        // 更新本地星座状态
+        setAstrologyState(prev => ({ 
+          ...prev, 
+          fortuneReading: response.data
+        }));
+        
+        // 更新统一状态管理
+        unifiedStore.setShowResults(true);
+        unifiedStore.setCurrentTestResult({
+          testType: 'fortune',
+          result: response.data,
+          metadata: {
+            processingTime: new Date().toISOString(),
+            processor: 'AstrologyService'
+          }
+        });
+        unifiedStore.setLoading(false);
+        
+        return response.data;
+      } else {
+        throw new Error(response.error || 'Failed to get fortune reading');
+      }
+    } catch (error) {
+      // 错误处理
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get fortune reading';
+      unifiedStore.setError(errorMessage);
+      unifiedStore.setLoading(false);
+      throw new Error(errorMessage);
+    }
   };
 
   // 获取兼容性分析
-  const getCompatibility = async () => {
-    // 暂时空实现
+  const getCompatibility = async (sign1: string, sign2: string, relationType: string) => {
+    try {
+      // 使用统一状态管理设置loading状态
+      unifiedStore.setLoading(true);
+      unifiedStore.clearError();
+      
+      // 调用实际的API获取兼容性分析数据
+      const response = await astrologyService.getCompatibility(sign1, sign2, relationType);
+      
+      if (response.success && response.data) {
+        // 更新本地星座状态
+        setAstrologyState(prev => ({ 
+          ...prev, 
+          compatibilityAnalysis: response.data
+        }));
+        
+        // 更新统一状态管理
+        unifiedStore.setShowResults(true);
+        unifiedStore.setCurrentTestResult({
+          testType: 'compatibility',
+          result: response.data,
+          metadata: {
+            processingTime: new Date().toISOString(),
+            processor: 'AstrologyService'
+          }
+        });
+        unifiedStore.setLoading(false);
+        
+        return response.data;
+      } else {
+        throw new Error(response.error || 'Failed to get compatibility analysis');
+      }
+    } catch (error) {
+      // 错误处理
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get compatibility analysis';
+      unifiedStore.setError(errorMessage);
+      unifiedStore.setLoading(false);
+      throw new Error(errorMessage);
+    }
   };
 
   // 获取出生图
@@ -79,18 +153,26 @@ export const useAstrologyStore = () => {
         
         // 更新统一Store状态
         unifiedStore.setShowResults(true);
-        unifiedStore.setCurrentSession({
-          id: response.data.sessionId || Date.now().toString(),
-          testType: 'birth-chart',
-          startTime: new Date().toISOString(),
-          endTime: new Date().toISOString(),
-          status: 'completed'
-        });
+        // 使用Zustand的setState方法更新currentSession
+        useUnifiedTestStore.setState((prev) => ({
+          ...prev,
+          currentSession: {
+            id: response.data?.sessionId || Date.now().toString(),
+            testType: 'birth-chart',
+            startTime: new Date(),
+            endTime: new Date(),
+            status: 'completed' as const,
+            currentQuestionIndex: 0,
+            totalQuestions: 0,
+            answers: [],
+            progress: 100
+          }
+        }));
       } else {
         throw new Error(response.error || 'Failed to get birth chart analysis');
       }
     } catch (error) {
-      console.error('Birth chart analysis error:', error);
+      // Log error for monitoring (in production, this would go to a logging service)
       unifiedStore.setError(error instanceof Error ? error.message : 'Failed to analyze birth chart');
     }
   };

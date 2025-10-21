@@ -11,6 +11,7 @@ import './styles/index.css'
 import { getApiBaseUrl } from './config/environment'
 import { useEffect } from 'react'
 import { trackEvent, buildBaseContext } from '@/services/analyticsService'
+import { registerServiceWorker } from '@/utils/serviceWorker'
 
 
 // 启动时环境与基地址调试日志（用于定位 API 指向）
@@ -44,6 +45,9 @@ function RouteAnalyticsWrapper() {
   }, [])
   return <App />
 }
+
+// 注册Service Worker
+registerServiceWorker();
 
 root.render(
   <React.StrictMode>

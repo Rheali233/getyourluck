@@ -9,6 +9,7 @@ import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 import { MBTIResult } from '../types';
 import { MBTIRelationshipMatrix } from './MBTIRelationshipMatrix';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 
 export interface MBTIResultDisplayProps extends BaseComponentProps {
@@ -232,6 +233,9 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
           />
         )}
 
+
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="mbti" className="mt-8" />
 
         <div className="text-center text-xs text-gray-500 max-w-2xl mx-auto">
           This result is for reference only and does not constitute any clinical or legal advice.

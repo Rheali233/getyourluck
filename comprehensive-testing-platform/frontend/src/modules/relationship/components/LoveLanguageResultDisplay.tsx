@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { Card, FeedbackFloatingWidget } from '@/components/ui';
+import { ContextualLinks } from '@/components/InternalLinks';
 import { cn } from '@/utils/classNames';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import type { TestResult } from '@/modules/testing/types/TestTypes';
@@ -23,13 +24,14 @@ export const LoveLanguageResultDisplay: React.FC<LoveLanguageResultDisplayProps>
   // remove unused props to satisfy lints
   ...props
 }) => {
+  
   // Extract data from TestResult format
   // 读取根层字段并兜底
   let primaryLanguage = (result as any).primaryType || (result as any).primaryLanguage || result.data?.primaryLanguage || 'Unknown';
   let secondaryLanguage = (result as any).secondaryType || (result as any).secondaryLanguage || result.data?.secondaryLanguage || '';
   // 统一根层读取，兼容 allScores/scores
   const rootScores: Record<string, number> = (result as any).scores || (result as any).allScores || result.data?.allScores || {};
-  const analysis = (result as any).analysis || result.data?.analysis || '';
+  const analysis = (result as any).analysis || result.data?.analysis || result.data?.interpretation || (result as any).interpretation || '';
   const meta = (result as any).metadata || result.data?.metadata || {};
   const recommendations = result.recommendations || result.data?.communicationTips || [];
   const loveLanguageDetails = (result as any).loveLanguageDetails || result.data?.loveLanguageDetails || {};
@@ -168,8 +170,14 @@ export const LoveLanguageResultDisplay: React.FC<LoveLanguageResultDisplayProps>
                 )}
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {analysis || 'Analysis not available'}
+                {analysis || 'AI analysis will provide detailed interpretation for Words of Affirmation love language'}
               </p>
+              {/* Debug info */}
+              {!analysis && (
+                <div className="mt-2 text-xs text-red-600 border border-red-200 p-2 rounded bg-red-50">
+                  <strong>Debug:</strong> No analysis found. Available fields: {Object.keys(result).join(', ')}
+                </div>
+              )}
             </div>
           </div>
         </Card>
@@ -298,6 +306,8 @@ export const LoveLanguageResultDisplay: React.FC<LoveLanguageResultDisplayProps>
         )}
 
         {/* Action buttons removed per request */}
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="love_language" className="mt-4" />
       </div>
       <FeedbackFloatingWidget
         containerSelector="#mainContent"

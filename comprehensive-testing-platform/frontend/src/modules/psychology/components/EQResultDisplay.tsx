@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { Card, Button, FeedbackFloatingWidget } from '@/components/ui';
+import { ContextualLinks } from '@/components/InternalLinks';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 
@@ -280,6 +281,8 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
         <div className="text-center text-xs text-gray-500 max-w-2xl mx-auto">
           This result is for reference only and does not constitute any clinical or legal advice.
         </div>
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="eq" className="mt-4" />
       </div>
       <FeedbackFloatingWidget
         containerSelector="#mainContent"

@@ -48,20 +48,26 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: false, // 调试阶段保留console.log
+        drop_console: true, // 生产环境移除console.log
         drop_debugger: true, // 移除debugger
+        pure_funcs: ['console.log', 'console.info', 'console.debug'], // 移除特定console函数
+        passes: 2, // 多次压缩优化
+      },
+      mangle: {
+        safari10: true, // 兼容Safari 10
       },
     },
     rollupOptions: {
       output: {
         manualChunks: {
-          // 核心框架
-          vendor: ['react', 'react-dom'],
+          // 核心框架 - 更细粒度分割
+          react: ['react', 'react-dom'],
           router: ['react-router-dom'],
           state: ['zustand'],
           
-          // UI库
-          ui: ['lucide-react', 'clsx', 'tailwind-merge'],
+          // UI库 - 按使用频率分割
+          icons: ['lucide-react'],
+          utils: ['clsx', 'tailwind-merge'],
           
           // 按模块分割
           psychology: [
@@ -135,5 +141,7 @@ export default defineConfig({
     // 优化构建性能
     chunkSizeWarningLimit: 1000, // 增加chunk大小警告阈值
     target: 'esnext', // 使用最新的ES特性
+    cssCodeSplit: true, // 启用CSS代码分割
+    assetsInlineLimit: 4096, // 小于4KB的资源内联
   },
 })

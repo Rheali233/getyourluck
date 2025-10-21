@@ -110,7 +110,7 @@ export function handleError(error: unknown, c: Context) {
 
   // 格式化错误响应
   const { body, status } = formatErrorResponse(moduleError);
-  c.status(status);
+  c.status(status as any);
   c.header('Content-Type', 'application/json');
 
   // 返回错误响应

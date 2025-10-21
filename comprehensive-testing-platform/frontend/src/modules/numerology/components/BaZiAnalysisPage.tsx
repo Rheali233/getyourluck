@@ -18,7 +18,7 @@ import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 
 export const BaZiAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
-  const { processNumerologyData, isLoading, error, showResults } = useNumerologyStore();
+  const { processNumerologyData, isLoading, error, showResults, analysisResult } = useNumerologyStore();
   
   // 关键词优化
   const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
@@ -68,12 +68,12 @@ export const BaZiAnalysisPage: React.FC = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // 监听结果加载完成，跳转到结果页面
+  // 监听结果加载完成，只有当有BaZi分析数据时才跳转到结果页面
   useEffect(() => {
-    if (showResults) {
+    if (showResults && analysisResult?.baZi) {
       navigate('/numerology/bazi/result');
     }
-  }, [showResults, navigate]);
+  }, [showResults, analysisResult, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

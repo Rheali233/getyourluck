@@ -63,7 +63,7 @@ export const TEST_MODULES = {
     icon: '📚',
     color: 'teal',
     route: '/learning',
-    features: ['Learning Style', 'Cognitive Ability']
+    features: ['Learning Style']
   },
   relationship: {
     id: 'relationship',

@@ -11,7 +11,7 @@ const learningTestRoutes = new Hono();
 // Create new test session
 learningTestRoutes.post('/create-session', async (c) => {
   try {
-    if (!c.env?.['DB']) {
+    if (!(c.env as any)?.['DB']) {
       return c.json({
         success: false,
         error: 'Database not available',
@@ -54,7 +54,7 @@ learningTestRoutes.post('/create-session', async (c) => {
 // Submit test answers and generate results
 learningTestRoutes.post('/submit', async (c) => {
   try {
-    if (!c.env?.['DB']) {
+    if (!(c.env as any)?.['DB']) {
       return c.json({
         success: false,
         error: 'Database not available',
@@ -135,7 +135,7 @@ learningTestRoutes.post('/submit', async (c) => {
 // Get test result by session ID
 learningTestRoutes.get('/result/:sessionId', async (c) => {
   try {
-    if (!c.env?.['DB']) {
+    if (!(c.env as any)?.['DB']) {
       return c.json({
         success: false,
         error: 'Database not available',
@@ -166,7 +166,7 @@ learningTestRoutes.get('/result/:sessionId', async (c) => {
 // Submit feedback for test result
 learningTestRoutes.post('/feedback/:sessionId', async (c) => {
   try {
-    if (!c.env?.['DB']) {
+    if (!(c.env as any)?.['DB']) {
       return c.json({
         success: false,
         error: 'Database not available',

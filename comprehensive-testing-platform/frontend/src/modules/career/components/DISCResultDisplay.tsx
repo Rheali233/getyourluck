@@ -8,6 +8,7 @@ import React from 'react';
 import { Card, FeedbackFloatingWidget } from '@/components/ui';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface DISCStyleDetails {
   score: number;
@@ -305,6 +306,8 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
             <strong>Disclaimer:</strong> This DISC assessment is based on William Marston's DISC theory and is for educational and professional development purposes only. It should not replace professional behavioral assessment or workplace training.
           </p>
         </div>
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="disc" className="mt-4" />
       </div>
       <FeedbackFloatingWidget
         containerSelector="#mainContent"

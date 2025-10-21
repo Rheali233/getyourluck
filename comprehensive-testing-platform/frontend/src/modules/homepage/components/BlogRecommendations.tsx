@@ -105,7 +105,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
         setLoadedArticles(mapped);
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to load blog articles:', error);
+        // Error handling for production
         setError('Failed to load blog articles');
         setIsLoading(false);
         

@@ -6,7 +6,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Card } from '@/components/ui';
+import { Button, Card, FAQ } from '@/components/ui';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
@@ -17,6 +17,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 export interface RelationshipHomePageProps extends BaseComponentProps {
   // eslint-disable-next-line no-unused-vars
@@ -98,38 +99,29 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
     {
       type: TestType.LOVE_LANGUAGE,
       name: 'Love Language Test',
-      description: 'Discover how you prefer to give and receive love in relationships',
+      description: 'Discover how you prefer to give and receive love in relationships through comprehensive assessment and personalized insights.',
       icon: '💝',
       color: 'from-pink-500 to-rose-500',
-      duration: '10-15 min',
-      questions: '30 questions',
       basis: 'Chapman Theory',
-      participants: '1.5M+',
-      rating: 4.7
+      tags: ['Chapman Theory', 'Love Communication', 'Relationship Dynamics', 'Emotional Intelligence']
     },
     {
       type: TestType.LOVE_STYLE,
       name: 'Love Style Assessment',
-      description: 'Understand your unique approach to romantic relationships',
+      description: 'Understand your unique approach to romantic relationships and emotional connections for better partnership compatibility.',
       icon: '💕',
       color: 'from-pink-500 to-rose-500',
-      duration: '15-20 min',
-      questions: '42 questions',
       basis: 'Lee Theory',
-      participants: '1.2M+',
-      rating: 4.6
+      tags: ['Lee Theory', 'Romantic Patterns', 'Attachment Styles', 'Love Compatibility']
     },
     {
       type: TestType.INTERPERSONAL,
       name: 'Interpersonal Skills Test',
-      description: 'Evaluate and improve your social communication skills',
+      description: 'Evaluate and improve your social communication skills and relationship dynamics for stronger personal connections.',
       icon: '🤝',
       color: 'from-pink-500 to-rose-500',
-      duration: '12-18 min',
-      questions: '36 questions',
       basis: 'Social Psychology',
-      participants: '980K+',
-      rating: 4.5
+      tags: ['Social Psychology', 'Communication Skills', 'Social Intelligence', 'Relationship Building']
     }
   ];
 
@@ -184,32 +176,25 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
       {/* Test Type Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {testTypes.map((test) => (
-          <Card key={test.type} className="border border-pink-200 hover:transition-all duration-300 relative h-[340px]">
+          <Card key={test.type} className="bg-white border border-pink-200 hover:transition-all duration-300 relative h-[360px]">
             {/* Content Area - Fixed height */}
-            <div className="p-4 text-center h-[240px] flex flex-col justify-start">
-              <div className="text-4xl mb-4">{test.icon}</div>
-              <h3 className="text-lg font-bold text-pink-900 mb-3">{test.name}</h3>
-              <p className="text-sm text-pink-800 leading-relaxed mb-3">{test.description}</p>
+            <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+              <div className="text-3xl mb-3">{test.icon}</div>
+              <h3 className="text-base font-bold text-pink-900 mb-3">{test.name}</h3>
+              <p className="text-xs text-pink-800 leading-relaxed mb-4 flex-grow">{test.description}</p>
               
-              {/* Test Information Tags */}
-              <div className="space-y-2">
-                {/* Test Basis */}
-                <div className="flex items-center justify-center">
-                  <span className="px-3 py-1 text-xs bg-pink-50 text-pink-700 rounded-full font-semibold border border-pink-200">
-                    {test.basis}
-                  </span>
-                </div>
-                
-                {/* Test Stats */}
-                <div className="flex items-center justify-center space-x-4 text-xs">
-                  <div className="flex items-center space-x-1 bg-pink-50 px-2 py-1 rounded-full">
-                    <span className="text-pink-700">👥</span>
-                    <span className="text-pink-800 font-medium">{test.participants}</span>
-                  </div>
-                  <div className="flex items-center space-x-1 bg-pink-50 px-2 py-1 rounded-full">
-                    <span className="text-pink-700">⭐</span>
-                    <span className="text-pink-800 font-medium">{test.rating}</span>
-                  </div>
+              {/* Test Information Tags - Only theoretical basis tags */}
+              <div className="space-y-2 mt-1">
+                {/* Multiple Tags */}
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {test.tags.map((tag, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 text-xs bg-pink-50 text-pink-700 rounded-full font-semibold border border-pink-200"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -262,7 +247,13 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
             </div>
           </div>
         </Card>
-      </div>
+        </div>
+
+        {/* FAQ Section */}
+        <FAQ 
+          items={FAQ_CONFIG.relationship}
+          titleColor="text-pink-900"
+        />
 
       {/* Important Notice */}
       <Card className="p-6 border border-pink-200">

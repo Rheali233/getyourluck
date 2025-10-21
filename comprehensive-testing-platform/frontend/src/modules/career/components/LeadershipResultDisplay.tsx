@@ -8,6 +8,7 @@ import React from 'react';
 import { Card, FeedbackFloatingWidget } from '@/components/ui';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface LeadershipDimension {
   name: string;
@@ -252,6 +253,8 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
             <strong>Disclaimer:</strong> This leadership assessment is based on modern leadership theories and is for educational and professional development purposes only. It should not replace professional leadership training or executive coaching.
           </p>
         </div>
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="leadership" className="mt-4" />
       </div>
       <FeedbackFloatingWidget
         containerSelector="#mainContent"

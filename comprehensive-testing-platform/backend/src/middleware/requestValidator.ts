@@ -32,7 +32,7 @@ export const requestValidator = async (c: Context, next: Next): Promise<void> =>
         requestId: c.req.header("X-Request-ID") || crypto.randomUUID(),
       };
       
-      c.status(error.statusCode);
+      c.status(error.statusCode as any);
       await c.json(response);
       return;
     }
@@ -45,7 +45,7 @@ export const requestValidator = async (c: Context, next: Next): Promise<void> =>
       requestId: c.req.header("X-Request-ID") || crypto.randomUUID(),
     };
     
-    c.status(400);
+    c.status(400 as any);
     await c.json(response);
     return;
   }

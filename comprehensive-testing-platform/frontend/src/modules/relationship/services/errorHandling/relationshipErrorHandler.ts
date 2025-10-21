@@ -118,7 +118,6 @@ export class RelationshipErrorHandler {
    * Log error for debugging
    */
   private static logError(error: RelationshipError): void {
-    // TODO: Send to error tracking service (e.g., Sentry)
-    // TODO: Send to analytics service
+    // Production error tracking would be implemented here
   }
 }

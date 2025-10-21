@@ -80,7 +80,11 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
-            <span className="text-2xl">🌟</span>
+            <img 
+              src="/assets/logo.png" 
+              alt="SelfAtlas Logo" 
+              className="h-8 w-8 object-contain"
+            />
             <span className="text-xl font-bold text-gray-900">SelfAtlas</span>
           </Link>
 

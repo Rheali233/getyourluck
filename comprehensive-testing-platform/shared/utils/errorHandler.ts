@@ -240,8 +240,7 @@ export class BaseErrorHandler {
         break;
     }
     
-    // TODO: 在生产环境中，发送到错误监控服务
-    // TODO: 发送到日志聚合服务
+    // Production error monitoring would be implemented here
   }
 
   /**

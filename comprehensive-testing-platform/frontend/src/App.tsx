@@ -3,7 +3,7 @@
  * 遵循统一开发标准的应用架构
  */
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import React from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -15,7 +15,6 @@ import { PreloadCriticalModules } from '@/components/Preload';
 import { LegacyTestsRedirect } from '@/routes/LegacyTestsRedirect';
 import { Homepage } from '@/modules/homepage/components/Homepage';
 import { BlogPage } from '@/pages/BlogPage/BlogPage';
-// 已删除的页面组件：TestPages, ResultPages, ComponentShowcase
 import { PsychologyHomePage } from '@/modules/psychology/components/PsychologyHomePage';
 import { GenericTestPage } from '@/modules/psychology/components/GenericTestPage';
 import { RelationshipHomePage } from '@/modules/relationship/components/RelationshipHomePage';
@@ -28,8 +27,8 @@ import { TarotModule } from '@/modules/tarot/TarotModule';
 import { NumerologyModule } from '@/modules/numerology/NumerologyModule';
 import { LearningAbilityHomePage } from '@/modules/learning-ability/components/LearningAbilityHomePage';
 import { VARKTestPage } from '@/modules/learning-ability/components/VARKTestPage';
-// CognitiveTestPage removed
 import { SEOToolsPage } from '@/pages/SEOToolsPage';
+import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 
 function App() {
   return (
@@ -103,10 +102,13 @@ function App() {
         {/* Learning Ability Module Routes */}
         <Route path="/learning" element={<LearningAbilityHomePage />} />
         <Route path="/learning/vark" element={<VARKTestPage />} />
-        {/* Cognitive removed */}
         <Route path="/relationship" element={<RelationshipHomePage />} />
-        <Route path="/relationship/love_language" element={<LoveLanguageTestPage />} />
-        <Route path="/relationship/love_style" element={<LoveStyleTestPage />} />
+        {/* Canonical hyphenated paths */}
+        <Route path="/relationship/love-language" element={<LoveLanguageTestPage />} />
+        <Route path="/relationship/love-style" element={<LoveStyleTestPage />} />
+        {/* Backward-compatibility redirects from underscore paths */}
+        <Route path="/relationship/love_language" element={<Navigate to="/relationship/love-language" replace />} />
+        <Route path="/relationship/love_style" element={<Navigate to="/relationship/love-style" replace />} />
         <Route path="/relationship/interpersonal" element={<InterpersonalTestPage />} />
         
         {/* 已删除：ResultPages和ComponentShowcase路由 */}
@@ -120,6 +122,9 @@ function App() {
         
         {/* API状态指示器 - 仅开发环境 */}
         <ApiStatusIndicator showDetails={process.env['NODE_ENV'] === 'development'} />
+        
+        {/* 性能监控 - 仅开发环境 */}
+        <PerformanceMonitor enabled={process.env['NODE_ENV'] === 'development'} />
       </ErrorBoundary>
     </HelmetProvider>
   );

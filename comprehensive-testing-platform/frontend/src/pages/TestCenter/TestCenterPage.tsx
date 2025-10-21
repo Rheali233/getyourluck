@@ -167,7 +167,7 @@ const TestList: React.FC<{
 }> = ({ active, query }) => {
   const normalizeId = (id: string): string => {
     // 将 UI_TEXT 中的 id 转换为 testConfigs 的 id 约定
-    // 例：love_language -> loveLanguage
+    // 例：love_language -> loveLanguage (URL 保持连字符，但内部标识仍可能使用下划线)
     return id.includes('_')
       ? id.split('_').map((p, i) => (i === 0 ? p : p.charAt(0).toUpperCase() + p.slice(1))).join('')
       : id;

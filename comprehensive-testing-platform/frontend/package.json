@@ -15,7 +15,9 @@
     "test:ui": "vitest --ui",
     "code-quality": "npm run lint && npm run type-check",
     "pre-commit": "npm run code-quality",
-    "generate-static": "node scripts/generate-static-pages.js"
+    "generate-static": "node scripts/generate-static-pages.js",
+    "generate-sitemap": "node scripts/generate-dynamic-sitemap.js",
+    "build:with-sitemap": "npm run build && npm run generate-sitemap"
   },
   "dependencies": {
     "clsx": "^2.0.0",

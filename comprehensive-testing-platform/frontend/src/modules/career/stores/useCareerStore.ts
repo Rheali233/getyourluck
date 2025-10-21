@@ -5,12 +5,6 @@
 
 import { useState } from 'react';
 import { useUnifiedTestStore } from '../../../stores/unifiedTestStore';
-// 暂时注释掉未使用的类型导入
-// import type { 
-//   TestSession, 
-//   UserAnswer, 
-//   TestResult
-// } from '../types';
 import {
   CareerTestTypeEnum,
   CareerTestType

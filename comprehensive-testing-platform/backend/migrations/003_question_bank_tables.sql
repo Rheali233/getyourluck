@@ -102,8 +102,7 @@ INSERT OR IGNORE INTO psychology_question_categories (id, name, code, descriptio
 ('cat_love_style', '恋爱风格测试', 'love_style', '评估恋爱关系中的行为模式', '["浪漫型", "游戏型", "友谊型", "现实型", "依恋型", "利他型"]', 'likert', 0, 100, 600),
 ('cat_interpersonal', '人际关系测试', 'interpersonal', '评估人际交往能力和风格', '["沟通技巧", "冲突处理", "合作能力", "社交技能"]', 'likert', 0, 100, 750),
 ('cat_vark', 'VARK学习风格测试', 'vark', '识别个人的学习偏好和风格', '["视觉型", "听觉型", "读写型", "动觉型"]', 'likert', 0, 100, 450),
-('cat_raven', '瑞文推理测试', 'raven', '评估抽象推理和逻辑思维能力', '["推理能力"]', 'binary', 0, 60, 1800),
-('cat_cognitive', '认知能力测试', 'cognitive', '综合评估认知功能', '["记忆力", "注意力", "处理速度", "执行功能"]', 'likert', 0, 100, 1200);
+-- Raven and Cognitive categories removed - no longer needed
 
 -- 插入PHQ-9测试题目示例
 INSERT OR IGNORE INTO psychology_questions (id, category_id, question_text, question_text_en, question_type, dimension, order_index) VALUES

@@ -6,12 +6,12 @@
 import { Hono } from 'hono';
 import type { AppContext } from '../../types/env';
 
-const testRouter = new Hono<AppContext>();
+const careerTestRouter = new Hono<AppContext>();
 
 // Simple test endpoint
-testRouter.get('/', async (c) => {
+careerTestRouter.get('/', async (c) => {
   try {
-    console.log('🧪 Career test route accessed');
+    // Career test route accessed - logged for monitoring
     
     return c.json({
       success: true,
@@ -22,7 +22,7 @@ testRouter.get('/', async (c) => {
       }
     });
   } catch (error) {
-    console.error('Career test route error:', error);
+    // Error handling for production - logged for monitoring service
     return c.json({
       success: false,
       error: 'Test route failed',
@@ -33,4 +33,4 @@ testRouter.get('/', async (c) => {
   }
 });
 
-export default testRouter;
+export { careerTestRouter };

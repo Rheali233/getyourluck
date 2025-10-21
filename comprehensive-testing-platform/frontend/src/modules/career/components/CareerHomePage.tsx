@@ -6,7 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, FAQ } from '@/components/ui';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
@@ -18,6 +18,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 export interface CareerHomePageProps extends BaseComponentProps {
   onTestSelect?: (testType: CareerTestType) => void;
@@ -99,38 +100,35 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
     {
       type: CareerTestTypeEnum.HOLLAND,
       name: 'Holland Career Interest Test',
-      description: 'Discover your career interests and find the perfect job match',
+      description: 'Discover your career interests and find the perfect job match through comprehensive assessment and personalized guidance.',
       icon: '💼',
       color: 'from-emerald-500 to-teal-500',
-      duration: '15-20 min',
-      questions: '60 questions',
       basis: 'Holland Theory',
       participants: '2.1M+',
-      rating: 4.8
+      rating: 4.8,
+      tags: ['Holland Theory', 'Career Interests', 'Job Matching', 'Professional Development']
     },
     {
       type: CareerTestTypeEnum.DISC,
       name: 'DISC Behavioral Style Assessment',
-      description: 'Understand your work style and improve team collaboration',
+      description: 'Understand your work style and improve team collaboration through behavioral analysis and communication insights.',
       icon: '📊',
       color: 'from-emerald-500 to-teal-500',
-      duration: '12-15 min',
-      questions: '28 questions',
       basis: 'DISC Model',
       participants: '1.8M+',
-      rating: 4.7
+      rating: 4.7,
+      tags: ['DISC Model', 'Work Style', 'Team Dynamics', 'Communication Skills']
     },
     {
       type: CareerTestTypeEnum.LEADERSHIP,
       name: 'Leadership Assessment',
-      description: 'Evaluate your leadership potential and development areas',
+      description: 'Evaluate your leadership potential and development areas through comprehensive evaluation and growth planning.',
       icon: '⭐',
       color: 'from-emerald-500 to-teal-500',
-      duration: '18-25 min',
-      questions: '40 questions',
       basis: 'Leadership Theory',
       participants: '1.5M+',
-      rating: 4.9
+      rating: 4.9,
+      tags: ['Leadership Theory', 'Management Skills', 'Team Leadership', 'Executive Development']
     }
   ];
 
@@ -196,32 +194,25 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
       {/* Test Type Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {testTypes.map((test) => (
-          <Card key={test.type} className="border border-emerald-200 hover:transition-all duration-300 relative h-[340px]">
+          <Card key={test.type} className="bg-white border border-emerald-200 hover:transition-all duration-300 relative h-[360px]">
             {/* Content Area - Fixed height */}
-            <div className="p-4 text-center h-[240px] flex flex-col justify-start">
-              <div className="text-4xl mb-4">{test.icon}</div>
-              <h3 className="text-lg font-bold text-green-900 mb-3">{test.name}</h3>
-              <p className="text-sm text-green-800 leading-relaxed mb-3">{test.description}</p>
+            <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+              <div className="text-3xl mb-3">{test.icon}</div>
+              <h3 className="text-base font-bold text-green-900 mb-3">{test.name}</h3>
+              <p className="text-xs text-green-800 leading-relaxed mb-4 flex-grow">{test.description}</p>
               
-              {/* Test Information Tags */}
-              <div className="space-y-2">
-                {/* Test Basis */}
-                <div className="flex items-center justify-center">
-                  <span className="px-3 py-1 text-xs bg-green-50 text-green-700 rounded-full font-semibold border border-emerald-200">
-                    {test.basis}
-                  </span>
-                </div>
-                
-                {/* Test Stats */}
-                <div className="flex items-center justify-center space-x-4 text-xs">
-                  <div className="flex items-center space-x-1 bg-green-50 px-2 py-1 rounded-full">
-                    <span className="text-green-700">👥</span>
-                    <span className="text-green-800 font-medium">{test.participants}</span>
-                  </div>
-                  <div className="flex items-center space-x-1 bg-green-50 px-2 py-1 rounded-full">
-                    <span className="text-green-700">⭐</span>
-                    <span className="text-green-800 font-medium">{test.rating}</span>
-                  </div>
+              {/* Test Information Tags - Only theoretical basis tags */}
+              <div className="space-y-2 mt-1">
+                {/* Multiple Tags */}
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {test.tags.map((tag, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 text-xs bg-green-50 text-green-700 rounded-full font-semibold border border-emerald-200"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -273,7 +264,13 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
             </div>
           </div>
         </Card>
-      </div>
+        </div>
+
+        {/* FAQ Section */}
+        <FAQ 
+          items={FAQ_CONFIG.career}
+          titleColor="text-green-900"
+        />
 
       {/* Important Notice */}
       <Card className="p-6 border border-emerald-200">

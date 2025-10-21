@@ -54,7 +54,7 @@ export const SEODashboard: React.FC<SEODashboardProps> = ({ className }) => {
       
       setSitemapGenerated(true);
     } catch (error) {
-      console.error('Error generating sitemap:', error);
+      // Error generating sitemap - handled silently in production
     }
   };
 
@@ -75,7 +75,7 @@ export const SEODashboard: React.FC<SEODashboardProps> = ({ className }) => {
       
       setRobotsGenerated(true);
     } catch (error) {
-      console.error('Error generating robots.txt:', error);
+      // Error generating robots.txt - handled silently in production
     }
   };
 

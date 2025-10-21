@@ -178,8 +178,18 @@ export class AstrologyService {
 
   constructor(_db: D1Database, kv: KVNamespace | null, apiKey?: string) {
     this.cacheService = new CacheService(kv, 3600); // 1小时缓存
+    // eslint-disable-next-line no-console
+    console.log('[Astrology Debug] Initializing AstrologyService', {
+      hasApiKey: !!apiKey,
+      apiKeyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'NO KEY'
+    });
     if (apiKey) {
       this.aiService = new AIService(apiKey);
+      // eslint-disable-next-line no-console
+      console.log('[Astrology Debug] AIService initialized successfully');
+    } else {
+      // eslint-disable-next-line no-console
+      console.log('[Astrology Debug] No API key provided, AIService will be null');
     }
   }
 
@@ -219,18 +229,34 @@ export class AstrologyService {
 
       // 尝试使用AI生成运势，如果失败则使用模拟生成
       let fortune;
+      // eslint-disable-next-line no-console
+      console.log('[Astrology Debug] Checking AI service availability:', {
+        hasAiService: !!this.aiService,
+        sign,
+        timeframe,
+        targetDate
+      });
+      
       if (this.aiService) {
         try {
+          // eslint-disable-next-line no-console
+          console.log('[Astrology Debug] Calling AI service for fortune generation');
           fortune = await this.aiService.analyzeFortune(sign, timeframe, {
             date: targetDate,
             zodiacSign: zodiacSign
           });
+          // eslint-disable-next-line no-console
+          console.log('[Astrology Debug] AI fortune generation successful');
           logger.info(`AI-generated fortune for ${sign} ${timeframe}`);
         } catch (aiError) {
+          // eslint-disable-next-line no-console
+          console.error('[Astrology Debug] AI fortune generation failed:', aiError);
           logger.error('AI fortune generation failed, falling back to simulation:', aiError);
           fortune = await this.generateFortune(zodiacSign, timeframe, targetDate);
         }
       } else {
+        // eslint-disable-next-line no-console
+        console.log('[Astrology Debug] No AI service available, using simulation');
         // 没有AI服务时使用模拟生成
         fortune = await this.generateFortune(zodiacSign, timeframe, targetDate);
       }

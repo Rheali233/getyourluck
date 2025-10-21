@@ -63,8 +63,8 @@ WHERE id = 'numerology';
 UPDATE homepage_modules
 SET 
   name = 'Learning Ability',
-  description = 'Assess your learning style and cognitive abilities to optimize learning methods',
-  features_data = json('["Learning Style","Cognitive Ability"]'),
+  description = 'Assess your learning style to optimize learning methods',
+  features_data = json('["Learning Style"]'),
   route = '/learning',
   estimated_time = '12-18 minutes',
   updated_at = CURRENT_TIMESTAMP

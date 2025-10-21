@@ -47,7 +47,7 @@ export const ArticleInteractions: React.FC<ArticleInteractionsProps> = ({
         setComments(response.data);
       }
     } catch (error) {
-      console.error('Failed to load comments:', error);
+      // Error handling for production
     } finally {
       setIsLoadingComments(false);
     }
@@ -80,7 +80,7 @@ export const ArticleInteractions: React.FC<ArticleInteractionsProps> = ({
         onLike?.(newLiked);
       }
     } catch (error) {
-      console.error('Failed to like article:', error);
+      // Error handling for production
     } finally {
       setIsLiking(false);
     }
@@ -112,7 +112,7 @@ export const ArticleInteractions: React.FC<ArticleInteractionsProps> = ({
         onComment?.(response.data);
       }
     } catch (error) {
-      console.error('Failed to add comment:', error);
+      // Error handling for production
     } finally {
       setIsSubmittingComment(false);
     }

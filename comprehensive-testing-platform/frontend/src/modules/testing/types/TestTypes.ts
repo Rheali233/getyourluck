@@ -17,7 +17,6 @@ export enum QuestionFormat {
   MULTIPLE_CHOICE = 'multiple_choice',  // 多选
   SCALE = 'scale',                      // 量表
   TEXT = 'text',                        // 文本
-  COGNITIVE_TASK = 'cognitive_task'     // 认知任务（交互式，无传统选项）
 }
 
 // Answer Types

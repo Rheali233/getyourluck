@@ -8,6 +8,7 @@ import React from 'react';
 import { Card, FeedbackFloatingWidget } from '@/components/ui';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 export interface HollandTypeDetails {
   score: number;
@@ -303,6 +304,8 @@ export const HollandResultDisplay: React.FC<HollandResultDisplayProps> = ({
             <strong>Disclaimer:</strong> This Holland Code assessment is based on John Holland's RIASEC theory and is for educational and career guidance purposes only. It should not replace professional career counseling or job placement services.
           </p>
         </div>
+        {/* Related content - consistent UI spacing */}
+        <ContextualLinks context="result" testType="holland" className="mt-4" />
       </div>
       <FeedbackFloatingWidget
         containerSelector="#mainContent"

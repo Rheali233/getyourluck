@@ -20,7 +20,7 @@ export const rateLimiter = (requests: number = 100, windowMs: number = 60000) =>
       // 检查KV是否可用
       if (!c.env.KV) {
         // 在开发环境中，KV可能不可用，这是正常的
-        if (c.env['NODE_ENV'] === 'development') {
+        if ((c.env as any)['NODE_ENV'] === 'development') {
           // 开发环境不显示警告，直接跳过速率限制
           return next();
         } else {

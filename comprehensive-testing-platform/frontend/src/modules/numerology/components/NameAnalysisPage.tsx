@@ -13,7 +13,7 @@ import { ChineseNameRecommendationInput } from '../types';
 
 export const NameAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
-  const { processNumerologyData, isLoading, error, showResults } = useNumerologyStore();
+  const { processNumerologyData, isLoading, error, showResults, analysisResult } = useNumerologyStore();
   
   const [formData, setFormData] = useState<ChineseNameRecommendationInput>({
     originalName: '',
@@ -27,12 +27,12 @@ export const NameAnalysisPage: React.FC = () => {
     usageContext: 'personal'
   });
 
-  // 监听结果加载完成，跳转到结果页面
+  // 监听结果加载完成，只有当有Chinese Name Recommendation数据时才跳转到结果页面
   useEffect(() => {
-    if (showResults) {
+    if (showResults && analysisResult?.chineseNameRecommendation) {
       navigate('/numerology/name/result');
     }
-  }, [showResults, navigate]);
+  }, [showResults, analysisResult, navigate]);
 
   const handleInputChange = (field: keyof ChineseNameRecommendationInput, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));

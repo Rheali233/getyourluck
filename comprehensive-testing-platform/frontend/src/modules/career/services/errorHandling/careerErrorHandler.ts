@@ -108,7 +108,7 @@ export class CareerErrorHandler {
    */
   private static logError(error: CareerError): void {
     // In production, this would send to a logging service
-    // For now, just console.error for development
+    // Error logging would be implemented here
     }
 
   /**

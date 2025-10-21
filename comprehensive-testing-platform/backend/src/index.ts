@@ -26,6 +26,9 @@ import questionsRouter from "./routes/psychology/questions";
 import { optionsRouter } from "./routes/psychology/options";
 import { testTypesRouter } from "./routes/test-types";
 import { aiRoutes } from "./routes/ai";
+import { careerQuestionsRouter } from "./routes/career/questions";
+import { careerTestRouter } from "./routes/career/test";
+import { relationshipQuestionsRouter } from "./routes/relationship/questions";
 import { DatabaseService } from "./services/DatabaseService";
 import { CacheService } from "./services/CacheService";
 
@@ -102,7 +105,7 @@ app.use("*", logger());
 
 // 全局OPTIONS处理 - 确保CORS预检请求得到正确处理
 app.options("*", (c) => {
-  return c.text("", 204);
+  return c.text("", 204 as any);
 });
 
 // 请求验证中间件 - 暂时注释掉以诊断问题
@@ -222,6 +225,9 @@ app.route("/api/seo", seoRoutes);
 app.route("/api/learning-ability/questions", learningQuestionsRoutes);
 app.route("/api/learning-ability/test", learningTestRoutes);
 app.route("/api/psychology/questions", questionsRouter);
+app.route("/api/career/questions", careerQuestionsRouter);
+app.route("/api/career/test", careerTestRouter);
+app.route("/api/relationship/questions", relationshipQuestionsRouter);
 app.route("/api/psychology/options", optionsRouter);
 app.route("/api/test-types", testTypesRouter);
 app.route("/api/ai", aiRoutes);

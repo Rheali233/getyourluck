@@ -9,6 +9,7 @@ import { RelationshipTestContainer } from './RelationshipTestContainer';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 interface RelationshipGenericTestPageProps {
   testType: string;
@@ -48,7 +49,7 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
       const allTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'vark', 'love_language', 'love_style', 'interpersonal', 'holland', 'disc', 'leadership'];
       allTestTypes.forEach(type => {
         if (type !== testType) {
-          get().clearTestTypeState(type);
+          clearTestTypeState(type);
         }
       });
     }
@@ -126,10 +127,11 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
   // 当显示结果时，确保testStarted保持true，这样会显示测试容器（包含结果）
   // 强化：一旦有结果或显示结果，强制保持测试状态，防止自动跳转
   useEffect(() => {
-    if (showResults || currentTestResult) {
+    const testTypeState = getTestTypeState(testType);
+    if (testTypeState.showResults || testTypeState.currentTestResult) {
       setTestStarted(true);
     }
-  }, [showResults, currentTestResult]);
+  }, [testType, getTestTypeState]);
 
   if (loading) {
     return (
@@ -354,6 +356,12 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
           </p>
         </div>
       </div>
+
+      {/* Related content - consistent UI spacing */}
+      <ContextualLinks 
+        context="test" 
+        className="mt-8"
+      />
     </RelationshipTestContainer>
   );
 };

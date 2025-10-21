@@ -108,4 +108,4 @@ careerQuestionsRouter.get('/:testType', async (c) => {
   }
 });
 
-export default careerQuestionsRouter;
+export { careerQuestionsRouter };

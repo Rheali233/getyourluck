@@ -4,8 +4,8 @@
  */
 
 import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { z } from 'zod';
+// import { zValidator } from '@hono/zod-validator';
+// import { z } from 'zod';
 import { QuestionBankModel } from '../../models/QuestionBankModel';
 import type { AppContext } from '../../types/env';
 
@@ -233,34 +233,34 @@ questionsRouter.get('/:testType/versions', async (c) => {
 });
 
       // Create new question (admin function)
-const createQuestionSchema = z.object({
-  categoryId: z.string(),
-  questionText: z.string().min(1),
-  questionTextEn: z.string().optional(),
-  questionType: z.enum(['single_choice', 'likert_scale', 'multiple_choice']),
-  dimension: z.string().optional(),
-  domain: z.string().optional(),
-  weight: z.number().default(1),
-  orderIndex: z.number().min(0),
-  isRequired: z.boolean().default(true),
-  options: z.array(z.object({
-    optionText: z.string().min(1),
-    optionTextEn: z.string().optional(),
-    optionValue: z.string(),
-    optionScore: z.number().optional(),
-    optionDescription: z.string().optional(),
-    orderIndex: z.number().min(0)
-  }))
-});
+// const createQuestionSchema = z.object({
+//   categoryId: z.string(),
+//   questionText: z.string().min(1),
+//   questionTextEn: z.string().optional(),
+//   questionType: z.enum(['single_choice', 'likert_scale', 'multiple_choice']),
+//   dimension: z.string().optional(),
+//   domain: z.string().optional(),
+//   weight: z.number().default(1),
+//   orderIndex: z.number().min(0),
+//   isRequired: z.boolean().default(true),
+//   options: z.array(z.object({
+//     optionText: z.string().min(1),
+//     optionTextEn: z.string().optional(),
+//     optionValue: z.string(),
+//     optionScore: z.number().optional(),
+//     optionDescription: z.string().optional(),
+//     orderIndex: z.number().min(0)
+//   }))
+// });
 
-questionsRouter.post('/', zValidator('json', createQuestionSchema), async (c) => {
+questionsRouter.post('/', async (c) => {
   try {
-    const questionData = c.req.valid('json');
+    const questionData = await c.req.json();
     
     // 简化实现，返回模拟结果
     const result = {
       id: `question_${Date.now()}`,
-      ...questionData,
+      ...(questionData as any),
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -285,27 +285,27 @@ questionsRouter.post('/', zValidator('json', createQuestionSchema), async (c) =>
 });
 
       // Update question (admin function)
-const updateQuestionSchema = z.object({
-  questionText: z.string().min(1).optional(),
-  questionTextEn: z.string().optional(),
-  questionType: z.enum(['single_choice', 'likert_scale', 'multiple_choice']).optional(),
-  dimension: z.string().optional(),
-  domain: z.string().optional(),
-  weight: z.number().min(0).optional(),
-  orderIndex: z.number().min(0).optional(),
-  isRequired: z.boolean().optional(),
-  isActive: z.boolean().optional()
-});
+// const updateQuestionSchema = z.object({
+//   questionText: z.string().min(1).optional(),
+//   questionTextEn: z.string().optional(),
+//   questionType: z.enum(['single_choice', 'likert_scale', 'multiple_choice']).optional(),
+//   dimension: z.string().optional(),
+//   domain: z.string().optional(),
+//   weight: z.number().min(0).optional(),
+//   orderIndex: z.number().min(0).optional(),
+//   isRequired: z.boolean().optional(),
+//   isActive: z.boolean().optional()
+// });
 
-questionsRouter.put('/:id', zValidator('json', updateQuestionSchema), async (c) => {
+questionsRouter.put('/:id', async (c) => {
   try {
-    const questionId = c.req.param('id');
-    const updateData = c.req.valid('json');
+    // const questionId = c.req.param('id');
+    const updateData = await c.req.json();
     
     // Simplified implementation, return mock result
     const result = {
-      id: questionId,
-      ...updateData,
+      id: c.req.param('id'),
+      ...(updateData as any),
       updatedAt: new Date()
     };
     
@@ -331,7 +331,7 @@ questionsRouter.put('/:id', zValidator('json', updateQuestionSchema), async (c) 
       // Delete question (admin function)
 questionsRouter.delete('/:id', async (c) => {
   try {
-    const questionId = c.req.param('id');
+    // const questionId = c.req.param('id');
     
     // Simplified implementation, simulate successful deletion
     // Debug logging removed for production

@@ -33,7 +33,8 @@ export const CardDrawingPage: React.FC = () => {
     tarotSpreads,
     processSelectedCards,
     error,
-    showResults
+    showResults,
+    currentSession
   } = useTarotStore();
   const { isLoading } = useUnifiedTestStore();
 
@@ -100,14 +101,14 @@ export const CardDrawingPage: React.FC = () => {
 
   const currentSpread = tarotSpreads.find(spread => spread.id === spreadId) || tarotSpreads[0];
 
-  // 监听结果加载完成，关闭loading弹窗
+  // 监听结果加载完成，只有当有tarot会话和loading弹窗显示时才跳转到结果页面
   useEffect(() => {
-    if (showResults && showLoadingModal) {
+    if (showResults && showLoadingModal && currentSession) {
       setShowLoadingModal(false);
       setIsProcessing(false);
       navigate('/tarot/reading');
     }
-  }, [showResults, showLoadingModal, navigate]);
+  }, [showResults, showLoadingModal, currentSession, navigate]);
 
   const handleCardsSelected = async (drawnCards: DrawnCard[]) => {
     // 记录抽牌事件

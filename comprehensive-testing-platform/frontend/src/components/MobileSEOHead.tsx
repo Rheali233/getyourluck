@@ -127,7 +127,7 @@ export const MobileSEOHead: React.FC<MobileSEOHeadProps> = ({
 
       {/* 预加载关键资源 */}
       <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-      <link rel="preload" href="/images/logo-mobile.png" as="image" />
+      <link rel="preload" href="/assets/logo.png" as="image" />
 
       {/* 移动端样式优化 */}
       <style>

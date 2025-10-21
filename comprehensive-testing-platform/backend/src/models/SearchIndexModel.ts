@@ -51,7 +51,20 @@ export class SearchIndexModel extends BaseModel {
         LIMIT ?
       `, [language, `%${query}%`, `%${query}%`, limit]);
       
-      return result.map(this.mapDatabaseRowToSearchResult);
+      return result.map((row: any) => ({
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        url: row.url,
+        type: row.type,
+        language: row.language,
+        relevanceScore: row.relevance_score,
+        searchCount: row.search_count,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+        contentType: row.content_type || 'unknown',
+        contentId: row.content_id || row.id
+      }));
     } catch (error) {
       // 返回空结果而不是抛出错误
       return [];

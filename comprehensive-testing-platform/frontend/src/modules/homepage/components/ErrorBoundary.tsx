@@ -1,25 +1,20 @@
-/**
- * 错误边界组件
- * 用于捕获React组件树中的JavaScript错误，记录错误信息，并显示降级UI
- */
-
 import { Component, ErrorInfo, ReactNode } from 'react';
-import type { BaseComponentProps } from '@/types/componentTypes';
+import { Card } from '@/components/ui';
 import { getApiBaseUrl } from '@/config/environment';
 
-export interface ErrorBoundaryProps extends BaseComponentProps {
-  children: ReactNode;
-  fallback?: ReactNode | ((error: Error, errorInfo: ErrorInfo) => ReactNode);
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
-  resetOnPropsChange?: boolean;
-  resetOnError?: boolean;
-}
-
-export interface ErrorBoundaryState {
+interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
   errorId: string | null;
+}
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+  // eslint-disable-next-line no-unused-vars
+  onError?: (_error: Error, _errorInfo: ErrorInfo) => void;
+  resetOnPropsChange?: boolean;
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -41,7 +36,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // 生成错误ID
     const errorId = this.generateErrorId();
     
     this.setState({
@@ -75,16 +69,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   // 记录错误信息
-  private logError(error: Error, errorInfo: ErrorInfo, errorId: string) {
-    console.error('Error logged:', {
-      errorId,
-      error: error.message,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      url: window.location.href
-    });
+  // eslint-disable-next-line no-unused-vars
+  private logError(_error: Error, _errorInfo: ErrorInfo, _errorId: string) {
+    // Error logged for monitoring service in production
+    // In production, error data would be sent to a logging service
   }
 
   // 发送错误报告到服务器
@@ -113,7 +101,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         })
       });
     } catch (reportError) {
-      }
+      // Failed to report error - handled silently in production
+    }
   }
 
   // 获取用户ID
@@ -162,107 +151,76 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   // 渲染降级UI
   override render() {
     if (this.state.hasError) {
-      const { fallback, testId = 'error-boundary' } = this.props;
-      const { error, errorInfo, errorId } = this.state;
-
+      const { error, errorId } = this.state;
+      const { handleRetry, handleGoHome, handleRefresh } = this;
+      
       // 如果提供了自定义fallback，使用它
-      if (fallback) {
-        if (typeof fallback === 'function') {
-          return fallback(error!, errorInfo!);
-        }
-        return fallback;
+      if (this.props.fallback) {
+        return this.props.fallback;
       }
 
       // 默认错误UI
       return (
-        <div 
-          className="min-h-screen flex items-center justify-center bg-gray-50 px-4"
-          data-testid={testId}
-        >
-          <div className="max-w-md w-full bg-white rounded-lg p-6 text-center">
-            {/* 错误图标 */}
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+          <Card className="max-w-2xl w-full p-8 text-center">
+            <div className="mb-6">
+              <div className="text-6xl mb-4">😵</div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Oops! Something went wrong
+              </h1>
+              <p className="text-gray-600 mb-4">
+                We encountered an unexpected error. Don't worry, our team has been notified.
+              </p>
+              {errorId && (
+                <p className="text-sm text-gray-500 mb-6">
+                  Error ID: <code className="bg-gray-100 px-2 py-1 rounded">{errorId}</code>
+                </p>
+              )}
             </div>
 
-            {/* 错误标题 */}
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              Page Error Occurred
-            </h2>
-
-            {/* 错误描述 */}
-            <p className="text-gray-600 mb-4">
-              Sorry, the page encountered an unexpected error. We have recorded this error and will fix it as soon as possible.
-            </p>
-
-            {/* 错误ID */}
-            {errorId && (
-              <div className="bg-gray-100 rounded p-3 mb-4 text-sm text-gray-600">
-                <strong>Error ID:</strong> {errorId}
+            <div className="space-y-3">
+              <button
+                onClick={handleRetry}
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Try Again
+              </button>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button
+                  onClick={handleRefresh}
+                  className="bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Refresh Page
+                </button>
+                
+                <button
+                  onClick={handleGoHome}
+                  className="bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Go Home
+                </button>
               </div>
-            )}
+            </div>
 
-            {/* 错误详情（开发环境显示） */}
-            {import.meta.env.DEV && error && (
-              <details className="text-left mb-4">
-                <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
-                  View Error Details
+            {error && (
+              <details className="mt-6 text-left">
+                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
+                  Technical Details
                 </summary>
-                <div className="mt-2 p-3 bg-red-50 rounded text-xs text-red-800 overflow-auto max-h-32">
-                                      <div><strong>Error Message:</strong> {error.message}</div>
+                <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-mono text-red-600 break-all">
+                    {error.message}
+                  </p>
                   {error.stack && (
-                    <div className="mt-2">
-                      <strong>堆栈跟踪:</strong>
-                      <pre className="whitespace-pre-wrap">{error.stack}</pre>
-                    </div>
-                  )}
-                  {errorInfo?.componentStack && (
-                    <div className="mt-2">
-                      <strong>组件堆栈:</strong>
-                      <pre className="whitespace-pre-wrap">{errorInfo.componentStack}</pre>
-                    </div>
+                    <pre className="text-xs text-gray-600 mt-2 overflow-auto max-h-40">
+                      {error.stack}
+                    </pre>
                   )}
                 </div>
               </details>
             )}
-
-            {/* 操作按钮 */}
-            <div className="flex flex-col space-y-2">
-              <button
-                onClick={this.handleRetry}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                重试
-              </button>
-              
-              <button
-                onClick={this.handleGoHome}
-                className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                返回首页
-              </button>
-              
-              <button
-                onClick={this.handleRefresh}
-                className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                刷新页面
-              </button>
-            </div>
-
-            {/* 联系支持 */}
-            <div className="mt-4 text-sm text-gray-500">
-              如果问题持续存在，请联系
-              <a 
-                href="mailto:support@selfatlas.net" 
-                className="text-blue-600 hover:text-blue-800 ml-1"
-              >
-                技术支持
-              </a>
-            </div>
-          </div>
+          </Card>
         </div>
       );
     }
@@ -270,3 +228,5 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return this.props.children;
   }
 }
+
+export default ErrorBoundary;

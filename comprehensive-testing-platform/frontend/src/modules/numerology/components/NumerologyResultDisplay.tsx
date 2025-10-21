@@ -6,6 +6,7 @@
 import React from 'react';
 import { Card, Button, FeedbackFloatingWidget } from '@/components/ui';
 import type { NumerologyAnalysis } from '../types';
+import { ContextualLinks } from '@/components/InternalLinks';
 
 interface NumerologyResultDisplayProps {
   analysis: NumerologyAnalysis;
@@ -329,6 +330,8 @@ export const NumerologyResultDisplay: React.FC<NumerologyResultDisplayProps> = (
           </Button>
         )}
       </div>
+      {/* Related content - consistent UI spacing */}
+      <ContextualLinks context="result" testType="numerology" className="mt-4" />
       </div>
       <FeedbackFloatingWidget
         testContext={{ testType: 'numerology', testId: 'numerology-result' }}

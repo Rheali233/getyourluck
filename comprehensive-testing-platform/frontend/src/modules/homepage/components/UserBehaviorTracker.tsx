@@ -200,7 +200,10 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
         },
         body: JSON.stringify({
           eventType: 'user_behavior',
-          data
+          eventData: data,
+          sessionId: data.sessionId,
+          pageUrl: data.url,
+          referrer: data.referrer
         })
       });
 
@@ -208,7 +211,8 @@ export const UserBehaviorTracker: React.FC<UserBehaviorTrackerProps> = ({
         onDataCollected?.(data);
       }
     } catch (error) {
-      }
+      // Error logging would be implemented here
+    }
   }, [onDataCollected]);
 
   // 开始跟踪

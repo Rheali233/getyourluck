@@ -14,6 +14,7 @@ import { SEOManager } from '@/modules/homepage/components/SEOManager';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { UserBehaviorTracker } from '@/modules/homepage/components/UserBehaviorTracker';
 
 interface BlogPageProps extends BaseComponentProps {}
 
@@ -183,6 +184,11 @@ const BlogList: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div>
       <div className="relative z-10">
         <Navigation />
+        {/* 用户行为数据收集 */}
+        <UserBehaviorTracker 
+          pageType="blog"
+          autoTrack={true}
+        />
       <SEOManager
         pageType="blog"
         metadata={{
@@ -349,11 +355,20 @@ const BlogArticle: React.FC = () => {
       });
       
       // 增加阅读次数
-      import('@/services/blogService').then(({ blogService }) => {
-        blogService.incrementViewCountBySlug?.(currentArticle.slug as string);
-      });
+      const updateViewCount = async () => {
+        try {
+          const { blogService } = await import('@/services/blogService');
+          await blogService.incrementViewCountBySlug(currentArticle.slug as string);
+          // 注意：不在这里重新获取文章数据，避免无限循环
+          // 浏览量会在下次访问时正确显示
+        } catch (error) {
+          // Error logging would be implemented here
+        }
+      };
+      
+      updateViewCount();
     }
-  }, [currentArticle]);
+  }, [currentArticle?.slug]); // 只依赖 slug，避免无限循环
 
   const canonical = React.useMemo(() => {
     const slug = (params['slug'] as string | undefined) || (currentArticle?.slug as string | undefined);
@@ -393,6 +408,11 @@ const BlogArticle: React.FC = () => {
     <div className="min-h-screen relative">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div>
       <div className="relative z-10">
+        {/* 用户行为数据收集 */}
+        <UserBehaviorTracker 
+          pageType="blog"
+          autoTrack={true}
+        />
       <SEOManager
         pageType="blog"
         metadata={{

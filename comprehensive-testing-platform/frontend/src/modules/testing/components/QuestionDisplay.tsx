@@ -15,112 +15,9 @@ import type {
 } from '../types/TestTypes';
 import { QuestionFormat } from '../types/TestTypes';
 import { Card } from '@/components/ui/Card';
+import { cn } from '@/utils/classNames';
 // import { OptimizedImage } from '@/components/OptimizedImage';
 
-// 轻量级的认知任务运行器：提供最小可用反应时与准确度采集
-// const CognitiveTaskRunner: React.FC<{
-//   question: any;
-//   onComplete: (results: any) => void;
-//   theme?: any;
-// }> = ({ question, onComplete, theme }) => {
-//   const [phase, setPhase] = React.useState<'idle' | 'running' | 'done'>('idle');
-//   const [startTime, setStartTime] = React.useState<number | null>(null);
-//   const [promptShownAt, setPromptShownAt] = React.useState<number | null>(null);
-//   const [reactionTimes, setReactionTimes] = React.useState<number[]>([]);
-//   const [hits, setHits] = React.useState(0);
-//   const [misses, setMisses] = React.useState(0);
-
-//   const durationMs = Math.min(Math.max(Number((question as any)?.metadata?.duration || 30) * 1000, 5000), 120000);
-
-//   React.useEffect(() => {
-//     if (phase !== 'running') return;
-//     const startedAt = Date.now();
-//     setStartTime(startedAt);
-
-//     let timerId: any;
-//     let promptId: any;
-
-//     const schedulePrompt = () => {
-//       const delay = 800 + Math.floor(Math.random() * 1400); // 0.8s~2.2s
-//       promptId = setTimeout(() => {
-//         setPromptShownAt(Date.now());
-//       }, delay);
-//     };
-
-//     const loop = () => {
-//       schedulePrompt();
-//       timerId = setInterval(() => {
-//         const now = Date.now();
-//         if (now - startedAt >= durationMs) {
-//           clearInterval(timerId);
-//           clearTimeout(promptId);
-//           const timeSpentMs = now - startedAt;
-//           const total = hits + misses;
-//           const avgReactionTimeMs = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length) : null;
-//           onComplete({
-//             correct: hits,
-//             total,
-//             errors: misses,
-//             omissions: Math.max(0, total - hits - misses),
-//             avgReactionTimeMs,
-//             timeSpentMs,
-//           });
-//           setPhase('done');
-//         } else if (promptShownAt && now - (promptShownAt as number) > 1800) {
-//           // 超时未响应，计一次遗漏
-//           setMisses((m) => m + 1);
-//           setPromptShownAt(null);
-//           schedulePrompt();
-//         }
-//       }, 500);
-//     };
-
-//     loop();
-//     return () => {
-//       clearInterval(timerId);
-//       clearTimeout(promptId);
-//     };
-//   }, [phase]);
-
-//   const handleStimulusClick = () => {
-//     if (promptShownAt) {
-//       const rt = Date.now() - promptShownAt;
-//       setReactionTimes((arr) => [...arr, rt]);
-//       setHits((h) => h + 1);
-//       setPromptShownAt(null);
-//     }
-//   };
-
-//   if (phase === 'idle') {
-//     return (
-//       <div className="text-center">
-//         <button
-//           onClick={() => setPhase('running')}
-//           className={`px-5 py-2 rounded-lg bg-gradient-to-r from-${theme?.primary || 'blue-600'} to-${theme?.secondary || 'indigo-500'} text-white font-semibold`}
-//         >
-//           Start Task
-//         </button>
-//       </div>
-//     );
-//   }
-
-//   if (phase === 'running') {
-//     return (
-//       <div className="relative h-48 flex items-center justify-center">
-//         <div
-//           className={`w-24 h-24 rounded-full ${promptShownAt ? 'bg-emerald-400' : 'bg-gray-300'} transition-colors duration-100`}
-//           role="button"
-//           aria-label="Stimulus"
-//           onClick={handleStimulusClick}
-//         />
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className={`text-${theme?.textLight || 'blue-600'}`}>Task completed. You can go to the next question.</div>
-//   );
-// };
 
 interface QuestionDisplayProps {
   question: Question;
@@ -145,6 +42,7 @@ interface QuestionDisplayProps {
     textMedium: string;
     textLight: string;
     backgroundLight: string;
+    borderMedium: string;
     gradient: string;
     gradientHover: string;
   };
@@ -339,11 +237,22 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         {singleChoiceQuestion.options?.map((option: QuestionOption) => (
           <label
             key={option.id}
-            className={`flex items-center justify-start p-5 border-2 rounded-lg cursor-pointer transition-all duration-300 text-left w-full ${
-              selectedValue === option.value
-                ? `shadow-md border-${theme?.primary || 'blue-600'} bg-${theme?.backgroundLight || 'blue-50'}`
-                : `border-gray-200 hover:border-${theme?.primary || 'blue-300'} hover:shadow-sm bg-white`
-            }`}
+            className={cn(
+              "flex items-center justify-start p-5 border-2 rounded-lg cursor-pointer transition-all duration-300 text-left w-full",
+              selectedValue === option.value ? 
+                "shadow-md" : 
+                "border-gray-200 bg-white hover:shadow-sm",
+              selectedValue === option.value && theme?.primary === 'blue-600' && "border-blue-600 bg-blue-50",
+              selectedValue === option.value && theme?.primary === 'pink-600' && "border-pink-600 bg-pink-50", 
+              selectedValue === option.value && theme?.primary === 'emerald-600' && "border-emerald-600 bg-emerald-50",
+              selectedValue === option.value && theme?.primary === 'cyan-600' && "border-cyan-600 bg-sky-50",
+              selectedValue === option.value && !theme?.primary && "border-blue-600 bg-blue-50",
+              selectedValue !== option.value && theme?.borderMedium === 'blue-300' && "hover:border-blue-300",
+              selectedValue !== option.value && theme?.borderMedium === 'pink-200' && "hover:border-pink-200",
+              selectedValue !== option.value && theme?.borderMedium === 'emerald-300' && "hover:border-emerald-300", 
+              selectedValue !== option.value && theme?.borderMedium === 'sky-400' && "hover:border-sky-400",
+              selectedValue !== option.value && !theme?.borderMedium && "hover:border-blue-300"
+            )}
           >
             <input
               type="radio"
@@ -401,11 +310,22 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
         {multipleChoiceQuestion.options?.map((option: QuestionOption) => (
           <label
             key={option.id}
-            className={`flex items-center justify-start p-5 border-2 rounded-lg cursor-pointer transition-all duration-300 text-left w-full ${
-              (selectedArray.includes(option.id) || selectedArray.includes(option.value))
-                ? `shadow-md border-${theme?.primary || 'blue-600'} bg-${theme?.backgroundLight || 'blue-50'}`
-                : `border-gray-200 hover:border-${theme?.primary || 'blue-300'} hover:shadow-sm bg-white`
-            }`}
+            className={cn(
+              "flex items-center justify-start p-5 border-2 rounded-lg cursor-pointer transition-all duration-300 text-left w-full",
+              (selectedArray.includes(option.id) || selectedArray.includes(option.value)) ? 
+                "shadow-md" : 
+                "border-gray-200 bg-white hover:shadow-sm",
+              (selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.primary === 'blue-600' && "border-blue-600 bg-blue-50",
+              (selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.primary === 'pink-600' && "border-pink-600 bg-pink-50",
+              (selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.primary === 'emerald-600' && "border-emerald-600 bg-emerald-50", 
+              (selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.primary === 'cyan-600' && "border-cyan-600 bg-sky-50",
+              (selectedArray.includes(option.id) || selectedArray.includes(option.value)) && !theme?.primary && "border-blue-600 bg-blue-50",
+              !(selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.borderMedium === 'blue-300' && "hover:border-blue-300",
+              !(selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.borderMedium === 'pink-200' && "hover:border-pink-200",
+              !(selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.borderMedium === 'emerald-300' && "hover:border-emerald-300",
+              !(selectedArray.includes(option.id) || selectedArray.includes(option.value)) && theme?.borderMedium === 'sky-400' && "hover:border-sky-400", 
+              !(selectedArray.includes(option.id) || selectedArray.includes(option.value)) && !theme?.borderMedium && "hover:border-blue-300"
+            )}
           >
             <input
               type="checkbox"

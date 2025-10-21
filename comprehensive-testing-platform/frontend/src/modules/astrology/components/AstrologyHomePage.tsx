@@ -5,7 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Breadcrumb } from '@/components/ui';
+import { Button, Card, Breadcrumb, FAQ } from '@/components/ui';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { AstrologyTestContainer } from './AstrologyTestContainer';
@@ -14,6 +14,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 export interface AstrologyHomePageProps extends BaseComponentProps {
   // eslint-disable-next-line no-unused-vars
@@ -96,7 +97,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
     {
       id: 'fortune',
       name: 'Horoscope Reading',
-      description: 'Get your daily, weekly, or monthly horoscope with detailed insights',
+      description: 'Get your daily, weekly, or monthly horoscope with detailed insights and personalized guidance for personal growth.',
       icon: '🌟',
       color: 'from-[#0B132B] to-[#5F0F40]',
       path: '/astrology/fortune',
@@ -104,12 +105,14 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       popularity: '2.1M+ users',
       rating: 4.8,
       estimatedTime: '2-3 min',
-      questions: 'Personalized reading'
+      questions: 'Personalized reading',
+      basis: 'Traditional Astrology',
+      tags: ['Traditional Astrology', 'Daily Guidance', 'Predictive Analysis', 'Personal Growth']
     },
     {
       id: 'compatibility',
       name: 'Zodiac Compatibility',
-      description: 'Discover compatibility between different zodiac signs for love, friendship, and work',
+      description: 'Discover compatibility between different zodiac signs for love, friendship, and work relationships through comprehensive analysis.',
       icon: '💕',
       color: 'from-[#0B132B] to-[#5F0F40]',
       path: '/astrology/compatibility',
@@ -117,12 +120,14 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       popularity: '1.8M+ users',
       rating: 4.7,
       estimatedTime: '3-5 min',
-      questions: 'Two zodiac signs'
+      questions: 'Two zodiac signs',
+      basis: 'Synastry Analysis',
+      tags: ['Synastry Analysis', 'Relationship Dynamics', 'Love Compatibility', 'Interpersonal Harmony']
     },
     {
       id: 'birth_chart',
       name: 'Birth Chart Analysis',
-      description: 'Generate your personal birth chart with comprehensive astrological insights',
+      description: 'Generate your personal birth chart with comprehensive astrological insights and detailed life analysis based on planetary positions.',
       icon: '🌌',
       color: 'from-[#0B132B] to-[#5F0F40]',
       path: '/astrology/birth-chart',
@@ -130,7 +135,9 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       popularity: '950K+ users',
       rating: 4.9,
       estimatedTime: '5-8 min',
-      questions: 'Birth details'
+      questions: 'Birth details',
+      basis: 'Natal Chart',
+      tags: ['Natal Chart', 'Planetary Analysis', 'Life Purpose', 'Personality Insights']
     }
   ];
 
@@ -184,34 +191,27 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       {/* 功能选择 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {astrologyFeatures.map((feature) => (
-          <Card key={feature.id} className="bg-white/80 hover:transition-all duration-300 relative h-[340px]">
+          <Card key={feature.id} className="bg-white hover:transition-all duration-300 relative h-[360px] border border-gray-200">
             {/* Content Area - Fixed height */}
-            <div className="p-4 text-center h-[240px] flex flex-col justify-start">
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.name}</h3>
-              <p className="text-sm text-gray-700 leading-relaxed mb-3">
+            <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+              <div className="text-3xl mb-3">{feature.icon}</div>
+              <h3 className="text-base font-bold text-gray-900 mb-3">{feature.name}</h3>
+              <p className="text-xs text-gray-700 leading-relaxed mb-4 flex-grow">
                 {feature.description}
               </p>
               
-              {/* Test Information Tags */}
-              <div className="space-y-2">
-                {/* Test Basis */}
-                <div className="flex items-center justify-center">
-                  <span className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full font-semibold border border-gray-300">
-                    {feature.name.split(' ')[0]} Focus
-                  </span>
-                </div>
-                
-                {/* Test Stats */}
-                <div className="flex items-center justify-center space-x-4 text-xs">
-                  <div className="flex items-center space-x-1 bg-blue-50 px-2 py-1 rounded-full">
-                    <span className="text-gray-700">👥</span>
-                    <span className="text-gray-800 font-medium">{feature.popularity}</span>
-                  </div>
-                  <div className="flex items-center space-x-1 bg-blue-50 px-2 py-1 rounded-full">
-                    <span className="text-gray-700">⭐</span>
-                    <span className="text-gray-800 font-medium">{feature.rating}</span>
-                  </div>
+              {/* Test Information Tags - Only theoretical basis tags */}
+              <div className="space-y-2 mt-1">
+                {/* Multiple Tags */}
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {feature.tags.map((tag, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full font-semibold border border-gray-300"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -232,7 +232,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       {/* 使用说明 */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-white mb-4">How It Works</h2>
-        <Card className="bg-white/80 p-6">
+        <Card className="bg-white p-6">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-[#0B132B] to-[#5F0F40] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -263,10 +263,16 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
             </div>
           </div>
         </Card>
-      </div>
+        </div>
+
+        {/* FAQ Section */}
+        <FAQ 
+          items={FAQ_CONFIG.astrology}
+          titleColor="text-white"
+        />
 
       {/* 重要提示 */}
-      <Card className="bg-white/80 p-6">
+      <Card className="bg-white p-6">
         <div className="flex items-start">
           <div className="flex-shrink-0">
             <span className="text-2xl">🌟</span>

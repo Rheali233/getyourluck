@@ -202,18 +202,18 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
     { label: 'relationship', current: true }
   ],
   
-  '/relationship/love_language': [
+  '/relationship/love-language': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'relationship', href: '/relationship' },
-    { label: 'love_language', current: true }
+    { label: 'love-language', current: true }
   ],
   
-  '/relationship/love_style': [
+  '/relationship/love-style': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'relationship', href: '/relationship' },
-    { label: 'love_style', current: true }
+    { label: 'love-style', current: true }
   ],
   
   '/relationship/interpersonal': [

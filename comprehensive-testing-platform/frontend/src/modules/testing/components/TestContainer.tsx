@@ -8,7 +8,6 @@ import { useTestStore } from '../stores/useTestStore';
 import { QuestionDisplay } from './QuestionDisplay';
 import { Card } from '@/components/ui';
 import { cn } from '@/utils/classNames';
-// TestResults已删除，现在使用专门的结果显示组件
 // Import specialized result displays - 使用懒加载优化性能
 import { 
   LazyPHQ9ResultDisplay,
@@ -126,7 +125,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     const redirectPath = ['vark'].includes(testType) 
       ? `/learning/${testType}` 
       : ['love_language', 'love_style', 'interpersonal'].includes(testType)
-      ? `/relationship/${testType}`
+      ? `/relationship/${testType === 'love_language' ? 'love-language' : testType === 'love_style' ? 'love-style' : 'interpersonal'}`
       : ['holland', 'disc', 'leadership'].includes(testType)
       ? `/career/${testType}`
       : `/psychology/${testType}`;
@@ -189,7 +188,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         textLight: 'pink-600',
         dots: 'pink-400',
         border: 'pink-200',
-        borderMedium: 'pink-300',
+        borderMedium: 'pink-200',
         loading: 'pink-600',
         gradient: 'from-pink-600 to-rose-500',
         gradientHover: 'from-pink-700 to-rose-600',
@@ -239,7 +238,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         textLight: 'sky-600',
         dots: 'sky-400',
         border: 'sky-200',
-        borderMedium: 'sky-300',
+        borderMedium: 'sky-400',
         loading: 'cyan-600',
         gradient: 'from-cyan-600 to-sky-500',
         gradientHover: 'from-cyan-700 to-sky-600',
@@ -564,7 +563,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     const redirectPath = ['vark'].includes(testType) 
       ? `/learning/${testType}` 
       : ['love_language', 'love_style', 'interpersonal'].includes(testType)
-      ? `/relationship/${testType}`
+      ? `/relationship/${testType === 'love_language' ? 'love-language' : testType === 'love_style' ? 'love-style' : 'interpersonal'}`
       : ['holland', 'disc', 'leadership'].includes(testType)
       ? `/career/${testType}`
       : `/psychology/${testType}`;
