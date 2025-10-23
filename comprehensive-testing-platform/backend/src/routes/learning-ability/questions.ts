@@ -8,6 +8,38 @@ import { LearningQuestionBankModel } from '../../models/learningQuestionBank';
 
 const learningQuestionsRoutes = new Hono();
 
+// Get all learning test questions
+learningQuestionsRoutes.get('/', async (c) => {
+  try {
+    if (!(c.env as any)?.['DB']) {
+      return c.json({
+        success: false,
+        error: 'Database not available',
+        timestamp: new Date().toISOString(),
+        requestId: '',
+      }, 500);
+    }
+    
+    const model = new LearningQuestionBankModel(c.env);
+    const varkQuestions = await model.getVARKQuestions();
+    
+    return c.json({
+      success: true,
+      data: {
+        vark: varkQuestions
+      },
+      message: 'Learning questions retrieved successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to retrieve learning questions',
+      timestamp: new Date().toISOString()
+    }, 500);
+  }
+});
+
 // Get VARK learning style questions
 learningQuestionsRoutes.get('/vark', async (c) => {
   try {

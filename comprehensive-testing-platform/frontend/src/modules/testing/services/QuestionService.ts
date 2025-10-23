@@ -33,8 +33,18 @@ export class QuestionService {
     language: string = 'en'
   ): Promise<QuestionServiceResponse<Question[]>> {
     try {
-      // 使用正确的API路径
-      const apiPath = `${this.baseUrl}/api/psychology/questions`;
+      // 根据测试类型确定API路径
+      let apiPath: string;
+      if (['mbti', 'phq9', 'eq', 'happiness'].includes(testType)) {
+        apiPath = `${this.baseUrl}/api/psychology/questions`;
+      } else if (['holland', 'disc', 'leadership'].includes(testType)) {
+        apiPath = `${this.baseUrl}/api/career/questions`;
+      } else if (['vark'].includes(testType)) {
+        apiPath = `${this.baseUrl}/api/learning-ability/questions`;
+      } else {
+        // 默认使用psychology API
+        apiPath = `${this.baseUrl}/api/psychology/questions`;
+      }
       
       const response = await fetch(`${apiPath}?language=${language}`, {
         method: 'GET',
@@ -49,10 +59,11 @@ export class QuestionService {
 
       const data = await response.json();
       
-      // 处理psychology API返回的数据结构
+      // 处理不同API返回的数据结构
       let questions = [];
       if (data.success && data.data) {
         // psychology API返回 { success: true, data: { phq9: [...], mbti: [...] } }
+        // career API返回 { success: true, data: { holland: [...], disc: [...] } }
         questions = data.data[testType] || [];
       } else if (data.questions || data.data) {
         // 其他API格式
