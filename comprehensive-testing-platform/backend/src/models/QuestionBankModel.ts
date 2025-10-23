@@ -356,7 +356,7 @@ export class QuestionBankModel extends BaseModel {
         const question = questionMap.get(questionId);
         const option = {
           id: row['option_id'] as string,
-          text: (row['option_text'] as string) || (row['option_text_en'] as string),
+          text: (row['option_text_en'] as string) || (row['option_text'] as string),
           value: row['option_value'] as string,
           order: row['option_order'] as number
         };
@@ -780,7 +780,7 @@ export class QuestionBankModel extends BaseModel {
     return {
       id: row.id as string,
       questionId: row.question_id as string,
-      optionText: (row.option_text as string) || (row.option_text_en as string), // 优先使用option_text，回退到option_text_en
+      optionText: (row.option_text_en as string) || (row.option_text as string), // 优先使用英文，必要时回退到原文本
       optionValue: row.option_value as string,
       optionScore: (row.option_score as number) ?? 0,
       optionDescription: (row.option_description as string) ?? "",
