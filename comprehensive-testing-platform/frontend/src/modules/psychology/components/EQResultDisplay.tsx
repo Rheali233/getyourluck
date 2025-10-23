@@ -182,7 +182,7 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {safeResult.dimensions.map((dimension: any, index: number) => (
-              <div key={index} className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+              <div key={index} className="p-6 rounded-lg bg-blue-50 border border-blue-200">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="text-lg font-semibold text-gray-900">{dimension.name}</h4>
                   <span className="text-sm font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded-full">
@@ -227,7 +227,7 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
             Improvement Plan
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Short-term Goals</h4>
               <ul className="space-y-2">
                 {safeResult.improvementPlan.shortTerm.length > 0 ? (
@@ -243,13 +243,13 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
               </ul>
             </div>
             
-            <div className="p-6 rounded-lg bg-indigo-50 border border-teal-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Long-term Goals</h4>
               <ul className="space-y-2">
                 {safeResult.improvementPlan.longTerm.length > 0 ? (
                   safeResult.improvementPlan.longTerm.map((goal: any, index: number) => (
-                    <li key={index} className="text-sm text-indigo-800 flex items-start">
-                      <span className="text-indigo-600 mr-2 mt-0.5">•</span>
+                    <li key={index} className="text-sm text-blue-800 flex items-start">
+                      <span className="text-blue-600 mr-2 mt-0.5">•</span>
                       {typeof goal === 'string' ? goal : JSON.stringify(goal)}
                     </li>
                   ))
@@ -259,7 +259,7 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
               </ul>
             </div>
             
-            <div className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4">Daily Practices</h4>
               <ul className="space-y-2">
                 {safeResult.improvementPlan.dailyPractices.length > 0 ? (

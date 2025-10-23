@@ -14,6 +14,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
 import { cn } from '@/utils/classNames';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface TestCenterPageProps extends BaseComponentProps {}
 
@@ -26,6 +27,13 @@ export const TestCenterPage: React.FC<TestCenterPageProps> = ({
   const [active, setActive] = React.useState<string>('all');
   const [query, setQuery] = React.useState<string>('');
   // Advanced filters removed per design – keep only category and search
+
+  // 确保页面滚动到顶部
+  useScrollToTop({
+    enabled: true,
+    behavior: 'smooth',
+    delay: 50
+  });
 
   return (
     <div className={`min-h-screen relative ${className || ''}`} data-testid={testId} {...props}>

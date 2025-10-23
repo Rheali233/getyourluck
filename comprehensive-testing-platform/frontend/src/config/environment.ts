@@ -10,6 +10,7 @@ export interface EnvironmentConfig {
   PAGES_PROJECT_NAME: string;
   PAGES_DEPLOYMENT_URL: string;
   PAGES_BRANCH_ALIAS_URL: string;
+  GOOGLE_ANALYTICS_ID?: string;
 }
 
 // 运行时动态判断环境配置
@@ -20,14 +21,20 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     
-    if (hostname.includes('selfatlas.net')) {
+    // 调试信息
+    console.log('Environment detection - hostname:', hostname);
+    console.log('Environment detection - window.location.hostname:', window.location.hostname);
+    
+    if (hostname === 'selfatlas.net' || hostname === 'www.selfatlas.net') {
+      console.log('Detected production environment for selfatlas.net');
       return {
-        API_BASE_URL: 'https://api.selfatlas.net',
+        API_BASE_URL: 'https://selfatlas-backend-prod.cyberlina.workers.dev',
         CDN_BASE_URL: 'https://cdn.selfatlas.net',
         ENVIRONMENT: 'production',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
         PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
-        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev',
+        GOOGLE_ANALYTICS_ID: env.VITE_GOOGLE_ANALYTICS_ID
       };
     }
     
@@ -38,7 +45,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
         ENVIRONMENT: 'staging',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
         PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
-        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev',
+        GOOGLE_ANALYTICS_ID: env.VITE_GOOGLE_ANALYTICS_ID
       };
     }
     
@@ -49,7 +57,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
         ENVIRONMENT: 'development',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
         PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
-        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+        PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev',
+        GOOGLE_ANALYTICS_ID: env.VITE_GOOGLE_ANALYTICS_ID
       };
     }
   }
@@ -77,26 +86,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
   };
 };
 
-// 验证必要的环境变量
-const validateEnvironmentConfig = (config: EnvironmentConfig): void => {
-  const requiredVars: (keyof EnvironmentConfig)[] = ['API_BASE_URL'];
-  
-  for (const requiredVar of requiredVars) {
-    if (!config[requiredVar]) {
-      // 在开发环境中，环境变量缺失是正常的，静默处理
-      // 在生产环境中，环境变量缺失会导致应用无法正常工作
-      if (config.ENVIRONMENT === 'production') {
-        // 生产环境中环境变量缺失是严重问题，但这里不抛出错误
-        // 应用会在运行时因为API调用失败而自然失败
-        // 这样可以避免在构建时就阻止部署
-      }
-    }
-  }
-};
-
 // 调试信息 - 在开发环境和staging环境中启用
 if (typeof window !== 'undefined' && (window.location.hostname.includes('localhost') || window.location.hostname.includes('pages.dev'))) {
-  const config = getEnvironmentConfig();
   // Debug info removed for production
 }
 
@@ -140,4 +131,9 @@ export const getPagesDeploymentUrl = (): string => {
 export const getPagesBranchAliasUrl = (): string => {
   const config = getEnvironmentConfig();
   return config.PAGES_BRANCH_ALIAS_URL;
+};
+
+export const getGoogleAnalyticsId = (): string | undefined => {
+  const config = getEnvironmentConfig();
+  return config.GOOGLE_ANALYTICS_ID;
 };

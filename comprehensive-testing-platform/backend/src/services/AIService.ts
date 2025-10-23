@@ -51,9 +51,9 @@ export class AIService {
     this.maxRetries = 3;
     this.timeout = 60000; // 60 seconds
     
-    // 调试日志
+    // 安全日志 - 不暴露 API key
     // eslint-disable-next-line no-console
-    console.log('AIService initialized with API key:', this.apiKey ? `${this.apiKey.substring(0, 10)}...` : 'NO API KEY');
+    console.log('AIService initialized:', this.apiKey ? 'API key configured' : 'NO API KEY');
   }
 
   /**

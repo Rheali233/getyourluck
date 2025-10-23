@@ -92,6 +92,30 @@ export class UserPreferencesModel extends BaseModel {
    */
   async updateCookiesConsent(sessionId: string, consent: CookiesConsentData): Promise<void> {
     try {
+      // 首先检查会话是否存在，如果不存在则创建
+      const existingSession = await this.safeDB
+        .prepare('SELECT id FROM test_sessions WHERE id = ?')
+        .bind(sessionId)
+        .first();
+      
+      if (!existingSession) {
+        // 创建测试会话记录
+        await this.safeDB
+          .prepare(`
+            INSERT INTO test_sessions (
+              id, test_type, status, started_at, completed_at, 
+              user_agent, ip_address, created_at, updated_at
+            ) VALUES (
+              ?, 'cookies_consent', 'completed', 
+              CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+              '', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )
+          `)
+          .bind(sessionId)
+          .run();
+      }
+
+      // 更新或插入用户偏好设置
       await this.safeDB
         .prepare(`
           INSERT OR REPLACE INTO user_preferences (
@@ -99,7 +123,7 @@ export class UserPreferencesModel extends BaseModel {
             language, theme, notification_enabled, search_history_enabled, 
             personalized_content, created_at, updated_at
           ) VALUES (
-            ?, ?, ?, ?, ?, 'zh-CN', 'auto', 1, 1, 1, 
+            ?, ?, ?, ?, ?, 'en-US', 'auto', 1, 1, 1, 
             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
           )
         `)

@@ -57,7 +57,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Service',
-      name: 'Horoscope Reading Service',
+      name: 'Zodiac Fortune Forecast Service',
       description: 'Personalized horoscope readings for all zodiac signs with daily, weekly, and monthly fortune predictions',
       provider: {
         '@type': 'Organization',
@@ -189,7 +189,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
           <div className="mb-16">
           <div className="flex items-center justify-between">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Horoscope Reading
+            Zodiac Fortune Forecast
           </h1>
             <button onClick={() => navigate('/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -375,7 +375,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Horoscope Reading
+            Zodiac Fortune Forecast
           </h1>
           <button onClick={() => navigate('/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

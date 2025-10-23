@@ -48,22 +48,11 @@ export const ZiWeiResultPage: React.FC = () => {
   }
 
   if (!analysisResult || !analysisResult.ziWeiChart) {
-    return (
-      <NumerologyTestContainer>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">ZiWei Analysis Not Available</h2>
-            <p className="text-gray-200 mb-6">The ZiWei analysis data is not available. Please try again.</p>
-            <Button
-              onClick={() => navigate('/numerology/ziwei')}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
-            >
-              Start New Analysis
-            </Button>
-          </div>
-        </div>
-      </NumerologyTestContainer>
-    );
+    // 若无数据，自动跳回分析页
+    React.useEffect(() => {
+      navigate('/numerology/ziwei', { replace: true });
+    }, [navigate]);
+    return null;
   }
 
   return (

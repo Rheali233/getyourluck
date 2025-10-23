@@ -16,6 +16,7 @@ export enum QuestionFormat {
   SINGLE_CHOICE = 'single_choice',      // 单选
   MULTIPLE_CHOICE = 'multiple_choice',  // 多选
   SCALE = 'scale',                      // 量表
+  LIKERT_SCALE = 'likert_scale',        // 李克特量表
   TEXT = 'text',                        // 文本
 }
 
@@ -183,6 +184,11 @@ export interface TextQuestion extends BaseQuestion {
   };
 }
 
+export interface LikertScaleQuestion extends BaseQuestion {
+  format: QuestionFormat.LIKERT_SCALE;
+  options: QuestionOption[];
+}
+
 // Question Option
 export interface QuestionOption {
   id: string;
@@ -194,7 +200,7 @@ export interface QuestionOption {
 }
 
 // Union type for all question types
-export type Question = SingleChoiceQuestion | MultipleChoiceQuestion | ScaleQuestion | TextQuestion;
+export type Question = SingleChoiceQuestion | MultipleChoiceQuestion | ScaleQuestion | TextQuestion | LikertScaleQuestion;
 
 // Test Progress
 export interface TestProgress {

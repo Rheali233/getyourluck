@@ -12,10 +12,12 @@ export class TestResultService {
   private processorFactory: TestResultProcessorFactory;
   private cacheService: CacheService;
   private aiService: AIService;
+  private env: any;
 
-  constructor(_dbService: DatabaseService, cacheService: CacheService, aiService: AIService) {
+  constructor(_dbService: DatabaseService, cacheService: CacheService, aiService: AIService, env?: any) {
     this.cacheService = cacheService;
     this.aiService = aiService;
+    this.env = env;
     
     // 初始化处理器工厂
     this.processorFactory = new TestResultProcessorFactory();
@@ -110,7 +112,12 @@ export class TestResultService {
       // 检查处理器是否支持AI分析参数
       let result;
       if ((processor as any).process.length > 1) {
-        result = await (processor as any).process(answers, aiAnalysis);
+        // 对于VARK处理器，传递env参数
+        if (testType === 'vark') {
+          result = await (processor as any).process(answers, this.env);
+        } else {
+          result = await (processor as any).process(answers, aiAnalysis);
+        }
       } else {
         result = await processor.process(answers);
         if (aiAnalysis) {

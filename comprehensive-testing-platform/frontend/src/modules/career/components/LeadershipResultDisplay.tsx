@@ -80,7 +80,7 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
           <div className="grid grid-cols-[64px_1fr] gap-6 items-start">
             {/* Left: Icon (square, slightly lower) */}
             <div className="flex items-start justify-center">
-              <div className="w-16 h-16 mt-2 shrink-0 rounded-lg flex items-center justify-center text-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow">
+              <div className="w-16 h-16 mt-2 shrink-0 rounded-lg flex items-center justify-center text-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow">
                 {getLevelIcon(result.leadershipLevel)}
               </div>
             </div>
@@ -116,7 +116,7 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
                     <div 
                       className={cn(
                         "h-2 rounded-full transition-all duration-1000",
-                        getLevelPercentage(dimension.level || 'moderate') >= 80 ? "bg-gradient-to-r from-emerald-500 to-teal-500" :
+                        getLevelPercentage(dimension.level || 'moderate') >= 80 ? "bg-gradient-to-r from-emerald-500 to-emerald-600" :
                         getLevelPercentage(dimension.level || 'moderate') >= 60 ? "bg-gradient-to-r from-yellow-400 to-orange-400" :
                         "bg-gradient-to-r from-red-400 to-pink-400"
                       )}
@@ -139,7 +139,7 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
                      </ul>
                    </div>
                    <div>
-                     <h5 className="font-medium text-teal-700 text-sm mb-2">Improvement Areas:</h5>
+                     <h5 className="font-medium text-emerald-700 text-sm mb-2">Improvement Areas:</h5>
                      <ul className="space-y-0.5">
                        {(dimension.improvementAreas || []).map((area, idx) => (
                          <li key={idx} className="text-sm text-gray-600 flex items-start">
@@ -177,15 +177,15 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
               </ul>
             </div>
             
-            <div className="p-6 bg-teal-50 rounded-lg border border-teal-200">
-              <h4 className="font-bold text-teal-900 mb-4 text-lg flex items-center">
+            <div className="p-6 bg-emerald-50 rounded-lg border border-emerald-200">
+              <h4 className="font-bold text-emerald-900 mb-4 text-lg flex items-center">
                 <span className="text-2xl mr-2">💡</span>
                 Recommendations
               </h4>
               <ul className="space-y-2">
                 {(result.recommendations || []).map((recommendation, index) => (
-                  <li key={index} className="text-sm text-teal-800 flex items-start">
-                    <span className="text-teal-600 mr-2 mt-0.5">•</span>
+                  <li key={index} className="text-sm text-emerald-800 flex items-start">
+                    <span className="text-emerald-600 mr-2 mt-0.5">•</span>
                     {recommendation}
                   </li>
                 ))}
@@ -217,15 +217,15 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
               </ul>
             </div>
             
-            <div className="p-6 bg-teal-50 rounded-lg border border-teal-200">
-              <h4 className="font-bold text-teal-900 mb-4 text-lg flex items-center">
+            <div className="p-6 bg-emerald-50 rounded-lg border border-emerald-200">
+              <h4 className="font-bold text-emerald-900 mb-4 text-lg flex items-center">
                 <span className="text-2xl mr-2">🎓</span>
                 Mentoring Advice
               </h4>
               <ul className="space-y-2">
                 {(result.mentoringAdvice || []).map((advice, index) => (
-                  <li key={index} className="text-sm text-teal-800 flex items-start">
-                    <span className="text-teal-600 mr-2 mt-0.5">•</span>
+                  <li key={index} className="text-sm text-emerald-800 flex items-start">
+                    <span className="text-emerald-600 mr-2 mt-0.5">•</span>
                     {advice}
                   </li>
                 ))}
@@ -240,7 +240,7 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
           {onDevelop && (
             <button
               onClick={onDevelop}
-              className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 font-medium"
+              className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium"
             >
               Develop Leadership
             </button>

@@ -18,8 +18,13 @@ import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 
 export const BaZiAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
-  const { processNumerologyData, isLoading, error, showResults, analysisResult } = useNumerologyStore();
+  const { processNumerologyData, isLoading, error, showResults, analysisResult, clearNumerologySession } = useNumerologyStore();
   
+  // 进入页面时重置命理状态，避免跨分析类型残留状态
+  useEffect(() => {
+    clearNumerologySession();
+  }, []);
+
   // 关键词优化
   const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
     pageType: 'test',

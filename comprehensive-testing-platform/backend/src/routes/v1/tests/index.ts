@@ -154,7 +154,7 @@ testRoutes.post("/:testType/submit",
       const cacheService = c.get("cacheService");
       const testEngineService = new TestEngineService(dbService, cacheService);
       // 使用环境变量中的API密钥
-      const testResultService = new TestResultService(dbService, cacheService, new AIService(c.env.DEEPSEEK_API_KEY || ''));
+      const testResultService = new TestResultService(dbService, cacheService, new AIService(c.env.DEEPSEEK_API_KEY || ''), c.env);
       
       // 验证测试类型是否存在
       await testEngineService.getTestConfig(testType);

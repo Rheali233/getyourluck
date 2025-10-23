@@ -91,12 +91,23 @@ export default defineConfig({
             './src/modules/astrology/components/CompatibilityTestPage.tsx',
             './src/modules/astrology/components/BirthChartTestPage.tsx'
           ],
-          tarot: [
-            './src/modules/tarot/components/TarotHomePage.tsx',
-            './src/modules/tarot/components/CardDrawingPage.tsx',
-            './src/modules/tarot/components/RecommendationPage.tsx',
-            './src/modules/tarot/components/ReadingResultPage.tsx'
-          ],
+                 tarot: [
+                   './src/modules/tarot/components/TarotHomePage.tsx',
+                   './src/modules/tarot/components/CardDrawingPage.tsx',
+                   './src/modules/tarot/components/RecommendationPage.tsx',
+                   './src/modules/tarot/components/ReadingResultPage.tsx',
+                   './src/modules/tarot/components/LazyTarotCardImage.tsx'
+                 ],
+                 // 塔罗牌数据文件单独分割
+                 'tarot-data': [
+                   './src/modules/tarot/data/tarotCards.ts',
+                   './src/modules/tarot/data/tarotSpreads.ts'
+                 ],
+                 // 塔罗牌服务文件
+                 'tarot-services': [
+                   './src/modules/tarot/services/tarotService.ts',
+                   './src/modules/tarot/services/tarotDataLoader.ts'
+                 ],
           numerology: [
             './src/modules/numerology/components/NumerologyHomePage.tsx',
             './src/modules/numerology/components/BaZiAnalysisPage.tsx',

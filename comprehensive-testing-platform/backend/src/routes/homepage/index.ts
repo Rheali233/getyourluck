@@ -38,8 +38,7 @@ homepageRoutes.get("/", async (c) => {
 // 获取首页配置
 homepageRoutes.get("/config", async (c) => {
   try {
-    const dbService = c.get("dbService");
-    const configModel = new HomepageConfigModel(dbService.env);
+    const configModel = new HomepageConfigModel(c.env);
     
     const configs = await configModel.getAllPublicConfigs();
     
@@ -63,8 +62,7 @@ homepageRoutes.get("/config", async (c) => {
 // 获取测试模块列表
 homepageRoutes.get("/modules", async (c) => {
   try {
-    const dbService = c.get("dbService");
-    const moduleModel = new HomepageModuleModel(dbService.env);
+    const moduleModel = new HomepageModuleModel(c.env);
     
     const modules = await moduleModel.getAllActiveModules();
     // short-term caching headers
@@ -91,8 +89,7 @@ homepageRoutes.get("/modules", async (c) => {
 homepageRoutes.get("/modules/:theme", async (c) => {
   try {
     const theme = c.req.param("theme");
-    const dbService = c.get("dbService");
-    const moduleModel = new HomepageModuleModel(dbService.env);
+    const moduleModel = new HomepageModuleModel(c.env);
     
     const modules = await moduleModel.getModulesByTheme(theme);
     
@@ -121,7 +118,7 @@ homepageRoutes.get("/stats", async (c) => {
     // Test database connection
     await dbService.db.prepare("SELECT COUNT(*) as count FROM homepage_modules").first();
     
-    const moduleModel = new HomepageModuleModel(dbService.env);
+    const moduleModel = new HomepageModuleModel(c.env);
     
     const stats = await moduleModel.getModulesStats();
     

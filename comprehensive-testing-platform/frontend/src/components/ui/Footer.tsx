@@ -7,6 +7,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { BaseComponentProps } from '../../types/componentTypes';
 import { cn } from '../../utils/classNames';
+import { scrollToTopImmediate } from '@/hooks/useScrollToTop';
 
 export interface FooterProps extends BaseComponentProps {
   variant?: 'default' | 'simple';
@@ -26,6 +27,14 @@ export const Footer: React.FC<FooterProps> = ({
 }) => {
   const year = new Date().getFullYear();
   const [showEmail, setShowEmail] = React.useState(false);
+
+  // 处理Footer链接点击，确保滚动到顶部
+  const handleLinkClick = () => {
+    // 稍微延迟确保路由切换完成
+    setTimeout(() => {
+      scrollToTopImmediate('smooth');
+    }, 100);
+  };
   
   if (variant === 'simple') {
     return (
@@ -63,7 +72,6 @@ export const Footer: React.FC<FooterProps> = ({
     company: {
       title: 'About Us',
       links: [
-        { name: 'Company Info', href: '/about' },
         { name: 'Terms of Service', href: '/terms' },
         { name: 'Privacy Policy', href: '/privacy' },
         { name: 'Cookie Policy', href: '/cookies' },
@@ -128,6 +136,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <li key={link.name}>
                     <Link
                       to={link.href}
+                      onClick={handleLinkClick}
                       className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                     >
                       {link.name}
@@ -145,6 +154,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <li key={link.name}>
                     <Link
                       to={link.href}
+                      onClick={handleLinkClick}
                       className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                     >
                       {link.name}
@@ -171,6 +181,7 @@ export const Footer: React.FC<FooterProps> = ({
                     ) : (
                       <Link
                         to={link.href}
+                        onClick={handleLinkClick}
                         className="text-gray-300 hover:text-white transition-colors duration-200 text-sm"
                       >
                         {link.name}

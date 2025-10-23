@@ -33,8 +33,8 @@ export class QuestionService {
     language: string = 'en'
   ): Promise<QuestionServiceResponse<Question[]>> {
     try {
-      // 统一使用 v1 接口
-      const apiPath = `${this.baseUrl}/api/v1/tests/${testType}/questions`;
+      // 使用正确的API路径
+      const apiPath = `${this.baseUrl}/api/psychology/questions`;
       
       const response = await fetch(`${apiPath}?language=${language}`, {
         method: 'GET',
@@ -49,16 +49,23 @@ export class QuestionService {
 
       const data = await response.json();
       
-      // 处理嵌套的数据结构
-      let questions = data.questions || data.data || data;
-      
-      // 如果questions是数组，直接使用；如果是对象，尝试提取其中的data字段
-      if (Array.isArray(questions)) {
-        // 直接是数组
-      } else if (questions && typeof questions === 'object' && questions.data) {
-        // 嵌套结构，提取内层的data
-        questions = questions.data;
+      // 处理psychology API返回的数据结构
+      let questions = [];
+      if (data.success && data.data) {
+        // psychology API返回 { success: true, data: { phq9: [...], mbti: [...] } }
+        questions = data.data[testType] || [];
+      } else if (data.questions || data.data) {
+        // 其他API格式
+        questions = data.questions || data.data || data;
       }
+      
+      // 确保questions是数组
+      if (!Array.isArray(questions)) {
+        questions = [];
+      }
+      
+      // 转换数据格式以匹配前端期望的结构
+      questions = this.convertQuestionFormat(questions);
       
       // 为 learning 模块转换数据格式
       if (['vark'].includes(testType)) {
@@ -159,6 +166,31 @@ export class QuestionService {
         error: error instanceof Error ? error.message : 'Failed to load question'
       };
     }
+  }
+
+  /**
+   * Convert question format from backend to frontend format
+   */
+  private convertQuestionFormat(questions: any[]): Question[] {
+    if (!Array.isArray(questions)) {
+      return [];
+    }
+
+    return questions.map((question) => {
+      // 转换 type 字段为 format 字段
+      if (question.type && !question.format) {
+        question.format = question.type;
+        delete question.type;
+      }
+      
+      // 确保 options 字段存在
+      if (!question.options && question.choices) {
+        question.options = question.choices;
+        delete question.choices;
+      }
+      
+      return question;
+    });
   }
 
   /**

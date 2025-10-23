@@ -10,7 +10,7 @@ import type {
   QuestionOption,
   SingleChoiceQuestion,
   MultipleChoiceQuestion,
-
+  LikertScaleQuestion,
   TextQuestion
 } from '../types/TestTypes';
 import { QuestionFormat } from '../types/TestTypes';
@@ -279,6 +279,59 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
     );
   };
 
+  // Render likert scale question (same as single choice for PHQ9)
+  const renderLikertScale = () => {
+    if (question.format !== QuestionFormat.LIKERT_SCALE) return null;
+    const likertQuestion = question as LikertScaleQuestion;
+    const containerClass = "likert-scale-options grid grid-cols-1 md:grid-cols-2 gap-3";
+    const selectedValue = typeof currentAnswer?.value === 'string' ? currentAnswer.value : selectedAnswer;
+    return (
+      <div className={containerClass}>
+        {likertQuestion.options?.map((option: QuestionOption) => (
+          <label
+            key={option.id}
+            className={cn(
+              "flex items-center justify-start p-5 border-2 rounded-lg cursor-pointer transition-all duration-300 text-left w-full",
+              selectedValue === option.value ? 
+                "shadow-md" : 
+                "border-gray-200 bg-white hover:shadow-sm",
+              selectedValue === option.value && theme?.primary === 'blue-600' && "border-blue-600 bg-blue-50",
+              selectedValue === option.value && theme?.primary === 'pink-600' && "border-pink-600 bg-pink-50", 
+              selectedValue === option.value && theme?.primary === 'emerald-600' && "border-emerald-600 bg-emerald-50",
+              selectedValue === option.value && theme?.primary === 'cyan-600' && "border-cyan-600 bg-sky-50",
+              selectedValue === option.value && !theme?.primary && "border-blue-600 bg-blue-50",
+              selectedValue !== option.value && theme?.borderMedium === 'blue-300' && "hover:border-blue-300",
+              selectedValue !== option.value && theme?.borderMedium === 'pink-200' && "hover:border-pink-200",
+              selectedValue !== option.value && theme?.borderMedium === 'emerald-300' && "hover:border-emerald-300", 
+              selectedValue !== option.value && theme?.borderMedium === 'sky-400' && "hover:border-sky-400",
+              selectedValue !== option.value && !theme?.borderMedium && "hover:border-blue-300"
+            )}
+          >
+            <input
+              type="radio"
+              name={`question-${question.id}`}
+              value={option.value}
+              checked={selectedValue === option.value}
+              onChange={() => handleAnswerChange(option.value)}
+              className="sr-only"
+            />
+            <div className="flex items-center">
+              <span 
+                className={`text-base leading-tight ${
+                  selectedValue === option.value 
+                    ? `text-${theme?.textDark || 'blue-900'}`
+                    : 'text-gray-700'
+                }`}
+              >
+                {option.text}
+              </span>
+            </div>
+          </label>
+        ))}
+      </div>
+    );
+  };
+
   // Render multiple choice question
   const renderMultipleChoice = () => {
     if (question.format !== QuestionFormat.MULTIPLE_CHOICE) return null;
@@ -404,6 +457,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       case QuestionFormat.SCALE:
         // PHQ-9使用与MBTI相同的按钮样式
         return renderSingleChoice();
+      case QuestionFormat.LIKERT_SCALE:
+        // PHQ-9使用李克特量表格式
+        return renderLikertScale();
       case QuestionFormat.TEXT:
         return renderText();
       // cognitive removed

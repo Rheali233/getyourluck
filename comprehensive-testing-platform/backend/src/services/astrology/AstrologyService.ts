@@ -180,8 +180,7 @@ export class AstrologyService {
     this.cacheService = new CacheService(kv, 3600); // 1小时缓存
     // eslint-disable-next-line no-console
     console.log('[Astrology Debug] Initializing AstrologyService', {
-      hasApiKey: !!apiKey,
-      apiKeyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'NO KEY'
+      hasApiKey: !!apiKey
     });
     if (apiKey) {
       this.aiService = new AIService(apiKey);

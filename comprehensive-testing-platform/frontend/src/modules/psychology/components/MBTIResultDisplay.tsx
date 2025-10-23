@@ -96,7 +96,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {(safeResult.dimensions || []).map((dimension, index) => (
-              <div key={index} className="p-6 rounded-lg bg-blue-50 border border-emerald-200 text-center">
+              <div key={index} className="p-6 rounded-lg bg-blue-50 border border-blue-200 text-center">
                 <div className="mb-4">
                   <div className="text-lg font-semibold text-gray-900 mb-2">{dimension.name}</div>
                   <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
@@ -116,7 +116,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
                   {dimension.score > 50 ? (
                     <span>Prefer <span className="font-semibold text-blue-600">{dimension.leftLabel}</span></span>
                   ) : (
-                    <span>Prefer <span className="font-semibold text-indigo-600">{dimension.rightLabel}</span></span>
+                    <span>Prefer <span className="font-semibold text-blue-600">{dimension.rightLabel}</span></span>
                   )}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
@@ -130,7 +130,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
         {/* Strengths and Blind Spots Analysis */}
         <Card className="p-6 bg-transparent border-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h3 className="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <span className="text-2xl mr-2">⭐</span>
                 Strengths
@@ -144,15 +144,15 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
                 ))}
               </ul>
             </div>
-            <div className="p-6 rounded-lg bg-indigo-50 border border-teal-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h3 className="text-lg font-semibold mb-4 text-gray-900 flex items-center">
                 <span className="text-2xl mr-2">⚠️</span>
                 Potential Blind Spots
               </h3>
               <ul className="space-y-2">
                 {(safeResult.blindSpots || []).map((b, i) => (
-                  <li key={i} className="text-sm text-indigo-800 flex items-start">
-                    <span className="text-indigo-600 mr-2 mt-0.5">•</span>
+                  <li key={i} className="text-sm text-blue-800 flex items-start">
+                    <span className="text-blue-600 mr-2 mt-0.5">•</span>
                     {b}
                   </li>
                 ))}
@@ -171,7 +171,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Workplace Performance */}
-            <div className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">💼</span>
                 Workplace Performance
@@ -184,7 +184,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
             </div>
 
             {/* Family Performance */}
-            <div className="p-6 rounded-lg bg-indigo-50 border border-teal-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">🏠</span>
                 Family Performance
@@ -197,7 +197,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
             </div>
 
             {/* Friendship Performance */}
-            <div className="p-6 rounded-lg bg-blue-50 border border-emerald-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">👥</span>
                 Friendship Performance
@@ -210,7 +210,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
             </div>
 
             {/* Romance Performance */}
-            <div className="p-6 rounded-lg bg-indigo-50 border border-teal-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">💖</span>
                 Romance Performance

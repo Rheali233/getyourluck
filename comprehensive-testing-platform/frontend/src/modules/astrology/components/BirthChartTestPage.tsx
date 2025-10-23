@@ -125,7 +125,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Sun Sign */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <div className="text-center mb-4">
                 <div className="text-4xl mb-3">☀️</div>
                 <h3 className="text-lg font-semibold text-gray-900">Sun in {birthChartAnalysis.sunSign}</h3>
@@ -140,7 +140,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                   <div>
                     <h4 className="text-sm font-semibold text-gray-800 mb-2">Key Strengths:</h4>
                     <ul className="text-xs text-gray-600 space-y-1">
-                      {birthChartAnalysis.personalityProfile.strengths.slice(0, 3).map((strength, index) => (
+                      {birthChartAnalysis.personalityProfile.strengths.slice(0, 3).map((strength: string, index: number) => (
                         <li key={index} className="flex items-start">
                           <span className="text-yellow-500 mr-2">•</span>
                           {strength}
@@ -153,7 +153,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
             </div>
             
             {/* Moon Sign */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <div className="text-center mb-4">
                 <div className="text-4xl mb-3">🌙</div>
                 <h3 className="text-lg font-semibold text-gray-900">Moon in {birthChartAnalysis.moonSign}</h3>
@@ -176,7 +176,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
             </div>
 
             {/* Rising Sign */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <div className="text-center mb-4">
                 <div className="text-4xl mb-3">⬆️</div>
                 <h3 className="text-lg font-semibold text-gray-900">Rising in {birthChartAnalysis.risingSign}</h3>
@@ -191,7 +191,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                   <div>
                     <h4 className="text-sm font-semibold text-gray-800 mb-2">Growth Areas:</h4>
                     <ul className="text-xs text-gray-600 space-y-1">
-                      {birthChartAnalysis.personalityProfile.challenges.slice(0, 2).map((challenge, index) => (
+                      {birthChartAnalysis.personalityProfile.challenges.slice(0, 2).map((challenge: string, index: number) => (
                         <li key={index} className="flex items-start">
                           <span className="text-blue-500 mr-2">•</span>
                           {challenge}
@@ -216,7 +216,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {Object.entries(birthChartAnalysis.planetaryPositions).map(([planet, sign]) => (
-                <div key={planet} className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div key={planet} className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                   <div className="flex items-center mb-4">
                     <div className="text-2xl mr-3 text-[#1C2541]">
                       {(() => {
@@ -283,10 +283,10 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Core Traits */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Core Traits</h3>
                 <div className="space-y-3">
-                  {birthChartAnalysis.personalityProfile.coreTraits.map((trait, index) => (
+                  {birthChartAnalysis.personalityProfile.coreTraits.map((trait: string, index: number) => (
                     <p key={index} className="text-gray-700 leading-relaxed">
                       {trait}
                     </p>
@@ -295,10 +295,10 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                 </div>
 
                 {/* Strengths */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Strengths</h3>
                 <div className="space-y-3">
-                  {birthChartAnalysis.personalityProfile.strengths.map((strength, index) => (
+                  {birthChartAnalysis.personalityProfile.strengths.map((strength: string, index: number) => (
                     <p key={index} className="text-gray-700 leading-relaxed">
                       {strength}
                     </p>
@@ -307,10 +307,10 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                 </div>
 
                 {/* Challenges */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Challenges</h3>
                 <div className="space-y-3">
-                  {birthChartAnalysis.personalityProfile.challenges.map((challenge, index) => (
+                  {birthChartAnalysis.personalityProfile.challenges.map((challenge: string, index: number) => (
                     <p key={index} className="text-gray-700 leading-relaxed">
                       {challenge}
                     </p>
@@ -319,7 +319,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
               </div>
 
               {/* Life Purpose */}
-              <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+              <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Life Purpose</h3>
                 <p className="text-gray-700 leading-relaxed">
                   {birthChartAnalysis.personalityProfile.lifePurpose}
@@ -340,7 +340,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Career */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Career</h3>
                 <p className="text-gray-700 leading-relaxed">
                   {birthChartAnalysis.lifeGuidance.career}
@@ -348,7 +348,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                 </div>
 
                 {/* Relationships */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Relationships</h3>
                 <p className="text-gray-700 leading-relaxed">
                   {birthChartAnalysis.lifeGuidance.relationships}
@@ -356,7 +356,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                 </div>
 
                 {/* Personal Growth */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Personal Growth</h3>
                 <p className="text-gray-700 leading-relaxed">
                   {birthChartAnalysis.lifeGuidance.personalGrowth}
@@ -364,7 +364,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                 </div>
 
                 {/* Challenges */}
-                <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Challenges</h3>
                 <p className="text-gray-700 leading-relaxed">
                   {birthChartAnalysis.lifeGuidance.challenges}

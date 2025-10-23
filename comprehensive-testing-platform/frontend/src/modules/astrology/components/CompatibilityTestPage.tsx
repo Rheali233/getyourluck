@@ -158,7 +158,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Sign 1 */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <div className="text-center mb-6">
                 <div className="w-20 h-20 bg-gradient-to-r from-[#0B132B] to-[#5F0F40] rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl text-white">{sign1Data?.symbol}</span>
@@ -209,7 +209,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
             </div>
 
             {/* Sign 2 */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <div className="text-center mb-6">
                 <div className="w-20 h-20 bg-gradient-to-r from-[#0B132B] to-[#5F0F40] rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl text-white">{sign2Data?.symbol}</span>
@@ -267,7 +267,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Strengths */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">💪 Strengths</h3>
               <ul className="space-y-3">
                 {compatibilityAnalysis.strengths.map((strength: string, index: number) => (
@@ -280,7 +280,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
             </div>
 
             {/* Challenges */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">⚠️ Challenges</h3>
               <ul className="space-y-3">
                 {compatibilityAnalysis.challenges.map((challenge: string, index: number) => (

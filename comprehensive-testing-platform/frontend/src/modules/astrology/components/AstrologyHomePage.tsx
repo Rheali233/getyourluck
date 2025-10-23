@@ -58,7 +58,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
         itemListElement: [
           {
             '@type': 'Service',
-            name: 'Horoscope Reading',
+            name: 'Zodiac Fortune Forecast',
             description: 'Get your daily, weekly, or monthly horoscope with detailed insights'
           },
           {
@@ -96,7 +96,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
   const astrologyFeatures = [
     {
       id: 'fortune',
-      name: 'Horoscope Reading',
+      name: 'Zodiac Fortune Forecast',
       description: 'Get your daily, weekly, or monthly horoscope with detailed insights and personalized guidance for personal growth.',
       icon: '🌟',
       color: 'from-[#0B132B] to-[#5F0F40]',

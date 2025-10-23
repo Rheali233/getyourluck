@@ -36,8 +36,32 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
 
   useEffect(() => {
     // 检查是否已经设置过Cookies同意
-    const hasConsent = localStorage.getItem('cookiesConsent');
-    if (!hasConsent) {
+    const consentData = localStorage.getItem('cookiesConsent');
+    if (!consentData) {
+      setIsVisible(true);
+      return;
+    }
+
+    try {
+      const consent = JSON.parse(consentData);
+      const consentTime = consent.timestamp;
+      const sixMonthsAgo = Date.now() - (6 * 30 * 24 * 60 * 60 * 1000); // 6个月前的时间戳
+      
+      // 如果同意时间超过6个月，重新显示弹窗
+      if (!consentTime || consentTime < sixMonthsAgo) {
+        localStorage.removeItem('cookiesConsent');
+        setIsVisible(true);
+      } else {
+        // 设置当前同意状态
+        setConsent({
+          cookiesConsent: consent.cookiesConsent || false,
+          analyticsConsent: consent.analyticsConsent || false,
+          marketingConsent: consent.marketingConsent || false,
+        });
+      }
+    } catch (error) {
+      // 如果解析失败，清除无效数据并显示弹窗
+      localStorage.removeItem('cookiesConsent');
       setIsVisible(true);
     }
   }, []);
@@ -74,7 +98,13 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
   };
 
   const saveConsent = (consentData: CookiesConsent) => {
-    localStorage.setItem('cookiesConsent', JSON.stringify(consentData));
+    // 添加时间戳到同意数据中
+    const consentWithTimestamp = {
+      ...consentData,
+      timestamp: Date.now(),
+    };
+    
+    localStorage.setItem('cookiesConsent', JSON.stringify(consentWithTimestamp));
     
     // 发送到后端API
     const sessionId = crypto.randomUUID();
@@ -83,10 +113,11 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sessionId,
-        ...consentData,
+        ...consentWithTimestamp,
       }),
     }).catch(error => {
-      });
+      // 静默处理API错误，不影响用户体验
+    });
   };
 
   if (!isVisible) return null;
@@ -106,11 +137,11 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                🍪 我们使用Cookies来改善您的体验
+                🍪 We Use Cookies to Improve Your Experience
               </h3>
               <p className="text-sm text-gray-600">
-                我们使用必要的Cookies来确保网站正常运行，以及分析Cookies来了解您如何使用我们的服务。
-                您可以选择接受所有Cookies或自定义您的偏好设置。
+                We use essential cookies to ensure our website functions properly, and analytics cookies to understand how you use our services.
+                You can choose to accept all cookies or customize your preferences.
               </p>
             </div>
             
@@ -120,20 +151,20 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
                   onClick={() => setShowSettingsModal(true)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
                 >
-                  自定义设置
+                  Customize Settings
                 </button>
               )}
               <button
                 onClick={handleRejectAll}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
-                拒绝所有
+                Reject All
               </button>
               <button
                 onClick={handleAcceptAll}
                 className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 transition-colors"
               >
-                接受所有
+                Accept All
               </button>
             </div>
           </div>
@@ -146,7 +177,7 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Cookies设置
+                Cookie Settings
               </h3>
               
               <div className="space-y-4">
@@ -154,9 +185,9 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h4 className="font-medium text-gray-900">必要Cookies</h4>
+                      <h4 className="font-medium text-gray-900">Essential Cookies</h4>
                       <p className="text-sm text-gray-600">
-                        这些Cookies对于网站正常运行是必需的，无法禁用。
+                        These cookies are necessary for the website to function properly and cannot be disabled.
                       </p>
                     </div>
                     <div className="flex items-center">
@@ -174,9 +205,9 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h4 className="font-medium text-gray-900">分析Cookies</h4>
+                      <h4 className="font-medium text-gray-900">Analytics Cookies</h4>
                       <p className="text-sm text-gray-600">
-                        帮助我们了解您如何使用网站，以便我们改进服务。
+                        Help us understand how you use our website so we can improve our services.
                       </p>
                     </div>
                     <div className="flex items-center">
@@ -194,9 +225,9 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h4 className="font-medium text-gray-900">营销Cookies</h4>
+                      <h4 className="font-medium text-gray-900">Marketing Cookies</h4>
                       <p className="text-sm text-gray-600">
-                        用于显示个性化内容和广告，改善您的体验。
+                        Used to display personalized content and advertisements to improve your experience.
                       </p>
                     </div>
                     <div className="flex items-center">
@@ -216,13 +247,13 @@ export const CookiesBanner: React.FC<CookiesBannerProps> = ({
                   onClick={() => setShowSettingsModal(false)}
                   className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
                 >
-                  取消
+                  Cancel
                 </button>
                 <button
                   onClick={handleSaveSettings}
                   className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 transition-colors"
                 >
-                  保存设置
+                  Save Settings
                 </button>
               </div>
             </div>

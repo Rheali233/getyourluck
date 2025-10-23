@@ -123,7 +123,7 @@ export const useTarotStore = () => {
     clearError
   } = unifiedStore;
   
-  // 加载塔罗牌数据
+  // 加载塔罗牌数据 - 加载完整的78张牌
   const loadTarotCards = useCallback(async () => {
     if (tarotStore.cardsLoaded) return;
     
@@ -131,13 +131,15 @@ export const useTarotStore = () => {
       setLoading(true);
       setError(null);
       
-      const response = await tarotService.getTarotCards();
-      if (response.success && response.data) {
-        tarotStore.setTarotState({
-          tarotCards: response.data || [],
-          cardsLoaded: true
-        });
-      }
+      // 直接加载完整的78张塔罗牌数据
+      const { allTarotCards } = await import('../data/tarotCards');
+      
+      // 设置完整数据
+      tarotStore.setTarotState({
+        tarotCards: allTarotCards,
+        cardsLoaded: true
+      });
+      
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load tarot cards';
       setError(errorMessage);

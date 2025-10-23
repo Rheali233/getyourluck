@@ -11,6 +11,7 @@ import { Navigation, Breadcrumb, Footer } from '@/components/ui';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 interface AboutPageProps extends BaseComponentProps {}
 
@@ -20,6 +21,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({
   ...props
 }) => {
   const canonical = `${typeof window !== 'undefined' ? window.location.origin : ''}/about`;
+  
+  // 确保页面滚动到顶部
+  useScrollToTop({
+    enabled: true,
+    behavior: 'smooth',
+    delay: 50
+  });
   
   // 记录页面访问事件
   React.useEffect(() => {

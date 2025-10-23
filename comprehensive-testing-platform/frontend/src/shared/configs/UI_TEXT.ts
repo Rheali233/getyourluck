@@ -37,49 +37,166 @@ export const UI_TEXT = {
   legal: {
     terms: {
       title: 'Terms of Service',
-      intro: 'Effective Date: September 28, 2025',
+      intro: 'Effective Date: October 22, 2025 | Last Updated: October 22, 2025. These Terms of Service govern your use of SelfAtlas.net, our comprehensive psychological testing and astrology analysis platform.',
       sections: [
-        { title: '1. Service Overview', content: 'Welcome to selfatlas. We provide online testing services for global users. Key features include psychology tests, career development tests, relationship tests, learning ability tests, and tarot/astrology services. Highlights include personalized AI‑powered insights, real‑time test progress, English interface, and international data protection alignment.' },
-        { title: '2. Acceptance of Terms', content: 'By accessing or using our services, you confirm that you have read, understood, and agree to be bound by these Terms. If you do not agree, please do not use the services. We may modify these Terms at any time. Updates take effect once posted on our website.' },
-        { title: '3. Permitted and Prohibited Uses', content: 'Permitted – Personal testing, career planning, relationship assessment, and learning ability evaluation. Prohibited – Violating applicable laws, disrupting the platform, attempting to access others’ information, bulk/automated testing for commercial purposes, distributing malware, or posting illegal or harmful content.' },
-        { title: '4. Use of Test Results', content: 'Test results are for personal reference only and do not constitute professional medical, psychological, career, or legal advice. You agree not to use results for commercial purposes.' },
-        { title: '5. Intellectual Property', content: 'All platform content (text, images, software, and other materials) is protected by copyright and other laws. You may not copy, modify, distribute, or commercially use any content without our written permission. Content you submit (e.g., test answers and feedback) remains yours, but you grant us a license to use it to provide and improve the services.' },
-        { title: '6. Privacy & Data Protection', content: 'We collect limited data such as test answers/results/types, session data (ID, duration, timestamps), technical data (hashed IP, user agent), and optional feedback. We use this data to provide results, improve functionality, offer support, and ensure security. For details, see our Privacy Policy.' },
-        { title: '7. Service Availability', content: 'We strive to keep the services available but do not guarantee uninterrupted operation. We may suspend services for maintenance, upgrades, or other reasons.' },
-        { title: '8. Disclaimers', content: 'The services and results are provided “as is” without warranties of any kind, express or implied. Test results are for entertainment and reference only. Seek professional advice where appropriate.' },
-        { title: '9. Limitation of Liability', content: 'To the maximum extent permitted by law, our total liability is limited to the amount you paid (if any) for the services. We are not liable for indirect, special, incidental, or consequential damages.' },
-        { title: '10. Dispute Resolution', content: 'These Terms are governed by the laws of the State of California, USA. In case of a dispute, please contact us first to attempt an amicable resolution. If we cannot resolve the dispute, it shall be submitted to international arbitration.' },
-        { title: '11. Contact Us', content: 'If you have any questions about these Terms, contact us at: support@selfatlas.net' }
+        { 
+          title: '1. Service Overview', 
+          content: 'Welcome to SelfAtlas.net. We provide a comprehensive psychological testing and astrology analysis platform offering: (a) Psychological Tests: MBTI, DISC, VARK, emotional intelligence, depression screening, and interpersonal assessments; (b) Career Development: Holland Code, career guidance, and professional development tools; (c) Astrology & Mystical Services: birth chart analysis, tarot card readings, and numerology; (d) Learning Assessment: learning style evaluation and educational guidance; (e) Relationship Tests: love language, communication style, and compatibility assessments. All services feature AI-powered personalized insights, real-time progress tracking, and English-only interface with international data protection compliance.' 
+        },
+        { 
+          title: '2. Acceptance of Terms', 
+          content: 'By accessing or using our services, you confirm that you have read, understood, and agree to be bound by these Terms. If you do not agree, please do not use the services. We may modify these Terms at any time with notice posted on our website. Continued use after changes constitutes acceptance of updated Terms.' 
+        },
+        { 
+          title: '3. Age Requirements and Eligibility', 
+          content: 'Our services are available to users aged 13 and above. Users under 18 must have parental consent. Users under 13 are not permitted to use our services. By using our platform, you represent that you meet these age requirements and have the legal capacity to enter into this agreement.' 
+        },
+        { 
+          title: '4. Permitted and Prohibited Uses', 
+          content: '**Permitted Uses**: Personal testing and self-discovery, career planning and development, relationship assessment and improvement, educational and learning evaluation, entertainment and recreational purposes. **Prohibited Uses**: Violating applicable laws or regulations, disrupting platform operations or security, attempting to access others\' accounts or information, bulk or automated testing for commercial purposes, reverse engineering or attempting to extract source code, distributing malware or harmful content, impersonating others, or using results for commercial resale without permission.' 
+        },
+        { 
+          title: '5. Use of Test Results', 
+          content: 'Test results are for personal reference, entertainment, and self-discovery purposes only. They do not constitute professional medical, psychological, career, legal, or therapeutic advice. You agree not to use results for commercial purposes, professional diagnosis, or as a substitute for professional consultation. For serious concerns, please consult qualified professionals.' 
+        },
+        { 
+          title: '6. Intellectual Property Rights', 
+          content: 'All platform content including text, images, software, algorithms, test questions, and materials are protected by copyright, trademark, and other intellectual property laws. You may not copy, modify, distribute, reverse engineer, or commercially exploit any content without our written permission. User-generated content (test answers, feedback) remains yours, but you grant us a non-exclusive license to use it for service provision and improvement.' 
+        },
+        { 
+          title: '7. Privacy & Data Protection', 
+          content: 'We collect and process data as described in our Privacy Policy, including: test responses and results, session data (ID, duration, timestamps), technical data (hashed IP, user agent), feedback and ratings, and usage analytics. We use this data to provide personalized results, improve services, offer support, ensure security, and conduct research using anonymized data. We work with trusted third-party processors including Cloudflare (hosting), Google Analytics (analytics), and DeepSeek AI (result analysis) under data protection agreements.' 
+        },
+        { 
+          title: '8. Account Termination and Suspension', 
+          content: 'We may suspend or terminate your access to our services at any time for violations of these Terms, illegal activity, or other reasons at our discretion. You may stop using our services at any time. Upon termination, your right to use the services ceases immediately, but certain provisions of these Terms will survive termination.' 
+        },
+        { 
+          title: '9. Service Availability and Modifications', 
+          content: 'We strive to maintain service availability but do not guarantee uninterrupted operation. We may suspend services for maintenance, upgrades, security updates, or other reasons. We reserve the right to modify, suspend, or discontinue any part of our services with reasonable notice. We are not liable for service interruptions or modifications.' 
+        },
+        { 
+          title: '10. Disclaimers and Warranties', 
+          content: 'The services and results are provided "as is" without warranties of any kind, express or implied. We disclaim all warranties including merchantability, fitness for a particular purpose, and non-infringement. Test results are for entertainment and reference only and should not replace professional advice. We do not guarantee accuracy, completeness, or reliability of results.' 
+        },
+        { 
+          title: '11. Limitation of Liability', 
+          content: 'To the maximum extent permitted by law, our total liability is limited to the amount you paid (if any) for the services, or $100, whichever is greater. We are not liable for indirect, special, incidental, consequential, or punitive damages, including but not limited to loss of profits, data, or business opportunities. Some jurisdictions do not allow limitation of liability, so these limitations may not apply to you.' 
+        },
+        { 
+          title: '12. Refund and Payment Policy', 
+          content: 'Our core testing services are currently provided free of charge. If we introduce paid services in the future, refunds will be handled on a case-by-case basis. For any payment-related issues, contact us at support@selfatlas.net within 30 days of the transaction.' 
+        },
+        { 
+          title: '13. Dispute Resolution', 
+          content: 'These Terms are governed by the laws of the State of California, USA. For any disputes, we encourage you to contact us first at support@selfatlas.net to attempt an amicable resolution. If we cannot resolve the dispute within 60 days, it shall be submitted to binding arbitration administered by the American Arbitration Association, except for claims of intellectual property infringement or injunctive relief.' 
+        },
+        { 
+          title: '14. Changes to Terms', 
+          content: 'We may update these Terms from time to time. Material changes will be communicated via email (if you have an account) or through a notice on our website. Your continued use after changes constitutes acceptance of updated Terms. If you disagree with changes, you must stop using our services.' 
+        },
+        { 
+          title: '15. Contact Information', 
+          content: 'For questions about these Terms, contact us at: support@selfatlas.net. We aim to respond to all inquiries within 48 hours during business days.' 
+        }
       ]
     },
     privacy: {
       title: 'Privacy Policy',
-      intro: 'Effective Date: September 28, 2025',
+      intro: 'Effective Date: October 22, 2025 | Last Updated: October 22, 2025. This Privacy Policy explains how SelfAtlas.net (\'we\', \'us\', \'our\') collects, uses, discloses and protects personal information in connection with our comprehensive psychological testing and astrology analysis platform, and describes your rights under applicable law (including GDPR and CCPA/CPRA).',
       sections: [
-        { title: '1. Information We Collect', content: 'We collect the following types of information to provide our services: (1) Information You Provide to Us — Test Information: your test answers and results used to generate personalized analysis; Feedback Information: your rating, comments, and contact email if provided. (2) Information We Collect Automatically — Usage Data: information about how you use our platform, including test type, test duration, and basic usage statistics; Technical Information: your browser user agent and network address (stored in hashed form) to help keep our service reliable and secure; Cookies: we use necessary and session cookies to operate the service. You can manage cookie preferences in your browser settings.' },
-        { title: '2. How We Use Your Information', content: 'We use collected information to: provide, operate, and maintain our services; generate personalized test results and analysis; respond to support inquiries and provide customer service; improve service functionality and user experience; protect platform security and prevent abuse; and comply with legal and regulatory requirements.' },
-        { title: '3. How We Share Your Information', content: 'We do not sell your personal data. We may share information with service providers such as Cloudflare (cloud hosting) and AI processing providers strictly to operate our services, with legal authorities to comply with law, or during business transfers (e.g., mergers or acquisitions).' },
-        { title: '4. Your Rights and Choices', content: 'You may request access to and correction of your personal information, request deletion, and opt out of marketing emails at any time.' },
-        { title: '5. Data Security & Retention', content: 'We take reasonable security measures to protect your data, including encryption and access controls. We retain your information for as long as necessary to provide services and comply with legal obligations.' },
-        { title: '6. International Users & Legal Compliance', content: 'We comply with data protection laws including GDPR and CCPA. If you are located outside the United States, your information may be processed in the U.S., where data protection laws may differ.' },
-        { title: '7. Changes to This Policy', content: 'We may update this Privacy Policy from time to time. If changes are significant, we will notify you by email or through our website.' },
-        { title: '8. Contact Us', content: 'If you have any questions about this Privacy Policy, contact us at: support@selfatlas.net' }
+        {
+          title: '1. Information We Collect',
+          content: 'We collect the following types of information to provide our services: (1) Information You Provide to Us — Test Information: your test answers and responses across all test categories (MBTI, DISC, VARK, astrology, tarot, career assessments, etc.) used to generate personalized analysis; Feedback Information: your ratings, comments, and contact email if provided; Blog Interaction: comments and reading behavior on our blog content. (2) Information We Collect Automatically — Usage Data: information about how you use our platform, including test type, test duration, progress data, search history, and basic usage statistics; Technical Information: your browser user agent and network address (stored in hashed form) to help keep our service reliable and secure; Cookies and Local Storage: we use necessary cookies, session storage, and local storage to operate the service and save your test progress. You can manage cookie preferences in your browser settings.'
+        },
+        {
+          title: '2. How We Use Your Information',
+          content: 'We use collected information to: provide, operate, and maintain our comprehensive testing platform; generate personalized test results and AI-powered analysis using third-party AI services; respond to support inquiries and provide customer service; improve service functionality and user experience through analytics; protect platform security and prevent abuse; conduct research and development using anonymized data; and comply with legal and regulatory requirements.'
+        },
+        {
+          title: '3. How We Share Your Information',
+          content: 'We do not sell your personal data. We may share information with: (a) Service providers such as Cloudflare (cloud hosting and security), Google Analytics (website analytics), and DeepSeek AI (test result analysis) strictly to operate our services; (b) Legal authorities to comply with law or protect rights; (c) During business transfers (e.g., mergers or acquisitions). All third-party processors are bound by data protection agreements.'
+        },
+        {
+          title: '4. Your Rights and Choices',
+          content: 'You may request access to and correction of your personal information, request deletion, and opt out of marketing emails at any time. For EU/EEA/UK residents, you have additional rights under GDPR including data portability and the right to object to processing. Contact support@selfatlas.net to exercise your rights.'
+        },
+        {
+          title: '5. Data Security & Retention',
+          content: 'We take reasonable security measures to protect your data, including encryption and access controls. We retain your information as follows: test responses and results for up to 3 years (or until account deletion if applicable); technical logs for 1 year; analytics data (anonymized) indefinitely for service improvement. After retention periods, data is deleted or irreversibly anonymized.'
+        },
+        {
+          title: '6. International Users & Legal Compliance',
+          content: 'We comply with data protection laws including GDPR and CCPA. If you are located outside the United States, your information may be processed in the U.S., where data protection laws may differ. We implement appropriate safeguards for international transfers.'
+        },
+        {
+          title: '7. Children\'s Privacy',
+          content: 'Our services are not directed to children under 13. We do not knowingly collect personal information from children under 13. If we learn we have collected data from a child, we will delete it promptly.'
+        },
+        {
+          title: '8. Changes to This Policy',
+          content: 'We may update this Privacy Policy from time to time. If changes are significant, we will notify you by email or through our website. The updated policy will be effective as of the "Last Updated" date shown above.'
+        },
+        {
+          title: '9. Contact Us',
+          content: 'If you have any questions about this Privacy Policy, contact us at: support@selfatlas.net. For EU/EEA/UK residents, you may also lodge a complaint with your local supervisory authority.'
+        }
       ]
     },
     cookies: {
       title: 'Cookie Policy',
-      intro: 'This policy explains how we use cookies and similar technologies on our platform.',
+      intro: 'Effective Date: October 22, 2025 | Last Updated: October 22, 2025 | Applicable Globally',
       sections: [
-        { title: 'What Are Cookies', content: 'Cookies are small text files stored on your device to help websites function and remember preferences.' },
-        { title: 'Types of Cookies', content: 'We use essential, performance, and analytics cookies to provide core functions and improve the service.' },
-        { title: 'Managing Cookies', content: 'You can control cookies in your browser settings. Blocking some cookies may affect site functionality.' },
-        { title: 'Updates', content: 'We may update this policy as needed. Changes will be posted on this page.' }
+        { 
+          title: 'Purpose of This Policy', 
+          content: 'This Cookie Policy explains how SelfAtlas.net (\'we\', \'our\', \'us\') uses cookies and similar tracking technologies on our website, in accordance with applicable data protection laws including the General Data Protection Regulation (GDPR), the ePrivacy Directive, and the California Consumer Privacy Act (CCPA).' 
+        },
+        { 
+          title: 'What Are Cookies and Similar Technologies', 
+          content: 'We use several technologies to enhance your experience:\n\n**Cookies**: Small text files stored on your device when you visit our website. They remember your preferences, enable certain functionalities, and help us analyze website usage.\n\n**Local Storage**: Browser storage technology used to save your test progress, preferences, and temporary data locally on your device.\n\n**Session Storage**: Temporary storage that persists only during your browser session.\n\nThese technologies may be \'session-based\' (deleted when you close your browser) or \'persistent\' (stored for a defined period).' 
+        },
+        { 
+          title: 'Types of Technologies We Use', 
+          content: 'We categorize our tracking technologies as follows:\n\n1. **Essential Technologies** — Necessary for core website functions (e.g., session management, security, test progress saving). They do not require user consent.\n2. **Performance Technologies** — Collect anonymous usage data to help improve site performance.\n3. **Analytics Technologies** — Track and analyze visitor interactions to improve our services.\n4. **Preference Technologies** — Store your language, theme, display settings, and test preferences.\n5. **Functional Technologies** — Enable extra features such as saving test progress and sharing functionality.\n\nFor GDPR compliance, only Essential Technologies are active by default; other categories require your explicit consent.' 
+        },
+        { 
+          title: 'Specific Technologies We Use', 
+          content: 'Below is a comprehensive list of technologies used on SelfAtlas.net:\n\n| Technology Name | Type | Purpose | Provider | Expiry |\n|----------------|------|---------|----------|--------|\n| `session_id` | Essential Cookie | Maintain login session & test progress | SelfAtlas.net | Session |\n| `cf_clearance` | Security Cookie | Verify requests & prevent bot attacks | Cloudflare | 30 days |\n| `test_progress_*` | Essential LocalStorage | Save your test progress locally | SelfAtlas.net | Until cleared |\n| `blog_cache_*` | Performance LocalStorage | Cache blog content for faster loading | SelfAtlas.net | 1 hour |\n| `analytics_event_queue_v1` | Analytics LocalStorage | Queue analytics events for batch sending | SelfAtlas.net | Until sent |\n| `lang_pref` | Preference Cookie | Store chosen language | SelfAtlas.net | 6 months |\n| `theme_pref` | Preference LocalStorage | Store display theme preference | SelfAtlas.net | 1 year |\n| `test_results_*` | Functional LocalStorage | Temporarily store test results | SelfAtlas.net | 24 hours |\n| `_ga` | Analytics Cookie | Track website usage patterns | Google Analytics | 2 years |\n| `_ga_*` | Analytics Cookie | Distinguish users | Google Analytics | 2 years |\n| `_gid` | Analytics Cookie | Distinguish users | Google Analytics | 24 hours |\n\n*Note: The actual set of technologies may change over time; updates will be reflected in this policy.*' 
+        },
+        { 
+          title: 'Third-Party Services and Data Processing', 
+          content: 'We use the following third-party services that may set their own cookies or process data:\n\n| Service | Purpose | Data Processed | Legal Basis | Data Retention | Privacy Policy | Data Transfers |\n|---------|---------|----------------|-------------|----------------|----------------|----------------|\n| **Cloudflare** | Website security, performance optimization, content delivery, and hosting | IP addresses, request headers, security logs | Legitimate interest (security and performance) | Up to 30 days for security logs | [Cloudflare Privacy Policy](https://www.cloudflare.com/privacypolicy/) | May involve transfers to the United States |\n| **Google Analytics** | Website traffic analysis, user behavior insights, and performance monitoring | IP addresses (anonymized), page views, user interactions, device information | Consent (can be withdrawn at any time) | Up to 26 months | [Google Privacy Policy](https://policies.google.com/privacy) | Data transferred to Google servers in the United States |\n| **AI Processing Services** | Provide personalized test results and insights | Test responses and results (anonymized for analysis) | Legitimate interest (service provision) | Processed and deleted after analysis | Contact us for details | May involve transfers to third-party AI providers |\n\n**Additional Information**:\n- **Google Analytics Opt-out**: You can opt-out via [Google Analytics Opt-out Browser Add-on](https://tools.google.com/dlpage/gaoptout)\n- **Data Transfer Protection**: All third-party data transfers are protected using appropriate safeguards including Standard Contractual Clauses and data processing agreements' 
+        },
+        { 
+          title: 'Data Processing and Storage', 
+          content: '**Local Storage Usage**:\n- Test progress is saved locally to prevent data loss during testing\n- Blog content is cached locally to improve loading speed\n- User preferences are stored locally for personalized experience\n- Analytics events are queued locally before being sent to our servers\n\n**Data Retention Schedule**:\n\n| Data Type | Retention Period | Storage Location | Deletion Method |\n|-----------|------------------|------------------|-----------------|\n| Test Progress | Until test completion or manual clearing | Local Storage | User-initiated or automatic |\n| Cache Data | 1 hour | Local Storage | Automatic |\n| Analytics Data | Up to 26 months (Google Analytics) | Google Servers | Automatic after retention period |\n| User Preferences | Until manually changed or cleared | Local Storage | User-initiated |\n| Security Logs | Up to 30 days | Cloudflare Servers | Automatic |\n| AI Processing Data | Processed and deleted after analysis | Third-party AI providers | Automatic |\n\n**Data Security**: All locally stored data is encrypted and protected by browser security measures. Third-party services implement their own security measures as described in their respective privacy policies.' 
+        },
+        { 
+          title: 'Legal Basis for Using Technologies', 
+          content: 'Under GDPR:\n- Essential technologies are processed based on our legitimate interest in operating the website and providing core functionality.\n- Non-essential technologies (analytics, preferences) are processed only with your explicit consent.\n- Local storage for test progress is necessary for the performance of our service contract.\n- Third-party processing is based on data processing agreements and your consent where required.\n\nUnder CCPA:\n- We do not sell personal information collected via cookies or local storage.\n- You have the right to know what personal information we collect and how we use it.\n- You may opt-out of non-essential technologies at any time.\n- You may request deletion of your personal information subject to certain exceptions.' 
+        },
+        { 
+          title: 'Managing Your Technology Preferences', 
+          content: 'You can control these technologies via the following methods:\n\n| Control Method | Description | Access | Limitations |\n|----------------|-------------|--------|-------------|\n| **Browser Settings** | Block or delete cookies and local storage | Browser settings menu | Blocking essential technologies may prevent core functionality |\n| **Cookie Settings Panel** | Granular control over different technology categories | \'Privacy & Cookies\' link on our site | Preferences saved and respected across sessions |\n| **Google Analytics Opt-out** | Disable Google Analytics tracking | [Google Analytics Opt-out Browser Add-on](https://tools.google.com/dlpage/gaoptout) | Only affects Google Analytics |\n| **Cloudflare Settings** | Discuss data processing preferences | Contact us directly | May affect website performance |\n| **AI Services Opt-out** | Disable AI processing of your data | Contact us directly | May affect personalized test results |\n\n**Browser-Specific Instructions**:\n- **Chrome**: Settings > Privacy and security > Cookies and other site data\n- **Firefox**: Options > Privacy & Security > Cookies and Site Data\n- **Safari**: Preferences > Privacy > Manage Website Data\n- **Edge**: Settings > Cookies and site permissions > Cookies and site data\n- **Opera**: Settings > Privacy & security > Cookies and other site data\n\n**Important Note**: Disabling essential technologies may prevent core functionality like saving test progress or maintaining your session.' 
+        },
+        { 
+          title: 'Cookie and Technology Consent', 
+          content: 'When first visiting our website, a consent banner will appear, offering options to:\n- Accept all technologies\n- Reject non-essential technologies\n- Customize preferences by category\n\nYour selection will be stored for 6 months. We will re-request consent if we materially change our technology usage or after the storage period expires.\n\n**Withdrawing Consent**: You may withdraw consent at any time through our settings panel or by clearing your browser data. Note that withdrawing consent for essential technologies may affect website functionality.\n\n**Consent Records**: We maintain records of your consent choices for compliance purposes.' 
+        },
+        { 
+          title: 'Updates to This Policy', 
+          content: 'We may update this Cookie Policy to reflect changes in technologies used, legal requirements, or operational needs. Updates will be posted on this page, with a revised \'Last Updated\' date.\n\n**Material Changes**: We will seek renewed consent for any material changes to our technology usage, especially those affecting data processing or privacy.\n\n**Notification Methods**: Significant changes will be communicated via consent banner, email (if applicable), or prominent website notice.' 
+        },
+        { 
+          title: 'Contact Us', 
+          content: 'For questions about our use of cookies and similar technologies, contact us:\n\n**Email**: support@selfatlas.net\n**Website**: https://selfatlas.net\n\n**Response Time**: We aim to respond to all inquiries within 48 hours during business days.\n\n**Complaints**: You have the right to lodge a complaint with your local data protection authority if you believe we have not handled your data in accordance with applicable laws.' 
+        }
       ]
     }
   },
   about: {
-    title: 'About Our Platform',
-    subtitle: 'Unified self-discovery platform across psychology, career, astrology, tarot, and more',
+    title: 'About SelfAtlas',
+    subtitle: 'Your comprehensive self-discovery platform for psychology, career, astrology, and personal growth',
     cta: {
       backHome: 'Back to Home',
       exploreBlog: 'Explore Blog',
@@ -89,62 +206,82 @@ export const UI_TEXT = {
       overview: {
         title: 'What We Do',
         paragraphs: [
-          'Our platform brings together scientific psychology assessments and traditional wisdom modules into one unified, English‑only experience.',
-          'Explore MBTI, PHQ‑9, EQ, learning styles, career planning, astrology, tarot, numerology, and more — with consistent UI, fast performance, and clear guidance across modules.'
+          'SelfAtlas is a comprehensive online platform that combines scientific psychology assessments with traditional wisdom to help you discover your true self and unlock your potential.',
+          'We offer 7 specialized testing modules: Psychology (MBTI, EQ, depression screening), Career Planning (Holland Code, DISC), Astrology & Mystical Services (birth charts, tarot readings, numerology), Learning Assessment (VARK learning styles), and Relationship Tests (love languages, communication styles). All tests feature AI-powered personalized insights and are available in English with a unified, mobile-first design.'
         ],
       },
       capabilities: {
         title: 'What You Can Do Here',
         items: [
-          'Discover your personality and strengths',
-          'Evaluate emotional intelligence and mental wellness',
-          'Plan your career path using proven frameworks',
-          'Explore astrology insights and tarot readings',
-          'Turn test results into practical next steps'
+          'Take 20+ scientifically-backed psychological assessments',
+          'Discover your personality type, strengths, and growth areas',
+          'Plan your career path with proven professional frameworks',
+          'Explore astrology insights and receive tarot guidance',
+          'Understand your learning style and optimize study methods',
+          'Improve relationships through love language and communication tests',
+          'Access personalized recommendations and actionable next steps',
+          'Read expert articles and insights on personal development'
         ],
       },
       quality: {
         title: 'How We Ensure Quality',
         items: [
-          'Unified design system and consistent UX',
-          'Verified test models and structured data',
-          'Mobile-first performance and fast responses',
-          'Privacy-first approach with no forced sign-in'
+          'Built on decades of psychological research and validated assessment tools',
+          'AI-powered analysis provides personalized, detailed insights',
+          'Unified design system ensures consistent, intuitive user experience',
+          'Mobile-first approach with fast loading and smooth performance',
+          'Privacy-first design with no forced account creation',
+          'Regular content updates and new test additions',
+          'Comprehensive data protection and GDPR compliance'
         ],
       },
       howItWorks: {
         title: 'How It Works',
         steps: [
-          'Step 1 — Pick a module or go to Test Center',
-          'Step 2 — Take a guided assessment with clear progress',
-          'Step 3 — Get structured results, insights, and next steps'
+          'Step 1 — Browse our Test Center or choose a specific module',
+          'Step 2 — Take a guided assessment with real-time progress tracking',
+          'Step 3 — Receive AI-generated personalized results and insights',
+          'Step 4 — Explore recommendations and next steps for personal growth'
         ],
       },
       privacy: {
         title: 'Data & Privacy',
         points: [
-          'English-only interface and content for clarity',
-          'We collect limited test/session and technical data to operate the service',
-          'Results are for personal reference; no forced account creation',
-          'See our Privacy Policy for details'
+          'English-only interface for global accessibility and clarity',
+          'Minimal data collection: only test responses and basic technical data',
+          'Results are for personal reference; no account required',
+          'Advanced encryption and security measures protect your data',
+          'Full GDPR and CCPA compliance with transparent data practices',
+          'See our detailed Privacy Policy and Cookie Policy for complete information'
         ],
       },
       modules: {
-        title: 'Explore Modules',
+        title: 'Explore Our Modules',
         entries: [
-          { label: 'Psychology Tests', href: '/psychology' },
-          { label: 'Career Planning', href: '/career' },
-          { label: 'Astrology', href: '/astrology' },
-          { label: 'Tarot Reading', href: '/tarot' },
-          { label: 'Numerology', href: '/numerology' },
-          { label: 'Relationships', href: '/relationship' },
-          { label: 'Learning Ability', href: '/learning' },
+          { label: 'Psychology Tests', href: '/psychology', description: 'MBTI, EQ, Depression Screening, Happiness Assessment' },
+          { label: 'Career Planning', href: '/career', description: 'Holland Code, DISC, Professional Development' },
+          { label: 'Astrology', href: '/astrology', description: 'Birth Chart Analysis, Zodiac Insights' },
+          { label: 'Tarot Reading', href: '/tarot', description: 'Online Card Drawings, Mystical Guidance' },
+          { label: 'Numerology', href: '/numerology', description: 'BaZi, Chinese Zodiac, Name Analysis' },
+          { label: 'Relationships', href: '/relationship', description: 'Love Languages, Communication Styles' },
+          { label: 'Learning Ability', href: '/learning', description: 'VARK Learning Styles, Study Optimization' },
+        ],
+      },
+      statistics: {
+        title: 'Platform Statistics',
+        items: [
+          '20+ Professional Assessments Available',
+          '7 Specialized Testing Modules',
+          'AI-Powered Personalized Results',
+          'Mobile-First Responsive Design',
+          'GDPR & CCPA Compliant',
+          'English-Only Interface'
         ],
       },
     },
     seo: {
-      title: 'About — SelfAtlas Testing Platform',
-      description: 'Learn how our English-only, unified testing platform helps you explore psychology, career, astrology, tarot, and more — fast, privacy-first, and consistent by design.',
+      title: 'About SelfAtlas - Comprehensive Self-Discovery Platform',
+      description: 'Discover yourself with SelfAtlas: 20+ psychological tests, career planning, astrology, tarot readings, and more. AI-powered insights, privacy-first design, and mobile-optimized experience.',
     }
   },
   testCenter: {
@@ -186,9 +323,9 @@ export const UI_TEXT = {
       { id: 'leadership', module: 'career', title: 'Leadership Skills Assessment', description: 'Evaluate leadership tendencies and management skills.', href: '/career', duration: '15-25', questions: '28', rating: '4.5', participants: '7800' },
 
       // Astrology
-      { id: 'birth_chart', module: 'astrology', title: 'Birth Chart Analysis', description: 'Unlock insights from your natal chart and cosmic blueprint', href: '/astrology', duration: '5', questions: 'Birth data', rating: '4.8', participants: '13400', isHot: true },
-      { id: 'compatibility', module: 'astrology', title: 'Compatibility Test', description: 'Explore compatibility through astrological indicators and synastry', href: '/astrology', duration: '8', questions: 'Birth data', rating: '4.6', participants: '9200' },
-      { id: 'fortune', module: 'astrology', title: 'Fortune Forecast', description: 'Check daily and monthly fortune trends and cosmic guidance', href: '/astrology', duration: '3', questions: 'Birth data', rating: '4.4', participants: '6800' },
+      { id: 'birth_chart', module: 'astrology', title: 'Birth Chart Analysis', description: 'Unlock insights from your natal chart and cosmic blueprint', href: '/astrology/birth-chart', duration: '5', questions: 'Birth data', rating: '4.8', participants: '13400', isHot: true },
+      { id: 'compatibility', module: 'astrology', title: 'Zodiac Compatibility', description: 'Explore compatibility through astrological indicators and synastry', href: '/astrology/compatibility', duration: '8', questions: 'Birth data', rating: '4.6', participants: '9200' },
+      { id: 'fortune', module: 'astrology', title: 'Zodiac Fortune Forecast', description: 'Check daily and monthly fortune trends and cosmic guidance', href: '/astrology/fortune', duration: '3', questions: 'Birth data', rating: '4.4', participants: '6800' },
 
       // Tarot
       { id: 'tarot_reading', module: 'tarot', title: 'Tarot Reading', description: 'Comprehensive interpretation of your spread with detailed insights', href: '/tarot', duration: '8', questions: 'Question', rating: '4.8', participants: '10500', isHot: true },

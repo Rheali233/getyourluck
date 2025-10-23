@@ -19,6 +19,7 @@ import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
+import { TarotPerformanceMonitor, useTarotPerformance } from './TarotPerformanceMonitor';
 
 export const TarotHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ export const TarotHomePage: React.FC = () => {
     questionText
   } = useTarotStore();
   const { isLoading } = useUnifiedTestStore();
+  const { startDataLoad, endDataLoad, markFirstCardRender } = useTarotPerformance();
 
   // 关键词优化
   const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
@@ -84,8 +86,20 @@ export const TarotHomePage: React.FC = () => {
   });
 
   useEffect(() => {
+    // 开始性能监控
+    startDataLoad();
+    
     // 加载基础数据
-    if (!cardsLoaded) loadTarotCards();
+    if (!cardsLoaded) {
+      loadTarotCards().then(() => {
+        endDataLoad();
+        markFirstCardRender();
+      });
+    } else {
+      endDataLoad();
+      markFirstCardRender();
+    }
+    
     if (!categoriesLoaded) loadQuestionCategories();
     if (!spreadsLoaded) loadTarotSpreads();
     
@@ -100,7 +114,7 @@ export const TarotHomePage: React.FC = () => {
         moduleType: 'test_module'
       }
     });
-  }, [cardsLoaded, categoriesLoaded, spreadsLoaded, loadTarotCards, loadQuestionCategories, loadTarotSpreads]);
+  }, []); // 移除所有依赖项，只在组件挂载时执行一次
 
   const handleCategorySelect = async (categoryId: string) => {
     // 记录分类选择事件
@@ -306,6 +320,11 @@ export const TarotHomePage: React.FC = () => {
         className="max-w-6xl mx-auto px-4 py-8" 
       />
     </TarotTestContainer>
+    
+    {/* 性能监控组件 */}
+    <TarotPerformanceMonitor 
+      enabled={process.env['NODE_ENV'] === 'development'}
+    />
     </>
   );
 };

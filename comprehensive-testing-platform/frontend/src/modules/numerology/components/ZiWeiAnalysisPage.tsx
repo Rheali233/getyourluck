@@ -12,7 +12,7 @@ import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 
 export const ZiWeiAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
-  const { processNumerologyData, isLoading, error, showResults, analysisResult } = useNumerologyStore();
+  const { processNumerologyData, isLoading, error, showResults, analysisResult, clearNumerologySession } = useNumerologyStore();
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -26,6 +26,11 @@ export const ZiWeiAnalysisPage: React.FC = () => {
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  // 进入页面时重置命理状态，避免跨分析类型残留状态
+  useEffect(() => {
+    clearNumerologySession();
+  }, []);
 
   // 监听结果加载完成，只有当有ZiWei分析数据时才跳转到结果页面
   useEffect(() => {

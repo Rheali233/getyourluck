@@ -89,12 +89,12 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
           slug: a.slug || a.id,
           title: a.title,
           excerpt: a.excerpt || '',
-          coverImage: a.coverImage || '',
+          coverImage: a.coverImage ? (a.coverImage.startsWith('http') ? a.coverImage : `https://selfatlas-backend-prod.cyberlina.workers.dev${a.coverImage}`) : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80',
           category: a.category || 'Blog',
-          readTime: a.readTime || '',
-          publishDate: a.publishedAt || a.publishDate || '',
-          author: a.author || '',
-          readCount: a.readCount || 0,
+          readTime: a.readTime || '5 min read', // 默认阅读时间
+          publishDate: a.publishedAt || a.publishDate || a.createdAt || '',
+          author: a.author || 'SelfAtlas Team',
+          readCount: a.readCount || a.viewCount || 0,
           tags: a.tags || [],
         }));
         

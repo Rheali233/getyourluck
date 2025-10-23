@@ -110,7 +110,7 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
             DISC Styles Analysis
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Object.entries(result.discStyles).map(([style, details]) => (
+            {Object.entries(result?.discStyles ?? {}).map(([style, details]) => (
               <div key={style} className="p-6 rounded-lg bg-emerald-50 border border-emerald-200">
                 <h4 className="text-lg font-semibold mb-4 text-gray-900">
                   {style}
@@ -148,7 +148,7 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
                   <div>
                     <h5 className="font-medium text-emerald-700 text-sm mb-2">Characteristics:</h5>
                     <ul className="space-y-0.5">
-                      {details.characteristics.map((char, idx) => (
+                      {(details.characteristics || []).map((char, idx) => (
                         <li key={idx} className="text-sm text-gray-600 flex items-start">
                           <span className="text-gray-500 mr-2 mt-0.5">•</span>
                           {char}
@@ -159,7 +159,7 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
                   <div>
                     <h5 className="font-medium text-emerald-700 text-sm mb-2">Strengths:</h5>
                     <ul className="space-y-0.5">
-                      {details.strengths.map((strength, idx) => (
+                      {(details.strengths || []).map((strength, idx) => (
                         <li key={idx} className="text-sm text-gray-600 flex items-start">
                           <span className="text-gray-500 mr-2 mt-0.5">•</span>
                           {strength}
@@ -170,7 +170,7 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
                   <div>
                     <h5 className="font-medium text-teal-700 text-sm mb-2">Challenges:</h5>
                     <ul className="space-y-0.5">
-                      {details.challenges.map((challenge, idx) => (
+                      {(details.challenges || []).map((challenge, idx) => (
                         <li key={idx} className="text-sm text-gray-600 flex items-start">
                           <span className="text-gray-500 mr-2 mt-0.5">•</span>
                           {challenge}

@@ -4,6 +4,7 @@
  */
 
 import { TestResultProcessor } from '../TestResultProcessor'
+import { AIService } from '../../AIService'
 
 export class VARKResultProcessor implements TestResultProcessor {
   getTestType(): string {
@@ -31,7 +32,7 @@ export class VARKResultProcessor implements TestResultProcessor {
     });
   }
   
-  async process(answers: any[]): Promise<any> {
+  async process(answers: any[], env?: any): Promise<any> {
     if (!this.validateAnswers(answers)) {
       throw new Error('Invalid VARK answers format')
     }
@@ -56,6 +57,29 @@ export class VARKResultProcessor implements TestResultProcessor {
     const dominantStyle = learningStyles[0] || 'Unknown'
     const secondaryStyle = learningStyles[1] || 'Unknown'
 
+    // 计算百分比
+    const totalAnswers = answers.length
+    const styles = Object.entries(scores)
+      .sort(([,a], [,b]) => b - a)
+      .map(([style, score]) => ({
+        name: this.getStyleName(style),
+        percent: Math.round((score / totalAnswers) * 100),
+        score
+      }))
+
+    // 生成AI个性化分析
+    let aiAnalysis = null
+    if (env && env.DEEPSEEK_API_KEY) {
+      try {
+        // 确保API key是字符串类型
+        const apiKey = String(env.DEEPSEEK_API_KEY)
+        const aiService = new AIService(apiKey)
+        aiAnalysis = await this.generateAIAnalysis(aiService, scores, styles, dominantStyle, secondaryStyle)
+      } catch (error) {
+        // AI analysis failed, using fallback
+      }
+    }
+
     return {
       // 基础学习风格信息
       scores,
@@ -72,17 +96,23 @@ export class VARKResultProcessor implements TestResultProcessor {
           percentage: Math.round((score / answers.length) * 100)
         })),
       
-      // 基础分析内容
-      interpretation: this.generateInterpretation(dominantStyle, secondaryStyle),
-      recommendations: this.generateRecommendations(dominantStyle),
-      studyTips: this.generateStudyTips(dominantStyle),
-      learningStrategies: this.generateLearningStrategies(dominantStyle),
+      // 样式数据用于前端显示
+      styles,
+      
+      // AI个性化分析 - 所有内容都来自AI
+      dimensionsAnalysis: aiAnalysis?.dimensionsAnalysis || {},
+      interpretation: aiAnalysis?.interpretation || '',
+      recommendations: aiAnalysis?.recommendations || [],
+      studyTips: aiAnalysis?.studyTips || [],
+      learningStrategies: aiAnalysis?.learningStrategies || [],
+      learningProfile: aiAnalysis?.learningProfile || {},
       
       // 元数据
       metadata: {
         totalQuestions: answers.length,
         processingTime: new Date().toISOString(),
-        processor: 'VARKResultProcessor'
+        processor: 'VARKResultProcessor',
+        aiGenerated: !!aiAnalysis
       }
     }
   }
@@ -97,23 +127,74 @@ export class VARKResultProcessor implements TestResultProcessor {
     return descriptions[style] || 'Unknown learning style'
   }
   
-  private generateInterpretation(dominant: string, _secondary: string): string {
-    // 移除硬编码解释，让AI生成个性化分析
-    return `AI analysis will provide detailed interpretation for ${dominant} learning style`;
+
+  private getStyleName(style: string): string {
+    const names: Record<string, string> = {
+      'V': 'Visual',
+      'A': 'Auditory', 
+      'R': 'Read/Write',
+      'K': 'Kinesthetic'
+    }
+    return names[style] || style
   }
-  
-  private generateRecommendations(dominantStyle: string): string[] {
-    // 移除硬编码推荐，让AI生成个性化建议
-    return [`AI analysis will provide personalized recommendations for ${dominantStyle} learning style`];
+
+  private async generateAIAnalysis(aiService: AIService, scores: any, styles: any[], dominantStyle: string, secondaryStyle: string): Promise<any> {
+    const prompt = `As a learning psychology expert, analyze this VARK learning style test result and provide comprehensive personalized insights.
+
+Test Results:
+- Visual (V): ${scores.V} points (${styles.find(s => s.name === 'Visual')?.percent || 0}%)
+- Auditory (A): ${scores.A} points (${styles.find(s => s.name === 'Auditory')?.percent || 0}%)  
+- Read/Write (R): ${scores.R} points (${styles.find(s => s.name === 'Read/Write')?.percent || 0}%)
+- Kinesthetic (K): ${scores.K} points (${styles.find(s => s.name === 'Kinesthetic')?.percent || 0}%)
+
+Primary Style: ${dominantStyle}
+Secondary Style: ${secondaryStyle}
+
+Please provide a comprehensive analysis with these exact keys:
+
+1. dimensionsAnalysis: Object with personalized analysis for each learning style dimension (Visual, Auditory, Read/Write, Kinesthetic). Each should be 2-3 sentences explaining what their score means for their learning approach.
+
+2. interpretation: Overall learning style interpretation (2-3 sentences)
+
+3. recommendations: Array of 3-5 specific learning recommendations based on their profile
+
+4. studyTips: Array of 4-6 practical study tips tailored to their learning style
+
+5. learningStrategies: Array of 3-4 learning strategies that work best for their profile
+
+6. learningProfile: Object containing:
+   - cognitiveStrengths: Array of 3-4 cognitive strengths based on their learning style
+   - learningPreferences: Object with:
+     - methods: Array of preferred learning methods
+     - environments: Array of preferred learning environments  
+     - timePatterns: Array of preferred study time patterns
+   - adaptability: Object with:
+     - strengths: Array of adaptability strengths
+     - challenges: Array of potential learning challenges
+     - strategies: Array of strategies for adapting to different learning situations
+
+Format as JSON with these exact keys. Be specific and personalized based on their actual scores and percentages.`
+
+    try {
+      const response = await (aiService as any).callDeepSeek(prompt)
+      
+      // 解析AI响应
+      if (response && response.choices && response.choices[0] && response.choices[0].message) {
+        const content = response.choices[0].message.content
+        
+        // 提取JSON内容（去除markdown代码块标记）
+        const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/)
+        const jsonString = jsonMatch ? jsonMatch[1] : content
+        
+        const parsed = JSON.parse(jsonString)
+        return parsed
+      } else {
+        return null
+      }
+    } catch (error) {
+      return null
+    }
   }
-  
-  private generateStudyTips(dominantStyle: string): string[] {
-    // 移除硬编码学习技巧，让AI生成个性化建议
-    return [`AI analysis will provide personalized study tips for ${dominantStyle} learning style`];
-  }
-  
-  private generateLearningStrategies(dominantStyle: string): string[] {
-    // 移除硬编码学习策略，让AI生成个性化建议
-    return [`AI analysis will provide personalized learning strategies for ${dominantStyle} learning style`];
-  }
+
+
 }

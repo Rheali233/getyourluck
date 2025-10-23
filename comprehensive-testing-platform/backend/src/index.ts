@@ -66,6 +66,8 @@ app.use("*", cors({
       "http://localhost:5173",
       "https://*.pages.dev",
       "https://*.cloudflare.com",
+      "https://selfatlas.net", // 生产域名
+      "https://www.selfatlas.net", // 带www的域名
     ];
     
     if (!origin) {

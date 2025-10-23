@@ -108,7 +108,7 @@ export const PHQ9ResultDisplay: React.FC<PHQ9ResultDisplayProps> = ({
             </div>
 
             {/* Psychological Analysis */}
-            <div className="p-6 rounded-lg bg-indigo-50 border border-indigo-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">🧠</span>
                 Psychological Patterns
@@ -149,7 +149,7 @@ export const PHQ9ResultDisplay: React.FC<PHQ9ResultDisplayProps> = ({
               </p>
             </div>
             
-            <div className="p-6 rounded-lg bg-indigo-50 border border-indigo-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">🏃</span>
                 Physical Activity
@@ -169,7 +169,7 @@ export const PHQ9ResultDisplay: React.FC<PHQ9ResultDisplayProps> = ({
               </p>
             </div>
             
-            <div className="p-6 rounded-lg bg-indigo-50 border border-indigo-200">
+            <div className="p-6 rounded-lg bg-blue-50 border border-blue-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <span className="text-2xl mr-2">🤝</span>
                 Social Support

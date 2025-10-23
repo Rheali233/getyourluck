@@ -10,6 +10,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { PerformancePanel } from '@/components/PerformancePanel';
 import { ApiStatusIndicator } from '@/components/ApiStatusIndicator';
 import { GlobalAnalyticsTracker } from '@/components/GlobalAnalyticsTracker';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { LazyAboutPage, LazyTestCenterPage } from '@/components/LazyComponent';
 import { PreloadCriticalModules } from '@/components/Preload';
 import { LegacyTestsRedirect } from '@/routes/LegacyTestsRedirect';
@@ -29,12 +30,16 @@ import { LearningAbilityHomePage } from '@/modules/learning-ability/components/L
 import { VARKTestPage } from '@/modules/learning-ability/components/VARKTestPage';
 import { SEOToolsPage } from '@/pages/SEOToolsPage';
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
+import { DefaultScrollRestoration } from '@/components/ScrollRestoration';
+import { CookiesBanner } from '@/modules/homepage/components/CookiesBanner';
 
 function App() {
   return (
     <HelmetProvider>
       <ErrorBoundary>
         <PreloadCriticalModules />
+        <DefaultScrollRestoration />
+        <CookiesBanner />
         <Routes>
         <Route path="/" element={<Homepage />} />
         {/* About - lazy loaded to keep initial bundle small */}
@@ -113,6 +118,9 @@ function App() {
         
         {/* 已删除：ResultPages和ComponentShowcase路由 */}
         </Routes>
+        
+        {/* Google Analytics */}
+        <GoogleAnalytics />
         
         {/* Global analytics tracker - lazy-load wrapper can be added by route-level splitting if needed */}
         <GlobalAnalyticsTracker />

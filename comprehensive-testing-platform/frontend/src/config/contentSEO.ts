@@ -139,7 +139,7 @@ export const INTERNAL_LINKING_CONFIG = {
       { path: '/career/leadership', text: 'Leadership Test', keywords: ['leadership skills'] }
     ],
     astrology: [
-      { path: '/astrology/fortune', text: 'Horoscope Reading', keywords: ['daily horoscope'] },
+      { path: '/astrology/fortune', text: 'Zodiac Fortune Forecast', keywords: ['daily horoscope'] },
       { path: '/astrology/compatibility', text: 'Zodiac Compatibility', keywords: ['zodiac match'] },
       { path: '/astrology/birth-chart', text: 'Birth Chart Analysis', keywords: ['natal chart'] }
     ]
@@ -232,12 +232,12 @@ export const RELATED_CONTENT_CONFIG = {
       { type: 'article', path: '/blog/11th-house-friendships-dreams-community', title: 'Friendships & Community Guide', reason: 'Learn to connect with others' }
     ],
     numerology: [
-      { type: 'test', path: '/astrology/fortune', title: 'Horoscope Reading', reason: 'Explore your cosmic destiny' },
+      { type: 'test', path: '/astrology/fortune', title: 'Zodiac Fortune Forecast', reason: 'Explore your cosmic destiny' },
       { type: 'test', path: '/tarot', title: 'Tarot Reading', reason: 'Get spiritual guidance' },
       { type: 'article', path: '/blog/numerology-power-of-names', title: 'Numerology Guide', reason: 'Learn about number meanings' }
     ],
     tarot: [
-      { type: 'test', path: '/astrology/fortune', title: 'Horoscope Reading', reason: 'Explore your cosmic destiny' },
+      { type: 'test', path: '/astrology/fortune', title: 'Zodiac Fortune Forecast', reason: 'Explore your cosmic destiny' },
       { type: 'test', path: '/numerology', title: 'Numerology Analysis', reason: 'Discover your life numbers' },
       { type: 'article', path: '/blog/kabbalah-birthday-angels-spiritual-growth', title: 'Spiritual Guidance', reason: 'Learn tarot card meanings' }
     ]

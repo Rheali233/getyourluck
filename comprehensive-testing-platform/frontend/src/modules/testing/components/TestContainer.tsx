@@ -6,6 +6,7 @@
 import React from 'react';
 import { useTestStore } from '../stores/useTestStore';
 import { QuestionDisplay } from './QuestionDisplay';
+import type { Question } from '../types/TestTypes';
 import { Card } from '@/components/ui';
 import { cn } from '@/utils/classNames';
 // Import specialized result displays - 使用懒加载优化性能
@@ -28,6 +29,7 @@ import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 
 interface TestContainerProps {
   testType: string;
+  questions?: Question[];
   onTestComplete?: (result: any) => void; // eslint-disable-line no-unused-vars
   className?: string;
   testId?: string;
@@ -35,6 +37,7 @@ interface TestContainerProps {
 
 export const TestContainer: React.FC<TestContainerProps> = ({
   testType,
+  questions: propQuestions,
   onTestComplete,
   className = '',
   testId
@@ -42,7 +45,6 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   const {
     // State
     currentQuestionIndex,
-    totalQuestions,
     questions: storeQuestions,
     isLoading,
     error,
@@ -140,8 +142,10 @@ export const TestContainer: React.FC<TestContainerProps> = ({
 
 
 
-  // Get current question
-  const currentQuestion = storeQuestions[currentQuestionIndex];
+  // Get current question - use prop questions if available, otherwise use store questions
+  const questions = propQuestions || storeQuestions;
+  const currentQuestion = questions[currentQuestionIndex];
+  const totalQuestions = questions.length;
 
   // Get theme colors based on testType
   const getThemeColors = () => {
@@ -242,7 +246,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         loading: 'cyan-600',
         gradient: 'from-cyan-600 to-sky-500',
         gradientHover: 'from-cyan-700 to-sky-600',
-        backgroundGradient: 'from-sky-50 via-cyan-50 to-sky-50'
+        backgroundGradient: 'from-cyan-100 via-sky-200 to-cyan-200'
       };
     }
     // Default (fallback to blue)
@@ -528,7 +532,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
               style={{ 
                 position: 'relative', 
                 zIndex: 1000000,
-                background: theme?.gradient === 'from-cyan-600 to-sky-500' 
+                background: (theme?.gradient === 'from-cyan-600 to-sky-500' || testType === 'vark')
                   ? 'linear-gradient(135deg, #0891b2 0%, #0ea5e9 100%)'
                   : theme?.gradient === 'from-pink-600 to-rose-500'
                   ? 'linear-gradient(135deg, #db2777 0%, #f43f5e 100%)'

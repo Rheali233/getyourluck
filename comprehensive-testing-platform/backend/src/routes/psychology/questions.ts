@@ -41,10 +41,10 @@ questionsRouter.get('/', async (c) => {
     // 获取所有分类的题目
     const categories = ['mbti', 'phq9', 'eq', 'happiness'];
     const categoryIdMap: { [key: string]: string } = {
-      'mbti': 'mbti-category',
-      'phq9': 'phq9-category',
-      'eq': 'eq-category',
-      'happiness': 'happiness-category'
+      'mbti': 'cat_mbti',
+      'phq9': 'cat_phq9',
+      'eq': 'cat_eq',
+      'happiness': 'cat_happiness'
     };
     const allQuestions: any = {};
     
@@ -58,7 +58,6 @@ questionsRouter.get('/', async (c) => {
           allQuestions[category] = [];
         }
       } catch (error) {
-        console.error(`获取${category}题目失败:`, error);
         allQuestions[category] = [];
       }
     }
@@ -71,7 +70,6 @@ questionsRouter.get('/', async (c) => {
       requestId: c.req.header('X-Request-ID')
     });
   } catch (error) {
-    console.error('获取所有题目失败:', error);
     return c.json({
       success: false,
       error: '获取题目失败',
@@ -104,10 +102,10 @@ questionsRouter.get('/:testType', async (c) => {
     
     // 映射testType到category_id
     const categoryIdMap: { [key: string]: string } = {
-      'mbti': 'mbti-category',
-      'phq9': 'phq9-category',
-      'eq': 'eq-category',
-      'happiness': 'happiness-category'
+      'mbti': 'cat_mbti',
+      'phq9': 'cat_phq9',
+      'eq': 'cat_eq',
+      'happiness': 'cat_happiness'
     };
     
     const categoryId = categoryIdMap[testType];
@@ -131,7 +129,6 @@ questionsRouter.get('/:testType', async (c) => {
       requestId: c.req.header('X-Request-ID')
     });
   } catch (error) {
-    console.error(`获取${c.req.param('testType')}题目失败:`, error);
     return c.json({
       success: false,
       error: '获取题目失败',
@@ -161,7 +158,6 @@ questionsRouter.get('/categories', async (c) => {
       requestId: c.req.header('X-Request-ID')
     });
   } catch (error) {
-    console.error('获取题目分类失败:', error);
     return c.json({
       success: false,
       error: '获取分类失败',
@@ -192,7 +188,6 @@ questionsRouter.get('/:testType/configs', async (c) => {
       requestId: c.req.header('X-Request-ID')
     });
   } catch (error) {
-    console.error(`获取${c.req.param('testType')}配置失败:`, error);
     return c.json({
       success: false,
       error: '获取配置失败',
@@ -221,7 +216,6 @@ questionsRouter.get('/:testType/versions', async (c) => {
       requestId: c.req.header('X-Request-ID')
     });
   } catch (error) {
-    console.error(`获取${c.req.param('testType')}版本失败:`, error);
     return c.json({
       success: false,
       error: '获取版本失败',
@@ -273,7 +267,6 @@ questionsRouter.post('/', async (c) => {
       requestId: c.req.header('X-Request-ID')
     }, 201);
   } catch (error) {
-    console.error('创建题目失败:', error);
     return c.json({
       success: false,
       error: '创建题目失败',
@@ -317,7 +310,6 @@ questionsRouter.put('/:id', async (c) => {
       requestId: c.req.header('X-Request-ID')
     });
   } catch (error) {
-    console.error('更新题目失败:', error);
     return c.json({
       success: false,
       error: '更新题目失败',
@@ -343,7 +335,6 @@ questionsRouter.delete('/:id', async (c) => {
       requestId: c.req.header('X-Request-ID')
     });
   } catch (error) {
-    console.error('删除题目失败:', error);
     return c.json({
       success: false,
       error: '删除题目失败',

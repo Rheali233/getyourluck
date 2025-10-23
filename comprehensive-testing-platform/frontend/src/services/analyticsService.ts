@@ -13,9 +13,10 @@ import { getApiBaseUrl } from '../config/environment'
 
 // 简单采样控制（可按需外部配置）
 const DEFAULT_SAMPLING: Partial<Record<AnalyticsEventType, number>> = {
-  click: 1,
-  interaction: 0.5,
-  scroll_depth: 0.5,
+  click: 0.3, // 降低点击事件采样率到30%
+  interaction: 0.2, // 降低交互事件采样率到20%
+  scroll_depth: 0.1, // 降低滚动深度采样率到10%
+  time_on_page: 0.1, // 降低页面停留时间采样率到10%
 }
 
 function shouldSample(eventType: AnalyticsEventType): boolean {
@@ -26,7 +27,7 @@ function shouldSample(eventType: AnalyticsEventType): boolean {
 
 const EVENT_QUEUE_KEY = 'analytics_event_queue_v1'
 const MAX_QUEUE_SIZE = 50
-const FLUSH_INTERVAL_MS = 8000
+const FLUSH_INTERVAL_MS = 30000 // 增加队列刷新间隔到30秒
 let flushTimer: number | null = null
 
 function enqueueEvent(payload: AnalyticsEventPayload) {

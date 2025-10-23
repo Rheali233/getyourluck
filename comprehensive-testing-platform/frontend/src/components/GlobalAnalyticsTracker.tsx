@@ -17,8 +17,8 @@ interface GlobalAnalyticsTrackerProps {
 export const GlobalAnalyticsTracker: React.FC<GlobalAnalyticsTrackerProps> = ({
   sessionId,
   enabled = true,
-  samplingRateHeartbeat = 1,
-  heartbeatIntervalMs = 20000,
+  samplingRateHeartbeat = 0.1, // 降低采样率到10%
+  heartbeatIntervalMs = 60000, // 增加心跳间隔到60秒
 }) => {
   const startTimeRef = useRef<number>(Date.now())
   const maxScrollRef = useRef<number>(0)

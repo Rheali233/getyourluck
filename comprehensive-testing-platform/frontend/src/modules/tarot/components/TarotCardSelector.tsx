@@ -117,7 +117,7 @@ export const TarotCardSelector: React.FC<TarotCardSelectorProps> = ({
           {/* 右滑动提示 */}
           <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-violet-200/80 to-transparent z-10 pointer-events-none"></div>
           <div className="flex gap-1 overflow-x-auto scrollbar-hide" style={{width: '100%', scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
-          {shuffledCards.slice(0, 26).map((card) => {
+          {shuffledCards.map((card) => {
           const selectedCard = selectedCards.find(sc => sc.card.id === card.id);
           const isSelected = !!selectedCard;
           const isFlipped = flippedCards.has(card.id);

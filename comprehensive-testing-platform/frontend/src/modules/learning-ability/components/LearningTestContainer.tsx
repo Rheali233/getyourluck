@@ -20,7 +20,7 @@ export const LearningTestContainer: React.FC<LearningTestContainerProps> = ({
 }) => {
   return (
     <div 
-      className={cn("min-h-screen bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-100 via-blue-200 to-blue-400 py-8 px-4", className)} 
+      className={cn("min-h-screen bg-gradient-to-br from-cyan-100 via-sky-200 to-cyan-200 py-8 px-4", className)} 
       data-testid={testId}
       {...props}
     >

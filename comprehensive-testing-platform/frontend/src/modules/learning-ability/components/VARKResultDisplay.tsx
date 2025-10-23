@@ -20,22 +20,21 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
   let primaryStyle = (result as any).primaryStyle || (result as any).dominantStyle || result.data?.dominantStyle || 'Unknown';
   let secondaryStyle = (result as any).secondaryStyle || result.data?.secondaryStyle || '';
   const rootScores: Record<string, number> = (result as any).scores || (result as any).allScores || result.data?.allScores || {};
-  const analysis = (result as any).analysis || result.data?.analysis || '';
+  const interpretation = (result as any).interpretation || result.data?.interpretation || '';
   const meta = (result as any).metadata || result.data?.metadata || {};
   const recommendations = (result as any).recommendations || result.data?.recommendations || [];
   const studyTips = (result as any).studyTips || result.data?.studyTips || [];
+  const learningStrategies = (result as any).learningStrategies || result.data?.learningStrategies || [];
   
   
-  // 新的5个核心模块数据提取
+  // 核心模块数据提取
   const learningProfile = (result as any).learningProfile || result.data?.learningProfile || {};
   const learningStrategiesImplementation = (result as any).learningStrategiesImplementation || result.data?.learningStrategiesImplementation || {};
-  const learningEffectiveness = (result as any).learningEffectiveness || result.data?.learningEffectiveness || {};
   
   // 兼容旧格式数据
   const cognitiveProfile = (result as any).cognitiveProfile || result.data?.cognitiveProfile || {};
   const learningPreferences = (result as any).learningPreferences || result.data?.learningPreferences || {};
   const contextualInsights = (result as any).contextualInsights || result.data?.contextualInsights || {};
-  const effectivenessPrediction = (result as any).effectivenessPrediction || result.data?.effectivenessPrediction || {};
 
   const getStyleIcon = (style: string) => {
     switch (style) {
@@ -81,38 +80,11 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
     'Weak preference'
   );
 
-  // 限制描述长度（100个单词以内）
-  const limitWords = (text: any, maxWords = 100): string => {
-    if (!text) return '';
-    const s = String(text).trim();
-    if (!s) return '';
-    const words = s.split(/\s+/);
-    if (words.length <= maxWords) return s;
-    return words.slice(0, maxWords).join(' ') + '…';
-  };
 
-  // 专业科学描述 - 根据评分结果描述特征和倾向
-  const getProfessionalDescription = (name: string, percent: number): string => {
-    const level = levelOf(percent);
-    const intensity = level.includes('Very strong') ? 'highly' : level.includes('Strong') ? 'moderately' : level.includes('Moderate') ? 'somewhat' : 'minimally';
-    
-    switch (name) {
-      case 'Visual':
-        return `Shows ${intensity} visual learning tendencies with ${level.includes('Weak') ? 'limited' : level.includes('Moderate') ? 'balanced' : 'strong'} preference for diagrams, charts, and spatial information processing.`;
-      case 'Auditory':
-        return `Exhibits ${intensity} auditory learning patterns with ${level.includes('Weak') ? 'preference for' : level.includes('Moderate') ? 'balanced approach to' : 'strong inclination toward'} listening-based information processing.`;
-      case 'Read/Write':
-        return `Demonstrates ${intensity} reading/writing orientation with ${level.includes('Weak') ? 'limited' : level.includes('Moderate') ? 'moderate' : 'strong'} preference for text-based learning materials.`;
-      case 'Kinesthetic':
-        return `Shows ${intensity} kinesthetic learning approach with ${level.includes('Weak') ? 'minimal' : level.includes('Moderate') ? 'moderate' : 'strong'} emphasis on hands-on and experiential learning.`;
-      default:
-        return `Shows ${intensity} characteristics in this learning style dimension.`;
-    }
-  };
 
 
   return (
-    <div className={cn('min-h-screen py-8 px-4', className)} data-testid={testId}>
+    <div className={cn('min-h-screen py-8 px-4 bg-gradient-to-br from-cyan-100 via-sky-200 to-cyan-200', className)} data-testid={testId}>
       <div id="mainContent" className="max-w-6xl mx-auto space-y-8">
         {/* Primary Learning Styles - align layout with Love Style: left icon, right content */}
         <Card className="p-6 bg-transparent border-0">
@@ -129,11 +101,11 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
               <h2 className="text-2xl font-bold text-gray-900">Learning Style Assessment</h2>
               <div className="text-sm text-gray-700 mb-2">
                 <span className="font-medium">Primary Style: </span>
-                <span className="text-cyan-600 font-semibold">{primaryStyle}</span>
+                <span className="text-gray-900 font-semibold">{primaryStyle}</span>
                 {secondaryStyle && secondaryStyle !== primaryStyle && (
                   <>
                     {' | Secondary Style: '}
-                    <span className="text-sky-600 font-semibold">{secondaryStyle}</span>
+                    <span className="text-gray-900 font-semibold">{secondaryStyle}</span>
                   </>
                 )}
               </div>
@@ -145,47 +117,60 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                 {primaryStyle === 'Kinesthetic' && 'You learn most effectively through hands-on activities, movement, and physical experience. You prefer to learn by doing rather than observing.'}
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {limitWords(analysis) || 'Your learning style assessment reveals how you process and retain information most effectively.'}
+                {interpretation || 'Your learning style assessment reveals how you process and retain information most effectively.'}
               </p>
             </div>
           </div>
         </Card>
 
-        {/* 维度分析卡片 - 完全参照Love Style的布局和样式 */}
+        {/* 维度分析卡片 - 使用AI个性化分析 */}
         <Card className="p-6 bg-transparent border-0">
-          <h3 className="text-xl font-semibold mb-6 text-sky-900 flex items-center">
+          <h3 className="text-xl font-semibold mb-6 text-gray-900 flex items-center">
             <span className="text-2xl mr-2">🎓</span>
             Learning Style Dimensions Analysis
           </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {styles.map((style) => (
-              <div key={style.name} className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                <div className="mb-3">
-                  <h4 className="text-lg font-semibold text-sky-900">{style.name}</h4>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-sky-600">Preference level</span>
-                  <span className="text-sm font-medium text-sky-900">{levelOf(style.percent)}</span>
-                </div>
-                <div className="mb-3">
-                  <div className="w-full bg-white/60 rounded-full h-2">
-                    <div 
-                      className={cn(
-                        "h-2 rounded-full transition-all duration-700",
-                        style.percent >= 80 ? "bg-gradient-to-r from-cyan-600 to-cyan-500" :
-                        style.percent >= 60 ? "bg-gradient-to-r from-cyan-500 to-cyan-400" :
-                        style.percent >= 40 ? "bg-gradient-to-r from-sky-500 to-sky-400" :
-                        "bg-gradient-to-r from-sky-300 to-sky-400"
-                      )}
-                      style={{ width: `${style.percent}%` }}
-                    />
+            {styles.map((style) => {
+              // 使用AI生成的个性化分析
+              const dimensionsAnalysis = (result as any).dimensionsAnalysis;
+              let analysis = null;
+              
+              if (dimensionsAnalysis && typeof dimensionsAnalysis === 'object') {
+                // 直接通过键获取AI生成的分析
+                analysis = dimensionsAnalysis[style.name];
+              }
+              
+              return (
+                <div key={style.name} className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
+                  <div className="mb-3">
+                    <h4 className="text-lg font-semibold text-gray-900">{style.name}</h4>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">Preference level</span>
+                    <span className="text-sm font-medium text-gray-900">{levelOf(style.percent)}</span>
+                  </div>
+                  <div className="mb-3">
+                    <div className="w-full bg-white/60 rounded-full h-2">
+                      <div 
+                        className={cn(
+                          "h-2 rounded-full transition-all duration-700",
+                          style.percent >= 80 ? "bg-gradient-to-r from-cyan-600 to-cyan-500" :
+                          style.percent >= 60 ? "bg-gradient-to-r from-cyan-500 to-cyan-400" :
+                          style.percent >= 40 ? "bg-gradient-to-r from-sky-500 to-sky-400" :
+                          "bg-gradient-to-r from-sky-300 to-sky-400"
+                        )}
+                        style={{ width: `${style.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-700">
+                      {analysis || 'AI analysis not available for this learning style dimension.'}
+                    </p>
                   </div>
                 </div>
-                <div className="mt-2">
-                  <p className="text-sm text-sky-700">{getProfessionalDescription(style.name, style.percent)}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
 
@@ -202,13 +187,13 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                 {/* 认知特征 */}
                 {(learningProfile.cognitiveStrengths || cognitiveProfile.learningStrengths) && (
                   <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                       <span className="text-xl mr-2">💪</span>
                       Cognitive Strengths
                     </h4>
                     <div className="space-y-3">
                       {(learningProfile.cognitiveStrengths || cognitiveProfile.learningStrengths || []).map((strength: string, index: number) => (
-                        <p key={index} className="text-sm text-sky-700 leading-relaxed">
+                        <p key={index} className="text-sm text-gray-700 leading-relaxed">
                           {strength}
                         </p>
                       ))}
@@ -219,15 +204,15 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                 {/* 学习偏好 */}
                 {(learningProfile.learningPreferences || learningPreferences) && (
                   <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                       <span className="text-xl mr-2">📚</span>
                       Learning Preferences
                     </h4>
                     <div className="space-y-4">
                       {Object.entries(learningProfile.learningPreferences || learningPreferences).map(([key, value]) => (
                         <div key={key}>
-                          <h5 className="font-semibold text-sky-900 mb-1 capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}</h5>
-                          <p className="text-sky-700 text-sm leading-relaxed">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
+                          <h5 className="font-semibold text-gray-900 mb-1 capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}</h5>
+                          <p className="text-gray-700 text-sm leading-relaxed">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
                         </div>
                       ))}
                     </div>
@@ -237,15 +222,15 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                 {/* 适应性 */}
                 {(learningProfile.adaptability || contextualInsights) && (
                   <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                       <span className="text-xl mr-2">🔄</span>
                       Adaptability
                     </h4>
                     <div className="space-y-3">
                       {Object.entries(learningProfile.adaptability || contextualInsights).map(([key, value]) => (
                         <div key={key}>
-                          <h5 className="font-semibold text-sky-900 mb-1 capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}</h5>
-                          <p className="text-sky-700 text-sm leading-relaxed">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
+                          <h5 className="font-semibold text-gray-900 mb-1 capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}</h5>
+                          <p className="text-gray-700 text-sm leading-relaxed">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
                         </div>
                       ))}
                     </div>
@@ -265,19 +250,19 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* 核心策略 */}
                 <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                  <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <span className="text-xl mr-2">💡</span>
                     Core Strategies
                   </h4>
                   <div className="space-y-3">
-                    {(learningStrategiesImplementation.coreStrategies || recommendations || [
+                    {(learningStrategies || learningStrategiesImplementation.coreStrategies || recommendations || [
                       `Focus on ${primaryStyle.toLowerCase()} learning methods to maximize your learning efficiency`,
                       `Create structured study environments that support your ${primaryStyle.toLowerCase()} preferences`,
                       `Use multi-sensory approaches when possible to reinforce learning`,
                       `Practice active recall techniques aligned with your learning style`,
                       `Set up dedicated study spaces optimized for your learning preferences`
                     ]).slice(0, 6).map((strategy: string, index: number) => (
-                      <p key={index} className="text-sm text-sky-700 leading-relaxed">
+                      <p key={index} className="text-sm text-gray-700 leading-relaxed">
                         {strategy}
                       </p>
                     ))}
@@ -286,7 +271,7 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                 
                 {/* 实用技巧 */}
                 <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                  <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <span className="text-xl mr-2">📝</span>
                     Study Tips
                   </h4>
@@ -298,7 +283,7 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                       `Review material using ${primaryStyle.toLowerCase()}-preferred techniques`,
                       `Connect new information to existing knowledge using your learning style strengths`
                     ]).slice(0, 6).map((tip: string, index: number) => (
-                      <p key={index} className="text-sm text-sky-700 leading-relaxed">
+                      <p key={index} className="text-sm text-gray-700 leading-relaxed">
                         {tip}
                       </p>
                     ))}
@@ -306,83 +291,28 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                 </div>
                 
                 {/* 环境设置 */}
-                {learningStrategiesImplementation.environmentSetup && (
-                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
-                      <span className="text-xl mr-2">🏠</span>
-                      Environment
-                    </h4>
-                    <div className="space-y-3">
-                      {Object.entries(learningStrategiesImplementation.environmentSetup).map(([key, value]) => (
-                        <div key={key}>
-                          <h5 className="font-semibold text-sky-900 mb-1 capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}</h5>
-                          <p className="text-sky-700 text-sm leading-relaxed">{Array.isArray(value) ? value.join(', ') : String(value)}</p>
-                        </div>
-                      ))}
-                    </div>
+                <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <span className="text-xl mr-2">🏠</span>
+                    Environment
+                  </h4>
+                  <div className="space-y-3">
+                    {(learningProfile.learningPreferences?.environments || learningStrategiesImplementation.environmentSetup || [
+                      `Create a ${primaryStyle.toLowerCase()}-friendly study space with appropriate lighting and materials`,
+                      `Minimize distractions and ensure comfortable seating for extended study sessions`,
+                      `Organize materials in a way that supports your ${primaryStyle.toLowerCase()} learning preferences`,
+                      `Consider background noise levels that work best for your learning style`
+                    ]).map((environment: string, index: number) => (
+                      <p key={index} className="text-sm text-gray-700 leading-relaxed">
+                        {environment}
+                      </p>
+                    ))}
                   </div>
-                )}
+                </div>
               </div>
             </Card>
           )}
 
-          {/* 模块5: Learning Effectiveness (学习效果) */}
-          {(Object.keys(learningEffectiveness).length > 0 || Object.keys(effectivenessPrediction).length > 0) && (
-            <Card className="p-6 bg-transparent border-0">
-              <h3 className="text-xl font-semibold mb-6 text-gray-900 flex items-center">
-                <span className="text-2xl mr-2">📊</span>
-                Learning Effectiveness
-              </h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* 效果预测 */}
-                {(learningEffectiveness.optimalConditions || effectivenessPrediction.optimalConditions) && (
-                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
-                      <span className="text-xl mr-2">⚡</span>
-                      Optimal Conditions
-                    </h4>
-                    <div className="space-y-3">
-                      {(learningEffectiveness.optimalConditions || effectivenessPrediction.optimalConditions || []).slice(0, 4).map((condition: string, index: number) => (
-                        <p key={index} className="text-sm text-sky-700 leading-relaxed">
-                          {condition}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {/* 预期表现 */}
-                {(learningEffectiveness.expectedPerformance || effectivenessPrediction.expectedPerformance) && (
-                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
-                      <span className="text-xl mr-2">📈</span>
-                      Performance
-                    </h4>
-                    <p className="text-sm text-sky-700 leading-relaxed">
-                      {learningEffectiveness.expectedPerformance || effectivenessPrediction.expectedPerformance}
-                    </p>
-                  </div>
-                )}
-                
-                {/* 改进领域 */}
-                {(learningEffectiveness.improvementAreas || effectivenessPrediction.improvementAreas) && (
-                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                    <h4 className="text-lg font-semibold text-sky-900 mb-4 flex items-center">
-                      <span className="text-xl mr-2">🔧</span>
-                      Improvement
-                    </h4>
-                    <div className="space-y-3">
-                      {(learningEffectiveness.improvementAreas || effectivenessPrediction.improvementAreas || []).slice(0, 4).map((area: string, index: number) => (
-                        <p key={index} className="text-sm text-sky-700 leading-relaxed">
-                          {area}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
         </div>
 
         {/* 操作按钮 */}
