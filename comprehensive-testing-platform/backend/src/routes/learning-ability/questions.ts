@@ -57,7 +57,9 @@ learningQuestionsRoutes.get('/vark', async (c) => {
     
     return c.json({
       success: true,
-      data: questions,
+      data: {
+        vark: questions
+      },
       message: 'VARK questions retrieved successfully',
       timestamp: new Date().toISOString()
     });
