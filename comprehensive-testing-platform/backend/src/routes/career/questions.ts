@@ -16,17 +16,20 @@ careerQuestionsRouter.get('/', async (c) => {
     const questionModel = new QuestionBankModel(dbService.env);
     
     // Get questions for all career test categories
-    const categories = ['holland-category', 'disc-category', 'leadership-category'];
+    const categories = ['cat_holland', 'cat_disc', 'cat_leadership'];
     const allQuestions: any = {};
     
     for (const categoryId of categories) {
       try {
+        console.log(`Fetching questions for category: ${categoryId}`);
         const questions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
-        const categoryCode = categoryId.replace('-category', '');
+        console.log(`Found ${questions.length} questions for ${categoryId}`);
+        console.log(`First question sample:`, questions[0]);
+        const categoryCode = categoryId.replace('cat_', '');
         allQuestions[categoryCode] = questions;
       } catch (error) {
         console.error(`Failed to get questions for ${categoryId}:`, error);
-        allQuestions[categoryId.replace('-category', '')] = [];
+        allQuestions[categoryId.replace('cat_', '')] = [];
       }
     }
     
@@ -71,9 +74,9 @@ careerQuestionsRouter.get('/:testType', async (c) => {
     
     // Map testType to category_id
     const categoryIdMap: { [key: string]: string } = {
-      'holland': 'holland-category',
-      'disc': 'disc-category',
-      'leadership': 'leadership-category'
+      'holland': 'cat_holland',
+      'disc': 'cat_disc',
+      'leadership': 'cat_leadership'
     };
     
     const categoryId = categoryIdMap[testType];
@@ -87,7 +90,10 @@ careerQuestionsRouter.get('/:testType', async (c) => {
       }, 400);
     }
     
+    console.log(`Fetching questions for categoryId: ${categoryId}`);
     const questions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
+    console.log(`Retrieved ${questions.length} questions for ${testType}`);
+    console.log('First question sample:', questions[0]);
     
     return c.json({
       success: true,

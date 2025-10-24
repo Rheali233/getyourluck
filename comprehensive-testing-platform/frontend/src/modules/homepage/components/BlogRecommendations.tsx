@@ -89,7 +89,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
           slug: a.slug || a.id,
           title: a.title,
           excerpt: a.excerpt || '',
-          coverImage: a.coverImage ? (a.coverImage.startsWith('http') ? a.coverImage : `https://selfatlas-backend-prod.cyberlina.workers.dev${a.coverImage}`) : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80',
+          coverImage: a.coverImage ? (a.coverImage.startsWith('http') ? a.coverImage : a.coverImage) : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80',
           category: a.category || 'Blog',
           readTime: a.readTime || '5 min read', // 默认阅读时间
           publishDate: a.publishedAt || a.publishDate || a.createdAt || '',
@@ -268,15 +268,13 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
                 >
                   {/* 背景大图填满 */}
                   <div className="absolute inset-0">
-                    <LazyLoadImage
+                    <img
                       src={a.coverImage}
                       alt={a.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      effect="blur"
-                      placeholderSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjI4OCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
+                        target.src = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />

@@ -20,6 +20,7 @@ VITE_ENVIRONMENT = "production"
 VITE_API_BASE_URL = "https://api.selfatlas.net"
 VITE_CDN_BASE_URL = "https://cdn.selfatlas.net"
 VITE_PAGES_PROJECT_NAME = "getyourluck-testing-platform"
+VITE_GOOGLE_ANALYTICS_ID = "G-S41XHZF1P7"
 
 [env.preview.vars]
 VITE_ENVIRONMENT = "staging"

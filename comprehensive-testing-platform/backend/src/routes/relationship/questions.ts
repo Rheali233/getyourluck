@@ -12,21 +12,20 @@ const relationshipQuestionsRouter = new Hono<AppContext>();
 // Get all relationship test questions
 relationshipQuestionsRouter.get('/', async (c) => {
   try {
-    const dbService = c.get('dbService');
-    const questionModel = new QuestionBankModel(dbService.env);
+    const questionModel = new QuestionBankModel(c.env);
     
     // Get questions for all relationship test categories
-    const categories = ['love-style-category', 'love-language-category', 'interpersonal-category'];
+    const categories = ['cat_love_style', 'cat_love_language', 'cat_interpersonal'];
     const allQuestions: any = {};
     
     for (const categoryId of categories) {
       try {
         const questions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
-        const categoryCode = categoryId.replace('-category', '');
+        const categoryCode = categoryId.replace('cat_', '').replace('_', '-');
         allQuestions[categoryCode] = questions;
       } catch (error) {
         console.error(`Failed to get questions for ${categoryId}:`, error);
-        allQuestions[categoryId.replace('-category', '')] = [];
+        allQuestions[categoryId.replace('cat_', '').replace('_', '-')] = [];
       }
     }
     
@@ -66,14 +65,13 @@ relationshipQuestionsRouter.get('/:testType', async (c) => {
       }, 400);
     }
     
-    const dbService = c.get('dbService');
-    const questionModel = new QuestionBankModel(dbService.env);
+    const questionModel = new QuestionBankModel(c.env);
     
     // Map testType to category_id
     const categoryIdMap: { [key: string]: string } = {
-      'love_style': 'love-style-category',
-      'love_language': 'love-language-category',
-      'interpersonal': 'interpersonal-category'
+      'love_style': 'cat_love_style',
+      'love_language': 'cat_love_language',
+      'interpersonal': 'cat_interpersonal'
     };
     
     const categoryId = categoryIdMap[testType];

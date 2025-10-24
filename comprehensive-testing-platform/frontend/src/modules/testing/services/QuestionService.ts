@@ -41,12 +41,26 @@ export class QuestionService {
         apiPath = `${this.baseUrl}/api/career/questions`;
       } else if (['vark'].includes(testType)) {
         apiPath = `${this.baseUrl}/api/learning-ability/questions`;
+      } else if (['love_language', 'love_style', 'interpersonal'].includes(testType)) {
+        apiPath = `${this.baseUrl}/api/relationship/questions`;
       } else {
         // 默认使用psychology API
         apiPath = `${this.baseUrl}/api/psychology/questions`;
       }
       
-      const response = await fetch(`${apiPath}?language=${language}`, {
+      // 对于career、learning和relationship模块，需要调用特定的测试类型端点
+      let fullApiPath = apiPath;
+      if (['holland', 'disc', 'leadership'].includes(testType)) {
+        fullApiPath = `${apiPath}/${testType}`;
+      } else if (['vark'].includes(testType)) {
+        fullApiPath = `${apiPath}/${testType}`;
+      } else if (['love_language', 'love_style', 'interpersonal'].includes(testType)) {
+        fullApiPath = `${apiPath}/${testType}`;
+      } else {
+        fullApiPath = `${apiPath}?language=${language}`;
+      }
+      
+      const response = await fetch(fullApiPath, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -62,9 +76,16 @@ export class QuestionService {
       // 处理不同API返回的数据结构
       let questions = [];
       if (data.success && data.data) {
-        // psychology API返回 { success: true, data: { phq9: [...], mbti: [...] } }
-        // career API返回 { success: true, data: { holland: [...], disc: [...] } }
-        questions = data.data[testType] || [];
+        if (['holland', 'disc', 'leadership', 'love_language', 'love_style', 'interpersonal'].includes(testType)) {
+          // career和relationship API的特定端点返回 { success: true, data: [...] }
+          questions = data.data || [];
+        } else if (['vark'].includes(testType)) {
+          // learning API的特定端点返回 { success: true, data: { vark: [...] } }
+          questions = data.data[testType] || [];
+        } else {
+          // psychology API返回 { success: true, data: { phq9: [...], mbti: [...] } }
+          questions = data.data[testType] || [];
+        }
       } else if (data.questions || data.data) {
         // 其他API格式
         questions = data.questions || data.data || data;

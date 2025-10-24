@@ -74,13 +74,13 @@ export const PreloadCriticalModules: React.FC = () => {
     // 预加载关键API（使用后端已存在且为GET的方法）
     const criticalAPIs = [
       // Psychology-related tests
-      '/api/v1/tests/mbti/questions?language=en',
-      '/api/v1/tests/phq9/questions?language=en',
-      '/api/v1/tests/eq/questions?language=en',
+      '/api/psychology/questions/mbti',
+      '/api/psychology/questions/phq9',
+      '/api/psychology/questions/eq',
       // Career-related tests
-      '/api/v1/tests/holland/questions?language=en',
-      '/api/v1/tests/disc/questions?language=en',
-      '/api/v1/tests/leadership/questions?language=en',
+      '/api/career/questions/holland',
+      '/api/career/questions/disc',
+      '/api/career/questions/leadership',
       // Astrology
       '/api/astrology/zodiac-signs',
     ];

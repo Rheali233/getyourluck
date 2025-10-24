@@ -83,7 +83,7 @@ export const CareerTestPage: React.FC<CareerTestPageProps> = ({
         const allTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'vark', 'love_language', 'love_style', 'interpersonal', 'holland', 'disc', 'leadership'];
         allTestTypes.forEach(type => {
           if (type !== testType) {
-            get().clearTestTypeState(type);
+            clearTestTypeState(type);
           }
         });
       }

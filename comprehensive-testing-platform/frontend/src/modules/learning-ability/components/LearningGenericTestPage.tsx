@@ -47,7 +47,7 @@ export const LearningGenericTestPage: React.FC<LearningGenericTestPageProps> = (
       const allTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'vark', 'love_language', 'love_style', 'interpersonal', 'holland', 'disc', 'leadership'];
       allTestTypes.forEach(type => {
         if (type !== testType) {
-          get().clearTestTypeState(type);
+          clearTestTypeState(type);
         }
       });
     }
@@ -86,9 +86,15 @@ export const LearningGenericTestPage: React.FC<LearningGenericTestPageProps> = (
         }
         
         // 调用后端API获取测试问题
+        // eslint-disable-next-line no-console
+        console.log(`Loading questions for testType: ${testType}`);
         const response = await questionService.getQuestionsByType(testType);
+        // eslint-disable-next-line no-console
+        console.log('API Response:', response);
 
         if (response.success && response.data && Array.isArray(response.data)) {
+          // eslint-disable-next-line no-console
+          console.log(`Loaded ${response.data.length} questions`);
           setQuestions(response.data);
           
           // 缓存数据
