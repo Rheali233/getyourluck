@@ -1,6 +1,6 @@
 // Service Worker for caching static assets
-const STATIC_CACHE = 'static-v8';
-const DYNAMIC_CACHE = 'dynamic-v8';
+const STATIC_CACHE = 'static-v9';
+const DYNAMIC_CACHE = 'dynamic-v9';
 
 // 需要缓存的静态资源（仅核心HTML）
 // ⚠️ 注意：图片和其他资源从CDN加载，不需要缓存
@@ -72,9 +72,18 @@ self.addEventListener('fetch', (event) => {
     return; // 让浏览器和_redirects处理API请求
   }
 
-  // 🔥 不拦截静态资源（现在从CDN加载）
-  if (url.pathname.startsWith('/assets/')) {
-    return; // 让浏览器直接请求CDN
+  // 🔥 不拦截静态资源（CSS、JS、图片等）
+  if (url.pathname.startsWith('/assets/') || 
+      url.pathname.startsWith('/css/') || 
+      url.pathname.startsWith('/js/') ||
+      url.pathname.startsWith('/images/')) {
+    return; // 让浏览器直接请求静态文件服务器
+  }
+
+  // 🔥 不拦截静态文件（根据文件扩展名）
+  const staticFileExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot'];
+  if (staticFileExtensions.some(ext => url.pathname.endsWith(ext))) {
+    return; // 让浏览器直接处理静态文件
   }
 
   // 静态HTML缓存策略（仅 / 和 /index.html）
