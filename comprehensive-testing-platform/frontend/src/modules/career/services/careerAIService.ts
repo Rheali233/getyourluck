@@ -10,7 +10,7 @@ export class CareerAIService {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = '/api/ai/career';
+    this.baseURL = '/ai/career';
   }
 
   /**

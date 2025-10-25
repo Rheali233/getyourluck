@@ -23,7 +23,7 @@ export class LearningAIService {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = '/api/ai/learning';
+    this.baseURL = '/ai/learning';
   }
 
   /**

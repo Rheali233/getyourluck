@@ -26,7 +26,7 @@ export class PsychologyAIService {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = '/api/ai/psychology';
+    this.baseURL = '/ai/psychology';
   }
 
   /**

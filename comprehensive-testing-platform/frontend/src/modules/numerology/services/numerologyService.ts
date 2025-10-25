@@ -13,7 +13,7 @@ import type {
 } from '../types';
 
 class NumerologyService {
-  private baseUrl = '/api/numerology';
+  private baseUrl = '/numerology';
 
   /**
    * 开始命理分析

@@ -10,7 +10,7 @@ export class RelationshipAIService {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = '/api/ai/relationship';
+    this.baseURL = '/ai/relationship';
   }
 
   /**
