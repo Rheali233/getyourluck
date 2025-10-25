@@ -1,4 +1,7 @@
 # API Proxy to backend
 /api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  301
 
-# NO catch-all rule! Let Functions handle SPA routing
+# SPA fallback - MUST be last rule
+# Cloudflare Pages checks static files FIRST, then applies this rule
+# This is the correct way according to Cloudflare Pages documentation
+/*  /index.html  200
