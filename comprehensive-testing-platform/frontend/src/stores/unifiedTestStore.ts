@@ -672,7 +672,7 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
 
         try {
           // 调用后端统一测试结果处理服务
-          const response = await fetch(`${getApiBaseUrl()}/api/v1/tests/${testType}/submit`, {
+          const response = await fetch(`${getApiBaseUrl()}/v1/tests/${testType}/submit`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
