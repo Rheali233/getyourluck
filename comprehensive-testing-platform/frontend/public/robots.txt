@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+Allow: /tests
+Allow: /psychology
+Allow: /career
+Allow: /astrology
+Allow: /tarot
+Allow: /numerology
+Allow: /learning
+Allow: /relationship
+Allow: /about
+Allow: /blog
+Allow: /terms
+Allow: /privacy
+Allow: /cookies
+
+Disallow: /admin
+Disallow: /api
+Disallow: /_*
+Disallow: /404
+Disallow: /500
+Disallow: /test-results
+Disallow: /user-data
+Disallow: /private
+Disallow: /temp
+Disallow: /cache
+
+# Sitemap
+Sitemap: https://2ff5182e.getyourluck-testing-platform.pages.dev/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
