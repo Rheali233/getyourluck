@@ -1,21 +1,23 @@
 # API 代理
 /api/* https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat 301
 
-# 静态资源 - 直接返回文件，不重定向
-/assets/* 200
-/favicon* 200
-/robots.txt 200
-/sitemap* 200
-/*.png 200
-/*.jpg 200
-/*.jpeg 200
-/*.gif 200
-/*.svg 200
-/*.webp 200
-/*.ico 200
-/*.css 200
-/*.js 200
+# SPA 路由回退 - 只对非静态资源路径重定向
+# 静态资源路径会直接返回文件，不匹配下面的规则
+/test-center* /index.html 200
+/blog* /index.html 200
+/psychology* /index.html 200
+/astrology* /index.html 200
+/tarot* /index.html 200
+/numerology* /index.html 200
+/career* /index.html 200
+/learning-ability* /index.html 200
+/relationship* /index.html 200
+/about* /index.html 200
+/privacy* /index.html 200
+/terms* /index.html 200
+/cookies* /index.html 200
+/feedback* /index.html 200
 
-# SPA 路由回退 - 其他路径重定向到 index.html
-/* /index.html 200
+# 根路径重定向
+/ /index.html 200
 
