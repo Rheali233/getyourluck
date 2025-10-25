@@ -21,8 +21,9 @@ export const ApiStatusIndicator: React.FC<ApiStatusIndicatorProps> = ({
 
   const checkApiStatus = async () => {
     try {
-      const apiBaseUrl = getApiBaseUrl();
-      const response = await fetch(`${apiBaseUrl}/health`, {
+      // 直接调用后端的健康检查端点，不通过 /api 代理
+      const backendUrl = 'https://selfatlas-backend-prod.cyberlina.workers.dev';
+      const response = await fetch(`${backendUrl}/health`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache'
