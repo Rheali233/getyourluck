@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Analytics Test Page</title>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S41XHZF1P7"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-S41XHZF1P7', {
+            page_title: 'GA Test Page',
+            page_location: window.location.href,
+            send_page_view: true
+        });
+        
+        // Test event tracking
+        setTimeout(() => {
+            gtag('event', 'test_page_loaded', {
+                event_category: 'test',
+                event_label: 'ga_test_page',
+                value: 1
+            });
+            console.log('Google Analytics test event sent');
+        }, 2000);
+    </script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        .warning { background: rgba(255, 152, 0, 0.3); }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Google Analytics Test Page</h1>
+        <p>This page tests Google Analytics integration for SelfAtlas.net</p>
+        
+        <div class="status info">
+            <strong>Measurement ID:</strong> G-S41XHZF1P7
+        </div>
+        
+        <div class="status" id="gaStatus">
+            <strong>Status:</strong> Checking Google Analytics...
+        </div>
+        
+        <div>
+            <button onclick="sendTestEvent()">Send Test Event</button>
+            <button onclick="sendPageView()">Send Page View</button>
+            <button onclick="checkGAStatus()">Check GA Status</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('gaStatus');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = `<strong>Status:</strong> ${message}`;
+        }
+        
+        function addResult(message) {
+            const resultsDiv = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.innerHTML += `[${timestamp}] ${message}\n`;
+        }
+        
+        function sendTestEvent() {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'manual_test_event', {
+                    event_category: 'test',
+                    event_label: 'manual_button_click',
+                    value: Math.floor(Math.random() * 100)
+                });
+                addResult('✅ Test event sent successfully');
+                updateStatus('Test event sent', 'success');
+            } else {
+                addResult('❌ gtag function not available');
+                updateStatus('gtag not loaded', 'warning');
+            }
+        }
+        
+        function sendPageView() {
+            if (typeof gtag !== 'undefined') {
+                gtag('config', 'G-S41XHZF1P7', {
+                    page_title: 'Manual Page View Test',
+                    page_location: window.location.href + '#manual-test'
+                });
+                addResult('✅ Manual page view sent');
+                updateStatus('Page view sent', 'success');
+            } else {
+                addResult('❌ gtag function not available');
+                updateStatus('gtag not loaded', 'warning');
+            }
+        }
+        
+        function checkGAStatus() {
+            const checks = [];
+            
+            // Check if gtag is loaded
+            if (typeof gtag !== 'undefined') {
+                checks.push('✅ gtag function loaded');
+            } else {
+                checks.push('❌ gtag function not loaded');
+            }
+            
+            // Check if dataLayer exists
+            if (typeof window.dataLayer !== 'undefined' && Array.isArray(window.dataLayer)) {
+                checks.push(`✅ dataLayer exists (${window.dataLayer.length} items)`);
+            } else {
+                checks.push('❌ dataLayer not found');
+            }
+            
+            // Check if GA script is loaded
+            const gaScript = document.querySelector('script[src*="googletagmanager.com/gtag/js"]');
+            if (gaScript) {
+                checks.push('✅ GA script tag found');
+            } else {
+                checks.push('❌ GA script tag not found');
+            }
+            
+            // Update results
+            document.getElementById('results').innerHTML = checks.join('\n') + '\n';
+            
+            if (checks.every(check => check.startsWith('✅'))) {
+                updateStatus('All checks passed!', 'success');
+            } else {
+                updateStatus('Some checks failed', 'warning');
+            }
+        }
+        
+        // Auto-check on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkGAStatus();
+                addResult('🚀 Page loaded, auto-checking GA status');
+            }, 1000);
+        });
+        
+        // Monitor dataLayer changes
+        if (typeof window.dataLayer !== 'undefined') {
+            const originalPush = window.dataLayer.push;
+            window.dataLayer.push = function(...args) {
+                addResult(`📊 dataLayer.push: ${JSON.stringify(args)}`);
+                return originalPush.apply(this, args);
+            };
+        }
+    </script>
+</body>
+</html>
