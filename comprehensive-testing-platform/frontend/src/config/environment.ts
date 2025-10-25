@@ -71,7 +71,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
       ENVIRONMENT: (env.VITE_ENVIRONMENT as 'development' | 'production' | 'staging') || 'staging',
       PAGES_PROJECT_NAME: env.VITE_PAGES_PROJECT_NAME || 'getyourluck-testing-platform',
       PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
-      PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+      PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev',
+      GOOGLE_ANALYTICS_ID: env.VITE_GOOGLE_ANALYTICS_ID
     };
   }
   
@@ -82,7 +83,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     ENVIRONMENT: 'staging',
     PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
     PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
-    PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev'
+    PAGES_BRANCH_ALIAS_URL: 'https://feature-test-preview.getyourluck-testing-platform.pages.dev',
+    GOOGLE_ANALYTICS_ID: env.VITE_GOOGLE_ANALYTICS_ID
   };
 };
 
