@@ -283,13 +283,16 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        // 🔥 修复：错误时先尝试原始路径，再使用fallback
-                        if (!target.src.includes('unsplash.com')) {
-                          target.src = a.coverImage.startsWith('/') 
-                            ? `${window.location.origin}${a.coverImage}`
-                            : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
-                        } else {
-                          target.src = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+                        // 防止无限重试：检查是否已经设置过 data-retry 属性
+                        if (target.dataset['retry']) {
+                          return; // 已经重试过，停止
+                        }
+                        target.dataset['retry'] = 'true'; // 标记已重试
+                        
+                        // 尝试使用fallback图片
+                        const fallbackUrl = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+                        if (target.src !== fallbackUrl) {
+                          target.src = fallbackUrl;
                         }
                       }}
                     />

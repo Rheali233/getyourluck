@@ -51,7 +51,6 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isError, setIsError] = useState(false);
   const [isInView, setIsInView] = useState(!lazy || priority);
   const [currentSrc, setCurrentSrc] = useState<string>('');
-  const [retryCount, setRetryCount] = useState(0);
   const imgRef = useRef<HTMLImageElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -129,45 +128,30 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   }, [onLoad]);
 
   // 处理图片错误
-  const handleImageError = useCallback(() => {
-    if (retryCount < 2) {
-      setRetryCount(prev => prev + 1);
-      setIsError(false);
-      
-      // 第一次重试：如果是CDN失败，尝试使用主域名
-      if (retryCount === 0 && src.startsWith('/')) {
-        const fallbackUrl = `${window.location.origin}${src}`;
-        setTimeout(() => {
-          setCurrentSrc(fallbackUrl);
-        }, 1000);
-      } else {
-        // 第二次重试：使用原始优化URL
-        setTimeout(() => {
-          if (imgRef.current) {
-            imgRef.current.src = generateOptimizedUrl(src, width, format);
-          }
-        }, 2000);
-      }
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    
+    // 防止无限重试：检查是否已经重试过
+    if (target.dataset['retry']) {
+      setIsError(true);
+      setIsLoaded(false);
+      onError?.();
+      return;
+    }
+    
+    // 标记已重试
+    target.dataset['retry'] = 'true';
+    
+    // 尝试使用fallback图片
+    const fallbackUrl = fallback || 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+    if (target.src !== fallbackUrl) {
+      setCurrentSrc(fallbackUrl);
     } else {
       setIsError(true);
       setIsLoaded(false);
-      
-      // 最终使用fallback图片
-      if (fallback && fallback !== src) {
-        setCurrentSrc(fallback);
-        setIsError(false); // 重置错误状态以显示fallback
-      }
-      
       onError?.();
-      
-      // 在控制台记录错误信息用于调试
-      console.warn(`Image loading failed after ${retryCount + 1} attempts:`, {
-        originalSrc: src,
-        currentSrc: currentSrc,
-        fallback: fallback
-      });
     }
-  }, [retryCount, src, width, format, generateOptimizedUrl, fallback, onError, currentSrc]);
+  }, [fallback, onError]);
 
   // 设置当前图片源
   useEffect(() => {

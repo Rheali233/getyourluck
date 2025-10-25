@@ -60,13 +60,16 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
             placeholderSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              // 🔥 修复：错误时先尝试原始路径，再使用fallback
-              if (!target.src.includes('unsplash.com')) {
-                target.src = coverImage.startsWith('/') 
-                  ? `${window.location.origin}${coverImage}`
-                  : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
-              } else {
-                target.src = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+              // 防止无限重试
+              if (target.dataset['retry']) {
+                return;
+              }
+              target.dataset['retry'] = 'true';
+              
+              // 使用fallback图片
+              const fallbackUrl = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+              if (target.src !== fallbackUrl) {
+                target.src = fallbackUrl;
               }
             }}
           />

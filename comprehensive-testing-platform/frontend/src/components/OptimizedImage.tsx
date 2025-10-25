@@ -35,8 +35,6 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(!lazy || priority);
   const [hasError, setHasError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  const [currentSrc, setCurrentSrc] = useState(src);
   const imgRef = useRef<HTMLImageElement>(null);
 
   // 懒加载逻辑
@@ -66,8 +64,6 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
   // 监听src变化，重置状态
   useEffect(() => {
-    setCurrentSrc(src);
-    setRetryCount(0);
     setHasError(false);
     setIsLoaded(false);
   }, [src]);
@@ -105,28 +101,25 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     setIsLoaded(true);
   };
 
-  const handleError = () => {
-    if (retryCount < 1 && src.startsWith('/')) {
-      // 如果CDN失败，尝试使用主域名
-      setRetryCount(prev => prev + 1);
-      const fallbackUrl = `${window.location.origin}${src}`;
-      setCurrentSrc(fallbackUrl);
-      setTimeout(() => {
-        if (imgRef.current) {
-          imgRef.current.src = fallbackUrl;
-        }
-      }, 1000);
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    // 防止无限重试
+    if (target.dataset['retry']) {
+      setHasError(true);
+      return;
+    }
+    target.dataset['retry'] = 'true';
+    
+    // 尝试fallback图片
+    const fallbackUrl = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+    if (target.src !== fallbackUrl) {
+      target.src = fallbackUrl;
     } else {
       setHasError(true);
-      console.warn(`Image loading failed:`, {
-        originalSrc: src,
-        currentSrc: currentSrc,
-        retryCount: retryCount
-      });
     }
   };
 
-  const urls = getResponsiveUrls(currentSrc);
+  const urls = getResponsiveUrls(src);
 
   return (
     <div
