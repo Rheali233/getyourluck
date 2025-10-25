@@ -1,6 +1,6 @@
 // Service Worker for caching static assets
-const STATIC_CACHE = 'static-v9';
-const DYNAMIC_CACHE = 'dynamic-v9';
+const STATIC_CACHE = 'static-v10';
+const DYNAMIC_CACHE = 'dynamic-v10';
 
 // 需要缓存的静态资源（仅核心HTML）
 // ⚠️ 注意：图片和其他资源从CDN加载，不需要缓存
@@ -157,7 +157,11 @@ self.addEventListener('fetch', (event) => {
         if (response) {
           return response;
         }
-        return fetch('/index.html')
+        // 🔥 修复：明确设置 redirect mode 为 follow
+        return fetch('/index.html', {
+          redirect: 'follow',
+          credentials: 'same-origin'
+        })
           .then((fetchResponse) => {
             if (fetchResponse.status === 200) {
               const responseClone = fetchResponse.clone();
