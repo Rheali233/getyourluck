@@ -1,11 +1,11 @@
 // Service Worker for caching static assets
-const STATIC_CACHE = 'static-v10';
-const DYNAMIC_CACHE = 'dynamic-v10';
+const STATIC_CACHE = 'static-v11';
+const DYNAMIC_CACHE = 'dynamic-v11';
 
 // 需要缓存的静态资源（仅核心HTML）
 // ⚠️ 注意：图片和其他资源从CDN加载，不需要缓存
+// ⚠️ 移除 '/' 避免与 SPA 路由冲突
 const STATIC_ASSETS = [
-  '/',
   '/index.html'
 ];
 
@@ -86,8 +86,9 @@ self.addEventListener('fetch', (event) => {
     return; // 让浏览器直接处理静态文件
   }
 
-  // 静态HTML缓存策略（仅 / 和 /index.html）
-  if (STATIC_ASSETS.some(asset => url.pathname === asset)) {
+  // 静态HTML缓存策略（仅 /index.html）
+  // ⚠️ 只缓存直接请求 index.html 的情况，不处理 SPA 路由
+  if (url.pathname === '/index.html') {
     event.respondWith(
       caches.match(request)
         .then((response) => {
@@ -150,33 +151,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 🔥 其他SPA路由：返回index.html（Cache-first策略）
-  event.respondWith(
-    caches.match('/index.html')
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        // 🔥 修复：明确设置 redirect mode 为 follow
-        return fetch('/index.html', {
-          redirect: 'follow',
-          credentials: 'same-origin'
-        })
-          .then((fetchResponse) => {
-            if (fetchResponse.status === 200) {
-              const responseClone = fetchResponse.clone();
-              caches.open(STATIC_CACHE)
-                .then((cache) => {
-                  cache.put('/index.html', responseClone);
-                });
-            }
-            return fetchResponse;
-          })
-          .catch(() => {
-            return new Response('Network error', { status: 503 });
-          });
-      })
-  );
+  // 🔥 其他所有请求：直接通过，不拦截
+  // ⚠️ 让服务器端的 _middleware.js 处理 SPA fallback
+  // ⚠️ Service Worker 不再处理 SPA 路由，避免重定向冲突
+  return;
 });
 
 // 消息处理
