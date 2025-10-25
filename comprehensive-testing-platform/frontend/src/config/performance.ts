@@ -88,7 +88,7 @@ export const PRELOAD_CONFIG = {
   // 关键图片
   CRITICAL_IMAGES: [
     '/images/hero-bg.jpg',
-    '/images/logo.png',
+    '/assets/logo.png',
   ],
   // 关键字体
   CRITICAL_FONTS: [
