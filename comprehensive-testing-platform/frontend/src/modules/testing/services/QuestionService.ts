@@ -36,16 +36,16 @@ export class QuestionService {
       // 根据测试类型确定API路径
       let apiPath: string;
       if (['mbti', 'phq9', 'eq', 'happiness'].includes(testType)) {
-        apiPath = `${this.baseUrl}/api/psychology/questions`;
+        apiPath = `${this.baseUrl}/psychology/questions`;
       } else if (['holland', 'disc', 'leadership'].includes(testType)) {
-        apiPath = `${this.baseUrl}/api/career/questions`;
+        apiPath = `${this.baseUrl}/career/questions`;
       } else if (['vark'].includes(testType)) {
-        apiPath = `${this.baseUrl}/api/learning-ability/questions`;
+        apiPath = `${this.baseUrl}/learning-ability/questions`;
       } else if (['love_language', 'love_style', 'interpersonal'].includes(testType)) {
-        apiPath = `${this.baseUrl}/api/relationship/questions`;
+        apiPath = `${this.baseUrl}/relationship/questions`;
       } else {
         // 默认使用psychology API
-        apiPath = `${this.baseUrl}/api/psychology/questions`;
+        apiPath = `${this.baseUrl}/psychology/questions`;
       }
       
       // 对于career、learning和relationship模块，需要调用特定的测试类型端点
@@ -174,7 +174,7 @@ export class QuestionService {
     language: string = 'en'
   ): Promise<QuestionServiceResponse<Question>> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/v1/questions/${questionId}?language=${language}`, {
+      const response = await fetch(`${this.baseUrl}/v1/questions/${questionId}?language=${language}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

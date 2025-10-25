@@ -81,9 +81,9 @@ export const PRELOAD_CONFIG = {
   ],
   // 关键API
   CRITICAL_APIS: [
-    '/api/psychology/questions',
-    '/api/career/questions',
-    '/api/astrology/services',
+    '/psychology/questions',
+    '/career/questions',
+    '/astrology/services',
   ],
   // 关键图片
   CRITICAL_IMAGES: [
