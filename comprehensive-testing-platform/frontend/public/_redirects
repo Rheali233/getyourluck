@@ -1,7 +1,4 @@
 # API Proxy to backend
 /api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  301
 
-# SPA Fallback - this will NOT affect static files
-# Cloudflare Pages checks if file exists first, then applies redirect
-/*  /index.html  200
-
+# NO catch-all rule! Let Functions handle SPA routing
