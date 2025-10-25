@@ -134,7 +134,7 @@ export class InterpersonalProcessor {
     _scores: InterpersonalScores,
     overallScore: number,
     strengths: string[],
-    weaknesses: string[]
+    areasForGrowth: string[]
   ): string {
     let interpretation = `Your overall interpersonal skills score is ${overallScore.toFixed(1)}/5. `;
 
