@@ -24,7 +24,7 @@ import type {
 export const astrologyService = {
   // 获取星座列表
   async getZodiacSigns(): Promise<APIResponse<ZodiacSign[]>> {
-    return apiClient.get('/api/astrology/zodiac-signs');
+    return apiClient.get('/astrology/zodiac-signs');
   },
 
   // 获取运势
@@ -38,7 +38,7 @@ export const astrologyService = {
 
   // 获取星座配对分析
   async getCompatibility(sign1: string, sign2: string, relationType: string): Promise<APIResponse<CompatibilityAnalysis>> {
-    return apiClient.post('/api/astrology/compatibility', {
+    return apiClient.post('/astrology/compatibility', {
       sign1,
       sign2,
       relationType
@@ -47,12 +47,12 @@ export const astrologyService = {
 
   // 生成星盘分析
   async getBirthChart(birthData: BirthChartRequest): Promise<APIResponse<BirthChart>> {
-    return apiClient.post('/api/astrology/birth-chart', birthData);
+    return apiClient.post('/astrology/birth-chart', birthData);
   },
 
   // 提交反馈
   async submitFeedback(sessionId: string, feedback: 'like' | 'dislike'): Promise<APIResponse<void>> {
-    return apiClient.post('/api/astrology/feedback', {
+    return apiClient.post('/astrology/feedback', {
       sessionId,
       feedback
     });
@@ -62,7 +62,7 @@ export const astrologyService = {
 
   // AI运势分析
   async analyzeFortuneAI(zodiacSign: string, timeframe: string, userContext?: any): Promise<APIResponse<FortuneReading>> {
-    return apiClient.post('/api/v1/ai/astrology/fortune', {
+    return apiClient.post('/v1/ai/astrology/fortune', {
       zodiacSign,
       timeframe,
       userContext
@@ -71,7 +71,7 @@ export const astrologyService = {
 
   // AI配对分析
   async analyzeCompatibilityAI(sign1: string, sign2: string, relationType: string, userContext?: any): Promise<APIResponse<CompatibilityAnalysis>> {
-    return apiClient.post('/api/v1/ai/astrology/compatibility', {
+    return apiClient.post('/v1/ai/astrology/compatibility', {
       sign1,
       sign2,
       relationType,

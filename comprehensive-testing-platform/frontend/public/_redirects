@@ -1,7 +1,8 @@
 # API Proxy to backend
-# Note: Backend routes already have /api prefix, so we proxy /api/* to backend/*
+# Frontend: /api/analytics/events → Backend: /api/analytics/events
+# Note: :splat captures path AFTER /api/, so we proxy to backend/:splat (which becomes backend/api/...)
 # IMPORTANT: Use 200 proxy (not 301 redirect) to preserve HTTP methods and headers
-/api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  200
+/api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/:splat  200
 
 # SPA Routes - Explicit paths to avoid matching static files
 # DO NOT use /* as it will match everything including CSS/JS files!

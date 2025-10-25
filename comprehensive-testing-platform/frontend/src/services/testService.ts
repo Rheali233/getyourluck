@@ -11,7 +11,7 @@ export const testService = {
    * 获取测试类型列表
    */
   async getTestTypes(): Promise<APIResponse<any[]>> {
-    return apiClient.get('/api/v1/tests')
+    return apiClient.get('/v1/tests')
   },
 
   /**

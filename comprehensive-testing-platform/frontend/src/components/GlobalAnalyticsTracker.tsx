@@ -75,7 +75,7 @@ export const GlobalAnalyticsTracker: React.FC<GlobalAnalyticsTrackerProps> = ({
           data: { ms: Date.now() - startTimeRef.current, scrollDepth: maxScrollRef.current },
         } as any
         const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' })
-        navigator.sendBeacon?.('/api/analytics/events', blob)
+        navigator.sendBeacon?.('/analytics/events', blob)
       } catch {}
     }
     window.addEventListener('beforeunload', onBeforeUnload)

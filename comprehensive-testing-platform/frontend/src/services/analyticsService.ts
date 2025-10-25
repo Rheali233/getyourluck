@@ -58,7 +58,7 @@ async function flushQueue(): Promise<void> {
       performance: e.performance,
       data: e.data,
     }))
-    const res = await apiClient.post<AnalyticsRecordResponse>('/api/analytics/events/batch', { events })
+    const res = await apiClient.post<AnalyticsRecordResponse>('/analytics/events/batch', { events })
     void res
   } catch {
     // 失败不再回灌，避免无限增长；下次继续补偿
@@ -104,7 +104,7 @@ export async function trackEvent(payload: AnalyticsEventPayload): Promise<Analyt
 
   // 使用统一 apiClient（其会拼接 baseURL）；失败则入队批量上报
   try {
-    const res = await apiClient.post<AnalyticsRecordResponse>('/api/analytics/events', body)
+    const res = await apiClient.post<AnalyticsRecordResponse>('/analytics/events', body)
     return res.data ?? { status: 'recorded' }
   } catch (e) {
     enqueueEvent(payload)
