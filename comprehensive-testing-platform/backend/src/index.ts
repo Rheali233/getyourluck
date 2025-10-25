@@ -62,10 +62,11 @@ app.use("*", cors({
     // 允许的域名列表
     const allowedOrigins = [
       "http://localhost:3000",
-      "http://localhost:3002", // Vite dev server
+      "http://localhost:3002", // Vite dev server  
       "http://localhost:5173",
       "https://*.pages.dev",
       "https://*.cloudflare.com",
+      "https://getyourluck-testing-platform.pages.dev", // 明确指定Pages域名
       "https://selfatlas.net", // 生产域名
       "https://www.selfatlas.net", // 带www的域名
     ];
@@ -76,8 +77,11 @@ app.use("*", cors({
     
     const allowed = allowedOrigins.some(allowed => {
       if (allowed.includes("*")) {
-        const pattern = allowed.replace("*", ".*");
-        return new RegExp(pattern).test(origin);
+        // 🔥 修复：正确转义正则表达式并处理通配符
+        const pattern = allowed
+          .replace(/\./g, "\\.")  // 转义点号
+          .replace(/\*/g, ".*");  // 替换通配符
+        return new RegExp(`^${pattern}$`).test(origin);
       }
       return allowed === origin;
     });
