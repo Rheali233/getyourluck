@@ -87,7 +87,10 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+public/*
+!public/_redirects
+!public/_routes.json
+!public/_headers
 
 # Storybook build outputs
 .out
