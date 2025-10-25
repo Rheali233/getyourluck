@@ -53,6 +53,7 @@ app.use("*", secureHeaders({
   xContentTypeOptions: "nosniff",
   referrerPolicy: "strict-origin-when-cross-origin",
   crossOriginEmbedderPolicy: false, // Cloudflare Workers不支持
+  crossOriginResourcePolicy: false, // 禁用以允许跨域资源访问
 }));
 
 // CORS中间件
