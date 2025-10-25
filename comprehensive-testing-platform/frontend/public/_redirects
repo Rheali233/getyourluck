@@ -1,0 +1,21 @@
+# API 代理
+/api/* https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat 301
+
+# 静态资源 - 直接返回文件，不重定向
+/assets/* 200
+/favicon* 200
+/robots.txt 200
+/sitemap* 200
+/*.png 200
+/*.jpg 200
+/*.jpeg 200
+/*.gif 200
+/*.svg 200
+/*.webp 200
+/*.ico 200
+/*.css 200
+/*.js 200
+
+# SPA 路由回退 - 其他路径重定向到 index.html
+/* /index.html 200
+
