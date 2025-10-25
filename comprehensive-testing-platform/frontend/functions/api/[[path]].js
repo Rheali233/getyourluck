@@ -5,27 +5,27 @@
  * while preserving HTTP methods, headers, and body.
  */
 
-interface Env {
-  // Add your environment variables here if needed
-}
-
-// Cloudflare Pages Functions type definitions
-interface EventContext<Env = unknown> {
-  request: Request;
-  env: Env;
-  params: Record<string, string>;
-  data: Record<string, unknown>;
-  next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-  waitUntil: (promise: Promise<unknown>) => void;
-}
-
-export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
+export async function onRequest(context) {
   const { request } = context;
   const url = new URL(request.url);
   
   // Build the backend URL
   // /api/analytics/events → https://backend/api/analytics/events
   const backendUrl = `https://selfatlas-backend-prod.cyberlina.workers.dev${url.pathname}${url.search}`;
+  
+  // Handle OPTIONS preflight first
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': url.origin,
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID, X-API-Key',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
+      },
+    });
+  }
   
   // Forward the request to the backend
   const backendRequest = new Request(backendUrl, {
@@ -46,21 +46,8 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Request-ID, X-API-Key');
   response.headers.set('Access-Control-Allow-Credentials', 'true');
   response.headers.set('Access-Control-Max-Age', '86400');
-  
-  // Handle OPTIONS preflight
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': url.origin,
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID, X-API-Key',
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '86400',
-      },
-    });
-  }
+  response.headers.set('Vary', 'Origin');
   
   return response;
-};
+}
 
