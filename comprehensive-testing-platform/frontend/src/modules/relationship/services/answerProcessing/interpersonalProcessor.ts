@@ -71,7 +71,7 @@ export class InterpersonalProcessor {
 
     // Generate interpretation
     const interpretation = this.generateInterpretation(averageScores, overallScore, strengths, areasForGrowth);
-    const recommendations = this.generateRecommendations(averageScores, areasForGrowth);
+    const recommendations = this.generateRecommendations(averageScores);
 
     return {
       scores: averageScores,
@@ -150,8 +150,8 @@ export class InterpersonalProcessor {
       interpretation += `Your strengths include: ${strengths.join(', ')}. `;
     }
 
-    if (_areasForGrowth.length > 0) {
-      interpretation += `Areas for growth include: ${_areasForGrowth.join(', ')}. `;
+    if (areasForGrowth.length > 0) {
+      interpretation += `Areas for growth include: ${areasForGrowth.join(', ')}. `;
     }
 
     interpretation += 'Focusing on these areas can significantly improve your relationships and social interactions.';
@@ -163,7 +163,7 @@ export class InterpersonalProcessor {
    * Generate recommendations based on scores
    */
   private static generateRecommendations(
-    scores: InterpersonalScores: string[]
+    scores: InterpersonalScores
   ): string[] {
     const recommendations: string[] = [];
 

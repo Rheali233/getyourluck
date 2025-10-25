@@ -15,7 +15,7 @@ interface PerformanceMonitorProps {
 }
 
 export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ 
-  enabled = process.env.NODE_ENV === 'development',
+  enabled = process.env['NODE_ENV'] === 'development',
   onMetricsUpdate 
 }) => {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
