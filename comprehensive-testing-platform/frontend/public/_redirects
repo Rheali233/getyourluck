@@ -1,8 +1,9 @@
-# API 代理
+# API Proxy
 /api/* https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat 301
 
-# SPA 路由回退 - 仅匹配已知的应用页面路由
-# 重要：不要使用 /* catch-all，否则会影响静态资源！
+# SPA Routes - Rewrite to index.html for client-side routing
+# Note: Cloudflare Pages serves static files BEFORE checking _redirects
+# So these rules only apply when the requested file does NOT exist
 /test-center* /index.html 200
 /psychology* /index.html 200
 /astrology* /index.html 200
@@ -16,12 +17,8 @@
 /terms /index.html 200
 /cookies /index.html 200
 /feedback /index.html 200
-
-# Blog 路由 - 只匹配 /blog 页面本身和文章详情页
 /blog /index.html 200
-/blog/ /index.html 200
-/blog/:slug /index.html 200
 
-# 根路径
+# Root path
 / /index.html 200
 
