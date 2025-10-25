@@ -18,7 +18,8 @@ project_name = "getyourluck-testing-platform"
 [env.production.vars]
 VITE_ENVIRONMENT = "production"
 VITE_API_BASE_URL = "https://api.selfatlas.net"
-VITE_CDN_BASE_URL = "https://cdn.selfatlas.net"
+# 🔥 修复：使用Cloudflare Pages作为CDN
+VITE_CDN_BASE_URL = "https://getyourluck-testing-platform.pages.dev"
 VITE_PAGES_PROJECT_NAME = "getyourluck-testing-platform"
 VITE_GOOGLE_ANALYTICS_ID = "G-S41XHZF1P7"
 

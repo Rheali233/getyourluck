@@ -8,8 +8,7 @@ import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
 import { useNavigate } from 'react-router-dom';
 import { blogService } from '@/services/blogService';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import { getCdnBaseUrl } from '@/config/environment';
 
 
 export interface BlogArticle {
@@ -43,6 +42,16 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
+
+  // 🔥 修复：处理图片URL，为相对路径添加CDN前缀
+  const processImageUrl = (imageUrl: string): string => {
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http')) return imageUrl; // 外部链接直接返回
+    if (imageUrl.startsWith('/')) {
+      return `${getCdnBaseUrl()}${imageUrl}`;
+    }
+    return imageUrl;
+  };
 
   // 当未传入 articles 时，从 blog 模块实时拉取
   const [loadedArticles, setLoadedArticles] = useState<BlogArticle[]>(articles || []);
@@ -269,12 +278,19 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
                   {/* 背景大图填满 */}
                   <div className="absolute inset-0">
                     <img
-                      src={a.coverImage}
+                      src={processImageUrl(a.coverImage)}
                       alt={a.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+                        // 🔥 修复：错误时先尝试原始路径，再使用fallback
+                        if (!target.src.includes('unsplash.com')) {
+                          target.src = a.coverImage.startsWith('/') 
+                            ? `${window.location.origin}${a.coverImage}`
+                            : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+                        } else {
+                          target.src = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80';
+                        }
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />

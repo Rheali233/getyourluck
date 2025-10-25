@@ -81,6 +81,24 @@ else
     echo "⚠️  后端服务状态检查: HTTP $backend_status"
 fi
 
+# 🔥 新增：验证图片资源
+echo ""
+echo "🖼️  验证图片资源..."
+image_status=$(curl -s -o /dev/null -w "%{http_code}" https://getyourluck-testing-platform.pages.dev/assets/logo.png)
+if [ "$image_status" = "200" ]; then
+    echo "✅ 图片资源正常"
+else
+    echo "⚠️  图片资源状态: HTTP $image_status"
+fi
+
+# 验证博客图片
+blog_image_status=$(curl -s -o /dev/null -w "%{http_code}" https://getyourluck-testing-platform.pages.dev/assets/blog/psychology/mbti-compatibility/cover.png)
+if [ "$blog_image_status" = "200" ]; then
+    echo "✅ 博客图片资源正常"
+else
+    echo "⚠️  博客图片资源状态: HTTP $blog_image_status"
+fi
+
 echo ""
 echo "🎉 Production环境部署完成！"
 echo ""
@@ -88,9 +106,11 @@ echo "📋 部署信息："
 echo "🔗 后端API: https://selfatlas-backend-prod.workers.dev"
 echo "🔗 后端健康检查: https://selfatlas-backend-prod.workers.dev/health"
 echo "🔗 前端URL: https://getyourluck-testing-platform.pages.dev"
+echo "🖼️  图片CDN: https://getyourluck-testing-platform.pages.dev"
 echo ""
 echo "📊 请验证以下功能："
 echo "   - 后端API响应正常"
 echo "   - 前端页面加载正常" 
+echo "   - 图片资源加载正常"
 echo "   - 数据库连接正常"
 echo "   - 各模块功能正常"

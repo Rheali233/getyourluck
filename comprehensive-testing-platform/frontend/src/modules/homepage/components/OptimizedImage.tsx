@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { getCdnBaseUrl } from '@/config/environment';
 
 export interface OptimizedImageProps extends BaseComponentProps {
   src: string;
@@ -62,22 +63,41 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     const cleanSrc = imageSrc.trim();
     if (!cleanSrc) return '';
     
-    // 如果是外部图片，直接返回
-    if (cleanSrc.startsWith('http') && !cleanSrc.includes('cloudflare.com')) {
+    // 如果是外部完整URL，处理Cloudflare图片优化
+    if (cleanSrc.startsWith('http')) {
+      // 如果是Cloudflare图片，使用图片优化服务
+      if (cleanSrc.includes('cloudflare.com') || cleanSrc.includes('imagedelivery.net') || cleanSrc.includes('pages.dev')) {
+        const params = new URLSearchParams();
+        if (targetWidth) params.append('w', targetWidth.toString());
+        if (targetFormat) params.append('f', targetFormat);
+        params.append('q', quality.toString());
+        
+        return `${cleanSrc}?${params.toString()}`;
+      }
+      
+      // 其他外部图片直接返回
       return cleanSrc;
     }
 
-    // 如果是Cloudflare图片，使用图片优化服务
-    if (cleanSrc.includes('cloudflare.com') || cleanSrc.includes('imagedelivery.net')) {
-      const params = new URLSearchParams();
-      if (targetWidth) params.append('w', targetWidth.toString());
-      if (targetFormat) params.append('f', targetFormat);
-      params.append('q', quality.toString());
+    // 🔥 关键修复：为相对路径添加CDN前缀
+    if (cleanSrc.startsWith('/')) {
+      const cdnBaseUrl = getCdnBaseUrl();
+      const fullUrl = `${cdnBaseUrl}${cleanSrc}`;
       
-      return `${cleanSrc}?${params.toString()}`;
+      // 如果配置了Cloudflare CDN，应用图片优化
+      if (cdnBaseUrl.includes('cloudflare.com') || cdnBaseUrl.includes('pages.dev')) {
+        const params = new URLSearchParams();
+        if (targetWidth) params.append('w', targetWidth.toString());
+        if (targetFormat) params.append('f', targetFormat);
+        params.append('q', quality.toString());
+        
+        return `${fullUrl}?${params.toString()}`;
+      }
+      
+      return fullUrl;
     }
 
-    // 本地图片，使用Vite的图片优化
+    // 其他情况（相对路径不以/开头）直接返回
     return cleanSrc;
   }, [quality]);
 
@@ -111,27 +131,43 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // 处理图片错误
   const handleImageError = useCallback(() => {
     if (retryCount < 2) {
-      // 重试加载
       setRetryCount(prev => prev + 1);
       setIsError(false);
-      // 延迟重试
-      setTimeout(() => {
-        if (imgRef.current) {
-          imgRef.current.src = generateOptimizedUrl(src, width, format);
-        }
-      }, 1000 * (retryCount + 1)); // 递增延迟
+      
+      // 第一次重试：如果是CDN失败，尝试使用主域名
+      if (retryCount === 0 && src.startsWith('/')) {
+        const fallbackUrl = `${window.location.origin}${src}`;
+        setTimeout(() => {
+          setCurrentSrc(fallbackUrl);
+        }, 1000);
+      } else {
+        // 第二次重试：使用原始优化URL
+        setTimeout(() => {
+          if (imgRef.current) {
+            imgRef.current.src = generateOptimizedUrl(src, width, format);
+          }
+        }, 2000);
+      }
     } else {
       setIsError(true);
       setIsLoaded(false);
       
-      // 尝试使用fallback图片
+      // 最终使用fallback图片
       if (fallback && fallback !== src) {
         setCurrentSrc(fallback);
+        setIsError(false); // 重置错误状态以显示fallback
       }
       
       onError?.();
+      
+      // 在控制台记录错误信息用于调试
+      console.warn(`Image loading failed after ${retryCount + 1} attempts:`, {
+        originalSrc: src,
+        currentSrc: currentSrc,
+        fallback: fallback
+      });
     }
-  }, [retryCount, src, width, format, generateOptimizedUrl, fallback, onError]);
+  }, [retryCount, src, width, format, generateOptimizedUrl, fallback, onError, currentSrc]);
 
   // 设置当前图片源
   useEffect(() => {

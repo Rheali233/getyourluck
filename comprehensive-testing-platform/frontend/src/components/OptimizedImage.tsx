@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/utils/classNames';
+import { getCdnBaseUrl } from '@/config/environment';
 
 interface OptimizedImageProps {
   src: string;
@@ -34,6 +35,8 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(!lazy || priority);
   const [hasError, setHasError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [currentSrc, setCurrentSrc] = useState(src);
   const imgRef = useRef<HTMLImageElement>(null);
 
   // 懒加载逻辑
@@ -61,6 +64,14 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     return () => observer.disconnect();
   }, [lazy, priority]);
 
+  // 监听src变化，重置状态
+  useEffect(() => {
+    setCurrentSrc(src);
+    setRetryCount(0);
+    setHasError(false);
+    setIsLoaded(false);
+  }, [src]);
+
   // 生成WebP URL (暂时未使用)
   // const _getWebPUrl = (originalSrc: string): string => {
   //   // 这里可以集成图片优化服务，如Cloudinary、ImageKit等
@@ -70,12 +81,17 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
   // 生成响应式图片URLs
   const getResponsiveUrls = (originalSrc: string) => {
-    const baseUrl = originalSrc.split('.')[0];
-    const extension = originalSrc.split('.').pop();
+    // 🔥 修复：为相对路径添加CDN前缀
+    const processedSrc = originalSrc.startsWith('/') 
+      ? `${getCdnBaseUrl()}${originalSrc}` 
+      : originalSrc;
+    
+    const baseUrl = processedSrc.split('.')[0];
+    const extension = processedSrc.split('.').pop();
     
     return {
       webp: `${baseUrl}.webp`,
-      fallback: originalSrc,
+      fallback: processedSrc,
       // 可以添加不同尺寸的URL
       sizes: {
         small: `${baseUrl}-400w.${extension}`,
@@ -90,10 +106,27 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   };
 
   const handleError = () => {
-    setHasError(true);
+    if (retryCount < 1 && src.startsWith('/')) {
+      // 如果CDN失败，尝试使用主域名
+      setRetryCount(prev => prev + 1);
+      const fallbackUrl = `${window.location.origin}${src}`;
+      setCurrentSrc(fallbackUrl);
+      setTimeout(() => {
+        if (imgRef.current) {
+          imgRef.current.src = fallbackUrl;
+        }
+      }, 1000);
+    } else {
+      setHasError(true);
+      console.warn(`Image loading failed:`, {
+        originalSrc: src,
+        currentSrc: currentSrc,
+        retryCount: retryCount
+      });
+    }
   };
 
-  const urls = getResponsiveUrls(src);
+  const urls = getResponsiveUrls(currentSrc);
 
   return (
     <div
