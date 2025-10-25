@@ -43,6 +43,6 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: comprehensive-testing-platform/backend
-          command: deploy
+          command: deploy --env production
 
 
