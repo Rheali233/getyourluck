@@ -1,5 +1,6 @@
 # API Proxy to backend
-/api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  301
+# Note: Backend routes already have /api prefix, so we proxy /api/* to backend/*
+/api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/:splat  301
 
 # SPA Routes - Explicit paths to avoid matching static files
 # DO NOT use /* as it will match everything including CSS/JS files!
