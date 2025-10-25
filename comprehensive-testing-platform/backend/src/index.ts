@@ -24,7 +24,6 @@ import { learningQuestionsRoutes } from "./routes/learning-ability/questions";
 import { learningTestRoutes } from "./routes/learning-ability/test";
 import questionsRouter from "./routes/psychology/questions";
 import { optionsRouter } from "./routes/psychology/options";
-import { testTypesRouter } from "./routes/test-types";
 import { aiRoutes } from "./routes/ai";
 import { careerQuestionsRouter } from "./routes/career/questions";
 import { careerTestRouter } from "./routes/career/test";
@@ -235,7 +234,6 @@ app.route("/api/career/questions", careerQuestionsRouter);
 app.route("/api/career/test", careerTestRouter);
 app.route("/api/relationship/questions", relationshipQuestionsRouter);
 app.route("/api/psychology/options", optionsRouter);
-app.route("/api/test-types", testTypesRouter);
 app.route("/api/ai", aiRoutes);
 // app.route("/api/recommendations", recommendationsRoutes); // 暂时注释，未定义
 // app.route("/api/seo", seoRoutes); // 暂时注释，未定义
