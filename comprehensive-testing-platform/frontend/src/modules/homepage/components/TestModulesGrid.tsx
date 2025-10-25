@@ -296,7 +296,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
     let isMounted = true;
     (async () => {
       try {
-        const res = await fetch(`${getApiBaseUrl()}/api/homepage/modules`);
+        const res = await fetch(`${getApiBaseUrl()}/homepage/modules`);
         if (!res.ok) return;
         const data = await res.json();
         if (isMounted && data?.success && Array.isArray(data.data)) {
