@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd comprehensive-testing-platform/frontend && npm install && npm run build && cd ../.. && cp -r comprehensive-testing-platform/frontend/dist ./dist && cp -r comprehensive-testing-platform/frontend/public/_routes.json ./dist/_routes.json 2>/dev/null || true && cp -r comprehensive-testing-platform/frontend/public/_redirects ./dist/_redirects 2>/dev/null || true"
+    "build": "cd comprehensive-testing-platform/frontend && npm install && npm run build"
   },
-  "description": "Monorepo for GetYourLuck comprehensive testing platform"
+  "description": "Monorepo for GetYourLuck comprehensive testing platform - build in frontend directory"
 }
