@@ -1,0 +1,2 @@
+/api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  301
+
