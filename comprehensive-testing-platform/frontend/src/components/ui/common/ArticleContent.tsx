@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/utils/classNames';
+import { getCdnBaseUrl } from '@/config/environment';
 
 export interface ArticleContentProps {
   html?: string; // 若传入Markdown，将自动进行轻量转换后再渲染
@@ -49,8 +50,21 @@ export const ArticleContent: React.FC<ArticleContentProps> = ({ html, className 
     .replace(/'/g, '&#39;');
 
   const escapeInline = (s: string) => {
+    // 🔥 修复：处理图片URL，为相对路径添加CDN前缀
+    const processImageUrl = (url: string): string => {
+      if (!url) return '';
+      if (url.startsWith('http')) return url; // 外部链接直接返回
+      if (url.startsWith('/')) {
+        return `${getCdnBaseUrl()}${url}`;
+      }
+      return url;
+    };
+
     // 链接与图片（不引入额外库的安全处理）
-    const img = s.replace(/!\[(.*?)\]\((.*?)\)/g, (_m, alt, url) => `<img src="${escapeHtml(url)}" alt="${escapeHtml(alt)}" loading="lazy" />`);
+    const img = s.replace(/!\[(.*?)\]\((.*?)\)/g, (_m, alt, url) => {
+      const processedUrl = processImageUrl(url);
+      return `<img src="${escapeHtml(processedUrl)}" alt="${escapeHtml(alt)}" loading="lazy" />`;
+    });
     return img.replace(/\[(.*?)\]\((.*?)\)/g, (_m, text, url) => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(text)}</a>`);
   };
 
