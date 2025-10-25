@@ -52,7 +52,7 @@ export const blogService = {
       params.append('category', category)
     }
 
-    return apiClient.get(`/api/blog/articles?${params.toString()}`) as Promise<PaginatedResponse<BlogArticleSummary[]>>
+    return apiClient.get(`/blog/articles?${params.toString()}`) as Promise<PaginatedResponse<BlogArticleSummary[]>>
   },
 
   /**
@@ -60,7 +60,7 @@ export const blogService = {
    */
   async searchArticles(keyword: string, limit = 24): Promise<APIResponse<{ results: BlogArticleSummary[] }>> {
     const q = encodeURIComponent(keyword);
-    const resp = await apiClient.get(`/api/search?q=${q}&lang=en-US&limit=${limit}`) as APIResponse<any>;
+    const resp = await apiClient.get(`/search?q=${q}&lang=en-US&limit=${limit}`) as APIResponse<any>;
 
     // 兼容不同后端字段：type 或 contentType；字段命名采用多源回退
     const raw = Array.isArray(resp.data?.results) ? resp.data.results : [];
@@ -103,26 +103,26 @@ export const blogService = {
    * 获取单篇博客文章
    */
   async getArticle(idOrSlug: string): Promise<APIResponse<BlogArticleDetail>> {
-    return apiClient.get(`/api/blog/articles/${idOrSlug}`) as Promise<APIResponse<BlogArticleDetail>>
+    return apiClient.get(`/blog/articles/${idOrSlug}`) as Promise<APIResponse<BlogArticleDetail>>
   },
 
   /**
    * 增加文章浏览量
    */
   async incrementViewCount(id: string): Promise<APIResponse<void>> {
-    return apiClient.post(`/api/blog/articles/${id}/view`, {})
+    return apiClient.post(`/blog/articles/${id}/view`, {})
   },
 
   // 基于 slug 的浏览量统计（新）
   async incrementViewCountBySlug(slug: string): Promise<APIResponse<void>> {
-    return apiClient.post(`/api/blog/articles/${slug}/view`, {})
+    return apiClient.post(`/blog/articles/${slug}/view`, {})
   },
 
   /**
    * 增加文章点赞数
    */
   async likeArticle(slug: string): Promise<APIResponse<void>> {
-    return apiClient.post(`/api/blog/articles/${slug}/like`, {})
+    return apiClient.post(`/blog/articles/${slug}/like`, {})
   },
 
   /**
@@ -133,14 +133,14 @@ export const blogService = {
       page: page.toString(),
       limit: limit.toString(),
     });
-    return apiClient.get(`/api/blog/articles/${slug}/comments?${params.toString()}`) as Promise<PaginatedResponse<BlogComment[]>>
+    return apiClient.get(`/blog/articles/${slug}/comments?${params.toString()}`) as Promise<PaginatedResponse<BlogComment[]>>
   },
 
   /**
    * 添加文章评论
    */
   async addComment(slug: string, comment: BlogCommentRequest): Promise<APIResponse<BlogComment>> {
-    return apiClient.post(`/api/blog/articles/${slug}/comments`, comment)
+    return apiClient.post(`/blog/articles/${slug}/comments`, comment)
   },
 }
 

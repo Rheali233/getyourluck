@@ -18,14 +18,14 @@ export const testService = {
    * 获取特定测试的题目
    */
   async getTestQuestions(testType: string): Promise<APIResponse<any[]>> {
-    return apiClient.get(`/api/v1/tests/${testType}/questions`)
+    return apiClient.get(`/v1/tests/${testType}/questions`)
   },
 
   /**
    * 提交测试答案
    */
   async submitTest(submission: TestSubmission): Promise<APIResponse<TestResult>> {
-    return apiClient.post(`/api/v1/tests/${submission.testType}/submit`, submission)
+    return apiClient.post(`/v1/tests/${submission.testType}/submit`, submission)
   },
 
   /**
@@ -33,7 +33,7 @@ export const testService = {
    * 修复: 需要提供 testType 参数
    */
   async getTestResult(testType: string, sessionId: string): Promise<APIResponse<TestResult>> {
-    return apiClient.get(`/api/v1/tests/${testType}/results/${sessionId}`)
+    return apiClient.get(`/v1/tests/${testType}/results/${sessionId}`)
   },
 
   /**
@@ -41,7 +41,7 @@ export const testService = {
    */
   async getTestResultBySession(sessionId: string): Promise<APIResponse<TestResult>> {
     // 先通过会话ID获取基本信息，再调用具体的结果接口
-    return apiClient.get(`/api/v1/tests/results/${sessionId}`)
+    return apiClient.get(`/v1/tests/results/${sessionId}`)
   },
 
   /**
