@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { getCdnBaseUrl } from '@/config/environment';
 
 
 export interface NavigationProps extends BaseComponentProps {
@@ -86,7 +87,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
             <img 
-              src="/assets/logo.png" 
+              src={`${getCdnBaseUrl()}/assets/logo.png`}
               alt="SelfAtlas Logo" 
               className="h-8 w-8 object-contain"
             />

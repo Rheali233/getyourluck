@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { cn } from '@/utils/classNames';
+import { getCdnBaseUrl } from '@/config/environment';
 
 export interface ResponsiveNavigationProps extends BaseComponentProps {
   showThemeToggle?: boolean;
@@ -81,7 +82,7 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
             <img 
-              src="/assets/logo.png" 
+              src={`${getCdnBaseUrl()}/assets/logo.png`}
               alt="SelfAtlas Logo" 
               className="h-8 w-8 object-contain"
             />
