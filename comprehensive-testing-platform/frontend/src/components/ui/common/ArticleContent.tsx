@@ -81,7 +81,17 @@ export const ArticleContent: React.FC<ArticleContentProps> = ({ html, className 
   const computedHtml = React.useMemo(() => {
     const raw = toHtml(html);
     // 若后端内容带有实体（例如 &lt;img ...&gt;），进行一次解码以正确渲染
-    return raw ? decodeEntities(raw) : '';
+    let decoded = raw ? decodeEntities(raw) : '';
+    
+    // 🔥 修复：为HTML中的相对路径图片添加CDN前缀
+    // 替换 <img src="/xxx" 为 <img src="CDN_BASE_URL/xxx"
+    const cdnBaseUrl = getCdnBaseUrl();
+    decoded = decoded.replace(/<img\s+([^>]*\s)?src="(\/[^"]+)"/gi, (match, attrs, src) => {
+      const fullUrl = `${cdnBaseUrl}${src}`;
+      return `<img ${attrs || ''}src="${fullUrl}"`;
+    });
+    
+    return decoded;
   }, [html, toHtml, decodeEntities]);
 
   return (

@@ -98,7 +98,8 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
           slug: a.slug || a.id,
           title: a.title,
           excerpt: a.excerpt || '',
-          coverImage: a.coverImage ? (a.coverImage.startsWith('http') ? a.coverImage : a.coverImage) : 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80',
+          // 🔥 修复：确保coverImage不为空，并且不在这里处理URL（processImageUrl会处理）
+          coverImage: a.coverImage || 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&h=200&q=80',
           category: a.category || 'Blog',
           readTime: a.readTime || '5 min read', // 默认阅读时间
           publishDate: a.publishedAt || a.publishDate || a.createdAt || '',
