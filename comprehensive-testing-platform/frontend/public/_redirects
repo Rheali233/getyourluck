@@ -1,8 +1,5 @@
-# API Proxy to backend
-# Frontend: /api/analytics/events → Backend: /api/analytics/events
-# :splat captures path AFTER /api/, so we need to add /api back in the target URL
-# IMPORTANT: Use 200 proxy (not 301 redirect) to preserve HTTP methods and headers
-/api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  200
+# API requests are handled by Pages Functions at functions/api/[[path]].ts
+# This provides better support for POST/PUT/DELETE methods and CORS
 
 # SPA Routes - Explicit paths to avoid matching static files
 # DO NOT use /* as it will match everything including CSS/JS files!
