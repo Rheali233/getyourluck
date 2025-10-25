@@ -9,7 +9,17 @@ interface Env {
   // Add your environment variables here if needed
 }
 
-export const onRequest: PagesFunction<Env> = async (context) => {
+// Cloudflare Pages Functions type definitions
+interface EventContext<Env = unknown> {
+  request: Request;
+  env: Env;
+  params: Record<string, string>;
+  data: Record<string, unknown>;
+  next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  waitUntil: (promise: Promise<unknown>) => void;
+}
+
+export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
   const { request } = context;
   const url = new URL(request.url);
   
