@@ -1,10 +1,9 @@
 # API 代理
 /api/* https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat 301
 
-# SPA 路由回退 - 只对非静态资源路径重定向
-# 静态资源路径会直接返回文件，不匹配下面的规则
+# SPA 路由回退 - 仅匹配已知的应用页面路由
+# 重要：不要使用 /* catch-all，否则会影响静态资源！
 /test-center* /index.html 200
-/blog* /index.html 200
 /psychology* /index.html 200
 /astrology* /index.html 200
 /tarot* /index.html 200
@@ -12,12 +11,17 @@
 /career* /index.html 200
 /learning-ability* /index.html 200
 /relationship* /index.html 200
-/about* /index.html 200
-/privacy* /index.html 200
-/terms* /index.html 200
-/cookies* /index.html 200
-/feedback* /index.html 200
+/about /index.html 200
+/privacy /index.html 200
+/terms /index.html 200
+/cookies /index.html 200
+/feedback /index.html 200
 
-# 根路径重定向
+# Blog 路由 - 只匹配 /blog 页面本身和文章详情页
+/blog /index.html 200
+/blog/ /index.html 200
+/blog/:slug /index.html 200
+
+# 根路径
 / /index.html 200
 
