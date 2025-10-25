@@ -13,6 +13,10 @@ export default defineConfig({
         {
           src: 'scripts/generate-static-pages.js',
           dest: 'scripts'
+        },
+        {
+          src: 'public/_routes.json',
+          dest: '.'
         }
       ]
     }),
