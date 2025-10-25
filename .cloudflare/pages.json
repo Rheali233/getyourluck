@@ -1,0 +1,9 @@
+{
+  "$schema": "https://developers.cloudflare.com/pages/configuration/schema.json",
+  "build": {
+    "command": "cd comprehensive-testing-platform/frontend && npm install && npm run build",
+    "cwd": "/",
+    "output_dir": "comprehensive-testing-platform/frontend/dist"
+  }
+}
+
