@@ -1,7 +1,18 @@
 # API Proxy to backend
 /api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  301
 
-# SPA fallback - MUST be last rule
-# Note: Static files (/assets/*, /css/*, /js/*) are served BEFORE this rule
-# Cloudflare Pages checks if file exists first, then applies redirects
-/*  /index.html  200
+# SPA Routes - Explicit paths to avoid matching static files
+# DO NOT use /* as it will match everything including CSS/JS files!
+/tests/*  /index.html  200
+/psychology/*  /index.html  200
+/astrology/*  /index.html  200
+/tarot/*  /index.html  200
+/career/*  /index.html  200
+/learning/*  /index.html  200
+/relationship/*  /index.html  200
+/blog/*  /index.html  200
+/about  /index.html  200
+/privacy  /index.html  200
+/terms  /index.html  200
+/cookies  /index.html  200
+/feedback  /index.html  200
