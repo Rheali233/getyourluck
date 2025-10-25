@@ -81,22 +81,22 @@ else
     echo "⚠️  后端服务状态检查: HTTP $backend_status"
 fi
 
-# 🔥 新增：验证图片资源
+# 🔥 修复：验证图片资源 - 使用正确的生产域名
 echo ""
 echo "🖼️  验证图片资源..."
-image_status=$(curl -s -o /dev/null -w "%{http_code}" https://getyourluck-testing-platform.pages.dev/assets/logo.png)
+image_status=$(curl -s -o /dev/null -w "%{http_code}" https://selfatlas.net/assets/logo.png)
 if [ "$image_status" = "200" ]; then
     echo "✅ 图片资源正常"
 else
-    echo "⚠️  图片资源状态: HTTP $image_status"
+    echo "⚠️  图片资源状态: HTTP $image_status (非阻塞错误)"
 fi
 
 # 验证博客图片
-blog_image_status=$(curl -s -o /dev/null -w "%{http_code}" https://getyourluck-testing-platform.pages.dev/assets/blog/psychology/mbti-compatibility/cover.png)
+blog_image_status=$(curl -s -o /dev/null -w "%{http_code}" https://selfatlas.net/assets/blog/psychology/mbti-compatibility/cover.png)
 if [ "$blog_image_status" = "200" ]; then
     echo "✅ 博客图片资源正常"
 else
-    echo "⚠️  博客图片资源状态: HTTP $blog_image_status"
+    echo "⚠️  博客图片资源状态: HTTP $blog_image_status (非阻塞错误)"
 fi
 
 echo ""
