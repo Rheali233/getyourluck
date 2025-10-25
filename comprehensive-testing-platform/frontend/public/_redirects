@@ -2,6 +2,6 @@
 /api/*  https://selfatlas-backend-prod.cyberlina.workers.dev/api/:splat  301
 
 # SPA fallback - MUST be last rule
-# Cloudflare Pages checks static files FIRST, then applies this rule
-# This is the correct way according to Cloudflare Pages documentation
+# Note: Static files (/assets/*, /css/*, /js/*) are served BEFORE this rule
+# Cloudflare Pages checks if file exists first, then applies redirects
 /*  /index.html  200

@@ -23,7 +23,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     
     if (hostname === 'selfatlas.net' || hostname === 'www.selfatlas.net') {
       return {
-        API_BASE_URL: 'https://selfatlas-backend-prod.cyberlina.workers.dev',
+        // 🔥 修复：使用相对路径，通过_redirects代理到后端，避免CORS问题
+        API_BASE_URL: '/api',
         // 🔥 修复：使用Cloudflare Pages作为CDN，确保图片资源可访问
         CDN_BASE_URL: 'https://getyourluck-testing-platform.pages.dev',
         ENVIRONMENT: 'production',
@@ -36,7 +37,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     
     if (hostname.includes('pages.dev')) {
       return {
-        API_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+        // 🔥 修复：staging环境也使用相对路径，通过_redirects代理
+        API_BASE_URL: '/api',
         // 🔥 修复：staging环境也使用Pages作为CDN
         CDN_BASE_URL: window.location.origin,
         ENVIRONMENT: 'staging',
