@@ -35,7 +35,7 @@ export const BaZiResultPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-white mb-4">{UI_TEXT.numerology.bazi.resultPage.errorTitle}</h2>
             <p className="text-gray-200 mb-6">{error}</p>
             <Button
-              onClick={() => navigate('/numerology/bazi')}
+              onClick={() => navigate('/tests/numerology/bazi')}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
             >
               {UI_TEXT.numerology.bazi.resultPage.tryAgain}
@@ -54,7 +54,7 @@ export const BaZiResultPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-white mb-4">{UI_TEXT.numerology.bazi.resultPage.noAnalysisTitle}</h2>
             <p className="text-gray-200 mb-6">{UI_TEXT.numerology.bazi.resultPage.noAnalysisDesc}</p>
             <Button
-              onClick={() => navigate('/numerology/bazi')}
+              onClick={() => navigate('/tests/numerology/bazi')}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
             >
               {UI_TEXT.numerology.bazi.resultPage.startNew}
@@ -74,7 +74,7 @@ export const BaZiResultPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-white mb-4">BaZi Analysis Not Available</h2>
             <p className="text-gray-200 mb-6">The BaZi analysis data is not available. Please try again.</p>
             <Button
-              onClick={() => navigate('/numerology/bazi')}
+              onClick={() => navigate('/tests/numerology/bazi')}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
             >
               Start New Analysis
@@ -94,7 +94,7 @@ export const BaZiResultPage: React.FC = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
               {UI_TEXT.numerology.bazi.resultPage.reportTitle}
             </h1>
-            <button onClick={() => navigate('/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
+            <button onClick={() => navigate('/tests/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

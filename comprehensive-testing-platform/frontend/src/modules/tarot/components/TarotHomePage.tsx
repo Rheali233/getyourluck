@@ -132,18 +132,18 @@ export const TarotHomePage: React.FC = () => {
     
     selectCategory(categoryId);
     // 跳转到推荐页面，让用户选择牌型
-    navigate('/tarot/recommendation');
+    navigate('/tests/tarot/recommendation');
   };
 
   const handleCustomQuestion = async () => {
     if (questionText.trim()) {
       // 设置默认分类为 general，然后跳转到推荐页面
       selectCategory('general');
-      navigate('/tarot/recommendation');
+      navigate('/tests/tarot/recommendation');
     } else {
       // 如果没有输入，也设置默认分类
       selectCategory('general');
-      navigate('/tarot/recommendation');
+      navigate('/tests/tarot/recommendation');
     }
   };
 
@@ -160,7 +160,7 @@ export const TarotHomePage: React.FC = () => {
       <SEOHead config={seoConfig} />
       <TarotTestContainer>
         {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig('/tarot')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/tarot')} />
       
       {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
       <div className="mb-8">

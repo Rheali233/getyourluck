@@ -40,114 +40,114 @@ const PAGE_CONFIGS: Record<string, Partial<SitemapUrl>> = {
     priority: 0.9,
     changefreq: 'daily'
   },
-  '/psychology': {
+  '/tests/psychology': {
     priority: 0.8,
     changefreq: 'weekly'
   },
-  '/career': {
+  '/tests/career': {
     priority: 0.8,
     changefreq: 'weekly'
   },
-  '/astrology': {
+  '/tests/astrology': {
     priority: 0.8,
     changefreq: 'weekly'
   },
-  '/tarot': {
+  '/tests/tarot': {
     priority: 0.8,
     changefreq: 'weekly'
   },
-  '/numerology': {
+  '/tests/numerology': {
     priority: 0.8,
     changefreq: 'weekly'
   },
-  '/learning': {
+  '/tests/learning': {
     priority: 0.8,
     changefreq: 'weekly'
   },
-  '/relationship': {
+  '/tests/relationship': {
     priority: 0.8,
     changefreq: 'weekly'
   },
   
   // 具体测试页面
-  '/psychology/mbti': {
+  '/tests/psychology/mbti': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/psychology/eq': {
+  '/tests/psychology/eq': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/psychology/phq9': {
+  '/tests/psychology/phq9': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/psychology/happiness': {
+  '/tests/psychology/happiness': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/career/holland': {
+  '/tests/career/holland': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/career/disc': {
+  '/tests/career/disc': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/career/leadership': {
+  '/tests/career/leadership': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/astrology/fortune': {
+  '/tests/astrology/fortune': {
     priority: 0.7,
     changefreq: 'daily'
   },
-  '/astrology/compatibility': {
+  '/tests/astrology/compatibility': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/astrology/birth-chart': {
+  '/tests/astrology/birth-chart': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/tarot/recommendation': {
+  '/tests/tarot/recommendation': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/tarot/drawing': {
+  '/tests/tarot/drawing': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/numerology/bazi': {
+  '/tests/numerology/bazi': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/numerology/zodiac': {
+  '/tests/numerology/zodiac': {
     priority: 0.7,
     changefreq: 'daily'
   },
-  '/numerology/name': {
+  '/tests/numerology/name': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/numerology/ziwei': {
+  '/tests/numerology/ziwei': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/learning/vark': {
+  '/tests/learning/vark': {
     priority: 0.7,
     changefreq: 'monthly'
   },
   // cognitive removed
-  '/relationship/love-language': {
+  '/tests/relationship/love-language': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/relationship/love-style': {
+  '/tests/relationship/love-style': {
     priority: 0.7,
     changefreq: 'monthly'
   },
-  '/relationship/interpersonal': {
+  '/tests/relationship/interpersonal': {
     priority: 0.7,
     changefreq: 'monthly'
   },
@@ -215,8 +215,7 @@ export const generateSitemap = (
  * 生成XML格式的sitemap
  */
 export const generateSitemapXML = (
-  urls: SitemapUrl[],
-  config: SitemapConfig = DEFAULT_CONFIG
+  urls: SitemapUrl[]
 ): string => {
   const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
   const urlsetOpen = `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
@@ -247,48 +246,48 @@ export const getAllPagePaths = (): string[] => {
     '/blog',
     
     // 模块页面
-    '/psychology',
-    '/career',
-    '/astrology',
-    '/tarot',
-    '/numerology',
-    '/learning',
-    '/relationship',
+    '/tests/psychology',
+    '/tests/career',
+    '/tests/astrology',
+    '/tests/tarot',
+    '/tests/numerology',
+    '/tests/learning',
+    '/tests/relationship',
     
     // 心理测试页面
-    '/psychology/mbti',
-    '/psychology/eq',
-    '/psychology/phq9',
-    '/psychology/happiness',
+    '/tests/psychology/mbti',
+    '/tests/psychology/eq',
+    '/tests/psychology/phq9',
+    '/tests/psychology/happiness',
     
     // 职业测试页面
-    '/career/holland',
-    '/career/disc',
-    '/career/leadership',
+    '/tests/career/holland',
+    '/tests/career/disc',
+    '/tests/career/leadership',
     
     // 占星页面
-    '/astrology/fortune',
-    '/astrology/compatibility',
-    '/astrology/birth-chart',
+    '/tests/astrology/fortune',
+    '/tests/astrology/compatibility',
+    '/tests/astrology/birth-chart',
     
     // 塔罗页面
-    '/tarot/recommendation',
-    '/tarot/drawing',
+    '/tests/tarot/recommendation',
+    '/tests/tarot/drawing',
     
     // 命理页面
-    '/numerology/bazi',
-    '/numerology/zodiac',
-    '/numerology/name',
-    '/numerology/ziwei',
+    '/tests/numerology/bazi',
+    '/tests/numerology/zodiac',
+    '/tests/numerology/name',
+    '/tests/numerology/ziwei',
     
     // 学习能力页面
-    '/learning/vark',
+    '/tests/learning/vark',
     // cognitive removed
     
     // 情感关系页面
-    '/relationship/love-language',
-    '/relationship/love-style',
-    '/relationship/interpersonal',
+    '/tests/relationship/love-language',
+    '/tests/relationship/love-style',
+    '/tests/relationship/interpersonal',
     
     // 法律页面
     '/terms',
@@ -305,7 +304,7 @@ export const generateAndSaveSitemap = async (
 ): Promise<string> => {
   const paths = getAllPagePaths();
   const urls = generateSitemap(paths, config);
-  const xml = generateSitemapXML(urls, config);
+  const xml = generateSitemapXML(urls);
   
   // 在浏览器环境中，可以下载文件
   if (typeof window !== 'undefined') {

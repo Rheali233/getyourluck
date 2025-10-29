@@ -27,7 +27,7 @@ export const ZodiacAnalysisPage: React.FC = () => {
   // 监听结果加载完成，只有当有Zodiac分析数据时才跳转到结果页面
   useEffect(() => {
     if (showResults && (analysisResult?.zodiac || analysisResult?.zodiacFortune)) {
-      navigate('/numerology/zodiac/result');
+      navigate('/tests/numerology/zodiac/result');
     }
   }, [showResults, analysisResult, navigate]);
 
@@ -81,7 +81,7 @@ export const ZodiacAnalysisPage: React.FC = () => {
       
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumb Navigation */}
-        <Breadcrumb items={getBreadcrumbConfig('/numerology/zodiac')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/numerology/zodiac')} />
         
         {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
         <div className="mb-8">
@@ -94,7 +94,7 @@ export const ZodiacAnalysisPage: React.FC = () => {
                 Discover your Chinese zodiac animal and get personalized yearly fortune guidance
               </p>
             </div>
-            <button onClick={() => navigate('/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-red-900 font-semibold hover:bg-white/80 transition ml-4">
+            <button onClick={() => navigate('/tests/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-red-900 font-semibold hover:bg-white/80 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

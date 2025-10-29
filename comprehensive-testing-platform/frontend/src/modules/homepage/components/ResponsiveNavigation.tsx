@@ -59,10 +59,10 @@ export const ResponsiveNavigation: React.FC<ResponsiveNavigationProps> = ({
   const navigationItems = [
     { name: '首页', href: '/', icon: '🏠' },
     { name: '测试中心', href: '/tests', icon: '🧪' },
-            { name: '心理测试', href: '/psychology', icon: '🧠' },
-    { name: '星座运势', href: '/astrology', icon: '⭐' },
-    { name: '塔罗占卜', href: '/tarot', icon: '🔮' },
-    { name: '职业规划', href: '/career', icon: '📊' },
+            { name: '心理测试', href: '/tests/psychology', icon: '🧠' },
+    { name: '星座运势', href: '/tests/astrology', icon: '⭐' },
+    { name: '塔罗占卜', href: '/tests/tarot', icon: '🔮' },
+    { name: '职业规划', href: '/tests/career', icon: '📊' },
     { name: '博客', href: '/blog', icon: '📝' },
     { name: '关于我们', href: '/about', icon: 'ℹ️' },
   ];

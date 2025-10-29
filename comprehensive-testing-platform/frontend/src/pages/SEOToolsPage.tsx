@@ -76,8 +76,8 @@ export const SEOToolsPage: React.FC = () => {
   const handleGenerateSitemap = async () => {
     try {
       const paths = [
-        '/', '/tests', '/psychology', '/career', '/astrology', 
-        '/tarot', '/numerology', '/learning', '/relationship',
+        '/', '/tests', '/tests/psychology', '/tests/career', '/tests/astrology', 
+        '/tests/tarot', '/tests/numerology', '/tests/learning', '/tests/relationship',
         '/about', '/blog', '/terms', '/privacy', '/cookies'
       ];
       const sitemap = generateSitemap(paths);

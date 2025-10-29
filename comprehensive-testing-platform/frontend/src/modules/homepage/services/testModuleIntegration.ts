@@ -17,7 +17,7 @@ export const TEST_MODULES = {
     description: 'Discover your personality secrets',
     icon: '🧠',
     color: 'blue',
-    route: '/psychology',
+    route: '/tests/psychology',
     features: ['MBTI', 'Depression', 'EQ']
   },
   astrology: {
@@ -26,7 +26,7 @@ export const TEST_MODULES = {
     description: 'Know your daily fortune',
     icon: '⭐',
     color: 'purple',
-    route: '/astrology',
+    route: '/tests/astrology',
     features: ['Zodiac Matching', 'Fortune']
   },
   tarot: {
@@ -35,7 +35,7 @@ export const TEST_MODULES = {
     description: 'Mysterious tarot reveals your heart',
     icon: '🔮',
     color: 'indigo',
-    route: '/tarot',
+    route: '/tests/tarot',
     features: ['Online Drawing', 'Interpretation']
   },
   career: {
@@ -44,7 +44,7 @@ export const TEST_MODULES = {
     description: 'Find your perfect career path',
     icon: '💼',
     color: 'green',
-    route: '/career',
+    route: '/tests/career',
     features: ['Holland Code', 'DISC Test']
   },
   numerology: {
@@ -53,7 +53,7 @@ export const TEST_MODULES = {
     description: 'Calculate your good fortune',
     icon: '🔢',
     color: 'orange',
-    route: '/numerology',
+    route: '/tests/numerology',
     features: ['BaZi', 'Chinese Zodiac', 'Name Analysis']
   },
   learning: {
@@ -62,7 +62,7 @@ export const TEST_MODULES = {
     description: 'Discover your learning superpowers',
     icon: '📚',
     color: 'teal',
-    route: '/learning',
+    route: '/tests/learning',
     features: ['Learning Style']
   },
   relationship: {
@@ -71,7 +71,7 @@ export const TEST_MODULES = {
     description: 'Understand your love code',
     icon: '💕',
     color: 'pink',
-    route: '/relationship',
+    route: '/tests/relationship',
     features: ['Love Type', 'Communication Style']
   }
 } as const;

@@ -136,7 +136,7 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
   if (loading) {
     return (
       <RelationshipTestContainer>
-        <Breadcrumb items={getBreadcrumbConfig(`/relationship/${testType}`)} />
+        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center max-w-md mx-auto">
             <div className="relative">
@@ -160,7 +160,7 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
   if (error) {
     return (
       <RelationshipTestContainer>
-        <Breadcrumb items={getBreadcrumbConfig(`/relationship/${testType}`)} />
+        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="text-red-600 text-6xl mb-4">⚠️</div>
@@ -181,7 +181,7 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
   if (questions.length === 0) {
     return (
       <RelationshipTestContainer>
-        <Breadcrumb items={getBreadcrumbConfig(`/relationship/${testType}`)} />
+        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="text-gray-400 text-6xl mb-4">📝</div>
@@ -203,7 +203,7 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
     return (
       <RelationshipTestContainer>
         {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig(`/relationship/${testType}`)} />
+        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
         {/* 顶部标题 + 返回首页按钮 */}
         <div className="mb-12">
           <div className="flex items-center justify-between">
@@ -216,7 +216,7 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
                 }
               </p>
             </div>
-            <button onClick={() => window.location.assign('/relationship')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-pink-800 font-semibold hover:hover:bg-white/80 transition ml-4">
+            <button onClick={() => window.location.assign('/tests/relationship')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-pink-800 font-semibold hover:hover:bg-white/80 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
@@ -236,7 +236,7 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
   return (
     <RelationshipTestContainer>
       {/* 面包屑导航 */}
-      <Breadcrumb items={getBreadcrumbConfig(`/relationship/${testType}`)} />
+      <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
       {/* 顶部标题 + 右上角返回按钮（对齐Psychology） */}
       <div className="mb-8">
         <div className="flex items-center justify-between">

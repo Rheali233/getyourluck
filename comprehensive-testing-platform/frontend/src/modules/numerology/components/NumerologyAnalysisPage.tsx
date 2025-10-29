@@ -48,7 +48,7 @@ export const NumerologyAnalysisPage: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate('/numerology');
+    navigate('/tests/numerology');
   };
 
   const handleNewAnalysis = () => {

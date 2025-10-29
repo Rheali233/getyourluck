@@ -141,7 +141,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
       }
     });
     
-    navigate(`/numerology/${analysisType}`);
+    navigate(`/tests/numerology/${analysisType}`);
   };
 
   return (
@@ -149,7 +149,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
       <SEOHead config={seoConfig} />
       <NumerologyTestContainer className={className}>
         {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig('/numerology')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/numerology')} />
       
       {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
       <div className="mb-8">

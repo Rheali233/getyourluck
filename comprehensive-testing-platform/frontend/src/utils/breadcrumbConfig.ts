@@ -17,177 +17,177 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   ],
   
   // 心理测试模块
-  '/psychology': [
+  '/tests/psychology': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'psychology', current: true }
   ],
   
   // 具体心理测试
-  '/psychology/mbti': [
+  '/tests/psychology/mbti': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'psychology', href: '/psychology' },
+    { label: 'psychology', href: '/tests/psychology' },
     { label: 'mbti', current: true }
   ],
   
-  '/psychology/phq9': [
+  '/tests/psychology/phq9': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'psychology', href: '/psychology' },
+    { label: 'psychology', href: '/tests/psychology' },
     { label: 'phq9', current: true }
   ],
   
-  '/psychology/eq': [
+  '/tests/psychology/eq': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'psychology', href: '/psychology' },
+    { label: 'psychology', href: '/tests/psychology' },
     { label: 'eq', current: true }
   ],
   
-  '/psychology/happiness': [
+  '/tests/psychology/happiness': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'psychology', href: '/psychology' },
+    { label: 'psychology', href: '/tests/psychology' },
     { label: 'happiness', current: true }
   ],
   
   // 职业发展模块
-  '/career': [
+  '/tests/career': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'career', current: true }
   ],
   
   // 具体职业测试
-  '/career/holland': [
+  '/tests/career/holland': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'career', href: '/career' },
+    { label: 'career', href: '/tests/career' },
     { label: 'holland', current: true }
   ],
   
-  '/career/disc': [
+  '/tests/career/disc': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'career', href: '/career' },
+    { label: 'career', href: '/tests/career' },
     { label: 'disc', current: true }
   ],
   
-  '/career/leadership': [
+  '/tests/career/leadership': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'career', href: '/career' },
+    { label: 'career', href: '/tests/career' },
     { label: 'leadership', current: true }
   ],
   
   // 占星模块
-  '/astrology': [
+  '/tests/astrology': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'astrology', current: true }
   ],
   
   // 占星具体页面
-  '/astrology/fortune': [
+  '/tests/astrology/fortune': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'astrology', href: '/astrology' },
+    { label: 'astrology', href: '/tests/astrology' },
     { label: 'horoscope reading', current: true }
   ],
   
-  '/astrology/compatibility': [
+  '/tests/astrology/compatibility': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'astrology', href: '/astrology' },
+    { label: 'astrology', href: '/tests/astrology' },
     { label: 'zodiac compatibility', current: true }
   ],
   
-  '/astrology/birth-chart': [
+  '/tests/astrology/birth-chart': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'astrology', href: '/astrology' },
+    { label: 'astrology', href: '/tests/astrology' },
     { label: 'birth chart analysis', current: true }
   ],
   
   // 塔罗模块
-  '/tarot': [
+  '/tests/tarot': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'tarot', current: true }
   ],
   
   // 塔罗具体页面
-  '/tarot/recommendation': [
+  '/tests/tarot/recommendation': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'tarot', href: '/tarot' },
+    { label: 'tarot', href: '/tests/tarot' },
     { label: 'choose spread', current: true }
   ],
   
-  '/tarot/drawing': [
+  '/tests/tarot/drawing': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'tarot', href: '/tarot' },
+    { label: 'tarot', href: '/tests/tarot' },
     { label: 'draw cards', current: true }
   ],
   
   // 命理模块
-  '/numerology': [
+  '/tests/numerology': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'numerology', current: true }
   ],
   
   // 命理具体页面
-  '/numerology/bazi': [
+  '/tests/numerology/bazi': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'numerology', href: '/numerology' },
+    { label: 'numerology', href: '/tests/numerology' },
     { label: 'bazi analysis', current: true }
   ],
   
-  '/numerology/zodiac': [
+  '/tests/numerology/zodiac': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'numerology', href: '/numerology' },
+    { label: 'numerology', href: '/tests/numerology' },
     { label: 'chinese zodiac fortune', current: true }
   ],
   
-  '/numerology/name': [
+  '/tests/numerology/name': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'numerology', href: '/numerology' },
+    { label: 'numerology', href: '/tests/numerology' },
     { label: 'name recommendation', current: true }
   ],
   
-  '/numerology/name/result': [
+  '/tests/numerology/name/result': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'numerology', href: '/numerology' },
-    { label: 'name recommendation', href: '/numerology/name' },
+    { label: 'numerology', href: '/tests/numerology' },
+    { label: 'name recommendation', href: '/tests/numerology/name' },
     { label: 'results', current: true }
   ],
   
-  '/numerology/ziwei': [
+  '/tests/numerology/ziwei': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'numerology', href: '/numerology' },
+    { label: 'numerology', href: '/tests/numerology' },
     { label: 'ziwei analysis', current: true }
   ],
   
   // 学习能力模块
-  '/learning': [
+  '/tests/learning': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'learning', current: true }
   ],
   
   // 具体学习能力测试
-  '/learning/vark': [
+  '/tests/learning/vark': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'learning', href: '/learning' },
+    { label: 'learning', href: '/tests/learning' },
     { label: 'vark', current: true }
   ],
   
@@ -196,30 +196,30 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   // cognitive removed
   
   // 情感关系模块
-  '/relationship': [
+  '/tests/relationship': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
     { label: 'relationship', current: true }
   ],
   
-  '/relationship/love-language': [
+  '/tests/relationship/love-language': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'relationship', href: '/relationship' },
+    { label: 'relationship', href: '/tests/relationship' },
     { label: 'love-language', current: true }
   ],
   
-  '/relationship/love-style': [
+  '/tests/relationship/love-style': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'relationship', href: '/relationship' },
+    { label: 'relationship', href: '/tests/relationship' },
     { label: 'love-style', current: true }
   ],
   
-  '/relationship/interpersonal': [
+  '/tests/relationship/interpersonal': [
     { label: 'home', href: '/' },
     { label: 'testcenter', href: '/tests' },
-    { label: 'relationship', href: '/relationship' },
+    { label: 'relationship', href: '/tests/relationship' },
     { label: 'interpersonal', current: true }
   ],
   

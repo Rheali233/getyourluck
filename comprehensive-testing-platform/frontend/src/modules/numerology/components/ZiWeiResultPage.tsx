@@ -36,7 +36,7 @@ export const ZiWeiResultPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-white mb-4">Analysis Error</h2>
             <p className="text-gray-200 mb-6">{error}</p>
             <Button
-              onClick={() => navigate('/numerology/ziwei')}
+              onClick={() => navigate('/tests/numerology/ziwei')}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
             >
               Try Again
@@ -50,7 +50,7 @@ export const ZiWeiResultPage: React.FC = () => {
   if (!analysisResult || !analysisResult.ziWeiChart) {
     // 若无数据，自动跳回分析页
     React.useEffect(() => {
-      navigate('/numerology/ziwei', { replace: true });
+      navigate('/tests/numerology/ziwei', { replace: true });
     }, [navigate]);
     return null;
   }
@@ -64,7 +64,7 @@ export const ZiWeiResultPage: React.FC = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
               ZiWei Analysis Report
             </h1>
-            <button onClick={() => navigate('/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
+            <button onClick={() => navigate('/tests/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

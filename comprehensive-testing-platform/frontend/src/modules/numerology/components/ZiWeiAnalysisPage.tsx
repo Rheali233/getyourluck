@@ -35,7 +35,7 @@ export const ZiWeiAnalysisPage: React.FC = () => {
   // 监听结果加载完成，只有当有ZiWei分析数据时才跳转到结果页面
   useEffect(() => {
     if (showResults && analysisResult?.ziWeiChart) {
-      navigate('/numerology/ziwei/result');
+      navigate('/tests/numerology/ziwei/result');
     }
   }, [showResults, analysisResult, navigate]);
 
@@ -79,7 +79,7 @@ export const ZiWeiAnalysisPage: React.FC = () => {
       
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumb Navigation */}
-        <Breadcrumb items={getBreadcrumbConfig('/numerology/ziwei')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/numerology/ziwei')} />
         
         {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
         <div className="mb-8">
@@ -92,7 +92,7 @@ export const ZiWeiAnalysisPage: React.FC = () => {
                 Discover your destiny through the ancient art of ZiWei DouShu
               </p>
             </div>
-            <button onClick={() => navigate('/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-red-900 font-semibold hover:bg-white/80 transition ml-4">
+            <button onClick={() => navigate('/tests/numerology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-red-900 font-semibold hover:bg-white/80 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

@@ -54,12 +54,12 @@ export const Footer: React.FC<FooterProps> = ({
     tests: {
       title: 'Test Services',
       links: [
-        { name: 'Psychology Tests', href: '/psychology' },
-        { name: 'Astrology Fortune', href: '/astrology' },
-        { name: 'Tarot Reading', href: '/tarot' },
-        { name: 'Career Planning', href: '/career' },
-        { name: 'Learning Ability', href: '/learning' },
-        { name: 'Relationships', href: '/relationship' },
+        { name: 'Psychology Tests', href: '/tests/psychology' },
+        { name: 'Astrology Fortune', href: '/tests/astrology' },
+        { name: 'Tarot Reading', href: '/tests/tarot' },
+        { name: 'Career Planning', href: '/tests/career' },
+        { name: 'Learning Ability', href: '/tests/learning' },
+        { name: 'Relationships', href: '/tests/relationship' },
       ],
     },
     resources: {

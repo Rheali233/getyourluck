@@ -63,7 +63,7 @@ export const ReadingResultPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-violet-900 mb-4">No Reading Found</h1>
             <p className="text-violet-800 mb-6">Please start a new tarot reading.</p>
             <Button
-              onClick={() => navigate('/tarot')}
+              onClick={() => navigate('/tests/tarot')}
               className="bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-700 hover:to-indigo-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
             >
               Start New Reading

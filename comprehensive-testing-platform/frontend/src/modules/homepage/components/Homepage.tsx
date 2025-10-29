@@ -163,13 +163,13 @@ export const Homepage: React.FC<HomepageProps> = ({
             description: 'A curated list of test modules including psychology, astrology, tarot, career and more',
             url: window.location.href,
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Personality & Mind', url: `${window.location.origin}/psychology` },
-              { '@type': 'ListItem', position: 2, name: 'Astrology & Fortune', url: `${window.location.origin}/astrology` },
-              { '@type': 'ListItem', position: 3, name: 'Tarot & Divination', url: `${window.location.origin}/tarot` },
-              { '@type': 'ListItem', position: 4, name: 'Career & Development', url: `${window.location.origin}/career` },
-              { '@type': 'ListItem', position: 5, name: 'Numerology & Destiny', url: `${window.location.origin}/numerology` },
-              { '@type': 'ListItem', position: 6, name: 'Learning & Intelligence', url: `${window.location.origin}/learning` },
-              { '@type': 'ListItem', position: 7, name: 'Relationships & Communication', url: `${window.location.origin}/relationship` }
+              { '@type': 'ListItem', position: 1, name: 'Personality & Mind', url: `${window.location.origin}/tests/psychology` },
+              { '@type': 'ListItem', position: 2, name: 'Astrology & Fortune', url: `${window.location.origin}/tests/astrology` },
+              { '@type': 'ListItem', position: 3, name: 'Tarot & Divination', url: `${window.location.origin}/tests/tarot` },
+              { '@type': 'ListItem', position: 4, name: 'Career & Development', url: `${window.location.origin}/tests/career` },
+              { '@type': 'ListItem', position: 5, name: 'Numerology & Destiny', url: `${window.location.origin}/tests/numerology` },
+              { '@type': 'ListItem', position: 6, name: 'Learning & Intelligence', url: `${window.location.origin}/tests/learning` },
+              { '@type': 'ListItem', position: 7, name: 'Relationships & Communication', url: `${window.location.origin}/tests/relationship` }
             ]
           },
           // CollectionPage JSON-LD 已添加

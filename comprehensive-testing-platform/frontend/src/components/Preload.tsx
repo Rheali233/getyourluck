@@ -57,11 +57,11 @@ export const PreloadCriticalModules: React.FC = () => {
   useEffect(() => {
     // 预加载关键路由
     const criticalRoutes = [
-      '/psychology',
-      '/career',
-      '/astrology',
-      '/tarot',
-      '/numerology',
+      '/tests/psychology',
+      '/tests/career',
+      '/tests/astrology',
+      '/tests/tarot',
+      '/tests/numerology',
     ];
 
     criticalRoutes.forEach(route => {

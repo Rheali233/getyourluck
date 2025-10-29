@@ -100,7 +100,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       description: 'Get your daily, weekly, or monthly horoscope with detailed insights and personalized guidance for personal growth.',
       icon: '🌟',
       color: 'from-[#0B132B] to-[#5F0F40]',
-      path: '/astrology/fortune',
+      path: '/tests/astrology/fortune',
       features: ['Daily Fortune', 'Weekly Trends', 'Monthly Outlook'],
       popularity: '2.1M+ users',
       rating: 4.8,
@@ -115,7 +115,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       description: 'Discover compatibility between different zodiac signs for love, friendship, and work relationships through comprehensive analysis.',
       icon: '💕',
       color: 'from-[#0B132B] to-[#5F0F40]',
-      path: '/astrology/compatibility',
+      path: '/tests/astrology/compatibility',
       features: ['Love Match', 'Friendship Analysis', 'Work Compatibility'],
       popularity: '1.8M+ users',
       rating: 4.7,
@@ -130,7 +130,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       description: 'Generate your personal birth chart with comprehensive astrological insights and detailed life analysis based on planetary positions.',
       icon: '🌌',
       color: 'from-[#0B132B] to-[#5F0F40]',
-      path: '/astrology/birth-chart',
+      path: '/tests/astrology/birth-chart',
       features: ['Sun/Moon/Rising', 'House Analysis', 'Planetary Aspects'],
       popularity: '950K+ users',
       rating: 4.9,
@@ -168,7 +168,7 @@ export const AstrologyHomePage: React.FC<AstrologyHomePageProps> = ({
       <SEOHead config={seoConfig} />
       <AstrologyTestContainer {...props} className={className} data-testid={testId}>
         {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig('/astrology')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/astrology')} />
       
       {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
       <div className="mb-8">

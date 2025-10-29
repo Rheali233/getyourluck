@@ -106,7 +106,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
       eventType: 'page_view',
       ...base,
       data: { 
-        route: '/astrology/fortune', 
+        route: '/tests/astrology/fortune', 
         pageType: 'test',
         testType: 'fortune'
       },
@@ -191,7 +191,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
             Zodiac Fortune Forecast
           </h1>
-            <button onClick={() => navigate('/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
+            <button onClick={() => navigate('/tests/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
@@ -369,7 +369,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
       <SEOHead config={seoConfig} />
       <AstrologyTestContainer className={className} data-testid={testId} {...props}>
       {/* 面包屑导航 */}
-      <Breadcrumb items={getBreadcrumbConfig('/astrology/fortune')} />
+      <Breadcrumb items={getBreadcrumbConfig('/tests/astrology/fortune')} />
       
       {/* Main Title and Description + Home button at top-right */}
       <div className="mb-8">

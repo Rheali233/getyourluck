@@ -88,33 +88,63 @@ function App() {
             </React.Suspense>
           }
         />
-        {/* Backward compatibility: /tests/* -> strip prefix to new module paths */}
-        <Route path="/tests/*" element={<LegacyTestsRedirect />} />
-        {/* 已删除：TestPages路由 */}
-        <Route path="/psychology" element={<PsychologyHomePage />} />
-        <Route path="/psychology/mbti" element={<GenericTestPage testType="mbti" title="MBTI Personality Test" description="Discover your personality type with the Myers-Briggs Type Indicator test." />} />
-        <Route path="/psychology/phq9" element={<GenericTestPage testType="phq9" title="PHQ-9 Depression Screening" description="A brief screening tool for depression assessment." />} />
-        <Route path="/psychology/eq" element={<GenericTestPage testType="eq" title="Emotional Intelligence Test" description="Assess your emotional intelligence and self-awareness" />} />
-        <Route path="/psychology/happiness" element={<GenericTestPage testType="happiness" title="Happiness Assessment" description="Measure your current happiness and life satisfaction levels." />} />
+        {/* Psychology Module Routes - Updated to /tests/psychology */}
+        <Route path="/tests/psychology" element={<PsychologyHomePage />} />
+        <Route path="/tests/psychology/mbti" element={<GenericTestPage testType="mbti" title="MBTI Personality Test" description="Discover your personality type with the Myers-Briggs Type Indicator test." />} />
+        <Route path="/tests/psychology/phq9" element={<GenericTestPage testType="phq9" title="PHQ-9 Depression Screening" description="A brief screening tool for depression assessment." />} />
+        <Route path="/tests/psychology/eq" element={<GenericTestPage testType="eq" title="Emotional Intelligence Test" description="Assess your emotional intelligence and self-awareness" />} />
+        <Route path="/tests/psychology/happiness" element={<GenericTestPage testType="happiness" title="Happiness Assessment" description="Measure your current happiness and life satisfaction levels." />} />
         
-        {/* Astrology Module Routes */}
-        <Route path="/astrology/*" element={<AstrologyModule />} />
-        {/* Tarot Module Routes */}
-        <Route path="/tarot/*" element={<TarotModule />} />
-        {/* Numerology Module Routes */}
-        <Route path="/numerology/*" element={<NumerologyModule />} />
-        <Route path="/career/*" element={<CareerModule />} />
-        {/* Learning Ability Module Routes */}
-        <Route path="/learning" element={<LearningAbilityHomePage />} />
-        <Route path="/learning/vark" element={<VARKTestPage />} />
-        <Route path="/relationship" element={<RelationshipHomePage />} />
-        {/* Canonical hyphenated paths */}
-        <Route path="/relationship/love-language" element={<LoveLanguageTestPage />} />
-        <Route path="/relationship/love-style" element={<LoveStyleTestPage />} />
+        {/* Career Module Routes - Updated to /tests/career */}
+        <Route path="/tests/career/*" element={<CareerModule />} />
+        
+        {/* Learning Ability Module Routes - Updated to /tests/learning */}
+        <Route path="/tests/learning" element={<LearningAbilityHomePage />} />
+        <Route path="/tests/learning/vark" element={<VARKTestPage />} />
+        
+        {/* Relationship Module Routes - Updated to /tests/relationship */}
+        <Route path="/tests/relationship" element={<RelationshipHomePage />} />
+        <Route path="/tests/relationship/love-language" element={<LoveLanguageTestPage />} />
+        <Route path="/tests/relationship/love-style" element={<LoveStyleTestPage />} />
+        <Route path="/tests/relationship/interpersonal" element={<InterpersonalTestPage />} />
         {/* Backward-compatibility redirects from underscore paths */}
-        <Route path="/relationship/love_language" element={<Navigate to="/relationship/love-language" replace />} />
-        <Route path="/relationship/love_style" element={<Navigate to="/relationship/love-style" replace />} />
-        <Route path="/relationship/interpersonal" element={<InterpersonalTestPage />} />
+        <Route path="/tests/relationship/love_language" element={<Navigate to="/tests/relationship/love-language" replace />} />
+        <Route path="/tests/relationship/love_style" element={<Navigate to="/tests/relationship/love-style" replace />} />
+        
+        {/* Astrology Module Routes - Updated to /tests/astrology */}
+        <Route path="/tests/astrology/*" element={<AstrologyModule />} />
+        {/* Tarot Module Routes - Updated to /tests/tarot */}
+        <Route path="/tests/tarot/*" element={<TarotModule />} />
+        {/* Numerology Module Routes - Updated to /tests/numerology */}
+        <Route path="/tests/numerology/*" element={<NumerologyModule />} />
+        
+        {/* Backward compatibility: Old paths redirect to new /tests/* paths */}
+        <Route path="/psychology" element={<Navigate to="/tests/psychology" replace />} />
+        <Route path="/psychology/mbti" element={<Navigate to="/tests/psychology/mbti" replace />} />
+        <Route path="/psychology/phq9" element={<Navigate to="/tests/psychology/phq9" replace />} />
+        <Route path="/psychology/eq" element={<Navigate to="/tests/psychology/eq" replace />} />
+        <Route path="/psychology/happiness" element={<Navigate to="/tests/psychology/happiness" replace />} />
+        <Route path="/career" element={<Navigate to="/tests/career" replace />} />
+        <Route path="/career/*" element={<LegacyTestsRedirect />} />
+        <Route path="/learning" element={<Navigate to="/tests/learning" replace />} />
+        <Route path="/learning/vark" element={<Navigate to="/tests/learning/vark" replace />} />
+        <Route path="/relationship" element={<Navigate to="/tests/relationship" replace />} />
+        <Route path="/relationship/love-language" element={<Navigate to="/tests/relationship/love-language" replace />} />
+        <Route path="/relationship/love-style" element={<Navigate to="/tests/relationship/love-style" replace />} />
+        <Route path="/relationship/interpersonal" element={<Navigate to="/tests/relationship/interpersonal" replace />} />
+        <Route path="/relationship/love_language" element={<Navigate to="/tests/relationship/love-language" replace />} />
+        <Route path="/relationship/love_style" element={<Navigate to="/tests/relationship/love-style" replace />} />
+        
+        {/* Backward compatibility: Old astrology/tarot/numerology paths redirect to new /tests/* paths */}
+        <Route path="/astrology" element={<Navigate to="/tests/astrology" replace />} />
+        <Route path="/astrology/*" element={<LegacyTestsRedirect />} />
+        <Route path="/tarot" element={<Navigate to="/tests/tarot" replace />} />
+        <Route path="/tarot/*" element={<LegacyTestsRedirect />} />
+        <Route path="/numerology" element={<Navigate to="/tests/numerology" replace />} />
+        <Route path="/numerology/*" element={<LegacyTestsRedirect />} />
+        
+        {/* Backward compatibility: /tests/* -> strip prefix to new module paths (for other legacy paths) */}
+        <Route path="/tests/*" element={<LegacyTestsRedirect />} />
         
         {/* 已删除：ResultPages和ComponentShowcase路由 */}
         </Routes>

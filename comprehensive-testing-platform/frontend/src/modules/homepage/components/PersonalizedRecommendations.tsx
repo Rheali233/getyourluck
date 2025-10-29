@@ -126,13 +126,13 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
       case 'test': {
         // 使用正确的模块路由
         const routeMap: Record<string, string> = {
-          'psychology': '/psychology',
-          'astrology': '/astrology',
-          'career': '/career',
-          'relationship': '/relationship',
-          'learning': '/learning',
-          'tarot': '/tarot',
-          'numerology': '/numerology'
+          'psychology': '/tests/psychology',
+          'astrology': '/tests/astrology',
+          'career': '/tests/career',
+          'relationship': '/tests/relationship',
+          'learning': '/tests/learning',
+          'tarot': '/tests/tarot',
+          'numerology': '/tests/numerology'
         };
         const moduleRoute = routeMap[item.category] || `/${item.category}`;
         window.location.href = moduleRoute;

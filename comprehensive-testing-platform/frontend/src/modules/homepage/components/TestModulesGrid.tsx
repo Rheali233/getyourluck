@@ -207,7 +207,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       testCount: 4,
       rating: 4.8,
       isActive: true,
-      route: '/psychology',
+      route: '/tests/psychology',
       features: ['🧠 Personality Discovery', '💙 Mental Wellness', '❤️ Emotional Intelligence'],
       estimatedTime: '10-15 minutes'
     },
@@ -220,7 +220,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       testCount: 6,
       rating: 4.7,
       isActive: true,
-      route: '/astrology',
+      route: '/tests/astrology',
       features: ['⭐ Daily Guidance', '🔮 Future Insights', '✨ Cosmic Wisdom'],
       estimatedTime: '5-8 minutes'
     },
@@ -233,7 +233,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       testCount: 3,
       rating: 4.9,
       isActive: true,
-      route: '/career',
+      route: '/tests/career',
       features: ['💼 Dream Job Match', '🚀 Leadership Skills', '🎯 Career Path'],
       estimatedTime: '15-20 minutes'
     },
@@ -246,7 +246,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       testCount: 3,
       rating: 4.6,
       isActive: true,
-      route: '/relationship',
+      route: '/tests/relationship',
       features: ['💕 Love Language', '💝 Relationship Style', '🤝 Social Skills'],
       estimatedTime: '8-12 minutes'
     },
@@ -259,7 +259,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       testCount: 3,
       rating: 4.5,
       isActive: true,
-      route: '/learning',
+      route: '/tests/learning',
       features: ['🎓 Learning Style', '🧩 Intelligence Test', '⚡ Brain Power'],
       estimatedTime: '12-18 minutes'
     },
@@ -272,7 +272,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       testCount: 6,
       rating: 4.6,
       isActive: true,
-      route: '/tarot',
+      route: '/tests/tarot',
       features: ['🔮 Mystical Cards', '✨ Future Vision', '🌟 Spiritual Journey'],
       estimatedTime: '8-12 minutes'
     },
@@ -285,7 +285,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       testCount: 5,
       rating: 4.4,
       isActive: true,
-      route: '/numerology',
+      route: '/tests/numerology',
       features: [ '🐲 Zodiac Fortune', '📝 Name Magic'],
       estimatedTime: '10-15 minutes'
     }

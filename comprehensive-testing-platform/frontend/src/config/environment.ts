@@ -51,8 +51,9 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     
     if (hostname.includes('localhost')) {
       return {
-        API_BASE_URL: 'http://localhost:8787',
-        CDN_BASE_URL: 'http://localhost:8787',
+        // 🔥 修改：本地环境直接访问 Cloudflare 远程后端，使用 selfatlas-local 数据库
+        API_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+        CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
         ENVIRONMENT: 'development',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
         PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',

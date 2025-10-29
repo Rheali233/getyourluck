@@ -59,7 +59,7 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
   };
 
   const handleBack = () => {
-    navigate('/astrology');
+    navigate('/tests/astrology');
   };
 
 
