@@ -41,12 +41,14 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Pages (Staging)
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: comprehensive-testing-platform/frontend
-          command: pages deploy dist --project-name getyourluck-testing-platform --branch staging
+          projectName: getyourluck-testing-platform
+          directory: comprehensive-testing-platform/frontend/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: staging
 
       - name: Verify deployment
         run: |
