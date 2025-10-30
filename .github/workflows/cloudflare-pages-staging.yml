@@ -40,6 +40,14 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify build output
+        run: |
+          echo "📦 Checking dist directory..."
+          ls -la dist/ | head -20
+          echo ""
+          echo "📁 Checking functions directory..."
+          ls -la dist/functions/ 2>/dev/null || echo "⚠️ functions directory not found"
+
       - name: Install Wrangler CLI
         run: npm install -g wrangler@latest
 
@@ -49,6 +57,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           cd comprehensive-testing-platform/frontend
+          echo "📋 Current directory: $(pwd)"
+          echo "📋 Dist directory exists: $(test -d dist && echo 'yes' || echo 'no')"
+          echo "📋 Functions directory exists: $(test -d dist/functions && echo 'yes' || echo 'no')"
           wrangler pages deploy dist \
             --project-name getyourluck-testing-platform \
             --branch staging
