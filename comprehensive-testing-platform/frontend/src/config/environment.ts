@@ -39,8 +39,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
       return {
         // 🔥 修复：staging环境也使用相对路径，通过_redirects代理
         API_BASE_URL: '/api',
-        // 🔥 修复：staging环境也使用Pages作为CDN
-        CDN_BASE_URL: window.location.origin,
+        // 🔥 修复：staging环境图片通过后端Worker访问R2存储
+        CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
         ENVIRONMENT: 'staging',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
         PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
@@ -51,9 +51,11 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     
     if (hostname.includes('localhost')) {
       return {
-        // 🔥 修改：本地环境直接访问 Cloudflare 远程后端，使用 selfatlas-local 数据库
-        API_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
-        CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+        // 🔥 修复：本地环境使用相对路径，通过 Vite 代理到本地后端 (localhost:8787)
+        // 确保本地开发完全隔离，不影响任何远程环境
+        API_BASE_URL: '/api',
+        // 本地开发使用本地后端作为 CDN
+        CDN_BASE_URL: 'http://localhost:8787',
         ENVIRONMENT: 'development',
         PAGES_PROJECT_NAME: 'getyourluck-testing-platform',
         PAGES_DEPLOYMENT_URL: 'https://4b4482a3.getyourluck-testing-platform.pages.dev',
@@ -76,9 +78,9 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     };
   }
   
-  // 默认返回staging环境
+  // 默认返回staging环境（用于构建时未设置环境变量的情况）
   return {
-    API_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+    API_BASE_URL: '/api',
     CDN_BASE_URL: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
     ENVIRONMENT: 'staging',
     PAGES_PROJECT_NAME: 'getyourluck-testing-platform',

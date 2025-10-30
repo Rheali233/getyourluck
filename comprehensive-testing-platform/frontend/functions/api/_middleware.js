@@ -3,15 +3,33 @@
  * 
  * This function proxies all /api/* requests to the backend Worker
  * while preserving HTTP methods, headers, and body.
+ * 
+ * Environment Detection:
+ * - Production: selfatlas.net or www.selfatlas.net -> selfatlas-backend-prod
+ * - Staging: *.pages.dev -> selfatlas-backend-staging
  */
 
 export async function onRequest(context) {
   try {
     const { request } = context;
     const url = new URL(request.url);
+    const hostname = url.hostname;
     
-    // Build the backend URL
-    const backendUrl = `https://selfatlas-backend-prod.cyberlina.workers.dev${url.pathname}${url.search}`;
+    // Determine backend URL based on hostname
+    let backendBaseUrl;
+    if (hostname === 'selfatlas.net' || hostname === 'www.selfatlas.net') {
+      // Production environment
+      backendBaseUrl = 'https://selfatlas-backend-prod.cyberlina.workers.dev';
+    } else if (hostname.includes('pages.dev')) {
+      // Staging environment (includes preview branches)
+      backendBaseUrl = 'https://selfatlas-backend-staging.cyberlina.workers.dev';
+    } else {
+      // Fallback to staging for unknown domains (should not happen in production)
+      backendBaseUrl = 'https://selfatlas-backend-staging.cyberlina.workers.dev';
+    }
+    
+    // Build the backend URL with path and query
+    const backendUrl = `${backendBaseUrl}${url.pathname}${url.search}`;
     
     // Handle OPTIONS preflight first
     if (request.method === 'OPTIONS') {

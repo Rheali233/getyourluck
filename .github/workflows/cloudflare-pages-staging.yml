@@ -1,0 +1,56 @@
+name: Deploy Frontend to Cloudflare Pages (Staging)
+
+on:
+  push:
+    branches: [ staging ]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy even if no changes'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: read
+  deployments: write
+  id-token: write
+
+jobs:
+  deploy-staging:
+    name: Build and Deploy to Staging
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: comprehensive-testing-platform/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: comprehensive-testing-platform/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages (Staging)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: comprehensive-testing-platform/frontend
+          command: pages deploy dist --project-name=getyourluck-testing-platform --branch=staging
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Staging deployment completed"
+          echo "🔗 Deployed to: https://staging.getyourluck-testing-platform.pages.dev"
+          echo "🔗 Or preview URL: https://[hash].getyourluck-testing-platform.pages.dev"
+

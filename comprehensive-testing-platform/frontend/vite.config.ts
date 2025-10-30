@@ -17,6 +17,14 @@ export default defineConfig({
         {
           src: 'public/_routes.json',
           dest: '.'
+        },
+        {
+          src: 'functions/_middleware.js',
+          dest: 'functions'
+        },
+        {
+          src: 'functions/api/_middleware.js',
+          dest: 'functions/api'
         }
       ]
     }),
