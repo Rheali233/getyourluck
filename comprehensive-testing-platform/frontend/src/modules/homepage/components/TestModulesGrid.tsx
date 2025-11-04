@@ -3,14 +3,12 @@
  * 遵循统一开发标准的首页组件
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui';
 import type { TestModule } from '../types';
 import { cn } from '@/utils/classNames';
 
-
-import { getApiBaseUrl } from '@/config/environment';
 export interface TestModulesGridProps {
   className?: string;
   testId?: string;
@@ -137,19 +135,21 @@ const TestModuleCard: React.FC<{
         {/* 底部信息区域 */}
         <div className="mt-auto">
           {/* Statistics */}
-          <div className={cn("flex items-center space-x-4 text-xs mb-3", themeColors.stats)}>
+          <div className={cn("flex items-center flex-wrap gap-2 text-xs mb-3", themeColors.stats)}>
             <span className="flex items-center">
               <span className={cn("w-2 h-2 rounded-full mr-1", themeColors.primaryDot)}></span>
-              {module.testCount} tests
+              {module.rating} ★
             </span>
-            <span className="flex items-center">
-              <span className={cn("w-2 h-2 rounded-full mr-1", themeColors.secondaryDot)}></span>
-              {module.rating} rating
-            </span>
+            <span className="text-gray-400">|</span>
+            <span>{module.testCount} tests</span>
+            <span className="text-gray-400">|</span>
+            <span>{module.estimatedTime}</span>
+            <span className="text-gray-400">|</span>
+            <span className="font-semibold text-green-600">Free</span>
           </div>
           
           {/* 特色功能 */}
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 mb-3">
             {module.features.slice(0, 2).map((feature, index) => (
               <span
                 key={index}
@@ -159,6 +159,25 @@ const TestModuleCard: React.FC<{
               </span>
             ))}
           </div>
+          
+          {/* CTA Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(module);
+            }}
+            className={cn(
+              "w-full px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
+              "bg-gradient-to-r from-blue-600 to-purple-600 text-white",
+              "hover:from-blue-700 hover:to-purple-700 hover:shadow-lg",
+              "flex items-center justify-center gap-2"
+            )}
+          >
+            Explore Module
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </button>
         </div>
         
         {/* Status indicator */}
@@ -169,11 +188,6 @@ const TestModuleCard: React.FC<{
             </span>
           </div>
         )}
-        
-        {/* Hover tooltip */}
-        <div className="absolute bottom-3 right-2 bg-black/70 text-white text-sm px-4 py-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-10">
-          Click to Try
-        </div>
         
       </div>
     </Card>
@@ -193,7 +207,6 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const [serverModules, setServerModules] = useState<TestModule[] | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Default test modules data
@@ -201,7 +214,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
     {
       id: 'psychology',
       name: 'Personality & Mind',
-      description: 'Professional psychological assessments to help you understand your personality, emotions, and cognitive traits',
+      description: 'Professional assessments revealing personality traits and growth insights',
       icon: '🧠',
       theme: 'psychology',
       testCount: 4,
@@ -214,7 +227,7 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
     {
       id: 'astrology',
       name: 'Astrology & Fortune',
-      description: 'Professional astrological analysis, decode your zodiac secrets and predict future fortune',
+      description: 'Daily guidance decoding zodiac tendencies and opportunities',
       icon: '⭐',
       theme: 'astrology',
       testCount: 6,
@@ -225,48 +238,9 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       estimatedTime: '5-8 minutes'
     },
     {
-      id: 'career',
-      name: 'Career & Development',
-      description: 'Scientific career assessment to help you find the most suitable career development direction',
-      icon: '💼',
-      theme: 'career',
-      testCount: 3,
-      rating: 4.9,
-      isActive: true,
-      route: '/tests/career',
-      features: ['💼 Dream Job Match', '🚀 Leadership Skills', '🎯 Career Path'],
-      estimatedTime: '15-20 minutes'
-    },
-    {
-      id: 'relationship',
-      name: 'Relationships & Communication',
-      description: 'In-depth analysis of your interpersonal relationship patterns to improve social skills',
-      icon: '❤️',
-      theme: 'relationship',
-      testCount: 3,
-      rating: 4.6,
-      isActive: true,
-      route: '/tests/relationship',
-      features: ['💕 Love Language', '💝 Relationship Style', '🤝 Social Skills'],
-      estimatedTime: '8-12 minutes'
-    },
-    {
-      id: 'learning',
-      name: 'Learning & Intelligence',
-      description: 'Assess your learning style and cognitive abilities to optimize learning methods',
-      icon: '📚',
-      theme: 'learning',
-      testCount: 3,
-      rating: 4.5,
-      isActive: true,
-      route: '/tests/learning',
-      features: ['🎓 Learning Style', '🧩 Intelligence Test', '⚡ Brain Power'],
-      estimatedTime: '12-18 minutes'
-    },
-    {
       id: 'tarot',
       name: 'Tarot & Divination',
-      description: 'Discover your destiny through ancient tarot card wisdom and mystical insights',
+      description: 'Mystical tarot draws with reflective insights and next steps',
       icon: '🔮',
       theme: 'tarot',
       testCount: 6,
@@ -277,59 +251,61 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
       estimatedTime: '8-12 minutes'
     },
     {
+      id: 'career',
+      name: 'Career & Development',
+      description: 'Career profiling to match strengths with roles and paths',
+      icon: '💼',
+      theme: 'career',
+      testCount: 3,
+      rating: 4.9,
+      isActive: true,
+      route: '/tests/career',
+      features: ['💼 Dream Job Match', '🚀 Leadership Skills', '🎯 Career Path'],
+      estimatedTime: '15-20 minutes'
+    },
+    {
       id: 'numerology',
       name: 'Numerology & Destiny',
-      description: 'Combining traditional culture to decode your numerological code and life trajectory',
+      description: 'Traditional numerology decoding life patterns, luck cycles, and meaningful name impacts',
       icon: '🔢',
       theme: 'numerology',
       testCount: 5,
-      rating: 4.4,
+      rating: 4.5,
       isActive: true,
       route: '/tests/numerology',
       features: [ '🐲 Zodiac Fortune', '📝 Name Magic'],
       estimatedTime: '10-15 minutes'
+    },
+    {
+      id: 'learning',
+      name: 'Learning & Intelligence',
+      description: 'Assess learning style and cognition to personalize strategies and study environments',
+      icon: '📚',
+      theme: 'learning',
+      testCount: 3,
+      rating: 4.7,
+      isActive: true,
+      route: '/tests/learning',
+      features: ['🎓 Learning Style', '🧩 Intelligence Test', '⚡ Brain Power'],
+      estimatedTime: '12-18 minutes'
+    },
+    {
+      id: 'relationship',
+      name: 'Relationships & Communication',
+      description: 'Analyze relationship patterns and communication styles to improve empathy and harmony',
+      icon: '❤️',
+      theme: 'relationship',
+      testCount: 3,
+      rating: 4.8,
+      isActive: true,
+      route: '/tests/relationship',
+      features: ['💕 Love Language', '💝 Relationship Style', '🤝 Social Skills'],
+      estimatedTime: '8-12 minutes'
     }
   ];
 
-  // 后端优先加载模块列表，失败时回退默认或外部传入
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const res = await fetch(`${getApiBaseUrl()}/homepage/modules`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (isMounted && data?.success && Array.isArray(data.data)) {
-          setServerModules(
-            data.data.map((m: any) => ({
-              id: m.id,
-              name: m.nameEn || m.name,
-              description: m.descriptionEn || m.description,
-              icon: m.icon || '',
-              theme: m.theme || (m.id as TestModule['theme']),
-              testCount: m.testCount ?? 0,
-              rating: m.rating ?? 4.5,
-              isActive: m.isActive ?? true,
-              route: m.route,
-              features: Array.isArray(m.featuresEn)
-                ? m.featuresEn
-                : Array.isArray(m.features)
-                ? m.features
-                : [],
-              estimatedTime: m.estimatedTime || '10-15 minutes',
-            }))
-          );
-        }
-      } catch (_) {
-        // silent fallback
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const displayModules = serverModules ?? (modules.length > 0 ? modules : defaultModules);
+  // 优先使用外部传入的模块数据，否则使用默认模块数据
+  const displayModules = modules.length > 0 ? modules : defaultModules;
 
   const handleModuleClick = (module: TestModule) => {
     // 检查是否有对应的测试界面

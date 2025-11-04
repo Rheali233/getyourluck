@@ -82,19 +82,24 @@ export async function onRequest(context) {
   }
 
   // List of static file extensions and paths
-  const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot', '.json', '.xml', '.txt', '.html'];
-  const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/favicon', '/apple-touch-icon', '/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json', '/index.html', '/ga-test.html'];
+  // 🔥 关键修复：优先检查路径前缀，确保所有静态资源都被正确识别
+  const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/favicon', '/apple-touch-icon'];
+  const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot', '.json', '.xml', '.txt', '.map'];
+  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json', '/index.html'];
 
   // Check if the request is for a static file
-  const isStaticFile = staticExtensions.some(ext => pathname.endsWith(ext)) ||
-                       staticPaths.some(path => pathname === path || pathname.startsWith(path));
+  // 优先级：路径前缀 > 文件扩展名 > 特定文件
+  const isStaticFile = staticPaths.some(path => pathname.startsWith(path)) ||
+                       staticExtensions.some(ext => pathname.endsWith(ext)) ||
+                       staticFiles.includes(pathname);
 
-  // If it's a static file, let it pass through
+  // If it's a static file, let it pass through to Cloudflare Pages static hosting
+  // 🔥 关键：不经过任何处理，直接返回静态文件
   if (isStaticFile) {
     return next();
   }
 
-  // For all other requests, try to get the requested resource
+  // For all other requests (SPA routes), try to get the requested resource first
   const response = await next();
 
   // If the resource exists (status 200), return it
@@ -102,27 +107,29 @@ export async function onRequest(context) {
     return response;
   }
 
-  // If the resource doesn't exist (404), return index.html for SPA routing
-  if (response.status === 404) {
-    // Fetch index.html from the same origin
-    const indexResponse = await fetch(new URL('/index.html', request.url));
+  // For 404 or any other status, return index.html for SPA routing
+  // This ensures that all routes work correctly when refreshed
+  try {
+    // Fetch index.html from the static files
+    const indexUrl = new URL('/index.html', request.url);
+    const indexResponse = await fetch(indexUrl);
     
-    if (!indexResponse.ok) {
-      return response; // If index.html also fails, return original 404
+    if (indexResponse.ok) {
+      // Return index.html with original URL preserved (for client-side routing)
+      return new Response(indexResponse.body, {
+        status: 200,
+        statusText: 'OK',
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'public, max-age=0, must-revalidate',
+        },
+      });
     }
-    
-    // Return index.html with original URL (for client-side routing)
-    return new Response(indexResponse.body, {
-      status: 200,
-      statusText: 'OK',
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'public, max-age=0, must-revalidate',
-      },
-    });
+  } catch (error) {
+    console.error('Failed to fetch index.html:', error);
   }
 
-  // For other status codes, return the response as is
+  // If we can't fetch index.html, return the original response
   return response;
 }
 
