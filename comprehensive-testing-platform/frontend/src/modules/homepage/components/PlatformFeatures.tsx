@@ -39,8 +39,8 @@ export const PlatformFeatures: React.FC<PlatformFeaturesProps> = ({
     {
       id: 'professional',
       icon: '🔬',
-      title: 'Scientifically Proven Results',
-      description: 'Built on decades of research - MBTI, Big Five, and ancient wisdom combined',
+      title: 'Research-Informed Results',
+      description: 'Built on research-informed models like Big Five and EQ, plus traditional wisdom systems for diverse insights',
       color: 'purple'
     },
     {

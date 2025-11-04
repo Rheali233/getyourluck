@@ -150,7 +150,7 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
       onTestSelect(testType);
     } else {
       // Default navigation to test page
-      navigate(`/career/${testType}`);
+      navigate(`/tests/career/${testType}`);
     }
   };
 
@@ -159,7 +159,7 @@ export const CareerHomePage: React.FC<CareerHomePageProps> = ({
       <SEOHead config={seoConfig} />
       <CareerTestContainer className={className || ''} data-testid={testId} {...props}>
         {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig('/career')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/career')} />
       
       {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
       <div className="mb-8">

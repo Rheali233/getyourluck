@@ -64,7 +64,7 @@ export const Homepage: React.FC<HomepageProps> = ({
       eventType: 'cta_click',
       ...base,
       data: {
-        name: 'Begin Your Journey',
+        name: 'Start Free Test',
         location: 'hero_section',
         target: 'test-modules-section'
       }

@@ -20,20 +20,17 @@ export interface HeroSectionProps extends BaseComponentProps {
   };
 }
 
-// 默认配置（全英文）
+// 默认配置（全英文）- 匹配部署版本
 const defaultConfig = {
-  title: "Unlock Your Potential with SelfAtlas",
-  subtitle: "Your Personal Journey of Self-Discovery Starts Here",
-  description: "Discover your true self through our comprehensive testing platform. From personality analysis to career guidance, SelfAtlas helps you understand yourself better and make informed decisions for your future.",
+  title: "Free AI-Powered Self-Discovery Tests",
+  subtitle: "Get research-informed insights into your personality, strengths, and career path. All tests are free and provide instant AI-powered results.",
+  description: "Get research-informed insights into your personality, strengths, and career path. All tests are free and provide instant AI-powered results.",
   features: [
-    "🔬 Scientific Psychology",
-    "⭐ Professional Astrology",
-    "🎴 Tarot Guidance",
-    "💼 Career Planning",
-    "❤️ Relationship Insights",
-    "🧠 Learning Ability"
+    "Instant Results",
+    "Personalized Insights",
+    "Free to Start"
   ],
-  ctaText: "Begin Your Journey",
+  ctaText: "Start Free Test",
   ctaRoute: "/tests"
 };
 
@@ -76,14 +73,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {heroConfig.title}
         </h1>
 
-        {/* 副标题 */}
+        {/* 副标题/描述 */}
         <p className="text-xl sm:text-2xl lg:text-3xl text-primary-600 font-semibold mb-8 animate-fade-in delay-300">
           {heroConfig.subtitle}
-        </p>
-
-        {/* 描述 */}
-        <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto mb-8 leading-relaxed animate-fade-in delay-500">
-          {heroConfig.description}
         </p>
 
         {/* CTA 按钮 */}
@@ -103,15 +95,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="mt-8 flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            Trusted by 10,000+ Users
+            Instant Results
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-            Professional Team
+            Personalized Insights
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-            AI-Powered Analysis
+            Free to Start
           </div>
         </div>
       </div>

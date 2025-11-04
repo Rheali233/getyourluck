@@ -117,7 +117,7 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
       onTestSelect();
     } else {
       // Default navigation to test page
-      navigate(`/learning/${testType}`);
+      navigate(`/tests/learning/${testType}`);
     }
   };
 
@@ -126,7 +126,7 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
       <SEOHead config={seoConfig} />
       <LearningTestContainer className={className || ''} data-testid={testId} {...props}>
         {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig('/learning')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/learning')} />
       
       {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
       <div className="mb-8">

@@ -143,7 +143,7 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
       onTestSelect(testType);
     } else {
       // Default navigation to test page
-      navigate(`/relationship/${testType}`);
+      navigate(`/tests/relationship/${testType}`);
     }
   };
 
@@ -152,7 +152,7 @@ export const RelationshipHomePage: React.FC<RelationshipHomePageProps> = ({
       <SEOHead config={seoConfig} />
       <RelationshipTestContainer className={className || ''} data-testid={testId} {...props}>
         {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig('/relationship')} />
+        <Breadcrumb items={getBreadcrumbConfig('/tests/relationship')} />
       
       {/* Main Title and Description - 左对齐 + 右上角返回按钮 */}
       <div className="mb-8">
