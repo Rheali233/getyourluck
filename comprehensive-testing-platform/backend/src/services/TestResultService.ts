@@ -81,40 +81,47 @@ export class TestResultService {
       const processor = this.processorFactory.getProcessor(testType);
       
       // 先获取AI分析结果（如果支持）
+      // 对于需要 AI 的测试类型，设置超时保护
       let aiAnalysis = null;
       if (this.aiService) {
-        try {
-          // eslint-disable-next-line no-console
-          console.log(`[PHQ9 Debug] Starting AI analysis for ${testType} with ${answers.length} answers`);
-          // eslint-disable-next-line no-console
-          console.log(`[PHQ9 Debug] AI Service instance exists:`, !!this.aiService);
-          // eslint-disable-next-line no-console
-          console.log(`[PHQ9 Debug] Answers data:`, JSON.stringify(answers.slice(0, 3), null, 2), '... (showing first 3)');
-          
-          // AI analysis integration completed
-          aiAnalysis = await this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
-          
-          // eslint-disable-next-line no-console
-          console.log(`[PHQ9 Debug] AI analysis completed for ${testType}`);
-          // eslint-disable-next-line no-console
-          console.log(`[PHQ9 Debug] AI analysis result keys:`, aiAnalysis ? Object.keys(aiAnalysis) : 'null');
-          // eslint-disable-next-line no-console
-          console.log(`[PHQ9 Debug] AI analysis preview:`, aiAnalysis ? JSON.stringify(aiAnalysis, null, 2).substring(0, 500) : 'null');
-          
-        } catch (aiError) {
-          // AI分析失败时记录警告，但不阻止测试结果处理
-          // eslint-disable-next-line no-console
-          console.error(`[PHQ9 Debug] AI analysis failed for ${testType}:`, aiError instanceof Error ? aiError.message : 'Unknown error');
-          // eslint-disable-next-line no-console
-          console.error(`[PHQ9 Debug] AI error stack:`, aiError instanceof Error ? aiError.stack : 'No stack trace');
-          // eslint-disable-next-line no-console
-          console.error(`[PHQ9 Debug] AI error details:`, aiError);
-          // 确保 aiAnalysis 保持为 null，这样处理器会使用基础结果
-          aiAnalysis = null;
+        const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'birth-chart', 'compatibility', 'fortune'];
+        const needsAI = aiTestTypes.includes(testType);
+        
+        if (needsAI) {
+          try {
+            const aiStartTime = Date.now();
+            console.log(`[TestResultService] Starting AI analysis for ${testType} with ${answers.length} answers`);
+            
+            // 设置 AI 分析超时（30秒，确保在 Workers CPU 限制内）
+            const aiTimeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => reject(new Error('AI analysis timeout')), 30000);
+            });
+            
+            const aiAnalysisPromise = this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
+            
+            aiAnalysis = await Promise.race([aiAnalysisPromise, aiTimeoutPromise]) as any;
+            
+            const aiTime = Date.now() - aiStartTime;
+            console.log(`[TestResultService] AI analysis completed for ${testType} in ${aiTime}ms`);
+            console.log(`[TestResultService] AI analysis result keys:`, aiAnalysis ? Object.keys(aiAnalysis) : 'null');
+            
+          } catch (aiError) {
+            // AI分析失败时记录警告，但不阻止测试结果处理
+            const aiTime = Date.now() - aiStartTime;
+            console.error(`[TestResultService] AI analysis failed for ${testType} after ${aiTime}ms:`, aiError instanceof Error ? aiError.message : 'Unknown error');
+            console.error(`[TestResultService] AI error details:`, aiError instanceof Error ? {
+              name: aiError.name,
+              message: aiError.message,
+              stack: aiError.stack?.substring(0, 500)
+            } : aiError);
+            // 确保 aiAnalysis 保持为 null，这样处理器会使用基础结果
+            aiAnalysis = null;
+          }
+        } else {
+          console.log(`[TestResultService] Skipping AI analysis for ${testType} (not an AI-powered test)`);
         }
       } else {
-        // eslint-disable-next-line no-console
-        console.warn(`[PHQ9 Debug] No AI service available for ${testType} - this.aiService is null/undefined`);
+        console.warn(`[TestResultService] No AI service available for ${testType}`);
       }
       
       // 将AI分析结果传递给处理器（如果处理器支持）

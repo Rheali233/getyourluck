@@ -48,8 +48,8 @@ export class AIService {
   constructor(apiKey?: string) {
     this.apiKey = apiKey || '';
     this.baseURL = 'https://api.deepseek.com/v1/chat/completions';
-    this.maxRetries = 3;
-    this.timeout = 60000; // 60 seconds
+    this.maxRetries = 2; // 减少重试次数，避免总时间过长
+    this.timeout = 45000; // 45 seconds - 确保在 Cloudflare Workers CPU 限制内
     
     // 安全日志 - 不暴露 API key
     // eslint-disable-next-line no-console
@@ -1265,50 +1265,74 @@ export class AIService {
    */
   async analyzeTestResult(data: { testType: string; answers: any[]; userContext?: any }): Promise<any> {
     try {
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] analyzeTestResult called for testType: ${data.testType}, answers count: ${data.answers.length}`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] API key configured:`, !!this.apiKey);
+      
       const prompt = this.buildAnalysisPrompt(data);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Prompt built, length: ${prompt.length}`);
+      
       const response = await this.callDeepSeek(prompt);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] DeepSeek API call successful, parsing response for ${data.testType}`);
       
       // 根据测试类型使用专门的解析方法
+      let parsedResult;
       if (data.testType === 'mbti') {
-        return this.parseMBTIResponse(response);
+        parsedResult = this.parseMBTIResponse(response);
       } else if (data.testType === 'phq9') {
-        return this.parsePHQ9Response(response);
+        // eslint-disable-next-line no-console
+        console.log(`[AIService] Parsing PHQ-9 response`);
+        parsedResult = this.parsePHQ9Response(response);
+        // eslint-disable-next-line no-console
+        console.log(`[AIService] PHQ-9 response parsed successfully, keys:`, Object.keys(parsedResult));
       } else if (data.testType === 'eq') {
-        return this.parseEQResponse(response);
+        parsedResult = this.parseEQResponse(response);
       } else if (data.testType === 'happiness') {
-        return this.parseHappinessResponse(response);
+        parsedResult = this.parseHappinessResponse(response);
       } else if (data.testType === 'love_language') {
-        return this.parseLoveLanguageResponse(response);
+        parsedResult = this.parseLoveLanguageResponse(response);
       } else if (data.testType === 'love_style') {
-        return this.parseLoveStyleResponse(response);
+        parsedResult = this.parseLoveStyleResponse(response);
       } else if (data.testType === 'interpersonal') {
-        return this.parseInterpersonalResponse(response);
+        parsedResult = this.parseInterpersonalResponse(response);
       } else if (data.testType === 'holland') {
-        return this.parseHollandResponse(response);
+        parsedResult = this.parseHollandResponse(response);
       } else if (data.testType === 'disc') {
-        return this.parseDISCResponse(response);
+        parsedResult = this.parseDISCResponse(response);
       } else if (data.testType === 'leadership') {
-        return this.parseLeadershipResponse(response);
+        parsedResult = this.parseLeadershipResponse(response);
       } else if (data.testType === 'vark') {
-        return this.parseVARKResponse(response);
+        parsedResult = this.parseVARKResponse(response);
       } else if (data.testType === 'tarot') {
-        return this.parseTarotResponse(response);
+        parsedResult = this.parseTarotResponse(response);
       } else if (data.testType === 'numerology') {
         // 检查分析类型，选择相应的解析方法
         const analysisData = data.answers[0]?.answer;
         if (analysisData && analysisData.type === 'zodiac') {
-          return this.parseChineseZodiacResponse(response.choices[0].message.content);
+          parsedResult = this.parseChineseZodiacResponse(response.choices[0].message.content);
         } else if (analysisData && analysisData.type === 'name') {
-          return this.parseChineseNameRecommendationResponse(response.choices[0].message.content);
+          parsedResult = this.parseChineseNameRecommendationResponse(response.choices[0].message.content);
         } else if (analysisData && analysisData.type === 'ziwei') {
-          return this.parseZiWeiResponse(response.choices[0].message.content);
+          parsedResult = this.parseZiWeiResponse(response.choices[0].message.content);
+        } else {
+          parsedResult = this.parseNumerologyResponse(response);
         }
-        return this.parseNumerologyResponse(response);
+      } else {
+        // 其他测试类型使用通用解析
+        parsedResult = JSON.parse(response.choices[0].message.content);
       }
       
-      // 其他测试类型使用通用解析
-      return JSON.parse(response.choices[0].message.content);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Analysis completed successfully for ${data.testType}`);
+      return parsedResult;
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`[AIService] analyzeTestResult error for ${data.testType}:`, error);
+      // eslint-disable-next-line no-console
+      console.error(`[AIService] Error stack:`, error instanceof Error ? error.stack : 'No stack trace');
       throw new Error(`Test result analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
