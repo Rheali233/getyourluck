@@ -8,6 +8,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getApiBaseUrl } from '@/config/environment'
+import { testService } from '@/services/testService'
 
 // 基础测试会话接口
 export interface TestSession {
@@ -672,14 +673,10 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
 
         try {
           // 调用后端统一测试结果处理服务
-          const response = await fetch(`${getApiBaseUrl()}/v1/tests/${testType}/submit`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              testType,
-              answers: currentSession.answers.map(answer => {
+          // 使用 testService 以获得超时控制和错误处理
+          const submission = {
+            testType,
+            answers: currentSession.answers.map(answer => {
                 // Tarot: 同时发送基础类型的 value（用于后端校验）与完整的 answer 对象（供 AI 使用）
                 if (testType === 'tarot') {
                   const cardId = (answer as any)?.answer?.card?.id;
@@ -766,15 +763,10 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
                 userAgent: navigator.userAgent,
                 timestamp: new Date().toISOString()
               }
-            })
-          });
+            };
 
-          if (!response.ok) {
-            throw new Error(`Test result generation failed: ${response.statusText}`);
-          }
-
-          const result = await response.json();
-          // // 调试日志
+          // 使用 testService 提交测试，它会自动处理超时和错误
+          const result = await testService.submitTest(submission);
           
           if (!result.success) {
             throw new Error(result.error || 'Test result generation failed');
@@ -789,7 +781,6 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
             }
           };
           
-          // // 调试日志
           return testResult;
         } catch (error) {
           // // 如果API调用失败，返回模拟结果
