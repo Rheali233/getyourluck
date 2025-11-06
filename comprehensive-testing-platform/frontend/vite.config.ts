@@ -69,7 +69,9 @@ export default defineConfig({
       },
       mangle: {
         safari10: true, // 兼容Safari 10
-        reserved: ['u', 'e', 't', 'n', 'r', 'o', 'i'], // 保留常用变量名避免混淆
+        properties: false, // 不混淆属性名
+        keep_classnames: true, // 保留类名
+        keep_fnames: true, // 保留函数名
       },
     },
     rollupOptions: {
