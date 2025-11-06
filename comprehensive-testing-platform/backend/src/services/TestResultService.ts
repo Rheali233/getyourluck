@@ -88,8 +88,8 @@ export class TestResultService {
         const needsAI = aiTestTypes.includes(testType);
         
         if (needsAI) {
+          const aiStartTime = Date.now(); // 在 try 块外定义，以便在 catch 块中使用
           try {
-            const aiStartTime = Date.now();
             console.log(`[TestResultService] Starting AI analysis for ${testType} with ${answers.length} answers`);
             
             // 设置 AI 分析超时（30秒，确保在 Workers CPU 限制内）
