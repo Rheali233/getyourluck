@@ -4,8 +4,7 @@
  */
 
 import { useCallback } from 'react';
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { create, type StateCreator } from 'zustand';
 import { getApiBaseUrl } from '@/config/environment';
 import type {
   NumerologyStore,
@@ -13,54 +12,54 @@ import type {
   NumerologyBasicInfo,
   NumerologyAnalysisType
 } from '../types';
+import { withDevtools } from '@/stores/utils/devtools';
+
+const createNumerologyState: StateCreator<NumerologyStore> = (set) => ({
+  // 状态
+  currentSession: null,
+  isLoading: false,
+  error: null,
+  analysisResult: null,
+  showResults: false,
+
+  // 操作
+  clearNumerologySession: () => {
+    set({
+      currentSession: null,
+      analysisResult: null,
+      showResults: false,
+      error: null,
+      isLoading: false
+    });
+  },
+
+  setError: (error: string | null) => {
+    set({ error });
+  },
+
+  setLoading: (loading: boolean) => {
+    set({ isLoading: loading });
+  },
+
+  setAnalysisResult: (analysis: NumerologyAnalysis | null) => {
+    set({ analysisResult: analysis });
+  },
+
+  setShowResults: (show: boolean) => {
+    set({ showResults: show });
+  }
+});
 
 // 命理模块状态管理
 const useNumerologyStoreStore = create<NumerologyStore>()(
-  devtools(
-    (set) => ({
-      // 状态
-      currentSession: null,
-      isLoading: false,
-      error: null,
-      analysisResult: null,
-      showResults: false,
-
-      // 操作
-      clearNumerologySession: () => {
-        set({
-          currentSession: null,
-          analysisResult: null,
-          showResults: false,
-          error: null,
-          isLoading: false
-        });
-      },
-
-      setError: (error: string | null) => {
-        set({ error });
-      },
-
-      setLoading: (loading: boolean) => {
-        set({ isLoading: loading });
-      },
-
-      setAnalysisResult: (analysis: NumerologyAnalysis | null) => {
-        set({ analysisResult: analysis });
-      },
-
-      setShowResults: (show: boolean) => {
-        set({ showResults: show });
-      }
-    }),
-    {
-      name: 'numerology-store',
-      partialize: (state: NumerologyStore) => ({
-        currentSession: state.currentSession,
-        analysisResult: state.analysisResult,
-        showResults: state.showResults
-      })
-    }
-  )
+  withDevtools(createNumerologyState, {
+    name: 'numerology-store',
+    selectState: (state) => ({
+      currentSession: state.currentSession,
+      analysisResult: state.analysisResult,
+      showResults: state.showResults
+    })
+  })
 );
 
 // 命理模块状态管理 Hook
