@@ -85,27 +85,36 @@ export class TestResultService {
       if (this.aiService) {
         try {
           // eslint-disable-next-line no-console
-          console.log(`Starting AI analysis for ${testType} with ${answers.length} answers`);
-          
+          console.log(`[PHQ9 Debug] Starting AI analysis for ${testType} with ${answers.length} answers`);
+          // eslint-disable-next-line no-console
+          console.log(`[PHQ9 Debug] AI Service instance exists:`, !!this.aiService);
+          // eslint-disable-next-line no-console
+          console.log(`[PHQ9 Debug] Answers data:`, JSON.stringify(answers.slice(0, 3), null, 2), '... (showing first 3)');
           
           // AI analysis integration completed
           aiAnalysis = await this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
           
           // eslint-disable-next-line no-console
-          console.log(`AI analysis completed for ${testType}:`, JSON.stringify(aiAnalysis, null, 2));
-          
+          console.log(`[PHQ9 Debug] AI analysis completed for ${testType}`);
+          // eslint-disable-next-line no-console
+          console.log(`[PHQ9 Debug] AI analysis result keys:`, aiAnalysis ? Object.keys(aiAnalysis) : 'null');
+          // eslint-disable-next-line no-console
+          console.log(`[PHQ9 Debug] AI analysis preview:`, aiAnalysis ? JSON.stringify(aiAnalysis, null, 2).substring(0, 500) : 'null');
           
         } catch (aiError) {
           // AI分析失败时记录警告，但不阻止测试结果处理
           // eslint-disable-next-line no-console
-          console.error(`AI analysis failed for ${testType}:`, aiError instanceof Error ? aiError.message : 'Unknown error');
+          console.error(`[PHQ9 Debug] AI analysis failed for ${testType}:`, aiError instanceof Error ? aiError.message : 'Unknown error');
           // eslint-disable-next-line no-console
-          console.error('AI error details:', aiError);
-          
+          console.error(`[PHQ9 Debug] AI error stack:`, aiError instanceof Error ? aiError.stack : 'No stack trace');
+          // eslint-disable-next-line no-console
+          console.error(`[PHQ9 Debug] AI error details:`, aiError);
+          // 确保 aiAnalysis 保持为 null，这样处理器会使用基础结果
+          aiAnalysis = null;
         }
       } else {
         // eslint-disable-next-line no-console
-        console.warn(`No AI service available for ${testType}`);
+        console.warn(`[PHQ9 Debug] No AI service available for ${testType} - this.aiService is null/undefined`);
       }
       
       // 将AI分析结果传递给处理器（如果处理器支持）
@@ -139,12 +148,25 @@ export class TestResultService {
       return result;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`TestResultService.processTestSubmission error for ${testType}:`, error);
+      console.error(`[TestResultService] Error processing ${testType} submission:`, error);
+      // eslint-disable-next-line no-console
+      console.error(`[TestResultService] Error details:`, error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } : error);
+      
       if (error instanceof ModuleError) {
         throw error;
       }
+      
+      // 提供更详细的错误信息
+      const errorMessage = error instanceof Error 
+        ? `Failed to calculate test results: ${error.message}`
+        : 'Failed to calculate test results';
+      
       throw new ModuleError(
-        'Failed to calculate test results',
+        errorMessage,
         ERROR_CODES.INTERNAL_ERROR,
         500
       );

@@ -206,11 +206,25 @@ testRoutes.post("/:testType/submit",
 
       return c.json(response);
     } catch (error) {
+      // 记录详细错误信息
+      console.error(`[Test Submit Error] Test type: ${c.req.param("testType")}`, error);
+      console.error(`[Test Submit Error] Error details:`, error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } : error);
+      
       if (error instanceof ModuleError) {
         throw error;
       }
+      
+      // 提供更详细的错误信息
+      const errorMessage = error instanceof Error 
+        ? `Failed to process test submission: ${error.message}`
+        : "Failed to process test submission";
+      
       throw new ModuleError(
-        "Failed to process test submission",
+        errorMessage,
         ERROR_CODES.CALCULATION_ERROR,
         500
       );
