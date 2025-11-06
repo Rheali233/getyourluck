@@ -213,12 +213,13 @@ testRoutes.post("/:testType/submit",
 
       return c.json(response);
     } catch (error) {
+      const processingTime = Date.now() - processingStartTime;
       // 记录详细错误信息
-      console.error(`[Test Submit Error] Test type: ${c.req.param("testType")}`, error);
+      console.error(`[Test Submit Error] Test type: ${testType} - RequestId: ${requestId} - Processing time: ${processingTime}ms`, error);
       console.error(`[Test Submit Error] Error details:`, error instanceof Error ? {
         name: error.name,
         message: error.message,
-        stack: error.stack
+        stack: error.stack?.substring(0, 1000) // 限制堆栈长度
       } : error);
       
       if (error instanceof ModuleError) {
