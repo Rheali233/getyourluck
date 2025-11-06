@@ -3,6 +3,7 @@ name: Deploy Backend to Cloudflare Workers
 on:
   push:
     branches:
+      - staging
       - chore/cf-test-deploy
       - main
 
