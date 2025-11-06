@@ -21,10 +21,14 @@ class ApiClient {
     const url = `${this.baseURL}${endpoint}`
     const requestId = crypto.randomUUID()
 
+    // 设置超时时间（默认 60 秒，对于长时间运行的请求如 birth chart）
+    const timeout = options.timeout || 60000
+
     const config: {
       headers: Record<string, string>;
       method?: string;
       body?: string;
+      signal?: AbortSignal;
     } = {
       headers: {
         'Content-Type': 'application/json',
@@ -34,8 +38,14 @@ class ApiClient {
       ...options,
     }
 
+    // 创建 AbortController 用于超时控制
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+    config.signal = controller.signal
+
     try {
       const response = await fetch(url, config)
+      clearTimeout(timeoutId)
       
       if (!response.ok) {
         // 尝试解析错误响应
@@ -67,14 +77,25 @@ class ApiClient {
 
       return result as APIResponse<T>
     } catch (error) {
+      clearTimeout(timeoutId)
+      
       if (error instanceof ModuleError) {
         throw error
       }
 
-      // 处理网络错误
-      if (error instanceof TypeError && error.message.includes('fetch')) {
+      // 处理超时错误
+      if (error instanceof Error && error.name === 'AbortError') {
         throw new ModuleError(
-          'Network connection failed',
+          'Request timeout - The server is taking too long to respond. Please try again.',
+          ERROR_CODES.NETWORK_ERROR,
+          0
+        )
+      }
+
+      // 处理网络错误（包括 ERR_NETWORK_CHANGED）
+      if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('network'))) {
+        throw new ModuleError(
+          'Network connection failed. Please check your internet connection and try again.',
           ERROR_CODES.NETWORK_ERROR,
           0
         )
@@ -93,10 +114,11 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'GET' })
   }
 
-  async post<T>(endpoint: string, data: any): Promise<APIResponse<T>> {
+  async post<T>(endpoint: string, data: any, options: Record<string, any> = {}): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
+      ...options,
     })
   }
 

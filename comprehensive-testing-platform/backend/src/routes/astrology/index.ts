@@ -101,31 +101,50 @@ astrologyRoutes.post('/compatibility', async (c) => {
 // 生成星盘分析
 astrologyRoutes.post('/birth-chart', async (c) => {
   try {
+    const requestId = c.get('requestId') || '';
+    const startTime = Date.now();
+    
+    console.log(`[Birth Chart] Request received - RequestId: ${requestId}`);
+    
     const request = await c.req.json();
     
     if (!request.birthDate || !request.birthLocation) {
+      console.warn(`[Birth Chart] Missing required parameters - RequestId: ${requestId}`);
       return c.json({
         success: false,
         error: 'Birth date and location are required',
         timestamp: new Date().toISOString(),
-        requestId: c.get('requestId') || ''
+        requestId
       }, 400);
     }
 
+    console.log(`[Birth Chart] Processing request - Date: ${request.birthDate}, Location: ${request.birthLocation} - RequestId: ${requestId}`);
+
     const astrologyService = new AstrologyService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     const birthChart = await astrologyService.analyzeBirthChart(request, {
-      requestId: c.get('requestId') || '',
+      requestId,
       userAgent: c.req.header('User-Agent') || '',
       ip: c.req.header('CF-Connecting-IP') || ''
     });
+    
+    const processingTime = Date.now() - startTime;
+    console.log(`[Birth Chart] Success - Processing time: ${processingTime}ms - RequestId: ${requestId}`);
     
     return c.json({
       success: true,
       data: birthChart,
       timestamp: new Date().toISOString(),
-      requestId: c.get('requestId') || ''
+      requestId
     });
   } catch (error) {
+    const requestId = c.get('requestId') || '';
+    console.error(`[Birth Chart] Error - RequestId: ${requestId}`, error);
+    console.error(`[Birth Chart] Error details:`, error instanceof Error ? {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    } : error);
+    
     return errorHandler(error, c);
   }
 });

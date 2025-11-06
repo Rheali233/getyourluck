@@ -105,10 +105,21 @@ cookiesRoutes.post("/consent", async (c) => {
       requestId: c.get("requestId"),
     });
   } catch (error) {
-    console.error("Failed to update cookies consent status:", error);
+    console.error("[Cookies Consent] Failed to update cookies consent status:", error);
+    console.error("[Cookies Consent] Error details:", error instanceof Error ? {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    } : error);
+    
+    // 提供更详细的错误信息
+    const errorMessage = error instanceof Error 
+      ? `Failed to update cookies consent status: ${error.message}`
+      : "Failed to update cookies consent status";
+    
     return c.json({
       success: false,
-      error: "Failed to update cookies consent status",
+      error: errorMessage,
       timestamp: new Date().toISOString(),
       requestId: c.get("requestId"),
     }, 500);

@@ -45,9 +45,9 @@ export const astrologyService = {
     });
   },
 
-  // 生成星盘分析
+  // 生成星盘分析（设置更长的超时时间，因为 AI 分析可能需要较长时间）
   async getBirthChart(birthData: BirthChartRequest): Promise<APIResponse<BirthChart>> {
-    return apiClient.post('/astrology/birth-chart', birthData);
+    return apiClient.post('/astrology/birth-chart', birthData, { timeout: 120000 }); // 120秒超时
   },
 
   // 提交反馈

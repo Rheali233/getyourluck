@@ -65,8 +65,7 @@ export class UserPreferencesModel extends BaseModel {
 
       return id;
     } catch (error) {
-      console.error('创建用户偏好设置失败:', error);
-      throw new Error('创建用户偏好设置失败');
+      throw new Error('Failed to create user preferences');
     }
   }
 
@@ -82,8 +81,7 @@ export class UserPreferencesModel extends BaseModel {
 
       return result ? this.mapDatabaseRowToPreferences(result) : null;
     } catch (error) {
-      console.error(`获取会话${sessionId}的用户偏好设置失败:`, error);
-      throw new Error('获取用户偏好设置失败');
+      throw new Error('Failed to load user preferences');
     }
   }
 
@@ -136,8 +134,11 @@ export class UserPreferencesModel extends BaseModel {
         )
         .run();
     } catch (error) {
-      console.error(`更新会话${sessionId}的Cookies同意状态失败:`, error);
-      throw new Error('更新Cookies同意状态失败');
+      console.error('[UserPreferencesModel] Failed to update cookies consent:', error);
+      const errorMessage = error instanceof Error 
+        ? `Failed to update cookie consent status: ${error.message}`
+        : 'Failed to update cookie consent status';
+      throw new Error(errorMessage);
     }
   }
 
@@ -186,8 +187,7 @@ export class UserPreferencesModel extends BaseModel {
         consentRate: totalUsers > 0 ? (cookiesConsent / totalUsers) * 100 : 0,
       };
     } catch (error) {
-      console.error('获取Cookies同意统计失败:', error);
-      throw new Error('获取Cookies同意统计失败');
+      throw new Error('Failed to retrieve cookie consent statistics');
     }
   }
 
@@ -206,8 +206,7 @@ export class UserPreferencesModel extends BaseModel {
 
       return result.meta.changes || 0;
     } catch (error) {
-      console.error('清理过期用户偏好设置失败:', error);
-      throw new Error('清理过期用户偏好设置失败');
+      throw new Error('Failed to clean up expired user preferences');
     }
   }
 
@@ -227,8 +226,7 @@ export class UserPreferencesModel extends BaseModel {
 
       return result.results?.map(this.mapDatabaseRowToPreferences) || [];
     } catch (error) {
-      console.error('获取用户偏好设置列表失败:', error);
-      throw new Error('获取用户偏好设置列表失败');
+      throw new Error('Failed to retrieve user preferences list');
     }
   }
 
@@ -242,8 +240,7 @@ export class UserPreferencesModel extends BaseModel {
         .bind(id)
         .run();
     } catch (error) {
-      console.error(`删除用户偏好设置${id}失败:`, error);
-      throw new Error('删除用户偏好设置失败');
+      throw new Error('Failed to delete user preferences');
     }
   }
 
