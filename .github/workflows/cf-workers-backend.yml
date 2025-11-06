@@ -6,6 +6,10 @@ on:
       - staging
       - chore/cf-test-deploy
       - main
+    paths:
+      - 'comprehensive-testing-platform/backend/**'
+      - 'comprehensive-testing-platform/shared/**'
+      - '.github/workflows/cf-workers-backend.yml'
 
 jobs:
   deploy:
