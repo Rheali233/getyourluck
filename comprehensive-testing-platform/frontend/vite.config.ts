@@ -63,10 +63,13 @@ export default defineConfig({
         drop_console: true, // 生产环境移除console.log
         drop_debugger: true, // 移除debugger
         pure_funcs: ['console.log', 'console.info', 'console.debug'], // 移除特定console函数
-        passes: 2, // 多次压缩优化
+        passes: 1, // 减少压缩次数以避免初始化顺序问题
+        hoist_funs: false, // 禁用函数提升以避免初始化问题
+        hoist_vars: false, // 禁用变量提升以避免初始化问题
       },
       mangle: {
         safari10: true, // 兼容Safari 10
+        reserved: ['u', 'e', 't', 'n', 'r', 'o', 'i'], // 保留常用变量名避免混淆
       },
     },
     rollupOptions: {
