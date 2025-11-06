@@ -23,12 +23,13 @@ interface BlogState extends ModuleState {
   selectedCategory: string | null
 }
 
+/* eslint-disable no-unused-vars */
 interface BlogActions extends ModuleActions {
-  fetchArticles: (page?: number, category?: string) => Promise<void>
-  fetchArticle: (idOrSlug: string) => Promise<void>
-  setSelectedCategory: (category: string | null) => void
-  incrementViewCount: (id: string) => Promise<void>
+  fetchArticles(page?: number, category?: string, tag?: string): Promise<void>
+  fetchArticle(slug: string): Promise<void>
+  setSelectedCategory(category: string | null): void
 }
+/* eslint-enable no-unused-vars */
 
 export const useBlogStore = create<BlogState & BlogActions>((set) => ({
   // 基础状态
@@ -59,11 +60,11 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
   setData: (data: any) => set({ data, lastUpdated: new Date() }),
 
   // 博客专用操作
-  fetchArticles: async (page = 1, category?: string) => {
+  fetchArticles: async (page = 1, category?: string, tag?: string) => {
     set({ isLoading: true, error: null })
     
     // 检查缓存
-    const cacheKey = `blog_articles_${page}_${category || 'all'}`;
+    const cacheKey = `blog_articles_${page}_${category || 'all'}_${tag || 'all'}`;
     const cachedData = localStorage.getItem(cacheKey);
     const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
     
@@ -87,7 +88,7 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
     }
     
     try {
-      const response = await blogService.getArticles(page, 12, category)
+      const response = await blogService.getArticles(page, 12, category, tag)
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch articles')
@@ -119,40 +120,43 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
     }
   },
 
-  fetchArticle: async (idOrSlug: string) => {
+  fetchArticle: async (slug: string) => {
     set({ isLoading: true, error: null })
     
     // 检查缓存
-    const cacheKey = `blog_article_${idOrSlug}`;
+    const cacheKey = `blog_article_${slug}`;
     const cachedData = localStorage.getItem(cacheKey);
     const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
-    
-    // 如果缓存存在且未过期（1小时内）
+    let shouldUseCached = false;
+
     if (cachedData && cacheTimestamp) {
       const now = Date.now();
-      const cacheTime = parseInt(cacheTimestamp);
+      const cacheTime = parseInt(cacheTimestamp, 10);
       const isExpired = (now - cacheTime) > 3600000; // 1小时
-      
+
       if (!isExpired) {
-        const cached = JSON.parse(cachedData);
-        set({
-          currentArticle: cached as BlogArticleDetail,
-          isLoading: false,
-          data: cached,
-          lastUpdated: new Date(),
-        });
-        return;
+        try {
+          const cached = JSON.parse(cachedData) as BlogArticleDetail;
+          shouldUseCached = true;
+          set({
+            currentArticle: cached,
+            isLoading: false,
+            data: cached,
+            lastUpdated: new Date(),
+          });
+        } catch (error) {
+          console.warn('Failed to parse cached article, ignore cache', error);
+        }
       }
     }
-    
+
     try {
-      const response = await blogService.getArticle(idOrSlug)
+      const response = await blogService.getArticle(slug)
       
       if (!response.success || !response.data) {
         throw new Error(response.error || 'Article not found')
       }
 
-      // 缓存文章数据
       localStorage.setItem(cacheKey, JSON.stringify(response.data));
       localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
 
@@ -166,21 +170,13 @@ export const useBlogStore = create<BlogState & BlogActions>((set) => ({
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch article'
       set({
         isLoading: false,
-        error: errorMessage,
+        error: shouldUseCached ? null : errorMessage,
       })
     }
   },
 
   setSelectedCategory: (category: string | null) => {
     set({ selectedCategory: category })
-  },
-
-  incrementViewCount: async (id: string) => {
-    try {
-      await blogService.incrementViewCount(id)
-    } catch {
-      /* noop */
-    }
   },
 
   reset: () => {

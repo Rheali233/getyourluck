@@ -12,6 +12,7 @@ import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 interface AboutPageProps extends BaseComponentProps {}
 
@@ -20,7 +21,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
   testId = 'about-page',
   ...props
 }) => {
-  const canonical = `${typeof window !== 'undefined' ? window.location.origin : ''}/about`;
+  const canonical = buildAbsoluteUrl('/about');
   
   // 确保页面滚动到顶部
   useScrollToTop({
@@ -53,11 +54,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({
       <div className="relative z-10">
         <Navigation />
         <SEOManager
-          pageType="homepage"
+          pageType="about"
           metadata={{
             title: UI_TEXT.about.seo.title,
             description: UI_TEXT.about.seo.description,
             canonicalUrl: canonical,
+            ogTitle: 'About SelfAtlas',
+            ogDescription: UI_TEXT.about.seo.description,
+            twitterTitle: 'About SelfAtlas',
+            twitterDescription: UI_TEXT.about.seo.description,
           }}
         />
 
@@ -156,15 +161,21 @@ export const AboutPage: React.FC<AboutPageProps> = ({
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <Link
               to="/tests"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-500 text-white font-semibold shadow-sm hover:from-indigo-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold rounded-full hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {UI_TEXT.about.cta.startTestCenter}
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </Link>
             <Link
               to="/blog"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-900 text-white font-semibold shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700"
+              className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-gray-700 to-gray-900 text-white text-lg font-semibold rounded-full hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-600"
             >
               {UI_TEXT.about.cta.exploreBlog}
+              <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </Link>
           </div>
         

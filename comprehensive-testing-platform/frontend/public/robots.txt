@@ -1,13 +1,13 @@
 User-agent: *
 Allow: /
 Allow: /tests
-Allow: /psychology
-Allow: /career
-Allow: /astrology
-Allow: /tarot
-Allow: /numerology
-Allow: /learning
-Allow: /relationship
+Allow: /tests/psychology
+Allow: /tests/career
+Allow: /tests/astrology
+Allow: /tests/tarot
+Allow: /tests/numerology
+Allow: /tests/learning
+Allow: /tests/relationship
 Allow: /about
 Allow: /blog
 Allow: /terms
@@ -26,7 +26,7 @@ Disallow: /temp
 Disallow: /cache
 
 # Sitemap
-Sitemap: https://2ff5182e.getyourluck-testing-platform.pages.dev/sitemap.xml
+Sitemap: https://selfatlas.net/sitemap.xml
 
 # Crawl delay
 Crawl-delay: 1

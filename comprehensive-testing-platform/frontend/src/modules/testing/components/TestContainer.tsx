@@ -94,7 +94,7 @@ export const TestContainer: React.FC<TestContainerProps> = ({
       provider: {
         '@type': 'Organization',
         name: 'Comprehensive Testing Platform',
-        url: 'https://selfatlas.com'
+        url: 'https://selfatlas.net'
       },
       about: {
         '@type': 'Test',
@@ -123,14 +123,14 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   const handleResetTest = () => {
     resetTest();
     setShowResults(false);
-    // 根据测试类型确定正确的重定向路径
+    // 根据测试类型确定正确的重定向路径（使用新的 /tests/* 格式）
     const redirectPath = ['vark'].includes(testType) 
-      ? `/learning/${testType}` 
+      ? `/tests/learning/${testType}` 
       : ['love_language', 'love_style', 'interpersonal'].includes(testType)
-      ? `/relationship/${testType === 'love_language' ? 'love-language' : testType === 'love_style' ? 'love-style' : 'interpersonal'}`
+      ? `/tests/relationship/${testType === 'love_language' ? 'love-language' : testType === 'love_style' ? 'love-style' : 'interpersonal'}`
       : ['holland', 'disc', 'leadership'].includes(testType)
-      ? `/career/${testType}`
-      : `/psychology/${testType}`;
+      ? `/tests/career/${testType}`
+      : `/tests/psychology/${testType}`;
     window.location.href = redirectPath;
   };
 
@@ -315,10 +315,10 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   // 使用测试类型特定的状态进行判断
   // 如果当前测试类型没有开始且没有显示结果，重定向到测试准备页面
   if (!testTypeIsTestStarted && !testTypeShowResults && !isLoading && !testTypeCurrentTestResult) {
-    // 根据测试类型确定正确的重定向路径
+    // 根据测试类型确定正确的重定向路径（使用新的 /tests/* 格式）
     const redirectPath = ['vark'].includes(testType) 
-      ? `/learning/${testType}` 
-      : `/psychology/${testType}`;
+      ? `/tests/learning/${testType}` 
+      : `/tests/psychology/${testType}`;
     window.location.href = redirectPath;
     return null;
   }
@@ -326,10 +326,10 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   // 检查questions是否有效（在结果页不触发重定向）
   // 使用测试类型特定的状态
   if (!testTypeShowResults && !isLoading && !testTypeCurrentTestResult && (!storeQuestions || storeQuestions.length === 0)) {
-    // 根据测试类型确定正确的重定向路径
+    // 根据测试类型确定正确的重定向路径（使用新的 /tests/* 格式）
     const redirectPath = ['vark'].includes(testType) 
-      ? `/learning/${testType}` 
-      : `/psychology/${testType}`;
+      ? `/tests/learning/${testType}` 
+      : `/tests/psychology/${testType}`;
     window.location.href = redirectPath;
     return null;
   }
@@ -563,14 +563,14 @@ export const TestContainer: React.FC<TestContainerProps> = ({
   // Render fallback state
   // 如果到达这里，优先保持结果页停留，避免误跳转
   if (!testTypeShowResults) {
-    // 根据测试类型确定正确的重定向路径
+    // 根据测试类型确定正确的重定向路径（使用新的 /tests/* 格式）
     const redirectPath = ['vark'].includes(testType) 
-      ? `/learning/${testType}` 
+      ? `/tests/learning/${testType}` 
       : ['love_language', 'love_style', 'interpersonal'].includes(testType)
-      ? `/relationship/${testType === 'love_language' ? 'love-language' : testType === 'love_style' ? 'love-style' : 'interpersonal'}`
+      ? `/tests/relationship/${testType === 'love_language' ? 'love-language' : testType === 'love_style' ? 'love-style' : 'interpersonal'}`
       : ['holland', 'disc', 'leadership'].includes(testType)
-      ? `/career/${testType}`
-      : `/psychology/${testType}`;
+      ? `/tests/career/${testType}`
+      : `/tests/psychology/${testType}`;
     window.location.href = redirectPath;
   }
   return null;

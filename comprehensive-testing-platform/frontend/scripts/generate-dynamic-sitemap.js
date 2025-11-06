@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 
 // 配置
 const CONFIG = {
-  baseUrl: 'https://2ff5182e.getyourluck-testing-platform.pages.dev',
-  apiUrl: 'https://selfatlas-backend-staging.cyberlina.workers.dev',
+  baseUrl: 'https://selfatlas.net',
+  apiUrl: 'https://selfatlas-backend-prod.cyberlina.workers.dev',
   outputPath: path.join(__dirname, '../public/sitemap.xml')
 };
 
@@ -22,13 +22,13 @@ const STATIC_PAGES = [
   { path: '/', priority: 1.0, changefreq: 'daily' },
   { path: '/tests', priority: 0.9, changefreq: 'daily' },
   { path: '/blog', priority: 0.7, changefreq: 'daily' },
-  { path: '/psychology', priority: 0.8, changefreq: 'weekly' },
-  { path: '/career', priority: 0.8, changefreq: 'weekly' },
-  { path: '/astrology', priority: 0.8, changefreq: 'weekly' },
-  { path: '/tarot', priority: 0.8, changefreq: 'weekly' },
-  { path: '/numerology', priority: 0.8, changefreq: 'weekly' },
-  { path: '/learning', priority: 0.8, changefreq: 'weekly' },
-  { path: '/relationship', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tests/psychology', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tests/career', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tests/astrology', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tests/tarot', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tests/numerology', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tests/learning', priority: 0.8, changefreq: 'weekly' },
+  { path: '/tests/relationship', priority: 0.8, changefreq: 'weekly' },
   { path: '/about', priority: 0.6, changefreq: 'monthly' },
   { path: '/terms', priority: 0.3, changefreq: 'yearly' },
   { path: '/privacy', priority: 0.3, changefreq: 'yearly' },
@@ -43,7 +43,7 @@ async function fetchBlogArticles() {
     
     if (data.success && data.data && Array.isArray(data.data)) {
       return data.data.map(article => ({
-        path: `/blog/${article.slug || article.id}`,
+        path: `/blog/${article.slug}`,
         priority: 0.8,
         changefreq: 'weekly',
         lastmod: article.updatedAt || article.publishDate || new Date().toISOString()

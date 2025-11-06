@@ -309,11 +309,11 @@ export function useResourcePreload() {
         { type: 'image', src: '/images/astrology-bg.jpg' },
         { type: 'image', src: '/images/tarot-bg.jpg' }
       ],
-      '/psychology': [
+      '/tests/psychology': [
         { type: 'image', src: '/images/mbti-icon.svg' },
         { type: 'image', src: '/images/eq-icon.svg' }
       ],
-      '/astrology': [
+      '/tests/astrology': [
         { type: 'image', src: '/images/astrology-chart.jpg' },
         { type: 'image', src: '/images/zodiac-icons.svg' }
       ]

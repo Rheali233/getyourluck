@@ -12,9 +12,9 @@ import { NumerologyTimeInput } from './NumerologyTimeInput';
 import { useNumerologyStore } from '../stores/useNumerologyStore';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
-import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { UI_TEXT } from '@/shared/configs/UI_TEXT';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 export const BaZiAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,28 +25,40 @@ export const BaZiAnalysisPage: React.FC = () => {
     clearNumerologySession();
   }, []);
 
-  // 关键词优化
-  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
-    pageType: 'test',
-    testType: 'bazi',
-    customKeywords: ['bazi analysis', 'eight pillars', 'chinese astrology']
-  });
-
   // SEO配置
+  const canonical = buildAbsoluteUrl('/tests/numerology/bazi');
   const seoConfig = useSEO({
     testType: 'numerology',
     testId: 'bazi',
-    title: optimizedTitle,
-    description: optimizedDescription,
+    title: 'Free BaZi Analysis - Four Pillars of Destiny | SelfAtlas',
+    description: 'Get free BaZi (Four Pillars of Destiny) analysis based on your birth date and time. Discover your five-element balance, personality traits, and life patterns through traditional Chinese numerology.',
+    keywords: [
+      'bazi analysis',
+      'four pillars of destiny',
+      'eight pillars',
+      'chinese astrology',
+      'ba zi',
+      'destiny analysis',
+      'five elements',
+      'chinese numerology'
+    ],
+    customConfig: {
+      canonical: canonical,
+      ogTitle: 'Free BaZi Analysis - Four Pillars of Destiny | SelfAtlas',
+      ogDescription: 'Get free BaZi (Four Pillars of Destiny) analysis based on your birth date and time. Discover your five-element balance, personality traits, and life patterns through traditional Chinese numerology.',
+      ogImage: buildAbsoluteUrl('/og-image.jpg'),
+      twitterCard: 'summary_large_image'
+    },
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Service',
       name: 'BaZi Analysis Service',
       description: 'Professional BaZi (Eight Pillars of Destiny) analysis based on your birth information',
+      inLanguage: 'en-US',
       provider: {
         '@type': 'Organization',
-        name: 'Comprehensive Testing Platform',
-        url: 'https://selfatlas.com'
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
       },
       offers: {
         '@type': 'Offer',

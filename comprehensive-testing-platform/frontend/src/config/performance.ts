@@ -76,8 +76,8 @@ export const PRELOAD_CONFIG = {
   CRITICAL_ROUTES: [
     '/',
     '/tests',
-    '/psychology',
-    '/career',
+    '/tests/psychology',
+    '/tests/career',
   ],
   // 关键API
   CRITICAL_APIS: [

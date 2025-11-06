@@ -20,6 +20,8 @@ export interface BlogArticleSummary {
   updatedAt?: string
   readTime?: string
   readCount?: number
+  wordCount?: number
+  isFeatured?: boolean
 }
 
 export interface BlogArticleDetail extends BlogArticleSummary {
@@ -41,7 +43,8 @@ export const blogService = {
   async getArticles(
     page = 1,
     limit = 10,
-    category?: string | null
+    category?: string | null,
+    tag?: string | null
   ): Promise<PaginatedResponse<BlogArticleSummary[]>> {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -50,6 +53,10 @@ export const blogService = {
     
     if (category) {
       params.append('category', category)
+    }
+
+    if (tag) {
+      params.append('tag', tag)
     }
 
     return apiClient.get(`/blog/articles?${params.toString()}`) as Promise<PaginatedResponse<BlogArticleSummary[]>>
@@ -79,6 +86,8 @@ export const blogService = {
         updatedAt: r.updatedAt,
         readTime: r.readTime,
         readCount: r.readCount,
+        wordCount: r.wordCount,
+        isFeatured: Boolean(r.isFeatured),
       }));
 
     // Fallback：若统一搜索无结果，降级到文章列表做前端包含匹配（title/excerpt/category）
@@ -102,15 +111,8 @@ export const blogService = {
   /**
    * 获取单篇博客文章
    */
-  async getArticle(idOrSlug: string): Promise<APIResponse<BlogArticleDetail>> {
-    return apiClient.get(`/blog/articles/${idOrSlug}`) as Promise<APIResponse<BlogArticleDetail>>
-  },
-
-  /**
-   * 增加文章浏览量
-   */
-  async incrementViewCount(id: string): Promise<APIResponse<void>> {
-    return apiClient.post(`/blog/articles/${id}/view`, {})
+  async getArticle(slug: string): Promise<APIResponse<BlogArticleDetail>> {
+    return apiClient.get(`/blog/articles/${slug}`) as Promise<APIResponse<BlogArticleDetail>>
   },
 
   // 基于 slug 的浏览量统计（新）

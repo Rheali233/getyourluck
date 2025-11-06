@@ -24,7 +24,7 @@ export const SEODashboard: React.FC<SEODashboardProps> = ({ className }) => {
   useEffect(() => {
     // 生成Search Console代码
     const code = generateCompleteSearchConsoleCode({
-      siteUrl: 'https://selfatlas.com',
+      siteUrl: 'https://selfatlas.net',
       enableIndexing: true,
       enablePerformanceTracking: true
     });

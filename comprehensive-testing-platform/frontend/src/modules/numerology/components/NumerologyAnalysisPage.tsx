@@ -98,7 +98,7 @@ export const NumerologyAnalysisPage: React.FC = () => {
     return (
       <NumerologyTestContainer>
         <div className="max-w-6xl mx-auto">
-          <Breadcrumb items={getBreadcrumbConfig(`/numerology/${currentAnalysisType}`)} />
+          <Breadcrumb items={getBreadcrumbConfig(`/tests/numerology/${currentAnalysisType}`)} />
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Your {getAnalysisTypeTitle()}

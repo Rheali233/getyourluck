@@ -134,13 +134,16 @@ export const PersonalizedRecommendations: React.FC<PersonalizedRecommendationsPr
           'tarot': '/tests/tarot',
           'numerology': '/tests/numerology'
         };
-        const moduleRoute = routeMap[item.category] || `/${item.category}`;
+        const moduleRoute = routeMap[item.category] || `/tests/${item.category}`;
         window.location.href = moduleRoute;
         break;
       }
-      case 'article':
-        window.location.href = `/blog/${item.id}`;
+      case 'article': {
+        // 优先使用slug，如果metadata中有slug则使用，否则使用id（后端API支持通过id或slug获取）
+        const slug = item.metadata?.slug || item.id;
+        window.location.href = `/blog/${slug}`;
         break;
+      }
       case 'feature': {
         // 处理功能推荐
         break;

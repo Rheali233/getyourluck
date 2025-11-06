@@ -17,6 +17,7 @@ import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { buildAbsoluteUrl } from '@/config/seo';
 import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 
@@ -41,18 +42,18 @@ export const PsychologyHomePage: React.FC<PsychologyHomePageProps> = ({
   // });
 
   // SEO配置
-  const canonical = `${typeof window !== 'undefined' ? window.location.origin : ''}/tests/psychology`;
+  const canonical = buildAbsoluteUrl('/tests/psychology');
   const seoConfig = useSEO({
     testType: 'psychology',
     testId: 'home',
     title: 'Free Psychological Tests: Personality, EQ, PHQ-9 & More | SelfAtlas',
-    description: 'Free research-informed psychological assessments to understand your personality, emotional intelligence, and mental wellness. Instant, personalized insights — not a diagnosis.',
+    description: 'Free research-informed psychological assessments to explore your personality, emotional intelligence, and mental wellness. Instant insights — not a diagnosis.',
     keywords: ['psychological tests', 'personality test', 'MBTI', 'emotional intelligence', 'EQ test', 'PHQ-9', 'depression screening', 'happiness assessment', 'free psychological assessments', 'mental wellness'],
     customConfig: {
       canonical: canonical,
       ogTitle: 'Free Psychological Tests: Personality, EQ, PHQ-9 & More | SelfAtlas',
-      ogDescription: 'Free research-informed psychological assessments to understand your personality, emotional intelligence, and mental wellness. Instant, personalized insights — not a diagnosis.',
-      ogImage: `${typeof window !== 'undefined' ? window.location.origin : ''}/og-image.jpg`,
+      ogDescription: 'Free research-informed psychological assessments to explore your personality, emotional intelligence, and mental wellness. Instant insights — not a diagnosis.',
+      ogImage: buildAbsoluteUrl('/og-image.jpg'),
       twitterCard: 'summary_large_image'
     },
     structuredData: {
@@ -60,6 +61,11 @@ export const PsychologyHomePage: React.FC<PsychologyHomePageProps> = ({
       '@type': 'CollectionPage',
       name: 'Psychological Tests',
       description: 'Free research-informed psychological assessments to understand your personality, emotional intelligence, and mental wellness. Instant, personalized insights — not a diagnosis.',
+      inLanguage: 'en-US',
+      audience: {
+        '@type': 'Audience',
+        audienceType: 'Self-explorers'
+      },
       provider: {
         '@type': 'Organization',
         name: 'SelfAtlas',
@@ -190,17 +196,17 @@ export const PsychologyHomePage: React.FC<PsychologyHomePageProps> = ({
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-3">
-            Psychological Tests
+            Explore Your Inner World
           </h1>
           <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-blue-900 font-semibold hover:hover:bg-white/80 transition ml-4">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            back to home
+            Back to Home
           </button>
         </div>
         <p className="text-xl text-blue-800 max-w-3xl">
-          Free research-informed psychological assessments to understand your personality, emotional intelligence, and mental wellness. Instant, personalized insights — not a diagnosis.
+          Take research-informed psychological assessments to explore your personality traits, emotional patterns, and mental well-being. Receive instant, personalized insights to deepen your self-awareness.
         </p>
       </div>
 

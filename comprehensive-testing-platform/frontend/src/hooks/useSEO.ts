@@ -5,7 +5,8 @@
 
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getSEOConfig, generateStructuredData, type SEOConfig } from '../config/seo';
+import { getSEOConfig, generateStructuredData, type SEOConfig, buildAbsoluteUrl } from '../config/seo';
+import { getLocationPathname } from '@/utils/browserEnv';
 
 interface UseSEOOptions {
   title?: string;
@@ -33,6 +34,14 @@ export function useSEO(options: UseSEOOptions = {}) {
     structuredData: options.structuredData || baseConfig.structuredData
   };
 
+  const currentPath = location.pathname || getLocationPathname();
+  const ensureAbsoluteUrl = (url: string | undefined): string => {
+    if (!url) {
+      return buildAbsoluteUrl(currentPath);
+    }
+    return /^https?:\/\//i.test(url) ? url : buildAbsoluteUrl(url);
+  };
+
   // 生成结构化数据
   const structuredData = seoConfig.structuredData || generateStructuredData(
     location.pathname.includes('/result') ? 'test-result' : 'test',
@@ -41,14 +50,14 @@ export function useSEO(options: UseSEOOptions = {}) {
       description: seoConfig.description,
       testType: options.testType,
       testId: options.testId,
-      url: window.location.href
+      url: ensureAbsoluteUrl(seoConfig.canonical)
     }
   );
 
   return {
     ...seoConfig,
     structuredData,
-    canonical: seoConfig.canonical || window.location.href
+    canonical: ensureAbsoluteUrl(seoConfig.canonical)
   };
 }
 

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { NavigateFunction } from 'react-router-dom';
 import { TestContainer } from '@/modules/testing/components/TestContainer';
-import { Question } from '@/modules/testing/types/TestTypes';
+import type { Question } from '@/modules/testing/types/TestTypes';
 import { questionService } from '@/modules/testing/services/QuestionService';
 import { useTestStore } from '@/modules/testing/stores/useTestStore';
 import { Card } from '@/components/ui/Card';
@@ -10,6 +12,9 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 import { ContextualLinks } from '@/components/InternalLinks';
+import { buildAbsoluteUrl } from '@/config/seo';
+import { useSEO } from '@/hooks/useSEO';
+import { SEOHead } from '@/components/SEOHead';
 
 interface RelationshipGenericTestPageProps {
   testType: string;
@@ -17,37 +22,205 @@ interface RelationshipGenericTestPageProps {
   description?: string;
 }
 
-export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPageProps> = ({ 
-  testType, 
-  title, 
-  description 
+// 返回测试列表按钮组件
+interface BackToTestsButtonProps {
+  onNavigate: NavigateFunction;
+  className?: string;
+}
+
+const BackToTestsButton: React.FC<BackToTestsButtonProps> = ({ onNavigate, className }) => {
+  const handleNavigate = () => {
+    const canGoBack = typeof window !== 'undefined' && window.history.length > 1;
+
+    if (canGoBack) {
+      onNavigate(-1);
+    } else {
+      onNavigate('/tests');
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleNavigate}
+      className={`inline-flex items-center gap-2 rounded-full border border-pink-200 bg-white/70 px-4 py-2 text-sm font-semibold text-pink-800 transition hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 ${className || ''}`}
+      aria-label="Back to tests"
+    >
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Tests
+    </button>
+  );
+};
+
+// 准备页内容配置
+interface TestPageContent {
+  heroDescription: string;
+  stats: {
+    estimatedMinutes: number;
+    format: string;
+    insightLabel: string;
+  };
+  questionCount?: number;
+  instructionPoints: string[];
+  theoreticalPoints: string[];
+  disclaimerPoints: string[];
+  crisisSupportMessage?: string;
+}
+
+const TEST_PAGE_CONTENT: Record<string, TestPageContent> = {
+  love_language: {
+    heroDescription:
+      'Free research-informed love language test delivering instant relationship insights. Understand your connection preferences — not a diagnosis or therapy.',
+    stats: {
+      estimatedMinutes: 8,
+      format: 'Single choice',
+      insightLabel: 'Instant insights'
+    },
+    questionCount: 30,
+    instructionPoints: [
+      'Answer honestly about how you naturally give and receive love without overthinking.',
+      'Focus on what feels meaningful to you instead of what you think should matter.',
+      'Complete the questions in one sitting to capture your current patterns.'
+    ],
+    theoreticalPoints: [
+      'Grounded in Gary Chapman’s five love languages framework.',
+      'Explores acts of service, words of affirmation, quality time, gifts, and physical touch.',
+      'Helps partners translate everyday gestures into aligned emotional support.'
+    ],
+    disclaimerPoints: [
+      'For educational and self-reflection purposes only — not a diagnosis or professional counseling.',
+      'Use results to guide conversations, not to label partners or force behavior changes.',
+      'Seek licensed guidance if relationship conflict impacts your wellbeing.'
+    ]
+  },
+  love_style: {
+    heroDescription:
+      'Free research-informed love style assessment with instant insights into romantic patterns. No account required and not a diagnosis.',
+    stats: {
+      estimatedMinutes: 10,
+      format: 'Single choice',
+      insightLabel: 'Instant insights'
+    },
+    questionCount: 30,
+    instructionPoints: [
+      'Reflect on how you typically approach intimacy, commitment, and emotional expression.',
+      'Select the response that represents your natural tendencies rather than ideal behavior.',
+      'Consider past and present relationships to surface consistent style themes.'
+    ],
+    theoreticalPoints: [
+      'Built on John Alan Lee’s six love styles and modern attachment research.',
+      'Highlights Eros, Ludus, Storge, Pragma, Mania, and Agape tendencies in combination.',
+      'Supports self-awareness and communication planning for current or future partners.'
+    ],
+    disclaimerPoints: [
+      'Insights are informational guidance and not professional diagnosis or therapy.',
+      'Growth often requires ongoing dialogue with partners, mentors, or counselors.',
+      'If relationship challenges affect wellbeing, seek qualified professional support.'
+    ]
+  },
+  interpersonal: {
+    heroDescription:
+      'Free research-informed interpersonal skills assessment with instant feedback. Strengthen communication habits — this is not a diagnosis.',
+    stats: {
+      estimatedMinutes: 12,
+      format: 'Single choice',
+      insightLabel: 'Instant insights'
+    },
+    questionCount: 30,
+    instructionPoints: [
+      'Think about everyday interactions at home, work, and social settings.',
+      'Choose the option that reflects your typical communication style most of the time.',
+      'Stay consistent across questions to reveal reliable interpersonal themes.'
+    ],
+    theoreticalPoints: [
+      'Informed by social psychology and emotional intelligence research.',
+      'Covers empathy, assertion, conflict navigation, and collaborative dialogue.',
+      'Transforms academic findings into actionable communication strategies.'
+    ],
+    disclaimerPoints: [
+      'Results are for personal development and not clinical assessment.',
+      'Use the guidance to support coaching conversations or habit-building plans.',
+      'Seek professional counseling if social challenges affect safety or wellbeing.'
+    ],
+    crisisSupportMessage:
+      'Need urgent relationship or emotional support? Reach out to trusted contacts, local counselors, or emergency services in your region.'
+  }
+};
+
+const DEFAULT_TEST_CONTENT: TestPageContent = {
+  heroDescription:
+    'Free research-informed relationship assessment offering instant insights. Built for self-reflection — not a diagnosis or professional therapy.',
+  stats: {
+    estimatedMinutes: 10,
+    format: 'Single choice',
+    insightLabel: 'Instant insights'
+  },
+  questionCount: 30,
+  instructionPoints: [
+    'Respond based on your genuine experiences in close relationships.',
+    'There are no right or wrong answers — authenticity supports better insights.',
+    'Complete the test in a calm environment to reflect clearly.'
+  ],
+  theoreticalPoints: [
+    'Inspired by modern relationship science and positive psychology.',
+    'Combines evidence-based frameworks with practical coaching takeaways.',
+    'Helps surface strengths and growth areas for communication and connection.'
+  ],
+  disclaimerPoints: [
+    'For education and instant guidance only — not professional counseling.',
+    'Results complement, not replace, conversations with partners or therapists.',
+    'If relationships affect your safety or mental health, contact professionals immediately.'
+  ]
+};
+
+export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPageProps> = ({
+  testType,
+  title,
+  description
 }) => {
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [testStarted, setTestStarted] = useState(false);
-  
+  const [startPending, setStartPending] = useState(false);
+
+  const breadcrumbPath = `/tests/relationship/${testType.replace(/_/g, '-')}`;
+  const breadcrumbItems = getBreadcrumbConfig(breadcrumbPath);
+  const content = useMemo(() => TEST_PAGE_CONTENT[testType] || DEFAULT_TEST_CONTENT, [testType]);
+
   // 集成useTestStore
-  const { 
-    startTest, 
-    setQuestions: setStoreQuestions, 
-    getTestTypeState, 
+  const {
+    startTest,
+    setQuestions: setStoreQuestions,
+    getTestTypeState,
     clearAllTestTypeStates,
     clearTestTypeState
   } = useTestStore();
 
-  // 在页面加载时清理其他测试的状态，确保测试之间不会相互影响
+  // 页面加载时清理其他测试状态
   useEffect(() => {
-    // 清理所有其他测试类型的状态，只保留当前测试类型的状态
     const currentTestTypeState = getTestTypeState(testType);
-    
-    // 如果当前测试类型没有状态，清理所有状态
+
     if (!currentTestTypeState.showResults && !currentTestTypeState.isTestStarted) {
       clearAllTestTypeStates();
     } else {
-      // 如果当前测试类型有状态，只清理其他测试类型的状态
-      const allTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'vark', 'love_language', 'love_style', 'interpersonal', 'holland', 'disc', 'leadership'];
-      allTestTypes.forEach(type => {
+      const allTestTypes = [
+        'mbti',
+        'phq9',
+        'eq',
+        'happiness',
+        'vark',
+        'love_language',
+        'love_style',
+        'interpersonal',
+        'holland',
+        'disc',
+        'leadership'
+      ];
+      allTestTypes.forEach((type) => {
         if (type !== testType) {
           clearTestTypeState(type);
         }
@@ -55,77 +228,87 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
     }
   }, [testType, getTestTypeState, clearAllTestTypeStates, clearTestTypeState]);
 
-  useEffect(() => {
-    const loadQuestions = async () => {
+  const loadQuestions = useCallback(
+    async (options?: { bypassCache?: boolean }) => {
       try {
         setLoading(true);
-        
-        // 检查缓存
+        setError(null);
+
         const cacheKey = `relationship_questions_${testType}`;
-        const cachedData = localStorage.getItem(cacheKey);
-        const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
-        
-        // 如果缓存存在且未过期（1小时内）
-        if (cachedData && cacheTimestamp) {
-          const now = Date.now();
-          const cacheTime = parseInt(cacheTimestamp);
-          const isExpired = (now - cacheTime) > 3600000; // 1小时
-          
-          if (!isExpired) {
-            const questions = JSON.parse(cachedData);
-            setQuestions(questions);
-            setLoading(false);
-            
-            // 记录页面访问事件
-            const base = buildBaseContext();
-            trackEvent({
-              eventType: 'page_view',
-              ...base,
-              data: { route: `/relationship/${testType}`, pageType: 'test' },
-            });
-            return;
+        const cacheTimestampKey = `${cacheKey}_timestamp`;
+
+        if (!options?.bypassCache) {
+          const cachedData = localStorage.getItem(cacheKey);
+          const cacheTimestamp = localStorage.getItem(cacheTimestampKey);
+
+          if (cachedData && cacheTimestamp) {
+            const now = Date.now();
+            const cacheTime = parseInt(cacheTimestamp, 10);
+            const isExpired = now - cacheTime > 3600000;
+
+            if (!isExpired) {
+              const parsed = JSON.parse(cachedData) as Question[];
+
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                setQuestions(parsed);
+
+                const base = buildBaseContext();
+                trackEvent({
+                  eventType: 'page_view',
+                  ...base,
+                  data: { route: `/tests/relationship/${testType}`, pageType: 'test' }
+                });
+
+                return parsed;
+              }
+
+              localStorage.removeItem(cacheKey);
+              localStorage.removeItem(cacheTimestampKey);
+            }
           }
         }
-        
-        // 调用后端API获取测试问题
+
         const response = await questionService.getQuestionsByType(testType);
-        
+
         if (response.success && response.data && Array.isArray(response.data)) {
           setQuestions(response.data);
-          
-          // 缓存数据
           localStorage.setItem(cacheKey, JSON.stringify(response.data));
-          localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
-          
-          // 记录页面访问事件
+          localStorage.setItem(cacheTimestampKey, Date.now().toString());
+
           const base = buildBaseContext();
           trackEvent({
             eventType: 'page_view',
             ...base,
-            data: { route: `/relationship/${testType}`, pageType: 'test' },
+            data: { route: `/tests/relationship/${testType}`, pageType: 'test' }
           });
-        } else {
-          setError(response.error || 'Failed to load questions');
+
+          return response.data as Question[];
         }
-        setLoading(false);
+
+        setError(response.error || 'Failed to load questions');
+        return [];
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load questions');
+        return [];
+      } finally {
         setLoading(false);
       }
-    };
+    },
+    [testType]
+  );
 
-    loadQuestions();
-  }, [testType]);
+  useEffect(() => {
+    void loadQuestions();
+  }, [loadQuestions]);
 
-  // 当questions加载完成后，同步到store
+  // 同步题目到store
   useEffect(() => {
     if (questions.length > 0) {
       setStoreQuestions(questions);
     }
   }, [questions, setStoreQuestions]);
 
-  // 当显示结果时，确保testStarted保持true，这样会显示测试容器（包含结果）
-  // 强化：一旦有结果或显示结果，强制保持测试状态，防止自动跳转
+  // 结果展示状态保持
   useEffect(() => {
     const testTypeState = getTestTypeState(testType);
     if (testTypeState.showResults || testTypeState.currentTestResult) {
@@ -133,235 +316,304 @@ export const RelationshipGenericTestPage: React.FC<RelationshipGenericTestPagePr
     }
   }, [testType, getTestTypeState]);
 
-  if (loading) {
-    return (
-      <RelationshipTestContainer>
-        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center max-w-md mx-auto">
-            <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-pink-200 border-t-pink-600 mx-auto mb-6"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-8 h-8 bg-pink-600 rounded-full animate-pulse"></div>
-              </div>
-            </div>
-            <h3 className="text-xl font-semibold text-pink-900 mb-2">Loading Test Questions</h3>
-            <p className="text-pink-700 mb-4">Preparing your relationship assessment...</p>
-            <div className="w-full bg-pink-100 rounded-full h-2">
-              <div className="bg-pink-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
-            </div>
-            <p className="text-sm text-pink-600 mt-2">This will only take a moment</p>
-          </div>
-        </div>
-      </RelationshipTestContainer>
-    );
-  }
-
-  if (error) {
-    return (
-      <RelationshipTestContainer>
-        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="text-red-600 text-6xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-pink-900 mb-2">Error Loading Test</h2>
-            <p className="text-sm text-pink-800 mb-4">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-500 text-white rounded-lg hover:transition-all duration-300"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </RelationshipTestContainer>
-    );
-  }
-
-  if (questions.length === 0) {
-    return (
-      <RelationshipTestContainer>
-        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="text-gray-400 text-6xl mb-4">📝</div>
-            <h2 className="text-2xl font-bold text-pink-900 mb-2">No Questions Available</h2>
-            <p className="text-sm text-pink-800">This test is not yet available or under maintenance.</p>
-          </div>
-        </div>
-      </RelationshipTestContainer>
-    );
-  }
-
-    // 如果测试已开始或显示结果，显示测试容器
-  // 获取当前测试类型的特定状态
   const testTypeState = getTestTypeState(testType);
   const testTypeShowResults = testTypeState.showResults;
   const testTypeIsTestStarted = testTypeState.isTestStarted;
+
+  const statItems = useMemo(() => {
+    const items = ['Free', 'Research-informed'];
+
+    if (content.stats.estimatedMinutes) {
+      items.push(`~${content.stats.estimatedMinutes} min`);
+    }
+
+    if (content.stats.format) {
+      items.push(content.stats.format);
+    }
+
+    if (content.stats.insightLabel) {
+      items.push(content.stats.insightLabel);
+    }
+
+    return items;
+  }, [content.stats]);
   
+  const waitingForQuestions = useMemo(() => {
+    if (loading) {
+      return true;
+    }
+
+    if (error) {
+      return false;
+    }
+
+    return questions.length === 0;
+  }, [error, loading, questions.length]);
+
+  const handleStartTest = useCallback(async () => {
+    try {
+      setStartPending(true);
+
+      let activeQuestions = questions;
+
+      if (activeQuestions.length === 0) {
+        activeQuestions = await loadQuestions({ bypassCache: true });
+      }
+
+      if (activeQuestions.length === 0) {
+        setStartPending(false);
+        return;
+      }
+
+      await startTest(testType, activeQuestions);
+      setTestStarted(true);
+
+      const base = buildBaseContext();
+      trackEvent({
+        eventType: 'test_start',
+        ...base,
+        data: { testType }
+      });
+    } catch {
+      // 静默处理，界面已有错误提示
+    } finally {
+      setStartPending(false);
+    }
+  }, [loadQuestions, questions, startTest, testType]);
+
+  const getSEOConfig = (activeTestType: string) => {
+    const seoConfigs: Record<string, { title: string; description: string; keywords: string[] }> = {
+      love_language: {
+        title: 'Free Love Language Test with Instant Insights | SelfAtlas',
+        description:
+          'Discover your primary love language with this free, research-informed assessment. Gain instant insights to strengthen your relationships. Not professional counseling.',
+        keywords: [
+          'love language test',
+          'free love language assessment',
+          'relationship communication test',
+          'gary chapman love languages',
+          'instant relationship insights'
+        ]
+      },
+      love_style: {
+        title: 'Free Love Style Assessment for Relationship Patterns | SelfAtlas',
+        description:
+          'Understand your romantic patterns with a free love style assessment. Research-informed insights delivered instantly. Not a diagnosis or therapy.',
+        keywords: [
+          'love style assessment',
+          'relationship style test',
+          'romantic compatibility insight',
+          'love style quiz',
+          'free relationship assessment'
+        ]
+      },
+      interpersonal: {
+        title: 'Free Interpersonal Skills Test with Instant Feedback | SelfAtlas',
+        description:
+          'Evaluate your interpersonal skills and communication tendencies with this free, research-informed test. Receive instant insights to improve connection. Not a diagnosis.',
+        keywords: [
+          'interpersonal skills test',
+          'communication assessment',
+          'relationship skills quiz',
+          'social intelligence test',
+          'free interpersonal assessment'
+        ]
+      }
+    };
+
+    return seoConfigs[activeTestType] || {
+      title: `Free ${title} | SelfAtlas`,
+      description:
+        description || 'Explore a free, research-informed relationship assessment and receive instant insights to support meaningful connections. Not a diagnosis.',
+      keywords: ['relationship test', 'free relationship assessment', 'instant relationship insights']
+    };
+  };
+
+  const seoData = getSEOConfig(testType);
+  const canonical = buildAbsoluteUrl(`/tests/relationship/${testType}`);
+
+  const seoConfig = useSEO({
+    testType: 'relationship',
+    testId: testType,
+    title: seoData.title,
+    description: seoData.description || content.heroDescription,
+    keywords: seoData.keywords,
+    customConfig: {
+      canonical,
+      ogTitle: seoData.title,
+      ogDescription: seoData.description || content.heroDescription,
+      ogImage: buildAbsoluteUrl('/og-image.jpg'),
+      twitterCard: 'summary_large_image'
+    },
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'Test',
+      name: title,
+      description: description || content.heroDescription,
+      category: 'Relationship Test',
+      provider: {
+        '@type': 'Organization',
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
+      },
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock'
+      },
+      educationalLevel: 'Beginner',
+      typicalAgeRange: '16-99',
+      timeRequired: content.stats.estimatedMinutes ? `PT${content.stats.estimatedMinutes}M` : undefined,
+      numberOfQuestions: questions.length || undefined,
+      testFormat: content.stats.format,
+      about: {
+        '@type': 'Thing',
+        name:
+          testType === 'love_language'
+            ? 'Love Language Assessment'
+            : testType === 'love_style'
+            ? 'Romantic Relationship Styles'
+            : testType === 'interpersonal'
+            ? 'Interpersonal Communication Skills'
+            : 'Relationship Assessment'
+      }
+    }
+  });
+
   if (testStarted || testTypeShowResults || testTypeIsTestStarted) {
     return (
-      <RelationshipTestContainer>
-        {/* 面包屑导航 */}
-        <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
-        {/* 顶部标题 + 返回首页按钮 */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-pink-800 mb-2">{title}</h1>
-              <p className="text-xl text-pink-700">
-                {testTypeShowResults 
-                  ? "Your personalized relationship assessment results"
-                  : "Please choose the option that best matches your true thoughts and feelings"
-                }
-              </p>
+      <>
+        <SEOHead config={seoConfig} />
+        <RelationshipTestContainer>
+          <Breadcrumb items={breadcrumbItems} />
+          <div className="mb-12">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold text-pink-800 mb-2">{title}</h1>
+                <p className="text-xl text-pink-700">
+                  {testTypeShowResults
+                    ? 'Your personalized relationship assessment results'
+                    : 'Please choose the option that best matches your true thoughts and feelings'}
+                </p>
+              </div>
+              <BackToTestsButton onNavigate={navigate} className="ml-4" />
             </div>
-            <button onClick={() => window.location.assign('/tests/relationship')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-pink-800 font-semibold hover:hover:bg-white/80 transition ml-4">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Center
-            </button>
           </div>
-        </div>
 
-        <TestContainer
-          testType={testType}
-        />
-      </RelationshipTestContainer>
+          <TestContainer testType={testType} questions={questions} />
+        </RelationshipTestContainer>
+      </>
     );
   }
 
-  // 显示完整的测试准备界面
   return (
-    <RelationshipTestContainer>
-      {/* 面包屑导航 */}
-      <Breadcrumb items={getBreadcrumbConfig(`/tests/relationship/${testType}`)} />
-      {/* 顶部标题 + 右上角返回按钮（对齐Psychology） */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-4xl md:text-5xl font-bold text-pink-900 mb-3">{title}</h1>
-          <button onClick={() => window.location.assign('/relationship')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-pink-900 font-semibold hover:hover:bg-white/80 transition ml-4">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Center
-          </button>
+    <>
+      <SEOHead config={seoConfig} />
+      <RelationshipTestContainer>
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <h1 className="text-4xl md:text-5xl font-bold text-pink-900 mb-3">{title}</h1>
+            <BackToTestsButton onNavigate={navigate} className="ml-4" />
+          </div>
+          <p className="text-xl text-pink-800 max-w-3xl">{description || content.heroDescription}</p>
         </div>
-        {description && (
-          <p className="text-xl text-pink-800 max-w-3xl">{description}</p>
-        )}
-      </div>
 
-          {/* 模块一：测试信息、说明和开始按钮 */}
-          <Card className="p-8 mb-8">
-            
-            <div className="mb-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-pink-50 border border-pink-200 rounded-xl p-6 text-center">
-                  <div className="text-3xl font-bold text-pink-900 mb-2">{questions.length}</div>
-                  <div className="text-sm text-pink-800 font-medium">Total Questions</div>
-                </div>
-                <div className="bg-pink-50 border border-pink-200 rounded-xl p-6 text-center">
-                  <div className="text-2xl font-bold text-pink-900 mb-2">{Math.ceil(questions.length * 15 / 60)} min</div>
-                  <div className="text-sm text-pink-800 font-medium">Estimated Time</div>
-                </div>
-                <div className="bg-pink-50 border border-pink-200 rounded-xl p-6 text-center">
-                  <div className="text-lg font-bold text-pink-900 mb-2">
-                    {(testType === 'love_language' || testType === 'love_style' || testType === 'interpersonal')
-                      ? 'Single choice'
-                      : 'Multiple choice'}
-                  </div>
-                  <div className="text-sm text-pink-800 font-medium">Test Format</div>
-                </div>
-              </div>
+        <div className="mb-6">
+          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-pink-800">
+            {statItems.map((item, index) => (
+              <React.Fragment key={item}>
+                {index > 0 && <span aria-hidden="true">|</span>}
+                <span>{item}</span>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        <Card className="p-6 mb-8">
+          <div className="grid gap-8 md:grid-cols-2">
+            <div>
+              <h2 className="text-lg font-semibold text-pink-900 mb-4 flex items-center">
+                <span className="text-pink-500 mr-3">📋</span>
+                Test Preparation
+              </h2>
+              <ul className="list-disc list-inside space-y-2 text-sm text-pink-900">
+                {content.instructionPoints.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
             </div>
-
-            <div className="grid md:grid-cols-2 gap-12 mb-8">
-              {/* Test Instructions */}
-              <div>
-                <h3 className="text-lg font-medium text-pink-900 mb-6 flex items-center">
-                  <span className="text-pink-500 mr-3">📋</span>
-                  Test Instructions
-                </h3>
-                <div className="text-pink-800 space-y-3">
-                  <p className="leading-tight">Answer honestly based on your true thoughts and feelings about relationships, rather than what you think you should answer or how others might expect you to respond.</p>
-                  <p className="leading-tight">Trust your first instinct and avoid overanalyzing each question, as the most accurate results come from your natural response.</p>
-                  <p className="leading-tight">There are no right or wrong answers in this assessment, and each response simply reflects your personal preferences and tendencies in relationships.</p>
-                  {testType === 'interpersonal' && (
-                    <p className="leading-tight">This test uses a 5-point single-choice Likert scale (Strongly Disagree → Strongly Agree). Please select one option per question.</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Theoretical Basis */}
-              <div>
-                <h3 className="text-lg font-medium text-pink-900 mb-6 flex items-center">
-                  <span className="text-pink-500 mr-3">🔬</span>
-                  Theoretical Basis
-                </h3>
-                <div className="text-pink-800 space-y-3">
-                  <p className="leading-tight">Based on John Alan Lee's six love styles theory, this assessment identifies your approach to romantic relationships across six dimensions.</p>
-                  <p className="leading-tight">The six styles are: Eros (passionate), Ludus (playful), Storge (friendship-based), Pragma (practical), Mania (intense), and Agape (selfless).</p>
-                  <p className="leading-tight">Most people exhibit combinations of these styles, and understanding your preferences helps improve relationship communication and compatibility.</p>
-                </div>
-              </div>
+            <div>
+              <h2 className="text-lg font-semibold text-pink-900 mb-4 flex items-center">
+                <span className="text-pink-500 mr-3">🔬</span>
+                Research Background
+              </h2>
+              <ul className="list-disc list-inside space-y-2 text-sm text-pink-900">
+                {content.theoreticalPoints.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
             </div>
+          </div>
 
-            <div className="text-center pt-6">
-              <button 
-                onClick={async () => {
-                  try {
-                    await startTest(testType, questions);
-                    setTestStarted(true);
-                    // 记录测试开始事件
-                    const base = buildBaseContext();
-                    trackEvent({
-                      eventType: 'test_start',
-                      ...base,
-                      data: { testType },
-                    });
-                  } catch (error) {
-                    // 静默处理错误，用户界面已经通过状态管理显示错误
-                  }
-                }}
-                className="bg-gradient-to-r from-pink-600 to-rose-500 text-white px-16 py-4 text-lg font-bold rounded-lg hover:transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold text-pink-900 mb-3 flex items-center">
+              <span className="text-pink-500 mr-3">⚠️</span>
+              Important Notices
+            </h2>
+            <ul className="list-disc list-inside space-y-2 text-sm text-pink-900">
+              {content.disclaimerPoints.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className={waitingForQuestions ? 'text-sm text-pink-700' : error ? 'text-sm text-red-600' : 'text-sm text-pink-900 font-semibold'}>
+              {waitingForQuestions && (
+                <span>
+                  {content.questionCount
+                    ? `Preparing ${content.questionCount} questions, please wait.`
+                    : 'Preparing questions, please wait.'}
+                </span>
+              )}
+              {!waitingForQuestions && error && (
+                <span>Unable to load questions right now. Please try again.</span>
+              )}
+              {!waitingForQuestions && !error && questions.length > 0 && (
+                <span>{questions.length} questions ready</span>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleStartTest}
+                disabled={loading || startPending}
+                className="bg-gradient-to-r from-pink-600 to-rose-500 text-white px-10 py-3 text-base font-bold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Start Test
+                {startPending ? 'Starting…' : 'Start Free Test'}
               </button>
+              {error && (
+                <button
+                  onClick={() => void loadQuestions({ bypassCache: true })}
+                  className="px-4 py-2 text-sm font-semibold text-pink-700 bg-white border border-pink-200 rounded-lg hover:bg-pink-50"
+                >
+                  Retry
+                </button>
+              )}
             </div>
-          </Card>
+          </div>
+        </Card>
 
+        {content.crisisSupportMessage && (
+          <div className="p-6 mb-8 bg-pink-50 border border-pink-200 rounded-3xl shadow-sm">
+            <p className="text-sm text-pink-800">{content.crisisSupportMessage}</p>
+          </div>
+        )}
 
-
-      {/* 模块三：重要声明 */}
-      <div className="p-8 mb-8 bg-pink-50 border border-pink-200 rounded-3xl shadow-sm">
-        <h3 className="text-lg font-medium text-pink-900 mb-8">Important Disclaimers</h3>
-        <div className="text-pink-800 space-y-3">
-          <p className="flex items-start leading-tight">
-            <span className="text-red-500 text-xl mr-4 flex-shrink-0">⚠️</span>
-            <span><span className="font-semibold text-pink-900">Not Professional Counseling:</span> This test is for educational and self-discovery purposes only. It does not constitute professional relationship counseling or therapy.</span>
-          </p>
-          <p className="flex items-start leading-tight">
-            <span className="text-red-500 text-xl mr-4 flex-shrink-0">🔒</span>
-            <span><span className="font-semibold text-pink-900">Privacy Protection:</span> Your responses are confidential and will not be shared with third parties without your explicit consent.</span>
-          </p>
-          <p className="flex items-start leading-tight">
-            <span className="text-red-500 text-xl mr-4 flex-shrink-0">📚</span>
-            <span><span className="font-semibold text-pink-900">Educational Tool:</span> Results should be used as a starting point for self-reflection and relationship improvement, not as definitive relationship labels.</span>
-          </p>
-          <p className="flex items-start leading-tight">
-            <span className="text-red-500 text-xl mr-4 flex-shrink-0">🆘</span>
-            <span><span className="font-semibold text-pink-900">Seek Professional Help:</span> If you're experiencing significant relationship challenges or emotional distress, please consult with a qualified relationship counselor or therapist.</span>
-          </p>
-        </div>
-      </div>
-
-      {/* Related content - consistent UI spacing */}
-      <ContextualLinks 
-        context="test" 
-        className="mt-8"
-      />
-    </RelationshipTestContainer>
+        <ContextualLinks context="test" className="mt-8" />
+      </RelationshipTestContainer>
+    </>
   );
 };
+

@@ -83,17 +83,17 @@ export const ReadingResultPage: React.FC = () => {
             Your Tarot Reading
           </h1>
           <button 
-            onClick={() => navigate('/tarot')}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-violet-900 font-semibold hover:hover:bg-white/80 transition"
+            onClick={() => navigate('/tests/tarot')}
+            className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-violet-900 font-semibold transition hover:bg-white/80"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Center
+            Back to Tarot Home
           </button>
         </div>
         <p className="text-xl text-violet-800 max-w-4xl">
-          Discover what the cards reveal about your future
+          Review your cards, reflect on the guidance, and return to the tarot home whenever you are ready for another spread.
         </p>
       </div>
       {/* 模块1: Your Question & Overall Interpretation */}

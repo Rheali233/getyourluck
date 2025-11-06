@@ -6,8 +6,8 @@
 export const UI_TEXT = {
   blog: {
     list: {
-      title: 'Blog Articles',
-      subtitle: 'Explore psychology, astrology, career, and personal growth insights',
+      title: 'SelfAtlas Insights Blog',
+      subtitle: 'Explore free AI-powered psychology, career, astrology, and personal growth insights with research-informed guidance',
       searchPlaceholder: 'Search articles',
       categoryAll: 'All Categories',
       loadMore: 'Load More',
@@ -15,6 +15,17 @@ export const UI_TEXT = {
       emptyDesc: 'We are preparing exciting content. Please check back later.',
       errorTitle: 'Failed to load articles',
       retry: 'Retry',
+      paginationPrev: 'Previous',
+      paginationNext: 'Next',
+    },
+    card: {
+      readMore: 'Read more',
+      featured: 'Featured',
+      newlyPublished: 'New',
+      publishedOn: 'Published on',
+      tagsLabel: 'Tags',
+      estimatedRead: 'Estimated read',
+      minutesUnit: 'min',
     },
     detail: {
       titleFallback: 'Blog Article',
@@ -27,6 +38,18 @@ export const UI_TEXT = {
       },
       notFoundTitle: 'Article Not Found',
       notFoundDesc: 'The article may have been removed or the link is incorrect.',
+      tocTitle: 'On this page',
+      tocEmpty: 'No sections available',
+      relatedTitle: 'Related articles',
+      relatedEmpty: 'More articles are coming soon.',
+      continueExploring: 'Continue exploring',
+      readingProgress: 'Reading progress',
+      backToTop: 'Back to top',
+      ctaButtons: [
+        { label: 'Take MBTI Test Now', href: '/tests/psychology/mbti' },
+        { label: 'Explore Compatibility', href: '/tests/psychology/mbti' },
+        { label: 'Visit Test Center', href: '/tests' }
+      ] as const,
     },
     common: {
       reads: 'reads',
@@ -206,14 +229,15 @@ export const UI_TEXT = {
       overview: {
         title: 'What We Do',
         paragraphs: [
-          'SelfAtlas is a comprehensive online platform that combines scientific psychology assessments with traditional wisdom to help you discover your true self and unlock your potential.',
-          'We offer 7 specialized testing modules: Psychology (MBTI, EQ, depression screening), Career Planning (Holland Code, DISC), Astrology & Mystical Services (birth charts, tarot readings, numerology), Learning Assessment (VARK learning styles), and Relationship Tests (love languages, communication styles). All tests feature AI-powered personalized insights and are available in English with a unified, mobile-first design.'
+          'SelfAtlas is a comprehensive online platform that combines research-informed psychology assessments with traditional wisdom to help you discover your true self and unlock your potential.',
+          'We offer 7 specialized testing modules: Psychology (MBTI, EQ, depression screening), Career Planning (Holland Code, DISC), Astrology & Mystical Services (birth charts, tarot readings, numerology), Learning Assessment (VARK learning styles), and Relationship Tests (love languages, communication styles). All tests feature AI-powered personalized insights and are available in English with a unified, mobile-first design.',
+          'Start your free self-discovery journey today with AI-powered insights and personalized recommendations.'
         ],
       },
       capabilities: {
         title: 'What You Can Do Here',
         items: [
-          'Take 20+ scientifically-backed psychological assessments',
+          'Take 20+ research-informed psychological assessments',
           'Discover your personality type, strengths, and growth areas',
           'Plan your career path with proven professional frameworks',
           'Explore astrology insights and receive tarot guidance',
@@ -281,13 +305,32 @@ export const UI_TEXT = {
     },
     seo: {
       title: 'About SelfAtlas - Comprehensive Self-Discovery Platform',
-      description: 'Discover yourself with SelfAtlas: 20+ psychological tests, career planning, astrology, tarot readings, and more. AI-powered insights, privacy-first design, and mobile-optimized experience.',
+      description: 'Discover SelfAtlas: free AI-powered self-discovery with research-informed psychology, career, astrology, tarot, numerology, relationship, and learning assessments. No account required.',
     }
   },
   testCenter: {
     title: 'Test Center',
-    subtitle: 'Find the right assessment across psychology, career, relationships, and more',
+    subtitle: 'Free AI-powered assessments with instant results across psychology, career, astrology, tarot, numerology, relationships, and learning',
     searchPlaceholder: 'Search tests',
+    cardText: {
+      // 卡片按钮与辅助文案（需要保持英文）
+      cta: 'Start Test',
+      hotBadge: 'Popular pick',
+      recommendation: 'Recommended for',
+      recommendations: {
+        psychology: 'Self-awareness and emotional growth',
+        career: 'Career planning and professional development',
+        astrology: 'Cosmic guidance and birth chart insights',
+        tarot: 'Intuitive guidance and spiritual reflection',
+        numerology: 'Life path exploration through numbers',
+        relationship: 'Connecting deeply with partners and friends',
+        learning: 'Optimizing study habits and learning styles',
+        all: 'Personal insight seekers'
+      },
+      duration: 'Duration',
+      questions: 'Questions',
+      minutesSuffix: 'min'
+    },
     categories: {
       all: 'All',
       psychology: 'Psychology',
@@ -299,8 +342,8 @@ export const UI_TEXT = {
       learning: 'Learning',
     },
     seo: {
-      title: 'Test Center - Comprehensive Testing Platform',
-      description: 'Browse and start tests across psychology, career, astrology, tarot, numerology, relationship, and learning modules.',
+      title: 'Test Center | SelfAtlas',
+      description: 'Free AI-powered assessments across psychology, career, astrology, tarot, numerology, relationship, and learning modules. Instant results, no account required.',
     },
     tests: [
       // Psychology
@@ -318,9 +361,9 @@ export const UI_TEXT = {
       { id: 'interpersonal', module: 'relationship', title: 'Interpersonal Skills Test', description: 'Assess communication and social skills for better relationships', href: '/tests/relationship/interpersonal', duration: '18', questions: '22', rating: '4.5', participants: '8200' },
 
       // Career
-      { id: 'holland', module: 'career', title: 'Holland Code Career Interest Assessment', description: 'Assess vocational interests using the RIASEC model for career guidance', href: '/tests/career', duration: '15', questions: '60', rating: '4.7', participants: '11800', isHot: true },
-      { id: 'disc', module: 'career', title: 'DISC Personality Assessment', description: 'Understand your dominant behavior style at work and in teams.', href: '/tests/career', duration: '12-18', questions: '24', rating: '4.6', participants: '9600' },
-      { id: 'leadership', module: 'career', title: 'Leadership Skills Assessment', description: 'Evaluate leadership tendencies and management skills.', href: '/tests/career', duration: '15-25', questions: '28', rating: '4.5', participants: '7800' },
+      { id: 'holland', module: 'career', title: 'Holland Code Career Interest Assessment', description: 'Assess vocational interests using the RIASEC model for career guidance', href: '/tests/career/holland', duration: '15', questions: '60', rating: '4.7', participants: '11800', isHot: true },
+      { id: 'disc', module: 'career', title: 'DISC Personality Assessment', description: 'Understand your dominant behavior style at work and in teams.', href: '/tests/career/disc', duration: '12-18', questions: '24', rating: '4.6', participants: '9600' },
+      { id: 'leadership', module: 'career', title: 'Leadership Skills Assessment', description: 'Evaluate leadership tendencies and management skills.', href: '/tests/career/leadership', duration: '15-25', questions: '28', rating: '4.5', participants: '7800' },
 
       // Astrology
       { id: 'birth_chart', module: 'astrology', title: 'Birth Chart Analysis', description: 'Unlock insights from your natal chart and cosmic blueprint', href: '/tests/astrology/birth-chart', duration: '5', questions: 'Birth data', rating: '4.8', participants: '13400', isHot: true },

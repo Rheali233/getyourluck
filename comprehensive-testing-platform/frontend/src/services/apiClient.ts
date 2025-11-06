@@ -12,11 +12,6 @@ class ApiClient {
 
   constructor() {
     this.baseURL = getApiBaseUrl()
-    // 调试信息
-    if (typeof window !== 'undefined') {
-      console.log('API Client initialized with baseURL:', this.baseURL)
-      console.log('Current hostname:', window.location.hostname)
-    }
   }
 
   async request<T>(

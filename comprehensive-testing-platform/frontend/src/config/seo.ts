@@ -3,10 +3,42 @@
  * 统一管理所有页面的SEO元数据
  */
 
+import { getLocationOrigin, getLocationPathname } from '@/utils/browserEnv';
+
+const DEFAULT_SITE_ORIGIN = 'https://selfatlas.net';
+
+const isLocalOrPreviewOrigin = (origin: string): boolean => {
+  return origin.includes('localhost') || origin.includes('pages.dev');
+};
+
+export const getSiteOrigin = (): string => {
+  const origin = getLocationOrigin(DEFAULT_SITE_ORIGIN);
+
+  if (isLocalOrPreviewOrigin(origin)) {
+    return origin;
+  }
+
+  return DEFAULT_SITE_ORIGIN;
+};
+
+export const buildAbsoluteUrl = (path: string): string => {
+  if (!path) {
+    return getSiteOrigin();
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+  return `${getSiteOrigin()}${normalizedPath}`;
+};
+
 export interface SEOConfig {
   title: string;
   description: string;
-  keywords: string[] | string;
+  keywords?: string[] | string;
   canonical?: string;
   ogTitle?: string;
   ogDescription?: string;
@@ -183,16 +215,17 @@ export const RESULT_PAGE_SEO: Record<string, SEOConfig> = {
 
 // 生成结构化数据
 export function generateStructuredData(type: string, data: any): any {
+  const fallbackUrl = data.url || buildAbsoluteUrl(getLocationPathname('/'));
   const baseStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: data.title || BASE_SEO.title,
     description: data.description || BASE_SEO.description,
-    url: data.url || window.location.href,
+    url: fallbackUrl,
     publisher: {
       '@type': 'Organization',
       name: 'Comprehensive Testing Platform',
-      url: 'https://selfatlas.com'
+      url: DEFAULT_SITE_ORIGIN
     }
   };
 

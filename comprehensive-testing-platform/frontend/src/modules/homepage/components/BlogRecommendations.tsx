@@ -150,7 +150,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
     {
       id: 'mbti-guide',
       title: 'Complete Guide to MBTI Personality Test: 16 Personality Types Explained',
-      excerpt: 'Deep dive into the scientific principles of MBTI personality test, explore the characteristics of 16 personality types, helping you better understand yourself and others...',
+      excerpt: 'Deep dive into the MBTI framework, learn the strengths and stress triggers of all 16 personality types, and get coaching prompts for everyday situations.',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk1CVEkgR3VpZGU8L3RleHQ+PC9zdmc+',
       category: 'Psychology',
       readTime: '8 min',
@@ -162,7 +162,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
     {
       id: 'career-planning',
       title: 'How to Find Your Perfect Job Through Career Tests?',
-      excerpt: 'Career planning tests not only help you understand your career inclinations but also provide scientific guidance for your career development...',
+      excerpt: 'Use Holland, DISC, and leadership assessments to uncover your strengths, preferred work environments, and next-step career experiments.',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhcmVlciBQbGFubmluZzwvdGV4dD48L3N2Zz4=',
       category: 'Career Development',
       readTime: '6 min',
@@ -174,7 +174,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
     {
       id: 'relationship-communication',
       title: '5 Psychology Tips to Improve Interpersonal Relationships',
-      excerpt: 'Interpersonal relationships are an important part of life. Master these psychology techniques to make your social interactions smoother...',
+      excerpt: 'Build stronger relationships with five psychology-backed practices that enhance empathy, communication, and conflict resolution.',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlJlbGF0aW9uc2hpcDwvdGV4dD48L3N2Zz4=',
       category: 'Interpersonal',
       readTime: '10 min',
@@ -186,7 +186,7 @@ export const BlogRecommendations: React.FC<BlogRecommendationsProps> = ({
     {
       id: 'stress-management',
       title: 'Modern Stress Management: A Psychological Perspective',
-      excerpt: 'In the fast-paced modern life, stress management is becoming increasingly important. Understand the psychological mechanisms of stress...',
+      excerpt: 'Understand the psychology behind stress, learn grounding techniques you can apply in five minutes, and design a realistic reset routine.',
       coverImage: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlN0cmVzcyBNYW5hZ2VtZW50PC90ZXh0Pjwvc3ZnPg==',
       category: 'Mental Health',
       readTime: '7 min',

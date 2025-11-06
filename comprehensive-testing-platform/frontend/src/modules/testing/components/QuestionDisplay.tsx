@@ -144,19 +144,19 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
     <div className="question-header mb-8">
       <div className="flex items-center justify-between mb-6">
         <span 
-          className={"inline-block px-3 py-1 text-sm font-medium text-sky-600"}
+          className={`inline-block px-3 py-1 text-sm font-medium text-${theme?.primary || 'blue-600'}`}
         >
           Question {questionNumber} of {totalQuestions}
         </span>
       </div>
       <h3 
-        className={"text-xl font-semibold mb-8 leading-relaxed text-sky-900"}
+        className={`text-xl font-semibold mb-8 leading-relaxed text-${theme?.textDark || 'blue-900'}`}
       >
         {question.text}
       </h3>
       {question.description && (
         <p 
-          className={"mt-2 text-sky-800"}
+          className={`mt-2 text-${theme?.textMedium || 'blue-800'}`}
         >
           {question.description}
         </p>

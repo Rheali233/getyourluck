@@ -12,6 +12,7 @@ export { DateInput } from './DateInput';
 export { TimeInput } from './TimeInput';
 export { LocationInput } from './LocationInput';
 export { LoadingSpinner } from './LoadingSpinner';
+export { SuspenseFallback } from './SuspenseFallback';
 export { Select } from './Select';
 export { Input } from './Input';
 

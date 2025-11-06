@@ -16,8 +16,8 @@ import { TarotCardSelector } from './TarotCardSelector';
 import type { DrawnCard } from '../types';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
-import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 export const CardDrawingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,28 +41,41 @@ export const CardDrawingPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
 
-  // 关键词优化
-  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
-    pageType: 'test',
-    testType: 'tarot',
-    customKeywords: ['tarot card reading', 'divination', 'spiritual guidance']
-  });
-
   // SEO配置
+  const canonical = buildAbsoluteUrl(`/tests/tarot/drawing${spreadId ? `?spread=${spreadId}` : ''}`);
   const seoConfig = useSEO({
     testType: 'tarot',
     testId: 'drawing',
-    title: optimizedTitle,
-    description: optimizedDescription,
+    title: 'Free AI-Powered Tarot Card Drawing & Insights | SelfAtlas',
+    description: 'Draw tarot cards and receive free AI-powered interpretations. Choose single, three-card, or Celtic cross spreads for guidance tailored to your question.',
+    keywords: [
+      'tarot card reading',
+      'tarot reading',
+      'draw tarot cards',
+      'tarot spread',
+      'tarot interpretation',
+      'free tarot reading',
+      'tarot card meanings',
+      'ai tarot drawing',
+      'online tarot spreads'
+    ],
+    customConfig: {
+      canonical: canonical,
+      ogTitle: 'Free AI-Powered Tarot Card Drawing & Insights | SelfAtlas',
+      ogDescription: 'Draw tarot cards and receive free AI-powered interpretations. Choose single, three-card, or Celtic cross spreads for guidance tailored to your question.',
+      ogImage: buildAbsoluteUrl('/og-image.jpg'),
+      twitterCard: 'summary_large_image'
+    },
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Service',
       name: 'Tarot Card Reading Service',
       description: 'Interactive tarot card readings with multiple spread options and detailed card interpretations',
+      inLanguage: 'en-US',
       provider: {
         '@type': 'Organization',
-        name: 'Comprehensive Testing Platform',
-        url: 'https://selfatlas.com'
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
       },
       offers: {
         '@type': 'Offer',
@@ -91,7 +104,7 @@ export const CardDrawingPage: React.FC = () => {
       eventType: 'page_view',
       ...base,
       data: { 
-        route: '/tarot/drawing', 
+        route: '/tests/tarot/drawing', 
         pageType: 'test',
         testType: 'tarot_drawing',
         spreadId: spreadId
@@ -155,15 +168,18 @@ export const CardDrawingPage: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-violet-900 mb-3">
             Draw Your Cards
           </h1>
-          <button onClick={() => navigate('/tests/tarot')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-violet-900 font-semibold hover:hover:bg-white/80 transition ml-4">
+          <button
+            onClick={() => navigate('/tests/tarot')}
+            className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-violet-900 font-semibold transition hover:bg-white/80 ml-4"
+          >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Center
+            Back to Tarot Home
           </button>
         </div>
         <p className="text-xl text-violet-800 max-w-4xl">
-          {currentSpread?.name_en} - {currentSpread?.card_count} cards
+          {currentSpread?.name_en} - {currentSpread?.card_count} cards. Select each card slowly and focus on your intention to receive the clearest guidance.
         </p>
       </div>
 
@@ -220,7 +236,7 @@ export const CardDrawingPage: React.FC = () => {
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Analyzing Your Tarot Reading</h3>
             <p className="text-violet-200 mb-4">
-              Please wait while we analyze the cards and generate your personalized tarot reading...
+              Please wait while we analyze the cards and generate your personalized tarot reading. Most readings appear in under 10 seconds.
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm text-violet-300">
               <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce"></div>

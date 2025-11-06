@@ -7,7 +7,6 @@ import React from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { UI_TEXT } from '@/shared/configs/UI_TEXT';
 import { getTestConfigSummary } from '@/shared/configs/testConfigs';
-import { SEOManager } from '@/modules/homepage/components/SEOManager';
 import { SEOHead } from '@/components/SEOHead';
 import { Navigation, Card } from '@/components/ui';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
@@ -15,6 +14,7 @@ import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
 import { cn } from '@/utils/classNames';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 interface TestCenterPageProps extends BaseComponentProps {}
 
@@ -23,7 +23,7 @@ export const TestCenterPage: React.FC<TestCenterPageProps> = ({
   testId = 'test-center-page',
   ...props
 }) => {
-  const canonical = `${typeof window !== 'undefined' ? window.location.origin : ''}/tests`;
+  const canonical = buildAbsoluteUrl('/tests');
   const [active, setActive] = React.useState<string>('all');
   const [query, setQuery] = React.useState<string>('');
   // Advanced filters removed per design – keep only category and search
@@ -40,40 +40,30 @@ export const TestCenterPage: React.FC<TestCenterPageProps> = ({
       <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div>
       <div className="relative z-10">
         <Navigation />
-        <SEOManager
-          pageType="homepage"
-          metadata={{
-            title: 'Test Center | MBTI, Holland, Tarot, BaZi, Name Recommendation',
-            description:
-              'Explore MBTI, Emotional Intelligence, Holland Code, Tarot Reading, BaZi (Four Pillars) Analysis, Chinese Name Recommendation and more. Start your self-discovery journey with fast, English-only tests.',
-            canonicalUrl: canonical,
-          }}
-        />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
           {/* Structured Data: CollectionPage + ItemList */}
           <SEOHead
             config={{
-              title: 'Test Center | MBTI, Holland, Tarot, BaZi, Name Recommendation',
+              title: 'Test Center | Free AI-Powered MBTI, Holland, Tarot & BaZi Tests',
               description:
-                'Explore MBTI, Emotional Intelligence, Holland Code, Tarot Reading, BaZi (Four Pillars) Analysis, Chinese Name Recommendation and more.',
-              keywords: ['MBTI','Holland Code','Tarot','BaZi','Chinese Name','EQ','Psychology Tests','Career Tests','Numerology'],
+                'Explore free & instant AI-powered assessments across psychology, career, tarot, astrology, numerology, relationships, and learning. No account required.',
               canonical: canonical,
-              ogTitle: 'Test Center',
-              ogDescription: 'Find and start popular tests across psychology, career, numerology and tarot.',
+              ogTitle: 'SelfAtlas Test Center',
+              ogDescription: 'Free AI-powered MBTI, Holland, tarot, astrology, numerology, relationship, and learning tests with instant results and no account required.',
               structuredData: {
                 '@context': 'https://schema.org',
                 '@type': 'CollectionPage',
                 name: 'Test Center',
                 description:
-                  'Collection of psychology, career, numerology, and tarot tests including MBTI, EQ, Holland, BaZi, Chinese Name Recommendation, and Tarot Reading.',
+                  'Free AI-powered psychology, career, tarot, astrology, numerology, relationship, and learning tests with instant results and no account required.',
                 hasPart: {
                   '@type': 'ItemList',
                   itemListElement: UI_TEXT.testCenter.tests.map((t, idx) => ({
                     '@type': 'ListItem',
                     position: idx + 1,
                     name: t.title,
-                    url: new URL(t.href, typeof window !== 'undefined' ? window.location.origin : 'https://selfatlas.net').toString(),
+                    url: buildAbsoluteUrl(t.href),
                   })),
                 },
               },
@@ -195,14 +185,14 @@ const TestList: React.FC<{
       const summary = getTestConfigSummary(normalizeId(t.id));
       // 规范路由映射（确保 numerology/name 等正确）
       const routeOverrides: Record<string, string> = {
-        name: '/numerology/name',
-        bazi: '/numerology/bazi',
-        zodiac: '/numerology/zodiac',
-        ziwei: '/numerology/ziwei',
-        holland: '/career/holland',
-        disc: '/career/disc',
-        leadership: '/career/leadership',
-        vark: '/learning/vark',
+        name: '/tests/numerology/name',
+        bazi: '/tests/numerology/bazi',
+        zodiac: '/tests/numerology/zodiac',
+        ziwei: '/tests/numerology/ziwei',
+        holland: '/tests/career/holland',
+        disc: '/tests/career/disc',
+        leadership: '/tests/career/leadership',
+        vark: '/tests/learning/vark',
       };
       // 标题不做覆盖，严格使用 UI_TEXT 中的 title
       const normId = normalizeId(t.id);
@@ -244,60 +234,97 @@ const TestList: React.FC<{
 // 测试卡片组件
 const TestCard: React.FC<{ test: any }> = ({ test }) => {
   const moduleConfig = getModuleConfig(test.module);
-  
+  const descriptionId = React.useId();
+
   return (
-    <Link 
-      to={test.href} 
-      className="block relative overflow-hidden rounded-xl"
+    <Link
+      to={test.href}
+      className="block relative overflow-hidden rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent transition-transform duration-200 hover:-translate-y-1"
+      aria-label={`${UI_TEXT.testCenter.cardText.cta}: ${test.title}`}
+      aria-describedby={descriptionId}
     >
-      <Card className={cn(
-        "relative bg-gradient-to-br from-white/70 via-white/60 to-white/50 backdrop-blur-lg p-6 h-full border-0",
-        "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-white/30 before:to-transparent before:pointer-events-none"
-      )}>
+      <Card
+        className={cn(
+          "relative flex h-full flex-col gap-4 bg-gradient-to-br from-white/70 via-white/60 to-white/50 backdrop-blur-lg p-6 border-0",
+          "before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-white/30 before:to-transparent before:pointer-events-none"
+        )}
+      >
         {/* 热门标识 */}
         {test.isHot && (
-          <div className="absolute top-2 right-2 z-10 select-none pointer-events-none">
-            <div className="origin-top-right rotate-6 bg-gradient-to-r from-fuchsia-500 to-rose-500 text-white text-[10px] font-semibold px-2 py-0.5 tracking-wide uppercase shadow rounded-sm">
+          <div className="absolute top-2 right-2 z-10 select-none">
+            <div
+              className="origin-top-right rotate-6 bg-gradient-to-r from-fuchsia-500 to-rose-500 text-white text-[10px] font-semibold px-2 py-0.5 tracking-wide uppercase shadow rounded-sm"
+              aria-label={UI_TEXT.testCenter.cardText.hotBadge}
+            >
               hot
             </div>
           </div>
         )}
 
-        {/* 类型标签在标题上方 */}
-        <div className="mb-2">
-          <span className={cn(
-            "text-xs px-3 py-1.5 rounded-full font-medium border",
-            moduleConfig.labelBg,
-            moduleConfig.labelText
-          )}>
+        {/* 类型标签与模块图标 */}
+        <div className="flex items-center gap-2">
+          <span aria-hidden="true" className="text-base">
+            {moduleConfig.icon}
+          </span>
+          <span
+            className={cn(
+              "text-xs px-3 py-1.5 rounded-full font-medium border",
+              moduleConfig.labelBg,
+              moduleConfig.labelText
+            )}
+          >
             {labelOfModule(test.module)}
           </span>
         </div>
-        <h3 className="text-lg font-bold text-gray-900 mb-3">
+
+        <h3 className="text-xl font-semibold text-gray-900">
           {test.title}
         </h3>
 
         {/* 描述 - 去掉结尾句号 */}
-        <p className="text-gray-600 text-xs leading-relaxed mb-4">
+        <p
+          id={descriptionId}
+          className="text-gray-600 text-sm leading-relaxed line-clamp-3"
+        >
           {(test.description || '').replace(/\.\s*$/, '')}
         </p>
 
-        {/* 测试信息 - 底部对齐 */}
-        <div className="mt-auto">
-          <div className="flex items-center text-xs text-gray-500 gap-4">
+        <div className="mt-auto flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
             <span className="flex items-center gap-1">
-              <span>⏱️</span>
-              <span>{test.duration || '10-15'} min</span>
+              <span aria-hidden="true">🎯</span>
+              <span>
+                {UI_TEXT.testCenter.cardText.recommendation}: {getRecommendationByModule(test.module)}
+              </span>
             </span>
             <span className="flex items-center gap-1">
-              <span>📝</span>
-              <span>{test.questions || '15-20'}</span>
+              <span aria-hidden="true">⏱️</span>
+              <span>
+                {UI_TEXT.testCenter.cardText.duration}: {test.duration || '10-15'} {UI_TEXT.testCenter.cardText.minutesSuffix}
+              </span>
+            </span>
+            <span className="flex items-center gap-1">
+              <span aria-hidden="true">📝</span>
+              <span>
+                {UI_TEXT.testCenter.cardText.questions}: {test.questions || '15-20'}
+              </span>
             </span>
           </div>
+
+          <span className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-all duration-200 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+            {UI_TEXT.testCenter.cardText.cta}
+            <span aria-hidden="true">→</span>
+          </span>
         </div>
       </Card>
     </Link>
   );
+};
+
+// 模块推荐语
+const getRecommendationByModule = (module: string): string => {
+  const { recommendations } = UI_TEXT.testCenter.cardText;
+  return recommendations[module as keyof typeof recommendations] || recommendations.all;
 };
 
 // 模块配置

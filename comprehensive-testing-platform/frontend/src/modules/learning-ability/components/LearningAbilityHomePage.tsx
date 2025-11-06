@@ -10,11 +10,12 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { LearningTestContainer } from './LearningTestContainer';
+import { ProgressRecoveryPrompt } from './ProgressRecoveryPrompt';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
-import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { buildAbsoluteUrl } from '@/config/seo';
 import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
 
 export interface LearningAbilityHomePageProps extends BaseComponentProps {
@@ -29,28 +30,42 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
 }) => {
   const navigate = useNavigate();
 
-  // 关键词优化
-  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
-    pageType: 'module',
-    moduleType: 'learning',
-    customKeywords: ['learning assessment', 'cognitive test', 'intelligence evaluation']
-  });
+  // 关键词优化（当前未使用，保留以备将来需要）
+  // const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
+  //   pageType: 'module',
+  //   moduleType: 'learning',
+  //   customKeywords: ['learning assessment', 'cognitive test', 'intelligence evaluation']
+  // });
 
   // SEO配置
+  const canonical = buildAbsoluteUrl('/tests/learning');
   const seoConfig = useSEO({
     testType: 'learning',
     testId: 'home',
-    title: optimizedTitle,
-    description: optimizedDescription,
+    title: 'Free Learning Style Test: VARK Assessment | SelfAtlas',
+    description: 'Identify your learning preferences across visual, auditory, reading, and kinesthetic styles. Get personalized strategies to boost academic performance.',
+    keywords: ['learning test', 'learning style test', 'VARK test', 'cognitive assessment', 'learning ability', 'study strategies', 'learning efficiency'],
+    customConfig: {
+      canonical: canonical,
+      ogTitle: 'Free Learning Style Test: VARK Assessment | SelfAtlas',
+      ogDescription: 'Identify your learning preferences across visual, auditory, reading, and kinesthetic styles. Get personalized strategies to boost academic performance.',
+      ogImage: buildAbsoluteUrl('/og-image.jpg'),
+      twitterCard: 'summary_large_image'
+    },
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: 'Learning Ability Tests Collection',
-      description: 'A collection of learning ability tests to help you understand your learning style',
+      name: 'Learning Style Tests',
+      description: 'Identify your learning preferences across visual, auditory, reading, and kinesthetic dimensions. Receive personalized study strategies and learning environment recommendations.',
+      inLanguage: 'en-US',
+      audience: {
+        '@type': 'Audience',
+        audienceType: 'Students and learners'
+      },
       provider: {
         '@type': 'Organization',
-        name: 'Comprehensive Testing Platform',
-        url: 'https://selfatlas.com'
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
       },
       mainEntity: {
         '@type': 'ItemList',
@@ -58,10 +73,8 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
           {
             '@type': 'Test',
             name: 'VARK Learning Style Test',
-            description: 'Discover your preferred learning style - Visual, Auditory, Reading/Writing, or Kinesthetic'
-          },
-          
-          
+            description: 'Identify your learning preferences across visual, auditory, reading, and kinesthetic dimensions. Receive personalized study strategies and learning environment recommendations.'
+          }
         ]
       }
     }
@@ -89,13 +102,15 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
     {
       type: 'vark',
       title: 'VARK Learning Style Test',
-      description: 'Discover your preferred learning style through a comprehensive assessment of visual, auditory, reading/writing, and kinesthetic preferences. Understand how you process information best and get practical study strategies tailored to your cognitive strengths.',
+      description: 'Identify your learning preferences across visual, auditory, reading, and kinesthetic styles. Get personalized study methods and learning environment tips tailored to how you process information best.',
       icon: '🎓',
       color: 'from-cyan-600 to-sky-500',
       bgColor: 'bg-sky-50',
       borderColor: 'border-sky-300',
       basis: 'Learning Psychology',
-      tags: ['Learning Psychology', 'Cognitive Styles', 'Study Strategies', 'Learning Efficiency']
+      tags: ['Learning Psychology', 'Cognitive Styles'],
+      duration: '~10 min',
+      insights: 'AI-guided insights'
     }
   ];
 
@@ -132,7 +147,7 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl md:text-5xl font-bold text-sky-900 mb-3">
-            Learning Ability Assessment Center
+            Identify Your Learning Style
           </h1>
           <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-sky-900 font-semibold hover:hover:bg-white/80 transition ml-4">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,27 +157,56 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
           </button>
         </div>
         <p className="text-xl text-sky-800 max-w-3xl">
-          Professional learning ability assessment tools to help you understand your cognitive strengths and optimize your learning potential
+          Understand how you process information best and receive tailored study methods that match your natural learning preferences.
         </p>
       </div>
+
+      {/* Progress Recovery Prompts */}
+      <div className="mb-6">
+        {testTypes.map((test) => (
+          <ProgressRecoveryPrompt
+            key={test.type}
+            testType={test.type as 'vark'}
+            className="mb-3"
+            onRecover={() => handleTestSelect(test.type as 'vark')}
+          />
+        ))}
+      </div>
+
         {/* Test Type Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-12">
           {testTypes.map((test) => (
-            <Card key={test.type} className="bg-white border border-sky-200 hover:transition-all duration-300 relative h-[360px]">
-              {/* Content Area - Fixed height */}
-              <div className="p-4 text-center h-[260px] flex flex-col justify-start">
+            <Card key={test.type} className="border border-sky-200 hover:transition-all duration-300 relative flex flex-col">
+              {/* Content Area */}
+              <div className="p-4 text-center flex flex-col flex-grow">
                 <div className="text-3xl mb-3">{test.icon}</div>
                 <h3 className="text-base font-bold text-sky-900 mb-3">{test.title}</h3>
                 <p className="text-xs text-sky-800 leading-relaxed mb-4 flex-grow">{test.description}</p>
                 
-                {/* Test Information Tags - Only theoretical basis tags */}
-                <div className="space-y-2 mt-1">
-                  {/* Multiple Tags */}
+                {/* Test Details: Free | Duration | Insights */}
+                <div className="text-xs text-gray-600 mb-3">
+                  <span className="font-semibold text-sky-600">Free</span>
+                  {test.duration && (
+                    <>
+                      <span className="mx-1">|</span>
+                      <span>{test.duration}</span>
+                    </>
+                  )}
+                  {test.insights && (
+                    <>
+                      <span className="mx-1">|</span>
+                      <span>{test.insights}</span>
+                    </>
+                  )}
+                </div>
+                
+                {/* Test Information Tags */}
+                <div className="space-y-2 mt-1 mb-3">
                   <div className="flex flex-wrap gap-1 justify-center">
                     {test.tags.map((tag, index) => (
                       <span 
                         key={index}
-                        className="px-2 py-1 text-xs bg-sky-50 text-sky-700 rounded-full font-semibold border border-sky-200"
+                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full font-medium border border-gray-300"
                       >
                         {tag}
                       </span>
@@ -171,14 +215,26 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
                 </div>
               </div>
 
-              {/* Start Test Button - Absolutely positioned at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
+              {/* Start Free Test Button and Learn more link - Fixed at bottom, centered */}
+              <div className="px-4 pb-3 pt-0 flex flex-col items-center">
                 <Button
                   onClick={() => handleTestSelect(test.type as 'vark')}
-                  className="w-full py-2 text-sm bg-gradient-to-r from-cyan-600 to-sky-500 hover:text-white font-bold rounded-lg transition-all duration-300"
+                  className="w-full py-2 text-sm bg-gradient-to-r from-cyan-600 to-sky-500 hover:from-cyan-700 hover:to-sky-600 text-white font-bold rounded-lg transition-all duration-300 mb-2"
                 >
-                  Start Test
+                  Start Free Test
                 </Button>
+                
+                {/* Learn more link - Centered */}
+                <a 
+                  href={`/tests/learning/${test.type}`}
+                  className="text-xs text-sky-600 hover:text-sky-800 underline"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleTestSelect(test.type as 'vark');
+                  }}
+                >
+                  Learn more →
+                </a>
               </div>
             </Card>
           ))}
@@ -188,14 +244,14 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-sky-900 mb-4">Test Instructions</h2>
           <Card className="p-6 border border-sky-200">
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-8 mb-6">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-cyan-600 to-sky-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">📝</span>
                 </div>
                 <h3 className="text-lg font-bold text-sky-900 mb-3">Honest Answers</h3>
                 <p className="text-sky-800 text-sm">
-                  Choose answers based on your true learning preferences and cognitive abilities. There are no right or wrong answers.
+                  Answer honestly based on your true thoughts and feelings. There are no right or wrong answers - authenticity leads to better insights.
                 </p>
               </div>
               <div className="text-center">
@@ -204,7 +260,7 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
                 </div>
                 <h3 className="text-lg font-bold text-sky-900 mb-3">Time Management</h3>
                 <p className="text-sky-800 text-sm">
-                  You can pause during the test. We recommend completing it in a quiet environment.
+                  You can pause anytime. Most tests take 10-15 minutes. We recommend completing in a quiet environment for best results.
                 </p>
               </div>
               <div className="text-center">
@@ -213,9 +269,15 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
                 </div>
                 <h3 className="text-lg font-bold text-sky-900 mb-3">Privacy Protection</h3>
                 <p className="text-sky-800 text-sm">
-                  All test data is processed anonymously with strict privacy protection.
+                  Your responses are kept confidential. We never sell your data. See our Privacy Policy for details.
                 </p>
               </div>
+            </div>
+            {/* Tip Section */}
+            <div className="mt-6 pt-6 border-t border-sky-200">
+              <p className="text-sm text-gray-600 italic">
+                <span className="font-semibold text-gray-700">Tip:</span> Results are best interpreted over time. Consider retaking after 2–4 weeks to track changes.
+              </p>
             </div>
           </Card>
         </div>
@@ -227,19 +289,24 @@ export const LearningAbilityHomePage: React.FC<LearningAbilityHomePageProps> = (
         />
 
         {/* Important Notice */}
-        <Card className="p-6 border border-sky-200">
+        <Card className="p-6 border-2 border-yellow-200 bg-yellow-50">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <span className="text-2xl">⚠️</span>
             </div>
             <div className="ml-4">
-              <h3 className="text-lg font-bold text-sky-900 mb-2">Important Notice</h3>
-              <p className="text-sky-800 text-sm leading-relaxed">
-                The learning ability tests provided on this platform are for self-understanding and educational development purposes only. 
-                They cannot replace professional educational assessment or psychological evaluation services. 
-                If you're experiencing significant learning challenges, we recommend consulting a qualified educational psychologist or learning specialist. 
-                Remember, learning ability development is a journey, and seeking guidance is a sign of educational maturity.
-              </p>
+              <h3 className="text-lg font-bold text-yellow-900 mb-2">Important Notice</h3>
+              <div className="text-yellow-800 text-sm leading-relaxed space-y-2">
+                <p>
+                  These learning ability tests are for educational purposes and self-reflection only. They are not a professional educational assessment and cannot replace professional educational assessment or psychological evaluation services.
+                </p>
+                <p>
+                  If you're experiencing significant learning challenges or need professional guidance, please seek help from a qualified educational psychologist or learning specialist. Seeking help is a sign of strength, and you are not alone.
+                </p>
+                <p className="font-semibold">
+                  Note: For educational and self-reflection purposes only — not a professional assessment. If you need learning guidance, seek professional help.
+                </p>
+              </div>
             </div>
           </div>
         </Card>

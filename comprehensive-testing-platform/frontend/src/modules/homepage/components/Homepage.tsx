@@ -6,12 +6,15 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
+import type { TestModule } from '@/modules/homepage/types';
+import type { BlogArticle as HomepageBlogArticle } from './BlogRecommendations';
+import type { PopularTest } from './PopularTests';
+import { getLocationHref, getLocationOrigin, resolveAbsoluteUrl } from '@/utils/browserEnv';
 import { cn } from '@/utils/classNames';
 import { Navigation } from '@/components/ui';
 import { Footer } from '@/components/ui';
 import { SEOManager } from './SEOManager';
 import { PerformanceOptimizer } from '@/components/PerformanceOptimizer';
-import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { HeroSection } from './HeroSection';
 import { TestModulesGrid } from './TestModulesGrid';
@@ -35,12 +38,12 @@ export const Homepage: React.FC<HomepageProps> = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const origin = getLocationOrigin();
+  const currentUrl = getLocationHref();
 
-  // 关键词优化
-  const { optimizedTitle, optimizedDescription, baseKeywords } = useKeywordOptimization({
-    pageType: 'homepage',
-    customKeywords: ['online tests', 'personality analysis', 'career guidance', 'astrology reading']
-  });
+  // SEO配置
+  const seoTitle = 'Free AI-Powered Self-Discovery Tests | SelfAtlas';
+  const seoDescription = 'Free & instant AI-powered MBTI, career, tarot, astrology, and numerology tests. No account required. Evidence-based insights. Start your self-discovery today.';
 
   // 处理从导航组件传递的滚动状态
   useEffect(() => {
@@ -77,7 +80,7 @@ export const Homepage: React.FC<HomepageProps> = ({
     }
   };
 
-  const handleModuleClick = (module: any) => {
+  const handleModuleClick = (module: TestModule | PopularTest) => {
     // 记录模块卡片点击事件
     const base = buildBaseContext();
     trackEvent({
@@ -99,7 +102,7 @@ export const Homepage: React.FC<HomepageProps> = ({
     // 模块点击处理
   };
 
-  const handleArticleClick = (article: any) => {
+  const handleArticleClick = (article: HomepageBlogArticle) => {
     // 记录文章点击事件
     const base = buildBaseContext();
     trackEvent({
@@ -108,7 +111,7 @@ export const Homepage: React.FC<HomepageProps> = ({
       data: {
         articleId: article?.id || 'unknown',
         articleTitle: article?.title || 'unknown',
-        articleUrl: article?.url || 'unknown',
+        articleUrl: article?.slug ? `/blog/${article.slug}` : 'unknown',
         location: 'blog_recommendations'
       }
     });
@@ -133,43 +136,56 @@ export const Homepage: React.FC<HomepageProps> = ({
       <SEOManager
         pageType="homepage"
         metadata={{
-          title: optimizedTitle,
-          description: optimizedDescription,
-          keywords: baseKeywords.join(', '),
-          ogTitle: optimizedTitle,
-          ogDescription: optimizedDescription,
-          ogImage: `${window.location.origin}/og-image.jpg`,
+          title: seoTitle,
+          description: seoDescription,
+          ogTitle: seoTitle,
+          ogDescription: seoDescription,
+          ogImage: resolveAbsoluteUrl('/og-image.jpg'),
         }}
         robots="index,follow"
         structuredData={[
           {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            name: 'Comprehensive Testing Platform',
-            description: 'Personality, psychology, career, astrology and more tests',
-            url: window.location.origin
+            name: 'SelfAtlas',
+            description: 'Free AI-powered self-discovery tests including personality, career, astrology, tarot, and numerology analysis',
+            url: origin || '',
+            inLanguage: 'en-US',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: {
+                '@type': 'EntryPoint',
+            urlTemplate: origin ? `${origin}/search?q={search_term_string}` : '/search?q={search_term_string}'
+              },
+              'query-input': 'required name=search_term_string'
+            }
           },
           {
             '@context': 'https://schema.org',
             '@type': 'Organization',
-            name: 'Comprehensive Testing Platform',
-            description: 'A modern online testing platform offering psychology, astrology, tarot and career tests',
-            url: window.location.origin
+            name: 'SelfAtlas',
+            description: 'A modern online testing platform offering free AI-powered psychology, astrology, tarot, numerology, and career tests',
+            url: origin || '',
+            logo: resolveAbsoluteUrl('/logo.png'),
+            sameAs: [
+              resolveAbsoluteUrl('/blog'),
+              resolveAbsoluteUrl('/tests')
+            ]
           },
           {
             '@context': 'https://schema.org',
             '@type': 'ItemList',
             name: 'Test Modules',
             description: 'A curated list of test modules including psychology, astrology, tarot, career and more',
-            url: window.location.href,
+            url: currentUrl,
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Personality & Mind', url: `${window.location.origin}/tests/psychology` },
-              { '@type': 'ListItem', position: 2, name: 'Astrology & Fortune', url: `${window.location.origin}/tests/astrology` },
-              { '@type': 'ListItem', position: 3, name: 'Tarot & Divination', url: `${window.location.origin}/tests/tarot` },
-              { '@type': 'ListItem', position: 4, name: 'Career & Development', url: `${window.location.origin}/tests/career` },
-              { '@type': 'ListItem', position: 5, name: 'Numerology & Destiny', url: `${window.location.origin}/tests/numerology` },
-              { '@type': 'ListItem', position: 6, name: 'Learning & Intelligence', url: `${window.location.origin}/tests/learning` },
-              { '@type': 'ListItem', position: 7, name: 'Relationships & Communication', url: `${window.location.origin}/tests/relationship` }
+              { '@type': 'ListItem', position: 1, name: 'Personality & Mind', url: resolveAbsoluteUrl('/tests/psychology') },
+              { '@type': 'ListItem', position: 2, name: 'Astrology & Fortune', url: resolveAbsoluteUrl('/tests/astrology') },
+              { '@type': 'ListItem', position: 3, name: 'Tarot & Divination', url: resolveAbsoluteUrl('/tests/tarot') },
+              { '@type': 'ListItem', position: 4, name: 'Career & Development', url: resolveAbsoluteUrl('/tests/career') },
+              { '@type': 'ListItem', position: 5, name: 'Numerology & Destiny', url: resolveAbsoluteUrl('/tests/numerology') },
+              { '@type': 'ListItem', position: 6, name: 'Learning & Intelligence', url: resolveAbsoluteUrl('/tests/learning') },
+              { '@type': 'ListItem', position: 7, name: 'Relationships & Communication', url: resolveAbsoluteUrl('/tests/relationship') }
             ]
           },
           // CollectionPage JSON-LD 已添加
@@ -178,16 +194,16 @@ export const Homepage: React.FC<HomepageProps> = ({
             '@type': 'CollectionPage',
             name: 'SelfAtlas Test Center & Modules',
             description: 'Collection of psychology, career, numerology and tarot modules (MBTI, EQ, Holland, BaZi, Chinese Name, Tarot Reading) to start your tests quickly.',
-            url: window.location.origin,
+            url: origin || '',
             hasPart: {
               '@type': 'ItemList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'MBTI Personality Test', url: `${window.location.origin}/psychology/mbti` },
-                { '@type': 'ListItem', position: 2, name: 'Emotional Intelligence Test', url: `${window.location.origin}/psychology/eq` },
-                { '@type': 'ListItem', position: 3, name: 'Holland Code Career Interest Assessment', url: `${window.location.origin}/career` },
-                { '@type': 'ListItem', position: 4, name: 'Tarot Reading', url: `${window.location.origin}/tarot` },
-                { '@type': 'ListItem', position: 5, name: 'BaZi Analysis', url: `${window.location.origin}/numerology/bazi` },
-                { '@type': 'ListItem', position: 6, name: 'Chinese Name Recommendation', url: `${window.location.origin}/numerology/name` }
+                { '@type': 'ListItem', position: 1, name: 'MBTI Personality Test', url: resolveAbsoluteUrl('/tests/psychology/mbti') },
+                { '@type': 'ListItem', position: 2, name: 'Emotional Intelligence Test', url: resolveAbsoluteUrl('/tests/psychology/eq') },
+                { '@type': 'ListItem', position: 3, name: 'Holland Code Career Interest Assessment', url: resolveAbsoluteUrl('/tests/career') },
+                { '@type': 'ListItem', position: 4, name: 'Tarot Reading', url: resolveAbsoluteUrl('/tests/tarot') },
+                { '@type': 'ListItem', position: 5, name: 'BaZi Analysis', url: resolveAbsoluteUrl('/tests/numerology/bazi') },
+                { '@type': 'ListItem', position: 6, name: 'Chinese Name Recommendation', url: resolveAbsoluteUrl('/tests/numerology/name') }
               ]
             }
           },
@@ -197,7 +213,7 @@ export const Homepage: React.FC<HomepageProps> = ({
             '@type': 'FAQPage',
             name: 'Homepage FAQ',
             description: 'Answers to common questions about SelfAtlas tests and features',
-            url: window.location.origin,
+            url: origin || '',
             mainEntity: [
               {
                 '@type': 'Question',

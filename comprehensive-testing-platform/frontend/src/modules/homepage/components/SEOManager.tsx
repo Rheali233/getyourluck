@@ -6,6 +6,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { BaseComponentProps } from '@/types/componentTypes';
+import { buildAbsoluteUrl } from '@/config/seo';
+import { getLocationPathname } from '@/utils/browserEnv';
 
 export interface SEOMetadata {
   title: string;
@@ -35,7 +37,7 @@ export interface StructuredData {
 }
 
 export interface SEOManagerProps extends BaseComponentProps {
-  pageType?: 'homepage' | 'test' | 'blog';
+  pageType?: 'homepage' | 'test' | 'blog' | 'test-center' | 'about';
   structuredData?: StructuredData[];
   // 允许外部覆盖的元数据
   metadata?: Partial<{
@@ -70,8 +72,7 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   const defaultMetadata = useMemo(() => ({
     title: 'Comprehensive Testing Platform - Personality, Psychology & Astrology Tests',
     description: 'Discover yourself with our comprehensive testing platform. Take personality tests, psychological assessments, astrology readings, and more.',
-    keywords: 'personality test, psychology test, astrology, numerology, tarot, self-discovery',
-    canonicalUrl: window.location.href,
+    canonicalUrl: buildAbsoluteUrl(getLocationPathname('/')),
     ogTitle: 'Comprehensive Testing Platform',
     ogDescription: 'Discover yourself with personality, psychology, and astrology tests',
     ogType: 'website',
@@ -108,9 +109,6 @@ export const SEOManager: React.FC<SEOManagerProps> = ({
   const updateMetaTags = () => {
     // 更新description
     updateMetaTag('description', currentMetadata.description);
-    
-    // 更新keywords
-    updateMetaTag('keywords', currentMetadata.keywords);
     
     // 更新canonical URL
     updateCanonicalUrl(currentMetadata.canonicalUrl || defaultMetadata.canonicalUrl);

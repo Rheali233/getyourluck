@@ -65,7 +65,7 @@ export interface SEORecommendation {
  * 生成完整的SEO报告
  */
 export const generateSEOReport = async (
-  siteUrl: string = 'https://selfatlas.com',
+  siteUrl: string = 'https://selfatlas.net',
   content?: string
 ): Promise<SEOReport> => {
   const reportDate = new Date().toISOString();

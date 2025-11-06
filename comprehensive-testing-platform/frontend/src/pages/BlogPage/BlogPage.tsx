@@ -6,7 +6,7 @@
 import React from 'react';
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import type { BaseComponentProps } from '@/types/componentTypes';
-import { Card, ArticleCard, ArticleMeta, LoadingSpinner, ArticleContent, Select, Input, ArticleCardSkeleton, Navigation, Breadcrumb } from '@/components/ui';
+import { Card, ArticleCard, ArticleMeta, LoadingSpinner, ArticleContent, Select, Input, ArticleCardSkeleton, Navigation, Breadcrumb, Pagination } from '@/components/ui';
 import { OptimizedImage } from '@/modules/homepage/components/OptimizedImage';
 import { UI_TEXT } from '@/shared/configs/UI_TEXT';
 import { useBlogStore } from '@/stores/blogStore';
@@ -15,8 +15,29 @@ import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { Link } from 'react-router-dom';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 import { UserBehaviorTracker } from '@/modules/homepage/components/UserBehaviorTracker';
+import { cn } from '@/utils/classNames';
+import type { BlogArticleSummary } from '@/services/blogService';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 interface BlogPageProps extends BaseComponentProps {}
+
+const formatPublishDate = (value?: string): string | undefined => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+};
+
+const formatWordCount = (value?: number): string | undefined => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return undefined;
+  return `${value.toLocaleString()} words`;
+};
 
 export const BlogPage: React.FC<BlogPageProps> = ({
   className,
@@ -81,7 +102,9 @@ const BlogList: React.FC = () => {
     if (trimmed.length === 0) {
       setSuggestions([]);
       if (category) {
-        navigate(`/blog/category/${category}/page/1`);
+      navigate(`/blog/category/${encodeURIComponent(category)}/page/1`);
+    } else if (tag) {
+      navigate(`/blog/tag/${encodeURIComponent(tag)}/page/1`);
       } else {
         navigate('/blog/');
       }
@@ -114,42 +137,48 @@ const BlogList: React.FC = () => {
         }
       })();
     } else {
-      fetchArticles(pageParam, category);
+      fetchArticles(pageParam, category, tag);
     }
-  }, [pageParam, category, keyword, fetchArticles]);
+  }, [pageParam, category, keyword, tag, fetchArticles]);
 
   const canonical = React.useMemo(() => {
-    const base = `${window.location.origin}/blog`;
-    if (category) return `${base}/category/${category}/page/${pageParam}`;
-    if (tag) return `${base}/tag/${tag}/page/${pageParam}`;
-    if (keyword) return `${base}/search/${encodeURIComponent(keyword)}/page/${pageParam}`;
-    if (pageParam && pageParam > 1) return `${base}/page/${pageParam}`;
-    return `${base}/`;
+    if (category) return buildAbsoluteUrl(`/blog/category/${encodeURIComponent(category)}/page/${pageParam}`);
+    if (tag) return buildAbsoluteUrl(`/blog/tag/${encodeURIComponent(tag)}/page/${pageParam}`);
+    if (keyword) return buildAbsoluteUrl(`/blog/search/${encodeURIComponent(keyword)}/page/${pageParam}`);
+    if (pageParam && pageParam > 1) return buildAbsoluteUrl(`/blog/page/${pageParam}`);
+    return buildAbsoluteUrl('/blog/');
   }, [pageParam, category, tag, keyword]);
 
   const links = React.useMemo(() => {
     const defs: Array<{ rel: string; href: string }> = [];
-    const base = `${window.location.origin}/blog`;
     const makeHref = (p: number) => {
-      if (category) return `${base}/category/${category}/page/${p}`;
-      if (tag) return `${base}/tag/${tag}/page/${p}`;
-      if (keyword) return `${base}/search/${encodeURIComponent(keyword)}/page/${p}`;
-      if (p === 1) return `${base}/`;
-      return `${base}/page/${p}`;
+      if (category) return buildAbsoluteUrl(`/blog/category/${encodeURIComponent(category)}/page/${p}`);
+      if (tag) return buildAbsoluteUrl(`/blog/tag/${encodeURIComponent(tag)}/page/${p}`);
+      if (keyword) return buildAbsoluteUrl(`/blog/search/${encodeURIComponent(keyword)}/page/${p}`);
+      if (p === 1) return buildAbsoluteUrl('/blog/');
+      return buildAbsoluteUrl(`/blog/page/${p}`);
     };
     if (pagination.hasPrev) defs.push({ rel: 'prev', href: makeHref(pagination.page - 1) });
     if (pagination.hasNext) defs.push({ rel: 'next', href: makeHref(pagination.page + 1) });
     return defs;
   }, [pagination, category, tag, keyword]);
 
+  const makeListHref = React.useCallback((p: number) => {
+    if (category) return `/blog/category/${encodeURIComponent(category)}/page/${p}`;
+    if (tag) return `/blog/tag/${encodeURIComponent(tag)}/page/${p}`;
+    if (keyword) return `/blog/search/${encodeURIComponent(keyword)}/page/${p}`;
+    if (p === 1) return '/blog/';
+    return `/blog/page/${p}`;
+  }, [category, tag, keyword]);
+
   const structuredData = React.useMemo(() => {
     // 有搜索时：注入 SearchAction
     if (keyword && keyword.trim().length > 0) {
-      const target = `${window.location.origin}/blog/search/{search_term_string}/page/1`;
+      const target = buildAbsoluteUrl('/blog/search/{search_term_string}/page/1');
       return [{
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        url: `${window.location.origin}/blog/`,
+        url: buildAbsoluteUrl('/blog/'),
         potentialAction: {
           '@type': 'SearchAction',
           target,
@@ -164,20 +193,25 @@ const BlogList: React.FC = () => {
         '@type': 'CollectionPage',
         name: 'Blog Articles',
         description: UI_TEXT.blog.list.subtitle,
-        url: `${window.location.origin}/blog/`,
+        url: buildAbsoluteUrl('/blog/'),
         hasPart: {
           '@type': 'ItemList',
           itemListElement: articles.map((a: any, idx: number) => ({
             '@type': 'ListItem',
             position: idx + 1,
             name: a.title,
-            url: `${window.location.origin}/blog/${a.slug || a.id}`
+            url: buildAbsoluteUrl(`/blog/${a.slug}`)
           }))
         }
       }];
     }
     return [] as any[];
   }, [keyword, articles]);
+
+  const metaTitle = React.useMemo(() => {
+    const base = `${UI_TEXT.blog.list.title} | SelfAtlas`;
+    return pageParam > 1 ? `${base} - Page ${pageParam}` : base;
+  }, [pageParam]);
 
   return (
     <div className="min-h-screen relative">
@@ -192,9 +226,13 @@ const BlogList: React.FC = () => {
       <SEOManager
         pageType="blog"
         metadata={{
-          title: `${UI_TEXT.blog.list.title}${pageParam && pageParam > 1 ? ` - Page ${pageParam}` : ''}`,
+          title: metaTitle,
           description: UI_TEXT.blog.list.subtitle,
           canonicalUrl: canonical,
+          ogTitle: metaTitle,
+          ogDescription: UI_TEXT.blog.list.subtitle,
+          twitterTitle: metaTitle,
+          twitterDescription: UI_TEXT.blog.list.subtitle,
         }}
         links={links}
         structuredData={structuredData as any}
@@ -223,7 +261,7 @@ const BlogList: React.FC = () => {
                 if (!value) {
                   navigate('/blog/');
                 } else {
-                  navigate(`/blog/category/${value}/page/1`);
+                  navigate(`/blog/category/${encodeURIComponent(value)}/page/1`);
                 }
               }}
               options={(() => {
@@ -278,7 +316,7 @@ const BlogList: React.FC = () => {
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">{UI_TEXT.blog.list.errorTitle}</h3>
             <p className="text-gray-600 mb-6">{error}</p>
-            <button onClick={() => fetchArticles(pagination.page)} className="btn-primary">{UI_TEXT.blog.list.retry}</button>
+            <button onClick={() => fetchArticles(pagination.page, category, tag)} className="btn-primary">{UI_TEXT.blog.list.retry}</button>
           </div>
         ) : (
           <>
@@ -289,6 +327,7 @@ const BlogList: React.FC = () => {
                 <p className="text-gray-600">{UI_TEXT.blog.list.emptyDesc}</p>
               </div>
             ) : (
+              <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {articles.map((a: any) => (
                   <ArticleCard
@@ -301,10 +340,27 @@ const BlogList: React.FC = () => {
                     readTime={a.readTime}
                     author={a.author}
                     readCount={a.readCount}
-                    onClick={(id) => navigate(`/blog/${a.slug || id}`)}
+                      publishDate={a.publishDate}
+                      tags={a.tags}
+                      wordCount={a.wordCount}
+                      isFeatured={a.isFeatured}
+                      onClick={() => navigate(`/blog/${a.slug}`)}
+                      onCategoryClick={a.category ? () => navigate(`/blog/category/${encodeURIComponent(a.category)}/page/1`) : undefined}
+                      onTagClick={(tagValue) => navigate(`/blog/tag/${encodeURIComponent(tagValue)}/page/1`)}
+                      ctaLabel={UI_TEXT.blog.card.readMore}
                   />
                 ))}
               </div>
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.totalPages}
+                  makeHref={makeListHref}
+                  onNavigate={(nextPage) => navigate(makeListHref(nextPage))}
+                  prevLabel={UI_TEXT.blog.list.paginationPrev}
+                  nextLabel={UI_TEXT.blog.list.paginationNext}
+                  className="mt-10"
+                />
+              </>
             )}
 
           </>
@@ -321,6 +377,87 @@ const BlogArticle: React.FC = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { isLoading, error, currentArticle, fetchArticle } = useBlogStore();
+  type HeadingItem = { id: string; text: string; level: number };
+  const [headings, setHeadings] = React.useState<HeadingItem[]>([]);
+  const [readingProgress, setReadingProgress] = React.useState(0);
+  const [showBackToTop, setShowBackToTop] = React.useState(false);
+  const articleRef = React.useRef<HTMLDivElement | null>(null);
+
+  const handleHeadingsChange = React.useCallback((items: HeadingItem[]) => {
+    setHeadings(items);
+  }, []);
+
+  const scrollToHeading = React.useCallback((id: string) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const offset = 96;
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+  }, []);
+
+  const handleBackToTop = React.useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleCategoryNavigate = React.useCallback((categoryValue: string) => {
+    navigate(`/blog/category/${encodeURIComponent(categoryValue)}/page/1`);
+  }, [navigate]);
+
+  const handleTagNavigate = React.useCallback((tagValue: string) => {
+    navigate(`/blog/tag/${encodeURIComponent(tagValue)}/page/1`);
+  }, [navigate]);
+
+  const handleBackToBlogNavigate = React.useCallback(() => {
+    navigate('/blog/');
+  }, [navigate]);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const container = articleRef.current;
+      if (!container) return;
+
+      const viewportHeight = window.innerHeight || 1;
+      const contentHeight = container.offsetHeight;
+      const contentTop = container.getBoundingClientRect().top + window.scrollY;
+      const currentScroll = window.scrollY;
+      const totalScrollable = Math.max(contentHeight - viewportHeight, 1);
+
+      let progress = 0;
+      if (currentScroll > contentTop) {
+        progress = Math.min((currentScroll - contentTop) / totalScrollable, 1);
+      }
+
+      setReadingProgress(progress);
+      setShowBackToTop(currentScroll > contentTop + 320);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  const formattedPublishDate = React.useMemo(() => formatPublishDate(currentArticle?.publishDate), [currentArticle?.publishDate]);
+  const wordCountLabel = React.useMemo(() => formatWordCount(currentArticle?.wordCount), [currentArticle?.wordCount]);
+  const tagList = React.useMemo(() => {
+    if (!currentArticle || !Array.isArray(currentArticle.tags)) return [] as string[];
+    return currentArticle.tags.filter((tagItem): tagItem is string => Boolean(tagItem));
+  }, [currentArticle]);
+  const hasHeadings = headings.length > 0;
+  const hasTags = tagList.length > 0;
+  const relatedArticles = React.useMemo(() => {
+    if (!currentArticle || !Array.isArray(currentArticle.relatedArticles)) {
+      return [] as Array<Pick<BlogArticleSummary, 'id' | 'slug' | 'title'>>;
+    }
+    return currentArticle.relatedArticles.filter(
+      (item): item is Pick<BlogArticleSummary, 'id' | 'slug' | 'title'> => Boolean(item)
+    );
+  }, [currentArticle]);
+  const hasRelated = relatedArticles.length > 0;
+  const progressPercentage = Math.min(100, Math.max(0, Math.round(readingProgress * 100)));
 
   React.useEffect(() => {
     const slug = params['slug'] as string | undefined;
@@ -372,8 +509,7 @@ const BlogArticle: React.FC = () => {
 
   const canonical = React.useMemo(() => {
     const slug = (params['slug'] as string | undefined) || (currentArticle?.slug as string | undefined);
-    const base = `${window.location.origin}/blog`;
-    return slug ? `${base}/${slug}` : `${base}/`;
+    return slug ? buildAbsoluteUrl(`/blog/${slug}`) : buildAbsoluteUrl('/blog/');
   }, [params['slug'], currentArticle?.slug]);
 
   // JSON-LD 结构化数据
@@ -395,9 +531,9 @@ const BlogArticle: React.FC = () => {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `${window.location.origin}/` },
-        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${window.location.origin}/blog/` },
-        currentArticle.category ? { '@type': 'ListItem', position: 3, name: currentArticle.category, item: `${window.location.origin}/blog/category/${currentArticle.category}` } : undefined,
+        { '@type': 'ListItem', position: 1, name: 'Home', item: buildAbsoluteUrl('/') },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: buildAbsoluteUrl('/blog/') },
+        currentArticle.category ? { '@type': 'ListItem', position: 3, name: currentArticle.category, item: buildAbsoluteUrl(`/blog/category/${currentArticle.category}`) } : undefined,
         { '@type': 'ListItem', position: currentArticle.category ? 4 : 3, name: currentArticle.title, item: canonical },
       ].filter(Boolean),
     } as any;
@@ -429,7 +565,20 @@ const BlogArticle: React.FC = () => {
         robots={error ? 'noindex,nofollow' : 'index,follow'}
         structuredData={structuredData as any}
       />
-      <div className="max-w-4xl mx-auto px-4 pt-16">
+      <div className="fixed top-0 left-0 right-0 z-40">
+        <div className="h-1 bg-white/20">
+          <div
+            className="h-full bg-primary-600 transition-[width] duration-200"
+            style={{ width: `${progressPercentage}%` }}
+            role="progressbar"
+            aria-label={UI_TEXT.blog.detail.readingProgress}
+            aria-valuenow={progressPercentage}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          />
+        </div>
+      </div>
+      <div className="max-w-6xl mx-auto px-4 pb-24 pt-16">
         {isLoading ? (
           <div className="flex justify-center py-16"><LoadingSpinner /></div>
         ) : error ? (
@@ -439,35 +588,71 @@ const BlogArticle: React.FC = () => {
             </div>
           </Card>
         ) : currentArticle ? (
-          <div>
-            {/* Breadcrumbs */}
-            <nav className="mb-2 text-sm text-gray-600" aria-label="Breadcrumb">
+          <>
+            <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-12">
+              <div ref={articleRef}>
+                <nav className="mb-3 text-sm text-gray-600" aria-label="Breadcrumb">
               <ol className="flex items-center gap-1">
                 <li><Link className="hover:underline" to="/">Home</Link></li>
                 <li>/</li>
                 <li><Link className="hover:underline" to="/blog/">Blog</Link></li>
-                {currentArticle.category && (<>
+                    {currentArticle.category && (
+                      <>
                   <li>/</li>
-                  <li><Link className="hover:underline" to={`/blog/category/${currentArticle.category}/page/1`}>{currentArticle.category}</Link></li>
-                </>)}
+                        <li>
+                          <Link
+                            className="hover:underline"
+                            to={`/blog/category/${encodeURIComponent(currentArticle.category)}/page/1`}
+                          >
+                            {currentArticle.category}
+                          </Link>
+                        </li>
+                      </>
+                    )}
               </ol>
             </nav>
-            {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
               {currentArticle.title || UI_TEXT.blog.detail.titleFallback}
             </h1>
             <ArticleMeta
               author={currentArticle.author || ''}
-              publishDate={currentArticle.publishDate || ''}
-              readTime={currentArticle.readTime || ''}
+                  publishDate={formattedPublishDate}
+                  readTime={currentArticle.readTime || undefined}
               views={currentArticle.readCount ?? 0}
-              className="mb-6"
-            />
+                  className="mt-4"
+                />
+                {(wordCountLabel || currentArticle.category) && (
+                  <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                    {wordCountLabel ? <span>{wordCountLabel}</span> : null}
+                    {currentArticle.category ? (
+                      <button
+                        type="button"
+                        className="inline-flex items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                        onClick={() => handleCategoryNavigate(currentArticle.category as string)}
+                      >
+                        {currentArticle.category}
+                      </button>
+                    ) : null}
+                  </div>
+                )}
+                {hasTags ? (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {tagList.map((tagValue) => (
+                      <button
+                        key={tagValue}
+                        type="button"
+                        className="inline-flex items-center rounded-full bg-gray-900/5 px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-900/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                        onClick={() => handleTagNavigate(tagValue)}
+                      >
+                        #{tagValue}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
             {currentArticle.coverImage || currentArticle.ogImage ? (
               <>
-                {/* Preload for LCP image */}
                 <link rel="preload" as="image" href={(currentArticle.coverImage || currentArticle.ogImage) as string} />
-                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-6">
+                    <div className="mt-6 aspect-video overflow-hidden rounded-xl bg-gray-100">
                   <OptimizedImage
                     src={(currentArticle.coverImage || currentArticle.ogImage) as string}
                     alt={currentArticle.title}
@@ -482,24 +667,99 @@ const BlogArticle: React.FC = () => {
                 </div>
               </>
             ) : null}
+                {hasHeadings ? (
+                  <div className="mt-10 lg:hidden">
+                    <details className="rounded-xl border border-white/60 bg-white/80 px-4 py-3 shadow-sm backdrop-blur">
+                      <summary className="cursor-pointer text-sm font-semibold text-gray-700">
+                        {UI_TEXT.blog.detail.tocTitle}
+                      </summary>
+                      <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                        {headings.map((heading) => (
+                          <li key={heading.id}>
+                            <button
+                              type="button"
+                              onClick={() => scrollToHeading(heading.id)}
+                              className={cn(
+                                'w-full text-left transition hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+                                heading.level === 3 ? 'pl-4 text-gray-600' : ''
+                              )}
+                            >
+                              {heading.text}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  </div>
+                ) : null}
             {(currentArticle as any).contentHtml ? (
-              <ArticleContent html={(currentArticle as any).contentHtml} className="mt-2" />
+                  <ArticleContent html={(currentArticle as any).contentHtml} className="mt-8" onHeadingsChange={handleHeadingsChange} />
             ) : currentArticle.content ? (
-              <ArticleContent html={currentArticle.content} className="mt-2" />
+                  <ArticleContent html={currentArticle.content} className="mt-8" onHeadingsChange={handleHeadingsChange} />
             ) : (
-              <div className="prose max-w-none">
-                <p className="text-gray-600">{UI_TEXT.blog.detail.notFoundDesc}</p>
+                  <div className="mt-8 rounded-xl border border-white/60 bg-white/80 p-6 text-gray-600">
+                    {UI_TEXT.blog.detail.notFoundDesc}
+                  </div>
+                )}
               </div>
-            )}
-
-            {/* 文章交互功能 - 暂时隐藏 */}
-            {/* <ArticleInteractions
-              slug={currentArticle.slug || currentArticle.id}
-              likeCount={currentArticle.readCount || 0}
-              commentCount={0} // Comment count will be fetched from API
-              className="mt-8"
-            /> */}
+              <aside className="hidden lg:block">
+                <div className="sticky top-28 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-sm backdrop-blur">
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
+                    {UI_TEXT.blog.detail.tocTitle}
+                  </h2>
+                  {hasHeadings ? (
+                    <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                      {headings.map((heading) => (
+                        <li key={heading.id}>
+                          <button
+                            type="button"
+                            onClick={() => scrollToHeading(heading.id)}
+                            className={cn(
+                              'w-full text-left transition hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+                              heading.level === 3 ? 'pl-4 text-gray-500' : ''
+                            )}
+                          >
+                            {heading.text}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-4 text-sm text-gray-500">{UI_TEXT.blog.detail.tocEmpty}</p>
+                  )}
+                </div>
+              </aside>
+            </div>
+            <section className="mt-16 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-sm backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold text-gray-900">{UI_TEXT.blog.detail.relatedTitle}</h2>
+                <button
+                  type="button"
+                  className="text-sm font-semibold text-primary-700 hover:text-primary-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                  onClick={() => navigate('/blog/')}
+                >
+                  {UI_TEXT.blog.detail.continueExploring}
+                </button>
           </div>
+              {hasRelated ? (
+                <ul className="mt-6 space-y-3">
+                  {relatedArticles.map((item) => (
+                    <li key={item.slug || item.id}>
+                      <button
+                        type="button"
+                        className="w-full text-left text-sm text-gray-700 transition hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                        onClick={() => navigate(`/blog/${encodeURIComponent(item.slug || item.id)}`)}
+                      >
+                        {item.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-gray-600">{UI_TEXT.blog.detail.relatedEmpty}</p>
+              )}
+            </section>
+          </>
         ) : (
           <Card title={UI_TEXT.blog.detail.notFoundTitle} description={UI_TEXT.blog.detail.notFoundDesc}>
             <div className="mt-6 text-center">
@@ -508,6 +768,27 @@ const BlogArticle: React.FC = () => {
           </Card>
         )}
       </div>
+      {showBackToTop && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-stretch gap-3">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-xl border border-primary-600 bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2"
+            onClick={handleBackToBlogNavigate}
+          >
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20">↩</span>
+            {UI_TEXT.blog.detail.backToList}
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/70 bg-white/80 px-4 py-2 text-sm font-semibold text-primary-700 shadow-lg backdrop-blur transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2"
+            onClick={handleBackToTop}
+            aria-label={UI_TEXT.blog.detail.backToTop}
+          >
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-100 text-primary-700">↑</span>
+            {UI_TEXT.blog.detail.backToTop}
+          </button>
+        </div>
+      )}
       </div>
     </div>
   );

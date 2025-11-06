@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import type { SEOConfig } from '../config/seo';
+import { buildAbsoluteUrl, type SEOConfig } from '@/config/seo';
 
 interface SEOHeadProps {
   config: SEOConfig;
@@ -16,7 +16,6 @@ export const SEOHead: React.FC<SEOHeadProps> = ({ config, children }) => {
   const {
     title,
     description,
-    keywords,
     canonical,
     ogTitle,
     ogDescription,
@@ -30,11 +29,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({ config, children }) => {
       {/* 基础SEO标签 */}
       <title>{title}</title>
       <meta name="description" content={description} />
-      <meta
-        name="keywords"
-        content={Array.isArray(keywords) ? keywords.join(', ') : (keywords || '')}
-      />
-      <link rel="canonical" href={canonical} />
+      <link rel="canonical" href={canonical || (typeof window !== 'undefined' ? buildAbsoluteUrl(window.location.pathname) : buildAbsoluteUrl('/'))} />
       
       {/* Open Graph标签 */}
       <meta property="og:title" content={ogTitle || title} />
@@ -79,22 +74,19 @@ export const SEOHead: React.FC<SEOHeadProps> = ({ config, children }) => {
 interface SimpleSEOProps {
   title: string;
   description: string;
-  keywords?: string[];
 }
 
 export const SimpleSEO: React.FC<SimpleSEOProps> = ({ 
   title, 
-  description, 
-  keywords
+  description
 }) => {
   const config: SEOConfig = {
     title,
     description,
-    keywords: keywords || [],
-    canonical: window.location.href,
+    canonical: typeof window !== 'undefined' ? buildAbsoluteUrl(window.location.pathname) : buildAbsoluteUrl('/'),
     ogTitle: title,
     ogDescription: description,
-    ogImage: '/og-image.jpg',
+    ogImage: buildAbsoluteUrl('/og-image.jpg'),
     twitterCard: 'summary_large_image'
   };
 

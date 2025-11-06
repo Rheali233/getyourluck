@@ -48,13 +48,16 @@ export class QuestionService {
         apiPath = `${this.baseUrl}/psychology/questions`;
       }
       
-      // 对于career、learning和relationship模块，需要调用特定的测试类型端点
+      // 对于career、learning、relationship和psychology模块，需要调用特定的测试类型端点
       let fullApiPath = apiPath;
       if (['holland', 'disc', 'leadership'].includes(testType)) {
         fullApiPath = `${apiPath}/${testType}`;
       } else if (['vark'].includes(testType)) {
         fullApiPath = `${apiPath}/${testType}`;
       } else if (['love_language', 'love_style', 'interpersonal'].includes(testType)) {
+        fullApiPath = `${apiPath}/${testType}`;
+      } else if (['mbti', 'phq9', 'eq', 'happiness'].includes(testType)) {
+        // Psychology 模块也使用特定端点，就像 DISC 一样
         fullApiPath = `${apiPath}/${testType}`;
       } else {
         fullApiPath = `${apiPath}?language=${language}`;
@@ -76,15 +79,15 @@ export class QuestionService {
       // 处理不同API返回的数据结构
       let questions = [];
       if (data.success && data.data) {
-        if (['holland', 'disc', 'leadership', 'love_language', 'love_style', 'interpersonal'].includes(testType)) {
-          // career和relationship API的特定端点返回 { success: true, data: [...] }
-          questions = data.data || [];
+        if (['holland', 'disc', 'leadership', 'love_language', 'love_style', 'interpersonal', 'mbti', 'phq9', 'eq', 'happiness'].includes(testType)) {
+          // career、relationship和psychology API的特定端点返回 { success: true, data: [...] }
+          questions = Array.isArray(data.data) ? data.data : [];
         } else if (['vark'].includes(testType)) {
           // learning API的特定端点返回 { success: true, data: { vark: [...] } }
           questions = data.data[testType] || [];
         } else {
-          // psychology API返回 { success: true, data: { phq9: [...], mbti: [...] } }
-          questions = data.data[testType] || [];
+          // 其他情况：可能返回 { success: true, data: { phq9: [...], mbti: [...] } }
+          questions = Array.isArray(data.data) ? data.data : (data.data[testType] || []);
         }
       } else if (data.questions || data.data) {
         // 其他API格式
@@ -209,20 +212,45 @@ export class QuestionService {
     }
 
     return questions.map((question) => {
+      // 确保id字段存在
+      if (!question.id) {
+        return null;
+      }
+      
+      // 确保text字段存在（后端返回text字段）
+      if (!question.text && question.questionText) {
+        question.text = question.questionText;
+      }
+      
       // 转换 type 字段为 format 字段
       if (question.type && !question.format) {
-        question.format = question.type;
+        // 后端返回的type值就是前端format需要的值
+        question.format = question.type as QuestionFormat;
         delete question.type;
       }
       
-      // 确保 options 字段存在
+      // 如果没有format，根据options推断
+      if (!question.format) {
+        if (question.options && question.options.length > 0) {
+          question.format = QuestionFormat.LIKERT_SCALE;
+        } else {
+          question.format = QuestionFormat.SINGLE_CHOICE;
+        }
+      }
+      
+      // 确保options字段存在且为数组
       if (!question.options && question.choices) {
         question.options = question.choices;
         delete question.choices;
       }
       
+      // 确保options是数组
+      if (!Array.isArray(question.options)) {
+        question.options = [];
+      }
+      
       return question;
-    });
+    }).filter((q): q is Question => q !== null);
   }
 
   /**

@@ -20,7 +20,6 @@ export const RecommendationPage: React.FC = () => {
     tarotSpreads,
     spreadsLoaded,
     selectedCategory,
-    questionText,
     error
   } = useTarotStore();
   const { isLoading } = useUnifiedTestStore();
@@ -47,8 +46,8 @@ export const RecommendationPage: React.FC = () => {
     return spread;
   }, [selectedCategory, tarotSpreads]);
 
-  // 判断是否显示推荐牌型（只有选择了问题类型且没有自定义输入时才显示）
-  const shouldShowRecommendation = selectedCategory && !questionText && recommendedSpread;
+  // 判断是否显示推荐牌型（选择了问题类型即可展示推荐）
+  const shouldShowRecommendation = selectedCategory && recommendedSpread;
 
   useEffect(() => {
     if (!spreadsLoaded) {
@@ -57,7 +56,7 @@ export const RecommendationPage: React.FC = () => {
   }, [spreadsLoaded, loadTarotSpreads]);
 
   const handleSpreadSelect = (spreadId: string) => {
-    navigate(`/tarot/drawing?spread=${spreadId}`);
+    navigate(`/tests/tarot/drawing?spread=${spreadId}`);
   };
 
   if (isLoading && !spreadsLoaded) {
@@ -79,18 +78,20 @@ export const RecommendationPage: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-violet-900 mb-3">
             Choose Your Spread
           </h1>
-          <button onClick={() => navigate('/tests/tarot')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-violet-900 font-semibold hover:hover:bg-white/80 transition ml-4">
+          <button
+            onClick={() => navigate('/tests/tarot')}
+            className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-violet-900 font-semibold transition hover:bg-white/80 ml-4"
+          >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Center
+            Back to Tarot Home
           </button>
         </div>
         <p className="text-xl text-violet-800 max-w-3xl">
-          {shouldShowRecommendation 
-            ? `Based on your ${selectedCategory} question, here's our recommendation:` 
-            : 'Select the tarot spread that resonates with your question'
-          }
+          {shouldShowRecommendation
+            ? `Based on your ${selectedCategory} question, here's our recommendation:`
+            : 'Select the tarot spread that resonates with your question or explore every option to compare layouts.'}
         </p>
       </div>
 

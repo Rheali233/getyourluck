@@ -32,43 +32,43 @@ export const PlatformFeatures: React.FC<PlatformFeaturesProps> = ({
     {
       id: 'comprehensive',
       icon: '🌟',
-      title: 'Discover Every Side of You',
-      description: '7 comprehensive test categories with multiple assessments revealing your complete personality, career path, and life purpose',
+      title: 'All-In-One Test Center',
+      description: '7 comprehensive modules covering MBTI, career, astrology, tarot, numerology, learning, and relationships for a 360° self-profile',
       color: 'blue'
     },
     {
       id: 'professional',
       icon: '🔬',
-      title: 'Research-Informed Results',
-      description: 'Built on research-informed models like Big Five and EQ, plus traditional wisdom systems for diverse insights',
+      title: 'Research-Informed Guidance',
+      description: 'Built on Big Five, EQ, Holland, DISC, and traditional wisdom systems so every insight is grounded in proven frameworks',
       color: 'purple'
     },
     {
       id: 'instant',
       icon: '⚡',
-      title: 'Get Answers in Minutes',
-      description: 'Advanced AI instantly analyzes your responses and delivers personalized insights',
+      title: 'Instant AI Insights',
+      description: 'Advanced AI instantly analyzes your responses, highlighting strengths, blind spots, and next-step coaching tips',
       color: 'green'
     },
     {
       id: 'personalized',
       icon: '🎯',
-      title: 'Your Personal Journey',
-      description: 'Track your growth over time with detailed reports and personalized recommendations',
+      title: 'Personalized Action Plans',
+      description: 'Track your growth over time with downloadable reports, habit prompts, and tailored recommendations you can act on right away',
       color: 'yellow'
     },
     {
       id: 'multicultural',
       icon: '🌍',
-      title: 'Ancient Wisdom, Modern Science',
-      description: 'Where Western psychology meets Eastern philosophy for deeper understanding',
+      title: 'East Meets West Perspectives',
+      description: 'Blend Western psychology with Eastern astrology and numerology for deeper, multicultural self-understanding',
       color: 'indigo'
     },
     {
       id: 'accessible',
       icon: '📱',
-      title: 'Test Anytime, Anywhere',
-      description: 'Perfect mobile experience - discover yourself during any moment',
+      title: 'Mobile-Optimized Experience',
+      description: 'Take assessments on any device with auto-saved progress, making self-discovery possible on the go',
       color: 'pink'
     }
   ];
@@ -86,7 +86,7 @@ export const PlatformFeatures: React.FC<PlatformFeaturesProps> = ({
         {/* Title section */}
         <div className="text-center mb-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">
-            Why Choose Us
+            Why Choose SelfAtlas
           </h2>
         </div>
 

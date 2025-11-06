@@ -97,7 +97,7 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
                 </span>
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {result.analysis || 'Analysis not available'}
+                {result.analysis || 'Your detailed analysis will appear here once it is ready.'}
               </p>
             </div>
           </div>
@@ -295,7 +295,7 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
               onClick={onLearn}
               className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 font-medium"
             >
-              Learn More
+              Explore DISC Guidance
             </button>
           )}
         </div>
@@ -303,7 +303,7 @@ export const DISCResultDisplay: React.FC<DISCResultDisplayProps> = ({
         {/* Disclaimer */}
         <div className="text-center text-sm text-gray-500 max-w-4xl mx-auto">
           <p className="leading-relaxed">
-            <strong>Disclaimer:</strong> This DISC assessment is based on William Marston's DISC theory and is for educational and professional development purposes only. It should not replace professional behavioral assessment or workplace training.
+            <strong>Disclaimer:</strong> This DISC assessment supports professional development. Combine these insights with workplace feedback or coaching for the best outcomes.
           </p>
         </div>
         {/* Related content - consistent UI spacing */}

@@ -89,7 +89,7 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
             <div className="space-y-3">
               <h2 className="text-2xl font-bold text-gray-900">Leadership Assessment</h2>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {result.analysis || 'Analysis not available'}
+                {result.analysis || 'Your detailed analysis will appear here once it is ready.'}
               </p>
             </div>
           </div>
@@ -242,7 +242,7 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
               onClick={onDevelop}
               className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium"
             >
-              Develop Leadership
+              Plan Leadership Growth
             </button>
           )}
         </div>
@@ -250,7 +250,7 @@ export const LeadershipResultDisplay: React.FC<LeadershipResultDisplayProps> = (
         {/* Disclaimer */}
         <div className="text-center text-sm text-gray-500 max-w-4xl mx-auto">
           <p className="leading-relaxed">
-            <strong>Disclaimer:</strong> This leadership assessment is based on modern leadership theories and is for educational and professional development purposes only. It should not replace professional leadership training or executive coaching.
+            <strong>Disclaimer:</strong> This leadership assessment draws on modern leadership research and supports professional development. Pair these insights with targeted coaching or feedback for the strongest results.
           </p>
         </div>
         {/* Related content - consistent UI spacing */}

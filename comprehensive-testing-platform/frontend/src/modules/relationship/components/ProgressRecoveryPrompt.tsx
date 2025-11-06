@@ -1,26 +1,42 @@
 /**
- * Progress Recovery Prompt Component for Career Module
- * Displays recovery prompt when user has unfinished career tests
- * Uses green theme to match Career module styling
+ * Progress Recovery Prompt Component for Relationship Module
+ * Displays recovery prompt when user has unfinished relationship tests
+ * Uses pink theme to match Relationship module styling
  */
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { progressManager } from '../services/progressManager';
 import type { BaseComponentProps } from '@/types/componentTypes';
-import { CareerTestTypeEnum, CareerTestType } from '../types';
-import type { TestProgress } from '../services/progressManager';
+import { TestType, RelationshipTestType } from '../types';
+
+// Placeholder type - will be replaced when progressManager is implemented
+interface TestProgress {
+  testType: RelationshipTestType;
+  sessionId: string;
+  isCompleted: boolean;
+  answers: any[];
+  currentQuestionIndex: number;
+  startTime: string;
+  lastUpdateTime: string;
+}
+
+// Note: progressManager would be implemented similar to career/psychology modules
+// For now, using a placeholder that will be implemented later
+const progressManager = {
+  getAllProgress: () => [] as TestProgress[],
+  deleteProgress: (_testType: RelationshipTestType, _sessionId: string) => {}
+};
 
 interface ProgressRecoveryPromptProps extends BaseComponentProps {
-  testType: CareerTestType;
+  testType: RelationshipTestType;
   onRecover?: () => void;
   onDismiss?: () => void;
 }
 
 export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({ 
   className, 
-  testId = 'career-progress-recovery-prompt',
+  testId = 'relationship-progress-recovery-prompt',
   testType,
   onRecover,
   onDismiss,
@@ -52,7 +68,7 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
       }
     } catch (error) {
       // Error handling would be implemented here
-      }
+    }
   };
 
   const handleRecover = () => {
@@ -80,11 +96,11 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
     return null;
   }
 
-  const getTestTypeName = (type: CareerTestType): string => {
+  const getTestTypeName = (type: RelationshipTestType): string => {
     const names = {
-      [CareerTestTypeEnum.HOLLAND]: 'Holland Career Interest Test',
-      [CareerTestTypeEnum.DISC]: 'DISC Behavioral Style Assessment',
-      [CareerTestTypeEnum.LEADERSHIP]: 'Leadership Assessment'
+      [TestType.LOVE_LANGUAGE]: 'Love Language Test',
+      [TestType.LOVE_STYLE]: 'Love Style Assessment',
+      [TestType.INTERPERSONAL]: 'Interpersonal Skills Test'
     };
     return names[type as keyof typeof names] || type;
   };
@@ -99,52 +115,52 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
         minute: '2-digit'
       });
     } catch {
-      return 'Time unavailable';
+      return 'Unknown time';
     }
   };
 
   return (
-    <Card className={`p-4 bg-green-50 border-emerald-200 ${className}`} data-testid={testId} {...props}>
+    <Card className={`p-4 bg-pink-50 border-pink-200 ${className}`} data-testid={testId} {...props}>
       <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm">💼</span>
+          <div className="w-8 h-8 bg-gradient-to-r from-pink-600 to-rose-500 rounded-full flex items-center justify-center">
+            <span className="text-white text-sm">💝</span>
           </div>
         </div>
         
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-green-800 mb-1">
-            Pick up where you left off?
+          <h3 className="text-sm font-medium text-pink-800 mb-1">
+            Unfinished Relationship Test Progress Found
           </h3>
           
-          <div className="text-xs text-green-700 space-y-1 mb-3">
-            <div>Assessment: {getTestTypeName(testType)}</div>
-            <div>Answered so far: {progress.answers.length}</div>
-            <div>Next question: {progress.currentQuestionIndex + 1}</div>
-            <div>Started: {formatTime(progress.startTime)}</div>
-            <div>Last saved: {formatTime(progress.lastUpdateTime)}</div>
+          <div className="text-xs text-pink-700 space-y-1 mb-3">
+            <div>Test Type: {getTestTypeName(testType)}</div>
+            <div>Questions Answered: {progress.answers.length}</div>
+            <div>Current Progress: {progress.currentQuestionIndex + 1} / {progress.currentQuestionIndex + progress.answers.length + 1}</div>
+            <div>Start Time: {formatTime(progress.startTime)}</div>
+            <div>Last Updated: {formatTime(progress.lastUpdateTime)}</div>
           </div>
           
           <div className="flex space-x-2">
             <Button
               onClick={handleRecover}
-              className="px-3 py-1 text-xs bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white"
+              className="px-3 py-1 text-xs bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-700 hover:to-rose-600 text-white"
             >
-              Continue Test
+              Restore Progress
             </Button>
             
             <Button
               onClick={handleDelete}
               className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white"
             >
-              Clear Progress
+              Delete Progress
             </Button>
             
             <Button
               onClick={handleDismiss}
               className="px-3 py-1 text-xs bg-gray-500 hover:bg-gray-600 text-white"
             >
-              Maybe Later
+              Dismiss
             </Button>
           </div>
         </div>

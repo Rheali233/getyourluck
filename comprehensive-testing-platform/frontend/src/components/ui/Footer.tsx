@@ -105,8 +105,8 @@ export const Footer: React.FC<FooterProps> = ({
                 <span className="text-xl font-bold">SelfAtlas</span>
               </div>
               <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                Professional online testing platform providing psychological tests, astrological analysis, tarot reading and various testing services.
-                Help you better understand yourself, discover potential, and plan for the future through scientific methods.
+                SelfAtlas is your AI-powered test center for psychology, career, astrology, tarot, numerology, learning, and relationship assessments.
+                Discover data-backed insights, explore traditional wisdom, and plan your next steps with confidence.
               </p>
               
               {showSocialMedia && (

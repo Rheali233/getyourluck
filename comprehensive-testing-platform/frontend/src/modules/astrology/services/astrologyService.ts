@@ -33,7 +33,7 @@ export const astrologyService = {
       timeframe,
       ...(date && { date })
     });
-    return apiClient.get(`/api/astrology/fortune/${sign}?${params}`);
+    return apiClient.get(`/astrology/fortune/${sign}?${params}`);
   },
 
   // 获取星座配对分析

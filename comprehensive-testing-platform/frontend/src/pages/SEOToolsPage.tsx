@@ -12,6 +12,8 @@ import { generateRobotsTxt } from '@/utils/robotsGenerator';
 import { generateCompleteSearchConsoleCode } from '@/utils/googleSearchConsole';
 import type { SEOReport } from '@/utils/seoReportGenerator';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { SEOHead } from '@/components/SEOHead';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 export const SEOToolsPage: React.FC = () => {
   const [seoReport, setSeoReport] = useState<SEOReport | null>(null);
@@ -115,7 +117,7 @@ export const SEOToolsPage: React.FC = () => {
 
   const handleGenerateSearchConsoleCode = () => {
     const code = generateCompleteSearchConsoleCode({
-      siteUrl: 'https://selfatlas.com',
+      siteUrl: 'https://selfatlas.net',
       enableIndexing: true,
       enablePerformanceTracking: true
     });
@@ -126,6 +128,16 @@ export const SEOToolsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <SEOHead
+        config={{
+          title: 'SEO Tools & Monitoring | SelfAtlas',
+          description: 'Access internal SEO dashboards, generators, and monitoring utilities to keep SelfAtlas optimized.',
+          canonical: buildAbsoluteUrl('/seo-tools'),
+          ogTitle: 'SEO Tools & Monitoring | SelfAtlas',
+          ogDescription: 'Access internal SEO dashboards, generators, and monitoring utilities to keep SelfAtlas optimized.',
+          ogImage: buildAbsoluteUrl('/og-image.jpg')
+        }}
+      />
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">SEO Tools & Analytics</h1>

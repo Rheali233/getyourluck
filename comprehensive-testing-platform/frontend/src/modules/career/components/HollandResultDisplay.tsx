@@ -98,7 +98,7 @@ export const HollandResultDisplay: React.FC<HollandResultDisplayProps> = ({
                 )}
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {result.analysis || 'Analysis not available'}
+                {result.analysis || 'Your detailed analysis will appear here once it is ready.'}
               </p>
             </div>
           </div>
@@ -293,7 +293,7 @@ export const HollandResultDisplay: React.FC<HollandResultDisplayProps> = ({
               onClick={onExplore}
               className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 font-medium"
             >
-              Explore Careers
+              Explore Career Matches
             </button>
           )}
         </div>
@@ -301,7 +301,7 @@ export const HollandResultDisplay: React.FC<HollandResultDisplayProps> = ({
         {/* Disclaimer */}
         <div className="text-center text-sm text-gray-500 max-w-4xl mx-auto">
           <p className="leading-relaxed">
-            <strong>Disclaimer:</strong> This Holland Code assessment is based on John Holland's RIASEC theory and is for educational and career guidance purposes only. It should not replace professional career counseling or job placement services.
+            <strong>Disclaimer:</strong> This Holland Code assessment supports career exploration. Combine these insights with conversations, research, and professional guidance as needed.
           </p>
         </div>
         {/* Related content - consistent UI spacing */}

@@ -37,61 +37,61 @@ export const FAQ: React.FC<FAQProps> = ({
     {
       id: '1',
       question: 'What makes SelfAtlas different from other testing platforms?',
-      answer: 'SelfAtlas uniquely combines Western psychology (MBTI, Big Five) with Eastern wisdom (Astrology, Tarot, Numerology). Our 7 comprehensive test categories provide multiple perspectives on your personality, career, and relationships - giving you a complete self-discovery experience.',
+      answer: 'SelfAtlas is a 360° self-discovery platform that unites Western psychology (MBTI, Big Five) with Eastern wisdom (Astrology, Tarot, Numerology). Our 7 comprehensive modules offer multiple angles on your personality, career, relationships, and life path for a complete journey.',
       category: 'Unique Features'
     },
     {
       id: '2',
       question: 'How accurate are the test results?',
-      answer: 'Our psychology tests are based on scientifically validated theories like MBTI and Big Five personality models. Traditional modules follow established wisdom systems. Our AI analysis provides personalized insights that go beyond generic results, helping you understand yourself better.',
+      answer: 'Expect research-informed accuracy backed by validated models. Our psychology tests build on MBTI and Big Five theories, while traditional modules follow established wisdom systems. AI-powered analysis personalizes every insight beyond generic summaries.',
       category: 'Accuracy'
     },
     {
       id: '3',
       question: 'How long do the tests take?',
-      answer: 'Most tests take 5-15 minutes! Psychology tests are typically 10-15 minutes, while traditional modules like Astrology or Tarot take 5-10 minutes. Each test shows the exact time estimate, and you can take breaks anytime.',
+      answer: 'Most free AI-powered tests take 5–15 minutes. Psychology assessments usually need 10–15 minutes, while Astrology or Tarot journeys take 5–10 minutes. Time estimates appear before you start, and you can pause or resume anytime.',
       category: 'Duration'
     },
     {
       id: '4',
       question: 'Is my personal information safe?',
-      answer: 'Yes! We prioritize your privacy and data security. While we may require basic account information for future features, your test responses and results are always kept confidential. We use industry-standard security measures to protect your data.',
+      answer: 'Your personal information stays private. We use industry-standard security controls, and your test responses plus results remain confidential. Future account features will still honour strict privacy policies and optional consent.',
       category: 'Privacy'
     },
     {
       id: '5',
       question: 'Can these tests help with career decisions?',
-      answer: 'Absolutely! Our Career module combines Holland\'s RIASEC theory with DISC leadership styles and learning preferences. You\'ll get specific job recommendations, leadership insights, and career development paths tailored to your personality and skills.',
+      answer: 'Yes—our career assessments translate insights into job actions. The Career module blends Holland RIASEC, DISC leadership styles, and learning preferences to surface role matches, leadership strengths, and next-step career plans.',
       category: 'Career'
     },
     {
       id: '6',
       question: 'What\'s the difference between Psychology and Traditional modules?',
-      answer: 'Psychology modules use Western scientific methods for personality and learning analysis. Traditional modules draw from ancient wisdom systems like astrology and numerology. Both approaches are valuable - explore what resonates with you!',
+      answer: 'Psychology modules deliver data-driven assessments rooted in Western science, such as MBTI, EQ, and VARK. Traditional modules draw from astrology, tarot, and numerology to provide reflective guidance. Both perspectives complement each other.',
       category: 'Modules'
     },
     {
       id: '7',
       question: 'Do I need special knowledge for Astrology or Numerology?',
-      answer: 'Not at all! Our modules are designed for everyone. We explain everything in simple terms and focus on practical insights you can use in your daily life. You\'ll discover fascinating aspects of yourself without needing any special background.',
+      answer: 'No prior knowledge is required. Every astrology, tarot, and numerology journey includes plain-language explanations plus practical takeaways you can apply immediately.',
       category: 'Cultural'
     },
     {
       id: '8',
       question: 'How do I understand all these different results?',
-      answer: 'Each module gives you a different perspective on yourself. Look for patterns and themes across your results - they often reinforce each other. Our AI analysis highlights connections between different test results, helping you see the bigger picture.',
+      answer: 'Look for repeating themes across modules to connect the dots. Each assessment reveals a different perspective, and AI summaries highlight how psychology, career, and traditional insights reinforce each other.',
       category: 'Integration'
     },
     {
       id: '9',
       question: 'Are the Tarot readings mystical or just for fun?',
-      answer: 'Our Tarot module combines traditional card meanings with modern psychological insights. Whether you see it as mystical guidance or a tool for self-reflection, the cards often reveal surprising truths about your current situation and future possibilities.',
+      answer: 'Tarot readings blend traditional card symbolism with reflective psychology prompts. Use them as mystical guidance or mindful self-reflection—the spreads surface patterns that relate to real-life decisions.',
       category: 'Tarot'
     },
     {
       id: '10',
       question: 'Can I use SelfAtlas on my phone?',
-      answer: 'Yes! SelfAtlas is fully mobile-optimized. You can take tests during your commute, coffee breaks, or anywhere you have a few minutes. The interface adapts perfectly to your phone screen, making self-discovery convenient and accessible.',
+      answer: 'Yes, SelfAtlas is fully mobile-optimized. Start or continue tests on your phone, tablet, or desktop with auto-saved progress so self-discovery fits into any moment.',
       category: 'Mobile'
     }
   ];

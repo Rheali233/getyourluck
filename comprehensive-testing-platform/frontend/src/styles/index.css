@@ -66,6 +66,47 @@
   .input {
     @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-smooth;
   }
+
+  /* 博客 CTA 按钮组 */
+  .blog-cta-group {
+    @apply mt-8 flex flex-wrap gap-3;
+  }
+
+  .blog-cta-group .blog-cta {
+    @apply inline-flex items-center rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2;
+  }
+}
+
+/* 针对博客正文（prose）中 CTA 的兜底样式，确保按钮外观 */
+.prose .blog-cta-group {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.prose .blog-cta-group .blog-cta {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: #fff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  box-shadow: 0 10px 30px -12px rgba(79, 70, 229, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.prose .blog-cta-group .blog-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 34px -16px rgba(79, 70, 229, 1);
+}
+
+.prose .blog-cta-group .blog-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.45), 0 0 0 6px rgba(255, 255, 255, 0.85);
 }
 
 /* 工具类 */

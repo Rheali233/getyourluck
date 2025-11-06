@@ -32,6 +32,7 @@ import { SEOToolsPage } from '@/pages/SEOToolsPage';
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { DefaultScrollRestoration } from '@/components/ScrollRestoration';
 import { CookiesBanner } from '@/modules/homepage/components/CookiesBanner';
+import { SuspenseFallback } from '@/components/ui/SuspenseFallback';
 
 function App() {
   return (
@@ -46,7 +47,14 @@ function App() {
         <Route
           path="/about"
           element={
-            <React.Suspense fallback={<div className="min-h-screen relative"><div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div></div>}>
+            <React.Suspense
+              fallback={
+                <SuspenseFallback
+                  message="Loading About page…"
+                  description="We are preparing the about content."
+                />
+              }
+            >
               <LazyAboutPage />
             </React.Suspense>
           }
@@ -58,7 +66,14 @@ function App() {
         <Route
           path="/terms"
           element={
-            <React.Suspense fallback={<div className="min-h-screen relative"><div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div></div>}>
+            <React.Suspense
+              fallback={
+                <SuspenseFallback
+                  message="Loading Terms of Service…"
+                  description="The legal content is loading."
+                />
+              }
+            >
               {React.createElement(React.lazy(() => import('@/pages/Legal/TermsPage')))}
             </React.Suspense>
           }
@@ -66,7 +81,14 @@ function App() {
         <Route
           path="/privacy"
           element={
-            <React.Suspense fallback={<div className="min-h-screen relative"><div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div></div>}>
+            <React.Suspense
+              fallback={
+                <SuspenseFallback
+                  message="Loading Privacy Policy…"
+                  description="The privacy details are being fetched."
+                />
+              }
+            >
               {React.createElement(React.lazy(() => import('@/pages/Legal/PrivacyPage')))}
             </React.Suspense>
           }
@@ -74,7 +96,14 @@ function App() {
         <Route
           path="/cookies"
           element={
-            <React.Suspense fallback={<div className="min-h-screen relative"><div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div></div>}>
+            <React.Suspense
+              fallback={
+                <SuspenseFallback
+                  message="Loading Cookies Policy…"
+                  description="The cookies policy is loading."
+                />
+              }
+            >
               {React.createElement(React.lazy(() => import('@/pages/Legal/CookiesPage')))}
             </React.Suspense>
           }
@@ -83,7 +112,14 @@ function App() {
         <Route
           path="/tests"
           element={
-            <React.Suspense fallback={<div className="min-h-screen relative"><div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div></div>}>
+            <React.Suspense
+              fallback={
+                <SuspenseFallback
+                  message="Loading Test Center…"
+                  description="We are gathering the available tests for you."
+                />
+              }
+            >
               <LazyTestCenterPage />
             </React.Suspense>
           }

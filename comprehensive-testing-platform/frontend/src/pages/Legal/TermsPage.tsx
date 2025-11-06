@@ -2,14 +2,15 @@ import React from 'react';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { UI_TEXT } from '@/shared/configs/UI_TEXT';
 import { Navigation, Breadcrumb } from '@/components/ui';
-import { SEOManager } from '@/modules/homepage/components/SEOManager';
+import { SEOHead } from '@/components/SEOHead';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 interface TermsPageProps extends BaseComponentProps {}
 
 export const TermsPage: React.FC<TermsPageProps> = ({ className, testId = 'terms-page', ...props }) => {
-  const canonical = `${typeof window !== 'undefined' ? window.location.origin : ''}/terms`;
+  const canonical = buildAbsoluteUrl('/terms');
   const T = UI_TEXT.legal.terms;
 
   // 确保页面滚动到顶部
@@ -23,7 +24,16 @@ export const TermsPage: React.FC<TermsPageProps> = ({ className, testId = 'terms
       <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-purple-300 to-indigo-400"></div>
       <div className="relative z-10">
         <Navigation />
-        <SEOManager pageType="homepage" metadata={{ title: T.title, description: T.intro, canonicalUrl: canonical }} />
+        <SEOHead
+          config={{
+            title: `${T.title} | SelfAtlas`,
+            description: T.intro,
+            canonical,
+            ogTitle: T.title,
+            ogDescription: T.intro,
+            ogImage: buildAbsoluteUrl('/og-image.jpg')
+          }}
+        />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
           {/* 面包屑导航 */}
           <Breadcrumb items={getBreadcrumbConfig('/terms')} />

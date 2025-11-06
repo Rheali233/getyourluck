@@ -24,8 +24,8 @@ export const ModuleNavigation: React.FC<ModuleNavigationProps> = ({
   const location = useLocation();
 
   const isActiveRoute = (path: string) => {
-    if (path === '/learning') {
-      return location.pathname === '/learning';
+    if (path === '/tests/learning') {
+      return location.pathname === '/tests/learning';
     }
     return location.pathname.startsWith(path);
   };

@@ -25,9 +25,9 @@ export const LearningAbilityRoutes: React.FC = () => {
 
 // Route constants for easy reference
 export const LEARNING_ROUTES = {
-  HOME: '/learning',
-  VARK: '/learning/vark',
-  // COGNITIVE: '/learning/cognitive',
+  HOME: '/tests/learning',
+  VARK: '/tests/learning/vark',
+  // COGNITIVE: '/tests/learning/cognitive',
 } as const;
 
 // Navigation items for the module

@@ -3,7 +3,7 @@
  * 捕获和处理组件错误
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  public override componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {
+  public override componentDidCatch() {
     // Error boundary implementation
   }
 

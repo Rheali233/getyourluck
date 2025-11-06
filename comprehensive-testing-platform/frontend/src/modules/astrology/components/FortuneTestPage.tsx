@@ -14,8 +14,8 @@ import { cn } from '@/utils/classNames';
 import { AstrologyTestContainer } from './AstrologyTestContainer';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
-import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 export interface FortuneTestPageProps extends BaseComponentProps {}
 
@@ -41,28 +41,32 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // 关键词优化
-  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
-    pageType: 'test',
-    testType: 'fortune',
-    customKeywords: ['horoscope reading', 'zodiac fortune', 'astrological guidance']
-  });
-
   // SEO配置
+  const canonical = buildAbsoluteUrl('/tests/astrology/fortune');
   const seoConfig = useSEO({
     testType: 'astrology',
     testId: 'fortune',
-    title: optimizedTitle,
-    description: optimizedDescription,
+    title: 'Free Daily Horoscope for All Zodiac Signs | AI Fortune Insights',
+    description: 'Instant AI horoscope readings across daily, weekly, and monthly vibes. Pick your sign for mood notes, focus cues, and action prompts—free and signup-free.',
+    keywords: [],
+    customConfig: {
+      canonical: canonical,
+      ogTitle: 'Free Daily Horoscope for All Zodiac Signs | AI Fortune Insights',
+      ogDescription: 'Instant AI horoscope readings across daily, weekly, and monthly vibes. Pick your sign for mood notes, focus cues, and action prompts—free and signup-free.',
+      ogImage: buildAbsoluteUrl('/og-image.jpg'),
+      twitterCard: 'summary_large_image'
+    },
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'Service',
-      name: 'Zodiac Fortune Forecast Service',
-      description: 'Personalized horoscope readings for all zodiac signs with daily, weekly, and monthly fortune predictions',
+      name: 'AI Horoscope Fortune Service',
+      description: 'Free AI horoscope readings offering daily, weekly, monthly, and yearly guidance with personalized insights.',
+      url: canonical,
+      inLanguage: 'en-US',
       provider: {
         '@type': 'Organization',
-        name: 'Comprehensive Testing Platform',
-        url: 'https://selfatlas.com'
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
       },
       offers: {
         '@type': 'Offer',
@@ -124,10 +128,10 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
   }, [isLoading, showResults, error]);
 
   const timeframes = [
-    { id: 'daily', name: 'Daily Fortune', description: 'Today\'s horoscope and guidance' },
-    { id: 'weekly', name: 'Weekly Fortune', description: 'This week\'s trends and opportunities' },
-    { id: 'monthly', name: 'Monthly Fortune', description: 'This month\'s overview and planning' },
-    { id: 'yearly', name: 'Yearly Fortune', description: 'This year\'s major themes and opportunities' }
+    { id: 'daily', name: "Today's Vibe", description: 'Quick boost tailored to your current mood' },
+    { id: 'weekly', name: 'Weekly Flow', description: 'Key themes to guide your next seven days' },
+    { id: 'monthly', name: 'Monthly Outlook', description: 'Momentum shifts and opportunities to track' },
+    { id: 'yearly', name: 'Yearly Horizon', description: 'Major storylines unfolding across the year' }
   ];
 
   const handleSubmit = async () => {
@@ -188,18 +192,21 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
           {/* Main Title and Description + Home button at top-right */}
           <div className="mb-16">
           <div className="flex items-center justify-between">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Zodiac Fortune Forecast
-          </h1>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+              Horoscope Boost Summary
+            </h1>
+            <p className="text-base text-gray-200">AI-personalized guidance with mood notes, focus cues, and one clear action.</p>
+          </div>
             <button onClick={() => navigate('/tests/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Center
+              Back to Astrology Hub
             </button>
           </div>
           <p className="text-xl text-gray-200 max-w-4xl">
-            {ZODIAC_SIGNS.find(s => s.id === fortuneReading.zodiacSign)?.name_en} Fortune for {
+            {ZODIAC_SIGNS.find(s => s.id === fortuneReading.zodiacSign)?.name_en} guidance for {
               (() => {
                 const today = new Date().toISOString().split('T')[0] as string;
                 let dateToUse: string = today;
@@ -248,46 +255,30 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
           </p>
         </div>
 
-        {/* 模块1: Overall Analysis */}
+        {/* 模块1: Cosmic Snapshot */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Overall Analysis</h2>
-          
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">
-                {ZODIAC_SIGNS.find(s => s.id === fortuneReading.zodiacSign)?.name_en} Fortune
-              </h3>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                {fortuneReading.overall.description}
-              </p>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Cosmic Snapshot</h2>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            {fortuneReading.overall.description}
+          </p>
         </Card>
 
-        {/* 模块2: Core Life Areas */}
+        {/* 模块2: Key Themes */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Core Life Areas</h2>
-          
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Key Themes</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Love */}
             <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-3">💕 Love & Relationships</h3>
               <p className="text-gray-700 leading-relaxed">{fortuneReading.love.description}</p>
             </div>
-
-            {/* Career */}
             <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-3">💼 Career & Work</h3>
               <p className="text-gray-700 leading-relaxed">{fortuneReading.career.description}</p>
             </div>
-
-            {/* Wealth */}
             <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-3">💰 Wealth & Finance</h3>
               <p className="text-gray-700 leading-relaxed">{fortuneReading.wealth.description}</p>
             </div>
-
-            {/* Health (optional) */}
             {fortuneReading.health && (
               <div className="bg-[#5F0F40]/10 rounded-lg border border-[#5F0F40]/30 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-3">🏥 Health & Wellness</h3>
@@ -297,24 +288,17 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
           </div>
         </Card>
 
-        {/* 模块3: Personal Guidance */}
+        {/* 模块3: Action Prompt */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Personal Guidance</h2>
-          
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Astrological Advice</h3>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                {fortuneReading.advice}
-              </p>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Action Prompt</h2>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            {fortuneReading.advice}
+          </p>
         </Card>
 
-        {/* 模块4: Lucky Elements */}
-        <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Lucky Elements</h2>
-          
+        {/* 模块4: Lucky Extras */}
+        <Card className="bg-white p-8 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Lucky Extras</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Lucky Colors */}
             <div>
@@ -353,6 +337,9 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
             </div>
           </div>
         </Card>
+        <div className="text-center text-sm text-gray-600">
+          Share Hint: Copy the insight that resonates most and send it to anyone who could use a cosmic boost.
+        </div>
         </div>
         <FeedbackFloatingWidget
           containerSelector="#mainContent"
@@ -374,19 +361,20 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
       {/* Main Title and Description + Home button at top-right */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Zodiac Fortune Forecast
-          </h1>
-          <button onClick={() => navigate('/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+              Daily, Weekly & Monthly Horoscope Boost
+            </h1>
+            <p className="text-base text-gray-200">Pick your zodiac sign and timeframe for instant AI horoscope guidance.</p>
+            <p className="text-sm text-gray-300">Free experience • No signup • Ready to share</p>
+          </div>
+          <button onClick={() => navigate('/tests/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Center
+            Back to Astrology Hub
           </button>
         </div>
-        <p className="text-xl text-gray-200 max-w-3xl">
-          Discover your cosmic guidance and unlock the secrets of the stars
-        </p>
       </div>
 
       {/* 错误提示 */}
@@ -403,7 +391,10 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
       <div className="space-y-6">
         {/* 选择时间范围 */}
         <Card className="bg-white p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Time Period</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Select Timeframe</h3>
+            <span className="text-sm text-gray-500">Choose the vibe you want insight on first.</span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {timeframes.map((timeframe) => (
               <button
@@ -431,7 +422,10 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
 
         {/* 选择星座 */}
         <Card className="bg-white p-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Your Zodiac Sign</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Select Your Zodiac Sign</h3>
+            <span className="text-sm text-gray-500">Tap the sign that represents you today.</span>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {ZODIAC_SIGNS.map((sign) => (
               <button
@@ -494,7 +488,7 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
                 Generating Reading...
               </div>
             ) : (
-              'Get My Fortune'
+              'Reveal My Horoscope'
             )}
           </Button>
         </div>
@@ -507,9 +501,9 @@ export const FortuneTestPage: React.FC<FortuneTestPageProps> = ({
             <div className="w-16 h-16 bg-gradient-to-r from-white/20 to-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Analyzing Your Fortune</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">Aligning Your Stars</h3>
             <p className="text-white/90 mb-4">
-              Please wait while we analyze the stars and generate your personalized horoscope reading...
+              Sit tight while we weave your AI-personalized horoscope with mood notes and focus cues.
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm">
               <div className="w-2 h-2 bg-white/80 rounded-full animate-bounce"></div>

@@ -1,26 +1,42 @@
 /**
- * Progress Recovery Prompt Component for Career Module
- * Displays recovery prompt when user has unfinished career tests
- * Uses green theme to match Career module styling
+ * Progress Recovery Prompt Component for Learning Ability Module
+ * Displays recovery prompt when user has unfinished learning tests
+ * Uses sky/cyan theme to match Learning Ability module styling
  */
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { progressManager } from '../services/progressManager';
 import type { BaseComponentProps } from '@/types/componentTypes';
-import { CareerTestTypeEnum, CareerTestType } from '../types';
-import type { TestProgress } from '../services/progressManager';
+import { LearningTestTypes, LearningTestType } from '../types';
+
+// Placeholder type - will be replaced when progressManager is implemented
+interface TestProgress {
+  testType: LearningTestType;
+  sessionId: string;
+  isCompleted: boolean;
+  answers: any[];
+  currentQuestionIndex: number;
+  startTime: string;
+  lastUpdateTime: string;
+}
+
+// Note: progressManager would be implemented similar to career/psychology modules
+// For now, using a placeholder that will be implemented later
+const progressManager = {
+  getAllProgress: () => [] as TestProgress[],
+  deleteProgress: (_testType: LearningTestType, _sessionId: string) => {}
+};
 
 interface ProgressRecoveryPromptProps extends BaseComponentProps {
-  testType: CareerTestType;
+  testType: LearningTestType;
   onRecover?: () => void;
   onDismiss?: () => void;
 }
 
 export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({ 
   className, 
-  testId = 'career-progress-recovery-prompt',
+  testId = 'learning-progress-recovery-prompt',
   testType,
   onRecover,
   onDismiss,
@@ -52,7 +68,7 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
       }
     } catch (error) {
       // Error handling would be implemented here
-      }
+    }
   };
 
   const handleRecover = () => {
@@ -80,11 +96,9 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
     return null;
   }
 
-  const getTestTypeName = (type: CareerTestType): string => {
+  const getTestTypeName = (type: LearningTestType): string => {
     const names = {
-      [CareerTestTypeEnum.HOLLAND]: 'Holland Career Interest Test',
-      [CareerTestTypeEnum.DISC]: 'DISC Behavioral Style Assessment',
-      [CareerTestTypeEnum.LEADERSHIP]: 'Leadership Assessment'
+      [LearningTestTypes.VARK]: 'VARK Learning Style Test'
     };
     return names[type as keyof typeof names] || type;
   };
@@ -99,52 +113,52 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
         minute: '2-digit'
       });
     } catch {
-      return 'Time unavailable';
+      return 'Unknown time';
     }
   };
 
   return (
-    <Card className={`p-4 bg-green-50 border-emerald-200 ${className}`} data-testid={testId} {...props}>
+    <Card className={`p-4 bg-sky-50 border-sky-200 ${className}`} data-testid={testId} {...props}>
       <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm">💼</span>
+          <div className="w-8 h-8 bg-gradient-to-r from-cyan-600 to-sky-500 rounded-full flex items-center justify-center">
+            <span className="text-white text-sm">🎓</span>
           </div>
         </div>
         
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-green-800 mb-1">
-            Pick up where you left off?
+          <h3 className="text-sm font-medium text-sky-800 mb-1">
+            Unfinished Learning Test Progress Found
           </h3>
           
-          <div className="text-xs text-green-700 space-y-1 mb-3">
-            <div>Assessment: {getTestTypeName(testType)}</div>
-            <div>Answered so far: {progress.answers.length}</div>
-            <div>Next question: {progress.currentQuestionIndex + 1}</div>
-            <div>Started: {formatTime(progress.startTime)}</div>
-            <div>Last saved: {formatTime(progress.lastUpdateTime)}</div>
+          <div className="text-xs text-sky-700 space-y-1 mb-3">
+            <div>Test Type: {getTestTypeName(testType)}</div>
+            <div>Questions Answered: {progress.answers.length}</div>
+            <div>Current Progress: {progress.currentQuestionIndex + 1} / {progress.currentQuestionIndex + progress.answers.length + 1}</div>
+            <div>Start Time: {formatTime(progress.startTime)}</div>
+            <div>Last Updated: {formatTime(progress.lastUpdateTime)}</div>
           </div>
           
           <div className="flex space-x-2">
             <Button
               onClick={handleRecover}
-              className="px-3 py-1 text-xs bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white"
+              className="px-3 py-1 text-xs bg-gradient-to-r from-cyan-600 to-sky-500 hover:from-cyan-700 hover:to-sky-600 text-white"
             >
-              Continue Test
+              Restore Progress
             </Button>
             
             <Button
               onClick={handleDelete}
               className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white"
             >
-              Clear Progress
+              Delete Progress
             </Button>
             
             <Button
               onClick={handleDismiss}
               className="px-3 py-1 text-xs bg-gray-500 hover:bg-gray-600 text-white"
             >
-              Maybe Later
+              Dismiss
             </Button>
           </div>
         </div>
@@ -152,3 +166,4 @@ export const ProgressRecoveryPrompt: React.FC<ProgressRecoveryPromptProps> = ({
     </Card>
   );
 };
+

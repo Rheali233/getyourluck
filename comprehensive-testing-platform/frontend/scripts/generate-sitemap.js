@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 网站基础URL
-const BASE_URL = 'https://selfatlas.com';
+const BASE_URL = 'https://selfatlas.net';
 
 // 页面配置
 const PAGES = [
@@ -22,61 +22,61 @@ const PAGES = [
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/psychology',
+    url: '/tests/psychology',
     changefreq: 'weekly',
     priority: '0.9',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/psychology/mbti',
+    url: '/tests/psychology/mbti',
     changefreq: 'monthly',
     priority: '0.8',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/psychology/eq',
+    url: '/tests/psychology/eq',
     changefreq: 'monthly',
     priority: '0.8',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/psychology/phq9',
+    url: '/tests/psychology/phq9',
     changefreq: 'monthly',
     priority: '0.8',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/psychology/happiness',
+    url: '/tests/psychology/happiness',
     changefreq: 'monthly',
     priority: '0.8',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/astrology',
+    url: '/tests/astrology',
     changefreq: 'weekly',
     priority: '0.9',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/tarot',
+    url: '/tests/tarot',
     changefreq: 'weekly',
     priority: '0.9',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/career',
+    url: '/tests/career',
     changefreq: 'weekly',
     priority: '0.9',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/relationship',
+    url: '/tests/relationship',
     changefreq: 'weekly',
     priority: '0.9',
     lastmod: new Date().toISOString().split('T')[0]
   },
   {
-    url: '/learning',
+    url: '/tests/learning',
     changefreq: 'weekly',
     priority: '0.8',
     lastmod: new Date().toISOString().split('T')[0]

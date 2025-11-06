@@ -173,7 +173,7 @@ const TestModuleCard: React.FC<{
               "flex items-center justify-center gap-2"
             )}
           >
-            Explore Module
+            Browse Module
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
@@ -214,92 +214,92 @@ export const TestModulesGrid: React.FC<TestModulesGridProps> = ({
     {
       id: 'psychology',
       name: 'Personality & Mind',
-      description: 'Professional assessments revealing personality traits and growth insights',
+      description: 'MBTI, Big Five, and EQ assessments revealing personality traits, motivators, and growth insights',
       icon: '🧠',
       theme: 'psychology',
       testCount: 4,
       rating: 4.8,
       isActive: true,
       route: '/tests/psychology',
-      features: ['🧠 Personality Discovery', '💙 Mental Wellness', '❤️ Emotional Intelligence'],
+      features: ['🧠 MBTI + Big Five', '💙 Emotional Intelligence', '📊 Mindset Growth'],
       estimatedTime: '10-15 minutes'
     },
     {
       id: 'astrology',
       name: 'Astrology & Fortune',
-      description: 'Daily guidance decoding zodiac tendencies and opportunities',
+      description: 'Daily horoscope, birth chart mapping, and zodiac compatibility guidance for upcoming opportunities',
       icon: '⭐',
       theme: 'astrology',
       testCount: 6,
       rating: 4.7,
       isActive: true,
       route: '/tests/astrology',
-      features: ['⭐ Daily Guidance', '🔮 Future Insights', '✨ Cosmic Wisdom'],
+      features: ['⭐ Daily Horoscope', '🌌 Birth Chart Insights', '✨ Cosmic Opportunities'],
       estimatedTime: '5-8 minutes'
     },
     {
       id: 'tarot',
       name: 'Tarot & Divination',
-      description: 'Mystical tarot draws with reflective insights and next steps',
+      description: 'Interactive tarot spreads deliver reflective guidance, next-step prompts, and intuitive journaling cues',
       icon: '🔮',
       theme: 'tarot',
       testCount: 6,
       rating: 4.6,
       isActive: true,
       route: '/tests/tarot',
-      features: ['🔮 Mystical Cards', '✨ Future Vision', '🌟 Spiritual Journey'],
+      features: ['🔮 Guided Tarot Spreads', '✨ Reflective Prompts', '🌟 Spiritual Journaling'],
       estimatedTime: '8-12 minutes'
     },
     {
       id: 'career',
       name: 'Career & Development',
-      description: 'Career profiling to match strengths with roles and paths',
+      description: 'Holland, DISC, and leadership profiling align your strengths with ideal roles, teams, and career paths',
       icon: '💼',
       theme: 'career',
       testCount: 3,
       rating: 4.9,
       isActive: true,
       route: '/tests/career',
-      features: ['💼 Dream Job Match', '🚀 Leadership Skills', '🎯 Career Path'],
+      features: ['💼 Holland Career Map', '🚀 DISC Leadership', '🎯 Growth Roadmap'],
       estimatedTime: '15-20 minutes'
     },
     {
       id: 'numerology',
       name: 'Numerology & Destiny',
-      description: 'Traditional numerology decoding life patterns, luck cycles, and meaningful name impacts',
+      description: 'BaZi, name analysis, and numerology decoding life patterns, luck cycles, and future timing insights',
       icon: '🔢',
       theme: 'numerology',
       testCount: 5,
       rating: 4.5,
       isActive: true,
       route: '/tests/numerology',
-      features: [ '🐲 Zodiac Fortune', '📝 Name Magic'],
+      features: ['🐲 BaZi Destiny Map', '📝 Name Numerology'],
       estimatedTime: '10-15 minutes'
     },
     {
       id: 'learning',
       name: 'Learning & Intelligence',
-      description: 'Assess learning style and cognition to personalize strategies and study environments',
+      description: 'VARK learning styles, cognition tests, and focus strategies personalize how you study and retain knowledge',
       icon: '📚',
       theme: 'learning',
       testCount: 3,
       rating: 4.7,
       isActive: true,
       route: '/tests/learning',
-      features: ['🎓 Learning Style', '🧩 Intelligence Test', '⚡ Brain Power'],
+      features: ['🎓 VARK Styles', '🧩 Cognitive Skills', '⚡ Focus Boosters'],
       estimatedTime: '12-18 minutes'
     },
     {
       id: 'relationship',
       name: 'Relationships & Communication',
-      description: 'Analyze relationship patterns and communication styles to improve empathy and harmony',
+      description: 'Love language, attachment, and communication style insights to improve empathy, harmony, and trust',
       icon: '❤️',
       theme: 'relationship',
       testCount: 3,
       rating: 4.8,
       isActive: true,
       route: '/tests/relationship',
-      features: ['💕 Love Language', '💝 Relationship Style', '🤝 Social Skills'],
+      features: ['💕 Love Languages', '💝 Attachment Map', '🤝 Communication Playbook'],
       estimatedTime: '8-12 minutes'
     }
   ];

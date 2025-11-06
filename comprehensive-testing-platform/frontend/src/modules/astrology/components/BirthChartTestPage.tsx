@@ -5,11 +5,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, DateInput, TimeInput, LocationInput, FeedbackFloatingWidget } from '@/components/ui';
+import { Button, Card, DateInput, TimeInput, LocationInput, FeedbackFloatingWidget, Breadcrumb } from '@/components/ui';
+import { useSEO } from '@/hooks/useSEO';
+import { SEOHead } from '@/components/SEOHead';
 import type { BaseComponentProps } from '@/types/componentTypes';
 import { useAstrologyStore } from '../stores/useAstrologyStore';
 import { cn } from '@/utils/classNames';
 import { AstrologyTestContainer } from './AstrologyTestContainer';
+import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
+import { resolveAbsoluteUrl } from '@/utils/browserEnv';
 
 export interface BirthChartTestPageProps extends BaseComponentProps {}
 
@@ -29,6 +33,45 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
   const [birthTime, setBirthTime] = useState<string>('');
   const [birthLocation, setBirthLocation] = useState<string>('');
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false);
+
+  const breadcrumbItems = getBreadcrumbConfig('/tests/astrology/birth-chart');
+
+  const canonical = resolveAbsoluteUrl('/tests/astrology/birth-chart', 'https://selfatlas.net');
+  const seoConfig = useSEO({
+    testType: 'astrology',
+    testId: 'birth-chart',
+    title: 'Free AI Birth Chart Reading | Personalized Natal Insights',
+    description: 'Generate your natal chart instantly with AI-crafted chapters. Discover planet placements, life themes, and reflection cues without any signup.',
+    keywords: [],
+    customConfig: {
+      canonical,
+      ogTitle: 'Free AI Birth Chart Reading | Personalized Natal Insights',
+      ogDescription: 'Generate your natal chart instantly with AI-crafted chapters. Discover planet placements, life themes, and reflection cues without any signup.',
+      ogImage: resolveAbsoluteUrl('/og-image.jpg', 'https://selfatlas.net'),
+      twitterCard: 'summary_large_image'
+    },
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: 'AI-Assisted Birth Chart Reading',
+      description: 'Instant AI birth chart analysis with personalized narratives for planets, houses, and life themes.',
+      url: canonical,
+      inLanguage: 'en-US',
+      provider: {
+        '@type': 'Organization',
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
+      },
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock'
+      },
+      serviceType: 'Astrology Reading',
+      availableLanguage: 'English'
+    }
+  });
 
   // 同步加载状态
   useEffect(() => {
@@ -65,31 +108,36 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
 
   if (showResults && birthChartAnalysis) {
     return (
-      <AstrologyTestContainer
-        testId={testId}
-      >
+      <>
+        <SEOHead config={seoConfig} />
+        <AstrologyTestContainer
+          testId={testId}
+        >
+        {/* 面包屑导航 */}
+        <Breadcrumb items={breadcrumbItems} />
         <div id="mainContent" className="max-w-6xl mx-auto space-y-8">
         {/* 结果页面头部 */}
         <div className="mb-16">
           <div className="flex items-center justify-between">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-              Birth Chart Analysis
-            </h1>
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+                Your Birth Chart Narrative
+              </h1>
+              <p className="text-base text-gray-200">AI-crafted chapters distilling your planets, houses, and life themes into clear reflections.</p>
+            </div>
             <button onClick={handleBack} className="inline-flex items-center px-4 py-2 rounded-full bg-white text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Center
+              Back to Astrology Hub
             </button>
           </div>
-          <p className="text-xl text-gray-200 max-w-3xl">
-            Your personalized birth chart analysis based on your birth details
-          </p>
+          <p className="text-sm text-gray-300">Bookmark the chapters that resonate and revisit them whenever you need perspective.</p>
         </div>
 
-        {/* 模块1: Overall Analysis */}
+        {/* 模块1: Cosmic Snapshot */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Overall Analysis</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Cosmic Snapshot</h2>
           <div className="text-left">
             <p className="text-gray-700 leading-relaxed text-lg">
               {(() => {
@@ -115,9 +163,9 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
           </div>
         </Card>
 
-        {/* 模块2: Core Planetary Positions */}
+        {/* 模块2: Identity Chapters */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Core Planetary Positions</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Identity Chapters</h2>
           <div className="text-left mb-6">
               <p className="text-gray-700 text-lg">
                 Your fundamental astrological blueprint based on your birth details
@@ -205,13 +253,13 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
           </div>
         </Card>
 
-        {/* 模块3: Planetary Positions */}
+        {/* 模块3: Planet Map */}
         {birthChartAnalysis.planetaryPositions && (
           <Card className="bg-white p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Planetary Positions</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Planet Map</h2>
             <div className="text-left mb-6">
               <p className="text-gray-700 text-lg">
-                Detailed positions of all planets in your birth chart
+                Every planet placement mapped with quick-read interpretations
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -272,13 +320,13 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
           </Card>
         )}
 
-        {/* 模块4: Personality Profile */}
+        {/* 模块4: Personality Chapters */}
         {birthChartAnalysis.personalityProfile && (
           <Card className="bg-white p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Personality Profile</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Personality Chapters</h2>
             <div className="text-left mb-6">
                 <p className="text-gray-700 text-lg">
-                Deep insights into your personality based on your astrological profile
+                Deep-dive narratives summarizing traits, strengths, and growth edges
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -329,13 +377,13 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
           </Card>
         )}
 
-        {/* 模块5: Life Guidance */}
+        {/* 模块5: Life Navigation */}
         {birthChartAnalysis.lifeGuidance && (
           <Card className="bg-white p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Life Guidance</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Life Navigation</h2>
             <div className="text-left mb-6">
                 <p className="text-gray-700 text-lg">
-                Practical guidance for different areas of your life based on your birth chart
+                Practical cues for career, relationships, and growth inspired by your chart
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -373,36 +421,50 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
             </div>
           </Card>
         )}
+        <Card className="bg-white p-6 mb-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Important Notice</h3>
+          <p className="text-gray-700 text-sm leading-relaxed">
+            This birth chart narrative is designed for inspiration and self-reflection. For medical, financial, or legal decisions, consult licensed professionals and combine these insights with your personal judgment.
+          </p>
+        </Card>
+        <div className="text-center text-sm text-gray-600">
+          Share Hint: Keep the chapter that resonates bookmarked or copy a favorite line to share with someone who follows your journey.
+        </div>
         </div>
         <FeedbackFloatingWidget
           containerSelector="#mainContent"
           testContext={{ testType: 'astrology', testId: 'birth-chart' }}
         />
-      </AstrologyTestContainer>
+        </AstrologyTestContainer>
+      </>
     );
   }
 
   return (
-    <AstrologyTestContainer
-      testId={testId}
-    >
+    <>
+      <SEOHead config={seoConfig} />
+      <AstrologyTestContainer
+        testId={testId}
+      >
+      {/* 面包屑导航 */}
+      <Breadcrumb items={breadcrumbItems} />
       {/* 页面头部 */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Birth Chart Analysis
-          </h1>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+              AI-Assisted Birth Chart Narrative
+            </h1>
+            <p className="text-base text-gray-200">Enter your birth details to receive AI-crafted chapters covering identity, life themes, and reflection prompts.</p>
+            <p className="text-sm text-gray-300">Free experience • No signup • Privacy-conscious</p>
+          </div>
           <button onClick={handleBack} className="inline-flex items-center px-4 py-2 rounded-full bg-white text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Center
+            Back to Astrology Hub
           </button>
         </div>
-        <p className="text-xl text-gray-200 max-w-3xl">
-          Discover the secrets of your birth chart and unlock insights about your personality, 
-          relationships, and life path through comprehensive astrological analysis.
-        </p>
       </div>
 
       {/* 错误提示 */}
@@ -422,7 +484,10 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Enter Your Birth Details</h3>
         <div className="space-y-6">
               <div>
-              <h4 className="text-md font-medium text-gray-900 mb-3">Birth Date</h4>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-md font-medium text-gray-900">Birth Date</h4>
+                <span className="text-xs text-gray-500">Sets the pace for your solar story.</span>
+              </div>
                 <DateInput
                   value={birthDate}
                   onChange={setBirthDate}
@@ -431,7 +496,10 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
             </div>
 
               <div>
-              <h4 className="text-md font-medium text-gray-900 mb-3">Birth Time</h4>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-md font-medium text-gray-900">Birth Time</h4>
+                <span className="text-xs text-gray-500">Helps decode your rising sign and daily rhythm.</span>
+              </div>
                 <TimeInput
                   value={birthTime}
                   onChange={setBirthTime}
@@ -440,7 +508,10 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
             </div>
 
               <div>
-              <h4 className="text-md font-medium text-gray-900 mb-3">Birth Location</h4>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-md font-medium text-gray-900">Birth Location</h4>
+                <span className="text-xs text-gray-500">Anchors house placements for life areas.</span>
+              </div>
                 <LocationInput
                   value={birthLocation}
                   onChange={setBirthLocation}
@@ -461,13 +532,13 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
-            {isLoading ? (
+              {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-100 mr-2"></div>
-                Analyzing Chart...
+                  Crafting Narrative...
                 </div>
               ) : (
-              'Get My Birth Chart'
+              'Generate My Birth Chart Story'
               )}
             </Button>
           </div>
@@ -480,9 +551,9 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
             <div className="w-16 h-16 bg-gradient-to-r from-white/20 to-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Analyzing Your Birth Chart</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">Weaving Your Natal Chapters</h3>
             <p className="text-white/90 mb-4">
-              Please wait while we analyze the stars and generate your personalized birth chart reading...
+              Give us a moment to translate your birth details into AI-guided chapters you can revisit anytime.
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm">
               <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
@@ -493,5 +564,6 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
         </div>
       )}
     </AstrologyTestContainer>
+    </>
   );
 };

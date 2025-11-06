@@ -1,13 +1,17 @@
 import React from 'react';
 import { cn } from '@/utils/classNames';
 
+/* eslint-disable no-unused-vars */
 export interface PaginationProps {
   currentPage: number;
   totalPages: number;
-  makeHref: (page: number) => string;
-  onNavigate?: (page: number) => void;
+  makeHref(page: number): string;
+  onNavigate?(page: number): void;
   className?: string;
+  prevLabel?: string;
+  nextLabel?: string;
 }
+/* eslint-enable no-unused-vars */
 
 // 简单分页组件：可点击页码 + 上一页/下一页
 export const Pagination: React.FC<PaginationProps> = ({
@@ -16,6 +20,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   makeHref,
   onNavigate,
   className,
+  prevLabel,
+  nextLabel,
 }) => {
   if (totalPages <= 1) return null;
 
@@ -41,8 +47,9 @@ export const Pagination: React.FC<PaginationProps> = ({
           currentPage === 1 ? 'text-gray-400 border-gray-200 cursor-not-allowed' : 'text-gray-700 border-gray-300 hover:bg-gray-50'
         )}
         aria-disabled={currentPage === 1}
+        aria-label={prevLabel || 'Previous page'}
       >
-        Prev
+        {prevLabel || 'Prev'}
       </a>
       {start > 1 && (
         <>
@@ -78,8 +85,9 @@ export const Pagination: React.FC<PaginationProps> = ({
           currentPage === totalPages ? 'text-gray-400 border-gray-200 cursor-not-allowed' : 'text-gray-700 border-gray-300 hover:bg-gray-50'
         )}
         aria-disabled={currentPage === totalPages}
+        aria-label={nextLabel || 'Next page'}
       >
-        Next
+        {nextLabel || 'Next'}
       </a>
     </nav>
   );

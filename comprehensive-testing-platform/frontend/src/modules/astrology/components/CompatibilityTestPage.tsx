@@ -12,6 +12,9 @@ import { useAstrologyStore } from '../stores/useAstrologyStore';
 import { ZODIAC_SIGNS } from '../data/zodiac-signs';
 import { cn } from '@/utils/classNames';
 import { AstrologyTestContainer } from './AstrologyTestContainer';
+import { useSEO } from '@/hooks/useSEO';
+import { SEOHead } from '@/components/SEOHead';
+import { resolveAbsoluteUrl } from '@/utils/browserEnv';
 
 export interface CompatibilityTestPageProps extends BaseComponentProps {}
 
@@ -36,6 +39,43 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  const canonical = resolveAbsoluteUrl('/tests/astrology/compatibility', 'https://selfatlas.net');
+  const seoConfig = useSEO({
+    testType: 'astrology',
+    testId: 'compatibility',
+    title: 'Zodiac Compatibility Calculator | AI Love & Friendship Insights',
+    description: 'Compare two zodiac signs across love, friendship, and work to unlock instant AI chemistry notes and conversation cues—no signup required.',
+    keywords: [],
+    customConfig: {
+      canonical,
+      ogTitle: 'Zodiac Compatibility Calculator | AI Love & Friendship Insights',
+      ogDescription: 'Compare two zodiac signs across love, friendship, and work to unlock instant AI chemistry notes and conversation cues—no signup required.',
+      ogImage: resolveAbsoluteUrl('/og-image.jpg', 'https://selfatlas.net'),
+      twitterCard: 'summary_large_image'
+    },
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: 'Zodiac Compatibility Calculator',
+      description: 'AI-powered compatibility readings for love, friendship, and work with instant chemistry notes.',
+      url: canonical,
+      inLanguage: 'en-US',
+      provider: {
+        '@type': 'Organization',
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
+      },
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock'
+      },
+      serviceType: 'Astrology Reading',
+      availableLanguage: 'English'
+    }
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
     clearError();
@@ -52,9 +92,9 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
   }, [isLoading, showResults, error]);
 
   const relationTypes = [
-    { id: 'love', name: 'Love Compatibility', description: 'Romantic relationship analysis', icon: '💕' },
-    { id: 'friendship', name: 'Friendship Compatibility', description: 'Friendship potential and dynamics', icon: '👫' },
-    { id: 'work', name: 'Work Compatibility', description: 'Professional collaboration analysis', icon: '💼' }
+    { id: 'love', name: 'Love Match', description: 'Romantic vibe check with emotional cues', icon: '💕' },
+    { id: 'friendship', name: 'Friendship Match', description: 'Chemistry for hangouts and support', icon: '👫' },
+    { id: 'work', name: 'Work Match', description: 'Collaboration and productivity signals', icon: '💼' }
   ];
 
   const handleSubmit = async () => {
@@ -105,30 +145,41 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
     const getElementalNature = (sign: any) => sign?.elementalNature;
     const getQualityTraits = (sign: any) => sign?.qualityTraits;
 
+    const relationLabel = compatibilityAnalysis.relationType === 'love'
+      ? 'Love'
+      : compatibilityAnalysis.relationType === 'friendship'
+        ? 'Friendship'
+        : 'Work';
+
     return (
-      <AstrologyTestContainer className={className} data-testid={testId} {...props}>
+      <>
+        <SEOHead config={seoConfig} />
+        <AstrologyTestContainer className={className} data-testid={testId} {...props}>
         <div id="mainContent" className="max-w-6xl mx-auto space-y-8">
         {/* Main Title and Description + Home button at top-right */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 capitalize">
-          {compatibilityAnalysis.relationType} Compatibility Analysis
-        </h1>
-        <button onClick={() => navigate('/tests/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Center
-        </button>
-        </div>
-        <p className="text-xl text-gray-200 max-w-4xl">
-          {getSignName(sign1Data)} & {getSignName(sign2Data)}
-        </p>
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+                Zodiac Chemistry Report
+              </h1>
+              <p className="text-base text-gray-200">AI-personalized chemistry notes tailored to your selected connection style.</p>
+            </div>
+            <button onClick={() => navigate('/tests/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Astrology Hub
+            </button>
+          </div>
+          <p className="text-xl text-gray-200 max-w-4xl">
+            {getSignName(sign1Data)} & {getSignName(sign2Data)} • Focus: {relationLabel}
+          </p>
         </div>
 
-        {/* 模块1: Compatibility Overview */}
+        {/* 模块1: Chemistry Overview */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Compatibility Overview</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Chemistry Overview</h2>
           
           <div className="space-y-6">
             <div className="text-center">
@@ -136,7 +187,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
                 {compatibilityAnalysis.overallScore}%
               </div>
               <div className="text-lg font-medium text-gray-700 mb-4">
-                {getCompatibilityLabel(compatibilityAnalysis.overallScore)} Match
+                {getCompatibilityLabel(compatibilityAnalysis.overallScore)} match score
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
                 <div className="text-center">
@@ -152,9 +203,9 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
           </div>
         </Card>
 
-        {/* 模块2: Zodiac Signs Comparison */}
+        {/* 模块2: Sign Profiles */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Zodiac Signs Comparison</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Sign Profiles</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Sign 1 */}
@@ -261,9 +312,9 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
           </div>
         </Card>
 
-        {/* 模块3: Relationship Analysis */}
+        {/* 模块3: Connection Themes */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Relationship Analysis</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Connection Themes</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Strengths */}
@@ -294,50 +345,57 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
           </div>
         </Card>
 
-        {/* 模块4: Relationship Advice */}
+        {/* 模块4: Conversation & Care Tips */}
         <Card className="bg-white p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Relationship Advice</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Conversation & Care Tips</h2>
           
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Astrological Guidance</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-3">Guided Cue</h3>
               <p className="text-gray-700 text-lg leading-relaxed">
                 {compatibilityAnalysis.advice}
               </p>
             </div>
           </div>
         </Card>
+        <div className="text-center text-sm text-gray-600">
+          Share Hint: Save the cue that resonates most and send it to your partner or friend to spark conversation.
+        </div>
         </div>
         <FeedbackFloatingWidget
           containerSelector="#mainContent"
           testContext={{ testType: 'astrology', testId: 'compatibility' }}
         />
-      </AstrologyTestContainer>
+        </AstrologyTestContainer>
+      </>
     );
   }
 
   // 显示输入表单
   return (
-    <AstrologyTestContainer className={className} data-testid={testId} {...props}>
+    <>
+      <SEOHead config={seoConfig} />
+      <AstrologyTestContainer className={className} data-testid={testId} {...props}>
       {/* 面包屑导航 */}
       <Breadcrumb items={getBreadcrumbConfig('/tests/astrology/compatibility')} />
       
       {/* Main Title and Description + Home button at top-right */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Zodiac Compatibility
-          </h1>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+              Zodiac Chemistry Checker
+            </h1>
+            <p className="text-base text-gray-200">Pick two signs and a connection type to unlock instant chemistry notes and conversation cues.</p>
+            <p className="text-sm text-gray-300">Free experience • No signup • Share-ready highlights</p>
+          </div>
           <button onClick={() => navigate('/tests/astrology')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 text-gray-900 font-semibold hover:bg-white/90 transition ml-4">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back to Center
+            Back to Astrology Hub
           </button>
         </div>
-        <p className="text-xl text-gray-200 max-w-3xl">
-          Discover the compatibility between different zodiac signs
-        </p>
       </div>
 
       {/* 错误提示 */}
@@ -354,7 +412,10 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
       <div className="space-y-6">
         {/* 选择关系类型 */}
         <Card className="bg-white p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Relationship Type</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Select Connection Style</h3>
+            <span className="text-sm text-gray-500">Pick the context you want to explore first.</span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {relationTypes.map((type) => (
               <button
@@ -383,7 +444,10 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
 
         {/* 选择第一个星座 */}
         <Card className="bg-white p-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Select First Zodiac Sign</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Select First Zodiac Sign</h3>
+            <span className="text-sm text-gray-500">Choose the sign representing you.</span>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {ZODIAC_SIGNS.map((sign) => (
               <button
@@ -430,7 +494,10 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
 
         {/* 选择第二个星座 */}
         <Card className="bg-white p-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Select Second Zodiac Sign</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Select Second Zodiac Sign</h3>
+            <span className="text-sm text-gray-500">Now pick the other sign you want to compare.</span>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {ZODIAC_SIGNS.map((sign) => (
               <button
@@ -492,7 +559,7 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
                 Analyzing Compatibility...
               </div>
             ) : (
-              'Analyze Compatibility'
+              'Reveal Chemistry'
             )}
           </Button>
         </div>
@@ -505,9 +572,9 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
             <div className="w-16 h-16 bg-gradient-to-r from-white/20 to-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Analyzing Compatibility</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">Mapping Your Chemistry</h3>
             <p className="text-white/90 mb-4">
-              Please wait while we analyze the compatibility between your selected zodiac signs...
+              We are blending your selected signs and connection style into instant, AI-crafted chemistry notes.
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm">
               <div className="w-2 h-2 bg-white/80 rounded-full animate-bounce"></div>
@@ -518,5 +585,6 @@ export const CompatibilityTestPage: React.FC<CompatibilityTestPageProps> = ({
         </div>
       )}
     </AstrologyTestContainer>
+    </>
   );
 };

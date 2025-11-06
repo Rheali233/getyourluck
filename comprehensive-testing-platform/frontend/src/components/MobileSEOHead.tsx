@@ -7,6 +7,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useMobileSEO } from '@/hooks/useMobileSEO';
 import { MOBILE_SEO_META, MOBILE_STRUCTURED_DATA } from '@/config/mobileSEO';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 interface MobileSEOHeadProps {
   title?: string;
@@ -21,9 +22,9 @@ interface MobileSEOHeadProps {
 export const MobileSEOHead: React.FC<MobileSEOHeadProps> = ({
   title = 'SelfAtlas - Mobile Testing Platform',
   description = 'Take professional psychological tests, career assessments, and more on your mobile device. Optimized for mobile experience.',
-  keywords = 'mobile psychological tests, smartphone personality test, mobile career assessment, mobile astrology, mobile tarot',
+  keywords: _keywords,
   canonicalUrl,
-  ogImage = 'https://selfatlas.com/images/mobile-og-image.jpg',
+  ogImage = buildAbsoluteUrl('/images/mobile-og-image.jpg'),
   structuredData
 }) => {
   const { isMobile, isTablet, touchSupport } = useMobileSEO();
@@ -36,10 +37,8 @@ export const MobileSEOHead: React.FC<MobileSEOHeadProps> = ({
     ? `${description} Optimized for mobile devices.`
     : description;
 
-  // 生成移动端关键词
-  const mobileKeywords = isMobile
-    ? `${keywords}, mobile friendly, touch optimized, responsive design`
-    : keywords;
+  const resolvedCanonicalUrl = canonicalUrl || (typeof window !== 'undefined' ? buildAbsoluteUrl(window.location.pathname) : buildAbsoluteUrl('/'));
+  const ogImageUrl = ogImage || buildAbsoluteUrl('/images/mobile-og-image.jpg');
 
   // 生成结构化数据
   const mobileStructuredData = {
@@ -53,8 +52,7 @@ export const MobileSEOHead: React.FC<MobileSEOHeadProps> = ({
       {/* 基础SEO标签 */}
       <title>{mobileTitle}</title>
       <meta name="description" content={mobileDescription} />
-      <meta name="keywords" content={mobileKeywords} />
-      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      {resolvedCanonicalUrl && <link rel="canonical" href={resolvedCanonicalUrl} />}
 
       {/* 移动端特定meta标签 */}
       <meta name="viewport" content={MOBILE_SEO_META.viewport} />
@@ -88,10 +86,10 @@ export const MobileSEOHead: React.FC<MobileSEOHeadProps> = ({
       {/* Open Graph标签 */}
       <meta property="og:title" content={mobileTitle} />
       <meta property="og:description" content={mobileDescription} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={ogImageUrl} />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="GetYourLuck" />
-      {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+      {resolvedCanonicalUrl && <meta property="og:url" content={resolvedCanonicalUrl} />}
 
       {/* 移动端Open Graph标签 */}
       <meta property="og:locale" content="en_US" />
@@ -103,7 +101,7 @@ export const MobileSEOHead: React.FC<MobileSEOHeadProps> = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={mobileTitle} />
       <meta name="twitter:description" content={mobileDescription} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={ogImageUrl} />
 
       {/* 移动端特定Twitter标签 */}
       {isMobile && (

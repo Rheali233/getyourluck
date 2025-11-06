@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '@/utils/classNames';
 import { useMobileSEO } from '@/hooks/useMobileSEO';
 import { MOBILE_TOUCH_TARGETS } from '@/config/mobileSEO';
+import { getSiteOrigin } from '@/config/seo';
 
 interface MobileOptimizedProps {
   children: React.ReactNode;
@@ -126,7 +127,7 @@ export const MobileImage: React.FC<MobileImageProps> = ({
 
   // 根据设备类型优化图片
   const getOptimizedSrc = () => {
-    const url = new URL(src, window.location.origin);
+    const url = new URL(src, getSiteOrigin());
     
     if (isMobile) {
       url.searchParams.set('w', '800');

@@ -11,10 +11,10 @@ import { NumerologyTestContainer } from './NumerologyTestContainer';
 import type { NumerologyAnalysisType } from '../types';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
-import { useKeywordOptimization } from '@/hooks/useKeywordOptimization';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
+import { buildAbsoluteUrl } from '@/config/seo';
 
 interface NumerologyHomePageProps {
   className?: string;
@@ -37,28 +37,39 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
     });
   }, []);
 
-  // 关键词优化
-  const { optimizedTitle, optimizedDescription } = useKeywordOptimization({
-    pageType: 'module',
-    moduleType: 'numerology',
-    customKeywords: ['bazi analysis', 'chinese zodiac', 'destiny analysis']
-  });
-
   // SEO配置
+  const canonical = buildAbsoluteUrl('/tests/numerology');
   const seoConfig = useSEO({
     testType: 'numerology',
     testId: 'home',
-    title: optimizedTitle,
-    description: optimizedDescription,
+    title: 'Free Numerology Analysis: BaZi, Chinese Zodiac & Name Guidance | SelfAtlas',
+    description: 'Discover your destiny through traditional Chinese numerology. Get free BaZi analysis, Chinese zodiac readings, and personalized name guidance.',
+    keywords: [
+      'numerology analysis',
+      'bazi analysis',
+      'chinese zodiac',
+      'destiny analysis',
+      'name numerology',
+      'ziwei chart',
+      'chinese fortune'
+    ],
+    customConfig: {
+      canonical: canonical,
+      ogTitle: 'Free Numerology Analysis: BaZi, Chinese Zodiac & Name Guidance | SelfAtlas',
+      ogDescription: 'Discover your destiny through traditional Chinese numerology. Get free BaZi analysis, Chinese zodiac readings, and personalized name guidance.',
+      ogImage: buildAbsoluteUrl('/og-image.jpg'),
+      twitterCard: 'summary_large_image'
+    },
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: 'Numerology Analysis Services Collection',
-      description: 'A comprehensive collection of numerology analysis services including BaZi, Chinese zodiac, name analysis, and ZiWei chart interpretation',
+      name: 'Numerology Analysis Services',
+      description: 'Discover your destiny through traditional Chinese numerology. Get free BaZi birth chart analysis, Chinese zodiac fortune readings, and personalized name recommendations.',
+      inLanguage: 'en-US',
       provider: {
         '@type': 'Organization',
-        name: 'Comprehensive Testing Platform',
-        url: 'https://selfatlas.com'
+        name: 'SelfAtlas',
+        url: 'https://selfatlas.net'
       },
       mainEntity: {
         '@type': 'ItemList',
@@ -92,38 +103,38 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
     {
       id: 'bazi' as NumerologyAnalysisType,
       title: 'BaZi Analysis',
-      description: 'Analyze your birth chart and five elements for life insight and guidance.',
+      description: 'Discover your life patterns through the Four Pillars of Destiny. Analyze your birth chart to understand personality traits, life cycles, and five-element balance.',
       icon: '🌙',
       color: 'from-blue-500 to-cyan-500',
       features: ['Birth Chart Analysis', 'Five Elements', 'Personality Traits', 'Destiny Guidance'],
-      tags: ['BaZi', 'Five Elements']
+      tags: ['Four Pillars', 'Five Elements', 'Destiny Analysis']
     },
     {
       id: 'zodiac' as NumerologyAnalysisType,
       title: 'Chinese Zodiac Fortune',
-      description: 'Check your Chinese zodiac fortune and receive period‑based personalized guidance.',
+      description: 'Explore fortune predictions based on your zodiac animal. Get insights for different time periods and understand how celestial cycles influence your journey.',
       icon: '🐲',
       color: 'from-purple-500 to-pink-500',
       features: ['Yearly Fortune', 'Monthly Fortune', 'Weekly Fortune', 'Lucky Elements'],
-      tags: ['Zodiac', 'Luck Insights']
+      tags: ['Zodiac Fortune', 'Time Periods', 'Celestial Cycles']
     },
     {
       id: 'name' as NumerologyAnalysisType,
       title: 'Chinese Name Recommendation',
-      description: 'Get personalized Chinese name recommendations with cultural meaning and usage advice.',
+      description: 'Receive personalized name suggestions based on numerology principles. Discover names that harmonize with your character and support your life path.',
       icon: '🎯',
       color: 'from-green-500 to-emerald-500',
       features: ['Personalized Names', 'Cultural Significance', 'Usage Advice', 'Multiple Options'],
-      tags: ['Name Selection', 'Cultural Meaning']
+      tags: ['Name Numerology', 'Character Harmony', 'Life Path']
     },
     {
       id: 'ziwei' as NumerologyAnalysisType,
       title: 'ZiWei Analysis',
-      description: 'Receive a comprehensive ZiWei chart analysis based on your birth information.',
+      description: 'Uncover deep insights through the ZiWei Doushu chart. Explore palace positions, star influences, and life guidance based on your birth information.',
       icon: '⭐',
       color: 'from-orange-500 to-red-500',
       features: ['ZiWei Chart', 'Palace Analysis', 'Star Positions', 'Life Guidance'],
-      tags: ['ZiWei', 'Chart Reading']
+      tags: ['ZiWei Chart', 'Palace Analysis', 'Star Positions']
     }
   ];
 
@@ -135,7 +146,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
       ...base,
       data: {
         testType: analysisType,
-        testName: analysisTypes.find(a => a.id === analysisType)?.name || 'Unknown',
+        testName: analysisTypes.find(a => a.id === analysisType)?.title || 'Unknown',
         moduleId: 'numerology',
         location: 'module_homepage'
       }
@@ -155,7 +166,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-            Numerology Analysis Center
+            Unlock Your Destiny Through Numerology
           </h1>
           <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-full bg-white/70 text-red-900 font-semibold hover:bg-white/80 transition ml-4">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,8 +175,8 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
             Back to Home
           </button>
         </div>
-        <p className="text-xl text-gray-200 max-w-3xl whitespace-nowrap">
-          Professional numerology analysis to help you discover your destiny through ancient Chinese wisdom
+        <p className="text-xl text-gray-200 max-w-3xl">
+          Explore traditional Chinese numerology through BaZi birth charts, zodiac fortune readings, and name analysis for reflective entertainment. Discover insights rooted in centuries of cultural wisdom to inspire self-reflection.
         </p>
       </div>
 
@@ -181,11 +192,11 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
                 {analysis.description}
               </p>
               
-              {/* Analysis Information Tags - Only theoretical basis tags */}
+              {/* Analysis Information Tags - Enhanced with more tags */}
               <div className="space-y-2 mt-1">
                 {/* Multiple Tags */}
                 <div className="flex flex-wrap gap-1 justify-center">
-                  {analysis.tags?.slice(0,2).map((tag, index) => (
+                  {analysis.tags?.map((tag, index) => (
                     <span 
                       key={index}
                       className="px-2 py-1 text-xs bg-red-50 text-red-700 rounded-full font-semibold border border-red-200"
@@ -221,7 +232,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
               </div>
               <h3 className="text-lg font-bold text-red-900 mb-3">Clear Intentions</h3>
               <p className="text-red-800 text-sm">
-                Focus on your question and maintain an open mind. The clearer your intention, the more accurate the analysis.
+                Focus on what you want to understand about your life path. Clear intentions help numerology reveal deeper patterns and insights.
               </p>
             </div>
             <div className="text-center">
@@ -230,7 +241,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
               </div>
               <h3 className="text-lg font-bold text-red-900 mb-3">Quiet Environment</h3>
               <p className="text-red-800 text-sm">
-                Find a peaceful space where you won't be disturbed. This helps you connect with your inner wisdom.
+                Take a moment in a peaceful setting. This helps you reflect on the ancient wisdom and its relevance to your journey.
               </p>
             </div>
             <div className="text-center">
@@ -239,7 +250,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
               </div>
               <h3 className="text-lg font-bold text-red-900 mb-3">Privacy Protection</h3>
               <p className="text-red-800 text-sm">
-                All analyses are completely private and secure. Your personal information and questions are protected.
+                Your birth information and analysis results remain completely confidential. We never share your personal details.
               </p>
             </div>
           </div>
@@ -261,10 +272,10 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
           <div className="ml-4">
             <h3 className="text-lg font-bold text-red-900 mb-2">Important Notice</h3>
             <p className="text-red-800 text-sm leading-relaxed">
-              The numerology analyses provided on this platform are for guidance and self-reflection purposes only. 
-              They cannot replace professional counseling, medical advice, or financial planning. Numerology 
-              is a tool for introspection and should be used as a complement to, not a substitute for, 
-              professional guidance. Remember, you have the power to shape your own destiny.
+              Numerology analysis draws from traditional Chinese cultural wisdom spanning centuries. 
+              These insights offer symbolic frameworks for self-reflection but cannot replace 
+              professional counseling, medical advice, or financial planning. Use these readings 
+              as tools for contemplation and consult qualified professionals for important decisions.
             </p>
           </div>
         </div>

@@ -20,7 +20,7 @@ export interface SitemapConfig {
 
 // 默认配置
 const DEFAULT_CONFIG: SitemapConfig = {
-  baseUrl: 'https://selfatlas.com',
+  baseUrl: 'https://selfatlas.net',
   defaultPriority: 0.5,
   defaultChangeFreq: 'weekly',
   excludePaths: ['/admin', '/api', '/_*', '/404', '/500'],

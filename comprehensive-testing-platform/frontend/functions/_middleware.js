@@ -12,6 +12,40 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
+  // 🔥 HTTP 到 HTTPS 重定向（仅在生产环境）
+  if (url.protocol === 'http:' && (url.hostname === 'selfatlas.net' || url.hostname === 'www.selfatlas.net')) {
+    url.protocol = 'https:';
+    return Response.redirect(url.toString(), 301);
+  }
+
+  // 🔥 服务器端 301 重定向：旧路径到新路径（SEO优化）
+  const redirectMap = {
+    '/psychology': '/tests/psychology',
+    '/career': '/tests/career',
+    '/astrology': '/tests/astrology',
+    '/tarot': '/tests/tarot',
+    '/numerology': '/tests/numerology',
+    '/learning': '/tests/learning',
+    '/relationship': '/tests/relationship',
+  };
+
+  // 检查精确匹配的旧路径
+  if (redirectMap[pathname]) {
+    const redirectUrl = new URL(redirectMap[pathname], url.origin);
+    redirectUrl.search = url.search; // 保留查询参数
+    return Response.redirect(redirectUrl.toString(), 301);
+  }
+
+  // 检查带子路径的旧路径（如 /career/holland -> /tests/career/holland）
+  for (const [oldPath, newPath] of Object.entries(redirectMap)) {
+    if (pathname.startsWith(oldPath + '/')) {
+      const newPathname = pathname.replace(oldPath, newPath);
+      const redirectUrl = new URL(newPathname, url.origin);
+      redirectUrl.search = url.search; // 保留查询参数
+      return Response.redirect(redirectUrl.toString(), 301);
+    }
+  }
+
   // 🔥 重要：API 请求 (/api/*) 直接在根级别处理，避免路由冲突
   if (pathname.startsWith('/api/')) {
     try {

@@ -40,24 +40,24 @@ export const ZodiacResultPage: React.FC = () => {
   const getFallbackAnalysis = (type: 'career' | 'wealth' | 'love' | 'health', score: number) => {
     const analyses = {
       career: {
-        high: "Exceptional career opportunities await! Your professional path is illuminated with success indicators. Leadership roles, promotions, or new ventures are highly favorable. Network strategically and seize opportunities that align with your zodiac characteristics.",
-        medium: "Steady career progress is indicated. While major breakthroughs may require patience, consistent effort will yield positive results. Focus on skill development and building relationships within your industry.",
-        low: "Career challenges require careful navigation. Avoid impulsive decisions and focus on stability. This period favors skill-building and strategic planning over immediate advancement."
+        high: "You may notice more career windows opening, especially for leadership or new ventures. Stay proactive, network intentionally, and follow opportunities that resonate with your zodiac tendencies.",
+        medium: "Career momentum appears steady. Consistent effort, skill development, and relationship-building can gradually improve your position even if breakthroughs take time.",
+        low: "Career energy feels slower right now. Focus on stability, honing skills, and strategic planning so you are ready when stronger momentum returns."
       },
       wealth: {
-        high: "Financial prosperity is strongly indicated! Investment opportunities, unexpected income, or business ventures show excellent potential. Your zodiac energy supports wealth accumulation and financial growth.",
-        medium: "Moderate financial stability is expected. Focus on prudent money management and avoid risky investments. Steady income growth through consistent effort is more likely than windfalls.",
-        low: "Financial caution is advised. Avoid major purchases or investments during this period. Focus on budgeting, debt reduction, and building emergency funds rather than seeking quick gains."
+        high: "Financial momentum could rise, with stronger chances for profitable projects or helpful support. Prioritize thoughtful decisions to make the most of this upswing.",
+        medium: "Finances look balanced overall. Prudent budgeting and moderate risk-taking keep things on course while you build toward longer-term goals.",
+        low: "Finances may require extra care in this cycle. Emphasize budgeting, reduce unnecessary spending, and wait for clearer signals before making major commitments."
       },
       love: {
-        high: "Love and relationships shine brightly! Romantic opportunities, deepening connections, or harmonious partnerships are strongly favored. Your zodiac energy attracts positive relationships and emotional fulfillment.",
-        medium: "Relationships show steady potential. Existing partnerships may deepen, while new connections require patience to develop. Focus on communication and understanding rather than rushing into commitments.",
-        low: "Relationship challenges may arise. Avoid conflicts and focus on understanding rather than confrontation. This period favors self-reflection and personal growth over seeking new romantic connections."
+        high: "Romantic energy tends to run high, making it easier to deepen bonds or meet inspiring connections. Express intentions clearly and stay open to mutual growth.",
+        medium: "Relationships show gradual progress. Honest conversations and steady attention help existing connections strengthen while new bonds develop at a natural pace.",
+        low: "Relationship dynamics might feel delicate. Focus on empathy, patient dialogue, and personal reflection rather than forcing immediate outcomes."
       },
       health: {
-        high: "Excellent health fortune is indicated! Your vitality and energy levels are strong. This is an ideal time for starting new fitness routines, preventive care, or wellness practices that align with your zodiac characteristics.",
-        medium: "Generally stable health with minor fluctuations expected. Maintain regular routines and pay attention to stress management. Preventive care and balanced lifestyle choices will serve you well.",
-        low: "Health requires extra attention and care. Focus on rest, stress reduction, and preventive measures. Avoid overexertion and prioritize wellness routines that support your zodiac energy."
+        high: "Vitality is likely stronger, so it is a favorable period to reinforce healthy routines, mindful movement, and restorative rest.",
+        medium: "Overall wellbeing appears balanced with minor fluctuations. Maintain consistent sleep, nutrition, and stress management habits to stay centered.",
+        low: "Body and mind may ask for gentler pacing. Prioritize rest, preventive care, and supportive rituals that help you recharge gradually."
       }
     };
 

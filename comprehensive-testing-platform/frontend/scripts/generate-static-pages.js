@@ -19,43 +19,43 @@ const CRITICAL_PAGES = [
     keywords: 'psychological tests,astrological analysis,tarot reading,career tests,learning ability,emotional relationships'
   },
   {
-    path: '/psychology',
+    path: '/tests/psychology',
     title: 'Professional Psychological Tests | Comprehensive Testing Platform',
     description: 'Take professional psychological tests including MBTI, EQ, PHQ-9, and more. Get detailed personality analysis and insights.',
     keywords: 'psychological tests,MBTI test,emotional intelligence test,personality assessment,mental health test'
   },
   {
-    path: '/psychology/mbti',
+    path: '/tests/psychology/mbti',
     title: 'Free MBTI Personality Test | 16 Personalities Assessment',
     description: 'Take the free MBTI personality test to discover your 16 personality type. Get detailed analysis of your strengths, weaknesses, and career preferences.',
     keywords: 'MBTI test,16 personalities,personality type,Myers-Briggs,personality assessment'
   },
   {
-    path: '/psychology/eq',
+    path: '/tests/psychology/eq',
     title: 'Free Emotional Intelligence Test | EQ Assessment',
     description: 'Take our free emotional intelligence test to measure your EQ. Get insights into self-awareness, self-management, and social skills.',
     keywords: 'emotional intelligence test,EQ test,emotional quotient,EI assessment,emotional skills'
   },
   {
-    path: '/astrology',
+    path: '/tests/astrology',
     title: 'Free Astrological Analysis & Birth Chart Reading | Comprehensive Testing Platform',
     description: 'Get free astrological analysis, birth chart reading, horoscope predictions, and compatibility tests. Professional astrological insights.',
     keywords: 'astrological analysis,birth chart reading,horoscope,astrology compatibility,zodiac signs'
   },
   {
-    path: '/tarot',
+    path: '/tests/tarot',
     title: 'Online Tarot Card Reading & Fortune Telling | Comprehensive Testing Platform',
     description: 'Get free online tarot card reading, fortune telling, and spiritual guidance. Professional tarot interpretations and insights.',
     keywords: 'tarot reading,fortune telling,tarot cards,spiritual guidance,tarot interpretation'
   },
   {
-    path: '/career',
+    path: '/tests/career',
     title: 'Career Assessment & Job Matching Tests | Comprehensive Testing Platform',
     description: 'Take professional career assessment tests including DISC, Holland Code, and leadership tests. Find your ideal career path.',
     keywords: 'career assessment,job matching,DISC test,Holland Code,leadership test,career guidance'
   },
   {
-    path: '/relationship',
+    path: '/tests/relationship',
     title: 'Relationship & Love Compatibility Tests | Comprehensive Testing Platform',
     description: 'Take relationship compatibility tests, love language assessment, and interpersonal skills tests. Improve your relationships.',
     keywords: 'relationship test,love compatibility,love language test,interpersonal skills,relationship advice'

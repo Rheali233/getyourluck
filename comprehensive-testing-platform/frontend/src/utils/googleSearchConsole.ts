@@ -34,7 +34,7 @@ export interface SearchConsoleMetrics {
 
 // 默认配置
 const DEFAULT_CONFIG: SearchConsoleConfig = {
-  siteUrl: 'https://selfatlas.com',
+  siteUrl: 'https://selfatlas.net',
   enableIndexing: true,
   enablePerformanceTracking: true
 };
@@ -78,10 +78,10 @@ export const generateStructuredDataValidation = (): string => {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "SelfAtlas - Comprehensive Testing Platform",
-  "url": "https://selfatlas.com",
+  "url": "https://selfatlas.net",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://selfatlas.com/search?q={search_term_string}",
+    "target": "https://selfatlas.net/search?q={search_term_string}",
     "query-input": "required name=search_term_string"
   }
 }
