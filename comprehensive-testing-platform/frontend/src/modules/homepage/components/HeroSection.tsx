@@ -23,12 +23,12 @@ export interface HeroSectionProps extends BaseComponentProps {
 // 默认配置（全英文）- 匹配部署版本
 const defaultConfig = {
   title: "Free AI-Powered Self-Discovery Tests",
-  subtitle: "Get research-informed insights into your personality, strengths, and career path. All tests are free and provide instant AI-powered results.",
-  description: "Get research-informed insights into your personality, strengths, and career path. All tests are free and provide instant AI-powered results.",
+  subtitle: "Discover tailored assessments that map your personality, strengths, relationships, and career path in minutes.",
+  description: "SelfAtlas combines MBTI, career frameworks, tarot, astrology, and numerology into one research-informed journey. Start for free, get instant guidance, and revisit your dashboard anytime.",
   features: [
-    "Instant Results",
-    "Personalized Insights",
-    "Free to Start"
+    "AI-Ready MBTI & Personality Science",
+    "Career, Tarot & Astrology Guidance",
+    "Start Free — No Account Required"
   ],
   ctaText: "Start Free Test",
   ctaRoute: "/tests"
@@ -78,6 +78,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {heroConfig.subtitle}
         </p>
 
+        {heroConfig.description && (
+          <p className="hidden lg:block text-lg text-gray-600 max-w-3xl mx-auto mb-8 animate-fade-in delay-500">
+            {heroConfig.description}
+          </p>
+        )}
+
         {/* CTA 按钮 */}
         <div className="animate-fade-in delay-700">
           <button 
@@ -95,15 +101,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="mt-8 flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            Instant Results
+            Instant AI Insights
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-            Personalized Insights
+            Research-Informed Models
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-            Free to Start
+            Start Free, No Account
           </div>
         </div>
       </div>
