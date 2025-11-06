@@ -55,6 +55,14 @@ unifiedAIRoutes.post("/analyze", async (c: Context<AppContext>) => {
       )
     }
 
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      throw new ModuleError(
+        "API key not configured",
+        ERROR_CODES.VALIDATION_ERROR,
+        500
+      )
+    }
+
     // 创建AI服务实例
     const aiService = new UnifiedAIService({
       apiKey: c.env.DEEPSEEK_API_KEY,
@@ -118,6 +126,16 @@ unifiedAIRoutes.post("/analyze", async (c: Context<AppContext>) => {
  */
 unifiedAIRoutes.get("/templates", async (c: Context<AppContext>) => {
   try {
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: ERROR_CODES.VALIDATION_ERROR,
+        message: "API key not configured",
+        timestamp: new Date().toISOString(),
+        requestId: c.req.header('X-Request-ID') || 'unknown',
+        version: "1.0.0"
+      }, 500 as any)
+    }
     // 创建AI服务实例
     const aiService = new UnifiedAIService({
       apiKey: c.env.DEEPSEEK_API_KEY,
@@ -167,6 +185,14 @@ unifiedAIRoutes.get("/templates/:testTypeId", async (c: Context<AppContext>) => 
         "Missing test type ID",
         ERROR_CODES.VALIDATION_ERROR,
         400
+      )
+    }
+
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      throw new ModuleError(
+        "API key not configured",
+        ERROR_CODES.VALIDATION_ERROR,
+        500
       )
     }
 
@@ -226,6 +252,16 @@ unifiedAIRoutes.get("/templates/:testTypeId", async (c: Context<AppContext>) => 
  */
 unifiedAIRoutes.get("/health", async (c: Context<AppContext>) => {
   try {
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: ERROR_CODES.VALIDATION_ERROR,
+        message: "API key not configured",
+        timestamp: new Date().toISOString(),
+        requestId: c.req.header('X-Request-ID') || 'unknown',
+        version: "1.0.0"
+      }, 500 as any)
+    }
     // 创建AI服务实例
     const aiService = new UnifiedAIService({
       apiKey: c.env.DEEPSEEK_API_KEY,

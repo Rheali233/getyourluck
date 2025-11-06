@@ -21,7 +21,7 @@ securityRoutes.post('/privacy/consent', async (c) => {
       }, 400);
     }
 
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 
@@ -66,7 +66,7 @@ securityRoutes.get('/privacy/consent/:sessionId/:consentType', async (c) => {
       }, 400);
     }
 
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 
@@ -103,7 +103,7 @@ securityRoutes.get('/privacy/gdpr-compliance/:sessionId', async (c) => {
       }, 400);
     }
 
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 
@@ -140,7 +140,7 @@ securityRoutes.get('/privacy/report/:sessionId', async (c) => {
       }, 400);
     }
 
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 
@@ -177,7 +177,7 @@ securityRoutes.get('/privacy/export/:sessionId', async (c) => {
       }, 400);
     }
 
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 
@@ -214,7 +214,7 @@ securityRoutes.delete('/privacy/forget/:sessionId', async (c) => {
       }, 400);
     }
 
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 
@@ -252,7 +252,7 @@ securityRoutes.post('/privacy/anonymize/:sessionId', async (c) => {
       }, 400);
     }
 
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 
@@ -280,7 +280,7 @@ securityRoutes.post('/privacy/anonymize/:sessionId', async (c) => {
 // 清理过期数据
 securityRoutes.post('/privacy/cleanup', async (c) => {
   try {
-    if (!c.env) {
+    if (!c.env || !c.env.DB) {
       return c.json({ 
         success: false, 
         error: '环境配置不可用' 

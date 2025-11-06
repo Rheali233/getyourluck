@@ -13,6 +13,14 @@ const tarotRoutes = new Hono<AppContext>();
 // 获取塔罗牌列表
 tarotRoutes.get('/cards', async (c) => {
   try {
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     const cards = await tarotService.getTarotCards();
     
@@ -30,6 +38,14 @@ tarotRoutes.get('/cards', async (c) => {
 // 清除塔罗牌缓存
 tarotRoutes.post('/cards/clear-cache', async (c) => {
   try {
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     await tarotService.clearTarotCardsCache();
     
@@ -47,6 +63,14 @@ tarotRoutes.post('/cards/clear-cache', async (c) => {
 // 获取问题分类
 tarotRoutes.get('/categories', async (c) => {
   try {
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     const categories = await tarotService.getQuestionCategories();
     
@@ -64,6 +88,14 @@ tarotRoutes.get('/categories', async (c) => {
 // 获取牌阵配置
 tarotRoutes.get('/spreads', async (c) => {
   try {
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     const spreads = await tarotService.getTarotSpreads();
     
@@ -92,6 +124,14 @@ tarotRoutes.post('/recommendation', async (c) => {
       }, 400);
     }
 
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     const recommendation = await tarotService.getRecommendation(request);
     
@@ -120,6 +160,14 @@ tarotRoutes.post('/draw', async (c) => {
       }, 400);
     }
 
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     const result = await tarotService.drawCards(request, {
       requestId: c.get('requestId') || '',
@@ -152,6 +200,14 @@ tarotRoutes.get('/ai-reading/:sessionId', async (c) => {
       }, 400);
     }
 
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     const reading = await tarotService.getAIReading(sessionId, {
       requestId: c.get('requestId') || '',
@@ -184,6 +240,14 @@ tarotRoutes.post('/feedback', async (c) => {
       }, 400);
     }
 
+    if (!c.env?.DEEPSEEK_API_KEY) {
+      return c.json({
+        success: false,
+        error: 'API key not configured',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId') || ''
+      }, 500);
+    }
     const tarotService = new TarotService(c.env.DB, c.env.KV, c.env.DEEPSEEK_API_KEY);
     await tarotService.submitFeedback(request.sessionId, request.feedback);
     

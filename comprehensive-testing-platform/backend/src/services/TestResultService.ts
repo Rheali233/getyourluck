@@ -83,12 +83,13 @@ export class TestResultService {
       // 先获取AI分析结果（如果支持）
       // 对于需要 AI 的测试类型，设置超时保护
       let aiAnalysis = null;
+      let aiStartTime: number | null = null; // 在更外层作用域声明，以便在 catch 块中使用
       if (this.aiService) {
         const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'birth-chart', 'compatibility', 'fortune'];
         const needsAI = aiTestTypes.includes(testType);
         
         if (needsAI) {
-          const aiStartTime = Date.now(); // 在 try 块外定义，以便在 catch 块中使用
+          aiStartTime = Date.now(); // 在 try 块外定义，以便在 catch 块中使用
           try {
             console.log(`[TestResultService] Starting AI analysis for ${testType} with ${answers.length} answers`);
             
@@ -101,13 +102,13 @@ export class TestResultService {
             
             aiAnalysis = await Promise.race([aiAnalysisPromise, aiTimeoutPromise]) as any;
             
-            const aiTime = Date.now() - aiStartTime;
+            const aiTime = aiStartTime ? Date.now() - aiStartTime : 0;
             console.log(`[TestResultService] AI analysis completed for ${testType} in ${aiTime}ms`);
             console.log(`[TestResultService] AI analysis result keys:`, aiAnalysis ? Object.keys(aiAnalysis) : 'null');
             
           } catch (aiError) {
             // AI分析失败时记录警告，但不阻止测试结果处理
-            const aiTime = Date.now() - aiStartTime;
+            const aiTime = aiStartTime ? Date.now() - aiStartTime : 0;
             console.error(`[TestResultService] AI analysis failed for ${testType} after ${aiTime}ms:`, aiError instanceof Error ? aiError.message : 'Unknown error');
             console.error(`[TestResultService] AI error details:`, aiError instanceof Error ? {
               name: aiError.name,
