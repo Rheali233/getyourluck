@@ -147,8 +147,13 @@ testRoutes.post("/:testType/submit",
   rateLimiter(10, 60000), // 每分钟最多10次提交
   validateTestSubmission,
   async (c: Context<AppContext>) => {
+    const requestId = c.get("requestId") || '';
+    const testType = c.req.param("testType");
+    const processingStartTime = Date.now();
+    
     try {
-      const testType = c.req.param("testType");
+      console.log(`[Test Submit] Starting ${testType} submission - RequestId: ${requestId}`);
+      
       const submission: TestSubmission = await c.req.json();
       const dbService = c.get("dbService");
       const cacheService = c.get("cacheService");
@@ -158,14 +163,16 @@ testRoutes.post("/:testType/submit",
       
       // 验证测试类型是否存在
       await testEngineService.getTestConfig(testType);
+      console.log(`[Test Submit] Test config validated for ${testType} - RequestId: ${requestId}`);
 
       // 处理测试结果（添加性能监控）
-      const processingStartTime = Date.now();
+      console.log(`[Test Submit] Processing test submission for ${testType} with ${submission.answers.length} answers - RequestId: ${requestId}`);
       const result = await testResultService.processTestSubmission(
         testType,
         submission.answers
       );
       const processingTime = Date.now() - processingStartTime;
+      console.log(`[Test Submit] Test processing completed for ${testType} in ${processingTime}ms - RequestId: ${requestId}`);
       
       // 添加处理时间到结果元数据
       if (result.metadata) {
