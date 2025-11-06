@@ -1,6 +1,6 @@
 // Service Worker for caching static assets
-const STATIC_CACHE = 'static-v10';
-const DYNAMIC_CACHE = 'dynamic-v10';
+const STATIC_CACHE = 'static-v1.2';
+const DYNAMIC_CACHE = 'dynamic-v1.2';
 
 // 需要缓存的静态资源（仅核心HTML）
 // ⚠️ 注意：图片和其他资源从CDN加载，不需要缓存
