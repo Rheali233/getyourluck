@@ -1,6 +1,6 @@
 // Service Worker for caching static assets
-const STATIC_CACHE = 'static-v1.2';
-const DYNAMIC_CACHE = 'dynamic-v1.2';
+const STATIC_CACHE = 'static-v1.3';
+const DYNAMIC_CACHE = 'dynamic-v1.3';
 
 // 需要缓存的静态资源（仅核心HTML）
 // ⚠️ 注意：图片和其他资源从CDN加载，不需要缓存
@@ -151,29 +151,51 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 🔥 其他SPA路由：返回index.html（Cache-first策略）
+  // 使用原始请求URL，让Cloudflare Pages Functions处理重定向
   event.respondWith(
-    caches.match('/index.html')
-      .then((response) => {
-        if (response) {
-          return response;
+    caches.match(request)
+      .then((cachedResponse) => {
+        // 如果缓存中有响应，检查是否是有效的HTML响应
+        if (cachedResponse && cachedResponse.status === 200) {
+          return cachedResponse;
         }
-        // 🔥 修复：明确设置 redirect mode 为 follow
-        return fetch('/index.html', {
+        
+        // 🔥 修复：使用原始请求URL fetch，让服务器处理重定向
+        // 明确设置 redirect mode 为 follow，确保正确处理重定向
+        return fetch(request, {
           redirect: 'follow',
-          credentials: 'same-origin'
+          credentials: 'same-origin',
+          cache: 'no-cache' // 确保总是从服务器获取最新内容
         })
           .then((fetchResponse) => {
-            if (fetchResponse.status === 200) {
+            // 只缓存成功的HTML响应（200状态码）
+            if (fetchResponse.status === 200 && fetchResponse.headers.get('content-type')?.includes('text/html')) {
               const responseClone = fetchResponse.clone();
               caches.open(STATIC_CACHE)
                 .then((cache) => {
-                  cache.put('/index.html', responseClone);
+                  // 同时缓存原始请求和 /index.html
+                  cache.put(request, responseClone);
+                  cache.put('/index.html', responseClone.clone());
+                })
+                .catch(() => {
+                  // 静默处理缓存错误
                 });
             }
             return fetchResponse;
           })
-          .catch(() => {
-            return new Response('Network error', { status: 503 });
+          .catch((error) => {
+            // 如果网络请求失败，尝试返回缓存的 index.html
+            return caches.match('/index.html')
+              .then((fallbackResponse) => {
+                if (fallbackResponse) {
+                  return fallbackResponse;
+                }
+                // 如果连缓存都没有，返回错误响应
+                return new Response('Network error', { 
+                  status: 503,
+                  headers: { 'Content-Type': 'text/plain' }
+                });
+              });
           });
       })
   );
