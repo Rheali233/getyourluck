@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+// 确保导入顺序：先导入统一 store，再导入服务
 import { useUnifiedTestStore } from '../../../stores/unifiedTestStore';
 import { astrologyService } from '../services/astrologyService';
 
@@ -139,12 +140,23 @@ export const useAstrologyStore = () => {
   // 获取出生图
   const getBirthChart = async (birthData: any) => {
     try {
+      unifiedStore.setLoading(true);
+      unifiedStore.clearError();
       setAstrologyState(prev => ({ ...prev, analysisType: 'birth-chart' }));
       
       // 调用API获取出生图分析
       const response = await astrologyService.getBirthChart(birthData);
       
       if (response.success && response.data) {
+        // 检查 AI 分析是否失败
+        if (response.data.aiAnalysisFailed || response.data.aiError) {
+          const errorMessage = response.data.aiError || 'AI analysis failed. Please try again.';
+          unifiedStore.setError(errorMessage);
+          unifiedStore.setLoading(false);
+          unifiedStore.setShowResults(false); // 确保不显示结果页面
+          throw new Error(errorMessage);
+        }
+        
         setAstrologyState(prev => ({ 
           ...prev, 
           birthChart: response.data,
@@ -153,27 +165,26 @@ export const useAstrologyStore = () => {
         
         // 更新统一Store状态
         unifiedStore.setShowResults(true);
-        // 使用Zustand的setState方法更新currentSession
-        useUnifiedTestStore.setState((prev) => ({
-          ...prev,
-          currentSession: {
-            id: response.data?.sessionId || Date.now().toString(),
-            testType: 'birth-chart',
-            startTime: new Date(),
-            endTime: new Date(),
-            status: 'completed' as const,
-            currentQuestionIndex: 0,
-            totalQuestions: 0,
-            answers: [],
-            progress: 100
+        // 设置测试结果，而不是直接操作 currentSession
+        unifiedStore.setCurrentTestResult({
+          testType: 'birth-chart',
+          result: response.data,
+          metadata: {
+            processingTime: new Date().toISOString(),
+            processor: 'AstrologyService'
           }
-        }));
+        });
+        unifiedStore.setLoading(false);
       } else {
         throw new Error(response.error || 'Failed to get birth chart analysis');
       }
     } catch (error) {
       // Log error for monitoring (in production, this would go to a logging service)
-      unifiedStore.setError(error instanceof Error ? error.message : 'Failed to analyze birth chart');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to analyze birth chart';
+      unifiedStore.setError(errorMessage);
+      unifiedStore.setLoading(false);
+      unifiedStore.setShowResults(false); // 确保不显示结果页面
+      throw error;
     }
   };
 

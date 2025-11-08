@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, DateInput, TimeInput, LocationInput, FeedbackFloatingWidget, Breadcrumb } from '@/components/ui';
+import { Button, Card, DateInput, TimeInput, LocationInput, FeedbackFloatingWidget, Breadcrumb, Modal, Input } from '@/components/ui';
 import { useSEO } from '@/hooks/useSEO';
 import { SEOHead } from '@/components/SEOHead';
 import type { BaseComponentProps } from '@/types/componentTypes';
@@ -26,13 +26,22 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
     error,
     showResults,
     birthChart: birthChartAnalysis,
-    getBirthChart
+    getBirthChart,
+    clearError
   } = useAstrologyStore();
 
   const [birthDate, setBirthDate] = useState<string>('');
   const [birthTime, setBirthTime] = useState<string>('');
   const [birthLocation, setBirthLocation] = useState<string>('');
   const [showLoadingModal, setShowLoadingModal] = useState<boolean>(false);
+  
+  // 错误弹窗状态（参照 psychology 模块）
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbackEmail, setFeedbackEmail] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('Failed to get AI analysis results for the birth chart');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   const breadcrumbItems = getBreadcrumbConfig('/tests/astrology/birth-chart');
 
@@ -79,6 +88,32 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
       setShowLoadingModal(false);
     }
   }, [showResults, error]);
+  
+  // 当有错误且不在 loading 状态时，显示错误弹窗（参照 psychology 模块）
+  useEffect(() => {
+    if (!error || isLoading) {
+      setShowErrorModal(false);
+      return;
+    }
+    
+    // 检查是否是 AI 分析错误
+    const isAIAnalysisError = (
+      error.toLowerCase().includes('ai analysis') ||
+      error.toLowerCase().includes('ai service') ||
+      error.toLowerCase().includes('analysis failed') ||
+      error.toLowerCase().includes('failed to parse') ||
+      error.toLowerCase().includes('ai analysis is required') ||
+      error.toLowerCase().includes('birth chart analysis failed') ||
+      error.toLowerCase().includes('test result analysis failed')
+    );
+    
+    // 如果是 AI 分析错误，显示错误弹窗
+    if (isAIAnalysisError || !showResults) {
+      setShowErrorModal(true);
+    } else {
+      setShowErrorModal(false);
+    }
+  }, [error, isLoading, showResults]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +122,10 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
       return;
     }
 
+    // 清除之前的错误
+    clearError();
+    setShowErrorModal(false);
+    
     // 立即显示加载弹窗
     setShowLoadingModal(true);
 
@@ -98,6 +137,33 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
       });
     } catch (error) {
       // Error handling is managed by the store
+    }
+  };
+  
+  // 处理重试提交（参照 psychology 模块）
+  const handleRetrySubmit = async () => {
+    setShowErrorModal(false);
+    setShowFeedbackForm(false);
+    clearError();
+    // 重新提交
+    await handleSubmit(new Event('submit') as any);
+  };
+  
+  // 处理反馈提交（参照 psychology 模块）
+  const handleSubmitFeedback = async () => {
+    if (!feedbackEmail || !feedbackMessage) {
+      return;
+    }
+    
+    setIsSubmittingFeedback(true);
+    try {
+      // 这里可以调用反馈 API
+      // await feedbackService.submitFeedback({ email: feedbackEmail, message: feedbackMessage });
+      setFeedbackSubmitted(true);
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
@@ -467,15 +533,6 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
         </div>
       </div>
 
-      {/* 错误提示 */}
-      {error && (
-        <Card className="bg-white p-4 mb-6">
-          <div className="flex items-center">
-            <span className="text-red-500 text-xl mr-3">⚠️</span>
-            <p className="text-red-600">{error}</p>
-          </div>
-        </Card>
-      )}
 
       {/* 选择表单 */}
       <div className="space-y-6">
@@ -563,6 +620,164 @@ export const BirthChartTestPage: React.FC<BirthChartTestPageProps> = ({
           </div>
         </div>
       )}
+      
+      {/* AI分析失败错误弹窗（参照 psychology 模块） */}
+      <Modal
+        isOpen={showErrorModal}
+        onClose={() => {
+          setShowErrorModal(false);
+          setShowFeedbackForm(false);
+          setFeedbackSubmitted(false);
+          setFeedbackEmail('');
+          setFeedbackMessage('Failed to get AI analysis results for the birth chart');
+        }}
+        title={showFeedbackForm ? "Report Issue" : "Analysis Temporarily Unavailable"}
+        size="medium"
+        closeOnOverlayClick={false}
+      >
+        {!showFeedbackForm ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">⚠️</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                AI Analysis Temporarily Unavailable
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">
+                We encountered an issue while generating your AI-powered analysis. Your input data has been saved, and you can try submitting again.
+              </p>
+              <p className="text-sm text-gray-500 mb-4">
+                If this problem persists, please contact us at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a> or report the issue using the form below.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleRetrySubmit}
+                className="flex-1 bg-gradient-to-r from-[#0B132B] to-[#5F0F40] hover:from-[#1C2541] hover:to-[#5F0F40] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Retrying...' : 'Try Again'}
+              </Button>
+              <Button
+                onClick={() => setShowFeedbackForm(true)}
+                variant="outline"
+                className="flex-1 border-[#5F0F40] text-[#5F0F40] hover:bg-[#5F0F40]/10 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Report Issue
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowErrorModal(false);
+                  clearError();
+                  setBirthDate('');
+                  setBirthTime('');
+                  setBirthLocation('');
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Start Over
+              </Button>
+            </div>
+          </div>
+        ) : feedbackSubmitted ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">✓</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Thank You for Your Feedback
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                We've received your report and will look into this issue. You can also reach us directly at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a>.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleRetrySubmit}
+                className="flex-1 bg-gradient-to-r from-[#0B132B] to-[#5F0F40] hover:from-[#1C2541] hover:to-[#5F0F40] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Retrying...' : 'Try Again'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowErrorModal(false);
+                  clearError();
+                  setBirthDate('');
+                  setBirthTime('');
+                  setBirthLocation('');
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Start Over
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Help Us Improve
+              </h3>
+              <p className="text-sm text-gray-600">
+                Please provide your email and describe the issue you encountered. This will help us fix the problem quickly.
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="email"
+                value={feedbackEmail}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedbackEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Issue Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={feedbackMessage}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFeedbackMessage(e.target.value)}
+                placeholder="Describe the issue you encountered..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F0F40]"
+                rows={4}
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleSubmitFeedback}
+                className="flex-1 bg-gradient-to-r from-[#0B132B] to-[#5F0F40] hover:from-[#1C2541] hover:to-[#5F0F40] text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isSubmittingFeedback || !feedbackEmail || !feedbackMessage}
+              >
+                {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowFeedbackForm(false);
+                  setFeedbackEmail('');
+                  setFeedbackMessage('Failed to get AI analysis results for the birth chart');
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </AstrologyTestContainer>
     </>
   );
