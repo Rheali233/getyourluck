@@ -151,6 +151,9 @@ testRoutes.post("/:testType/submit",
     const testType = c.req.param("testType");
     const processingStartTime = Date.now();
     
+    // 添加调试日志
+    console.log(`[Test Submit Route] Matched route for testType: ${testType}, method: ${c.req.method}, path: ${c.req.path}`);
+    
     try {
       console.log(`[Test Submit] Starting ${testType} submission - RequestId: ${requestId}`);
       
@@ -161,9 +164,72 @@ testRoutes.post("/:testType/submit",
       // 使用环境变量中的API密钥
       const testResultService = new TestResultService(dbService, cacheService, new AIService(c.env.DEEPSEEK_API_KEY || ''), c.env);
       
-      // 验证测试类型是否存在
-      await testEngineService.getTestConfig(testType);
-      console.log(`[Test Submit] Test config validated for ${testType} - RequestId: ${requestId}`);
+      // 验证测试类型是否存在，如果不存在则尝试创建（仅对已知的特殊测试类型）
+      try {
+        await testEngineService.getTestConfig(testType);
+        console.log(`[Test Submit] Test config validated for ${testType} - RequestId: ${requestId}`);
+      } catch (error: any) {
+        // 如果是 numerology 或 tarot 等特殊测试类型，尝试自动创建配置
+        if (error.code === 'TEST_NOT_FOUND' && (testType === 'numerology' || testType === 'tarot')) {
+          console.log(`[Test Submit] Test type ${testType} not found, attempting to create default config - RequestId: ${requestId}`);
+          try {
+            const defaultConfigs: Record<string, any> = {
+              numerology: {
+                id: 'numerology',
+                name: 'Numerology Analysis',
+                category: 'numerology',
+                description: 'Number symbolism for personal reflection',
+                config_data: JSON.stringify({
+                  subtype: 'numerology',
+                  analysisTypes: ['bazi', 'zodiac', 'name', 'ziwei'],
+                  estimatedTime: 600
+                }),
+                is_active: 1,
+                sort_order: 13
+              },
+              tarot: {
+                id: 'tarot',
+                name: 'Tarot Reading',
+                category: 'tarot',
+                description: 'Card spreads for self-reflection',
+                config_data: JSON.stringify({
+                  subtype: 'tarot',
+                  spreadTypes: ['single', 'three_card', 'celtic_cross'],
+                  estimatedTime: 600
+                }),
+                is_active: 1,
+                sort_order: 12
+              }
+            };
+            
+            const defaultConfig = defaultConfigs[testType];
+            if (defaultConfig) {
+              // 使用 TestTypeModel 创建测试类型
+              await dbService.testTypes.create({
+                id: defaultConfig.id,
+                name: defaultConfig.name,
+                category: defaultConfig.category,
+                description: defaultConfig.description,
+                config: JSON.parse(defaultConfig.config_data),
+                isActive: defaultConfig.is_active === 1,
+                sortOrder: defaultConfig.sort_order
+              });
+              console.log(`[Test Submit] Default config created for ${testType} - RequestId: ${requestId}`);
+              
+              // 重新验证配置
+              await testEngineService.getTestConfig(testType);
+              console.log(`[Test Submit] Test config validated for ${testType} after creation - RequestId: ${requestId}`);
+            } else {
+              throw error; // 重新抛出原始错误
+            }
+          } catch (createError) {
+            console.error(`[Test Submit] Failed to create default config for ${testType}:`, createError);
+            throw error; // 重新抛出原始错误
+          }
+        } else {
+          throw error; // 重新抛出原始错误
+        }
+      }
 
       // 处理测试结果（添加性能监控）
       console.log(`[Test Submit] Processing test submission for ${testType} with ${submission.answers.length} answers - RequestId: ${requestId}`);

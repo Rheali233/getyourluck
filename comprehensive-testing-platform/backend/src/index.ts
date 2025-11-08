@@ -28,22 +28,12 @@ import { aiRoutes } from "./routes/ai";
 import { careerQuestionsRouter } from "./routes/career/questions";
 import { careerTestRouter } from "./routes/career/test";
 import { relationshipQuestionsRouter } from "./routes/relationship/questions";
+import { systemRoutes } from "./routes/system";
 import { DatabaseService } from "./services/DatabaseService";
 import { CacheService } from "./services/CacheService";
 
 import type { APIResponse } from "../../shared/types/apiResponse";
 import type { AppContext } from "./types/env";
-
-// Cloudflare Workers 环境类型定义
-export interface Env {
-  DB?: any; // D1Database - 可选，支持本地开发
-  KV?: any; // KVNamespace - 可选，支持本地开发
-  BUCKET?: any; // R2Bucket - 可选，支持本地开发
-  ENVIRONMENT: string;
-  [key: string]: any; // 添加索引签名
-}
-
-
 
 const app = new Hono<AppContext>();
 
@@ -121,6 +111,11 @@ app.options("*", (c) => {
 app.use("*", async (c, next) => {
   // 生成请求ID
   const requestId = c.req.header("X-Request-ID") || crypto.randomUUID();
+  
+  // 添加路由调试日志（仅对测试相关路由）
+  if (c.req.path.includes('/api/v1/tests')) {
+    console.log(`[Route Debug] ${c.req.method} ${c.req.path} - RequestId: ${requestId}`);
+  }
   
   // 检查环境变量
   
@@ -236,6 +231,7 @@ app.route("/api/career/test", careerTestRouter);
 app.route("/api/relationship/questions", relationshipQuestionsRouter);
 app.route("/api/psychology/options", optionsRouter);
 app.route("/api/ai", aiRoutes);
+app.route("/api/system", systemRoutes);
 // app.route("/api/recommendations", recommendationsRoutes); // 暂时注释，未定义
 // app.route("/api/seo", seoRoutes); // 暂时注释，未定义
 

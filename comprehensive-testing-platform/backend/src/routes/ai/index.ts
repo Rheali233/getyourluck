@@ -11,8 +11,9 @@ import { careerAIRoutes } from './career';
 import { learningAIRoutes } from './learning';
 import { astrologyAIRoutes } from './astrology';
 import { tarotAIRoutes } from './tarot';
+import type { AppContext } from '../../types/env';
 
-const aiRoutes = new Hono();
+const aiRoutes = new Hono<AppContext>();
 
 // Mount AI service routes
 aiRoutes.route('/psychology', psychologyAIRoutes);

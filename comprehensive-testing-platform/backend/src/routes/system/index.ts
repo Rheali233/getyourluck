@@ -129,11 +129,16 @@ systemRoutes.get("/migrations", async (c) => {
 systemRoutes.get("/health/cache", async (c) => {
   try {
     // 简单的KV健康检查
-    if (!c.env) {
-      return c.json({ 
-        success: false, 
-        error: '环境配置不可用' 
-      }, 500);
+    if (!c.env || !(c.env as any)['KV']) {
+      const response: APIResponse = {
+        success: false,
+        error: "Cache binding not configured",
+        message: "KV namespace is required for cache health checks",
+        timestamp: new Date().toISOString(),
+        requestId: c.get("requestId"),
+      };
+
+      return c.json(response, 500);
     }
 
     const testKey = "health_check_cache";
@@ -269,9 +274,9 @@ systemRoutes.get("/info", async (c) => {
     const response: APIResponse = {
       success: true,
       data: {
-        name: "综合测试平台 API",
+        name: "Comprehensive Testing Platform API",
         version: "1.0.0",
-        description: "专业的心理测试、占星分析、塔罗占卜等在线测试服务",
+        description: "Professional platform for psychological testing, astrology insights, tarot readings, and more",
         uptime: "N/A", // Cloudflare Workers不支持process.uptime
         timestamp: new Date().toISOString(),
         environment: (c.env as any)?.['ENVIRONMENT'],
