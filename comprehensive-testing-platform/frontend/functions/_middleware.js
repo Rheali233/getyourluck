@@ -32,8 +32,11 @@ export async function onRequest(context) {
   if (isStaticFile) {
     if (env && env.ASSETS) {
       const assetResponse = await env.ASSETS.fetch(request);
-      if (assetResponse && assetResponse.status !== 404) {
-        return assetResponse;
+      if (assetResponse) {
+        const assetContentType = assetResponse.headers.get('content-type') || '';
+        if (assetResponse.status !== 404 && !(assetContentType.includes('text/html') && pathname !== '/index.html')) {
+          return assetResponse;
+        }
       }
     }
 
