@@ -43,23 +43,36 @@ export const HappinessResultDisplay: React.FC<HappinessResultDisplayProps> = ({
   result,
   ...props
 }) => {
-  // 添加默认值处理，防止访问 undefined 属性
+  // 验证结果是否有效（AI分析失败时不应该到达这里，但作为安全措施）
+  if (!result || !result.happinessLevel || !result.overallAnalysis || !result.domains || result.domains.length === 0) {
+    return (
+      <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId} {...props}>
+        <div className="max-w-6xl mx-auto">
+          <Card className="p-8 text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Analysis Not Available</h2>
+            <p className="text-gray-600 mb-4">
+              Unable to generate AI analysis for your Happiness test results. Please try submitting again.
+            </p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // 使用实际结果，不提供默认值
   const safeResult: any = {
-    happinessLevel: result?.happinessLevel || 'moderate',
-    levelName: result?.levelName || 'Happiness Assessment',
-    domains: Array.isArray(result?.domains) ? result.domains : [
-      { name: 'Positive Emotions', score: 0, maxScore: 20, description: '', currentStatus: '', improvementAreas: [], positiveAspects: [] },
-      { name: 'Engagement', score: 0, maxScore: 20, description: '', currentStatus: '', improvementAreas: [], positiveAspects: [] },
-      { name: 'Relationships', score: 0, maxScore: 20, description: '', currentStatus: '', improvementAreas: [], positiveAspects: [] },
-      { name: 'Meaning', score: 0, maxScore: 20, description: '', currentStatus: '', improvementAreas: [], positiveAspects: [] },
-      { name: 'Accomplishment', score: 0, maxScore: 20, description: '', currentStatus: '', improvementAreas: [], positiveAspects: [] }
-    ],
-    overallAnalysis: result?.overallAnalysis || '',
+    happinessLevel: result.happinessLevel,
+    levelName: result.levelName || '',
+    domains: result.domains,
+    overallAnalysis: result.overallAnalysis,
     improvementPlan: {
-      immediate: Array.isArray(result?.improvementPlan?.immediate) ? result.improvementPlan.immediate : [],
-      shortTerm: Array.isArray(result?.improvementPlan?.shortTerm) ? result.improvementPlan.shortTerm : [],
-      longTerm: Array.isArray(result?.improvementPlan?.longTerm) ? result.improvementPlan.longTerm : [],
-      dailyHabits: Array.isArray(result?.improvementPlan?.dailyHabits) ? result.improvementPlan.dailyHabits : []
+      immediate: Array.isArray(result.improvementPlan?.immediate) ? result.improvementPlan.immediate : [],
+      shortTerm: Array.isArray(result.improvementPlan?.shortTerm) ? result.improvementPlan.shortTerm : [],
+      longTerm: Array.isArray(result.improvementPlan?.longTerm) ? result.improvementPlan.longTerm : [],
+      dailyHabits: Array.isArray(result.improvementPlan?.dailyHabits) ? result.improvementPlan.dailyHabits : []
     }
   };
 
@@ -99,7 +112,7 @@ export const HappinessResultDisplay: React.FC<HappinessResultDisplayProps> = ({
                 </span>
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {safeResult.overallAnalysis || 'Analysis not available'}
+                {safeResult.overallAnalysis}
               </p>
             </div>
           </div>

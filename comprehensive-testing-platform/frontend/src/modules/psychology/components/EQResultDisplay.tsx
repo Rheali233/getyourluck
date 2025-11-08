@@ -46,43 +46,44 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
   onRetry,
   ...props
 }) => {
-  // 添加默认值处理，防止访问 undefined 属性
+  // 验证结果是否有效（AI分析失败时不应该到达这里，但作为安全措施）
+  if (!result || !result.overallLevel || !result.overallAnalysis || !result.dimensions || result.dimensions.length === 0) {
+    return (
+      <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId} {...props}>
+        <div className="max-w-6xl mx-auto">
+          <Card className="p-8 text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Analysis Not Available</h2>
+            <p className="text-gray-600 mb-4">
+              Unable to generate AI analysis for your EQ test results. Please try submitting again.
+            </p>
+            {onRetry && (
+              <Button
+                onClick={onRetry}
+                className="mt-4 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white"
+              >
+                Retry Analysis
+              </Button>
+            )}
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // 使用实际结果，不提供默认值
   const safeResult: any = {
-    // 不使用默认等级以免误导，若缺失则用占位展示
-    overallLevel: result?.overallLevel,
-    levelName: result?.levelName || 'Emotional Intelligence Assessment',
-    dimensions: result?.dimensions || [
-      { 
-        name: 'Self-Awareness', 
-        level: 'Average', 
-        description: 'This dimension measures your ability to recognize and understand your own emotions and their impact on your thoughts and behaviors.', 
-        strengths: ['Basic emotional recognition', 'Some self-reflection skills'] 
-      },
-      { 
-        name: 'Self-Management', 
-        level: 'Average', 
-        description: 'This dimension assesses your ability to regulate your emotions and manage your impulses effectively in various situations.', 
-        strengths: ['Some emotional regulation', 'Basic stress management'] 
-      },
-      { 
-        name: 'Social Awareness', 
-        level: 'Average', 
-        description: 'This dimension evaluates your ability to understand others\' emotions and read social cues in different contexts.', 
-        strengths: ['Some empathy', 'Basic social understanding'] 
-      },
-      { 
-        name: 'Relationship Management', 
-        level: 'Average', 
-        description: 'This dimension measures your ability to build and maintain healthy relationships with others.', 
-        strengths: ['Some communication skills', 'Basic relationship building'] 
-      }
-    ],
-    overallAnalysis: typeof result?.overallAnalysis === 'string' ? result.overallAnalysis : 
-                    typeof result?.overallAnalysis === 'object' ? JSON.stringify(result.overallAnalysis) : '',
+    overallLevel: result.overallLevel,
+    levelName: result.levelName || '',
+    dimensions: result.dimensions,
+    overallAnalysis: typeof result.overallAnalysis === 'string' ? result.overallAnalysis : 
+                    typeof result.overallAnalysis === 'object' ? JSON.stringify(result.overallAnalysis) : '',
     improvementPlan: {
-      shortTerm: Array.isArray(result?.improvementPlan?.shortTerm) ? result.improvementPlan.shortTerm : [],
-      longTerm: Array.isArray(result?.improvementPlan?.longTerm) ? result.improvementPlan.longTerm : [],
-      dailyPractices: Array.isArray(result?.improvementPlan?.dailyPractices) ? result.improvementPlan.dailyPractices : []
+      shortTerm: Array.isArray(result.improvementPlan?.shortTerm) ? result.improvementPlan.shortTerm : [],
+      longTerm: Array.isArray(result.improvementPlan?.longTerm) ? result.improvementPlan.longTerm : [],
+      dailyPractices: Array.isArray(result.improvementPlan?.dailyPractices) ? result.improvementPlan.dailyPractices : []
     }
   };
 
@@ -166,7 +167,7 @@ export const EQResultDisplay: React.FC<EQResultDisplayProps> = ({
                 </span>
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {safeResult.overallAnalysis || 'Analysis not available'}
+                {safeResult.overallAnalysis}
               </p>
             </div>
           </div>

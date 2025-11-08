@@ -22,39 +22,37 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
   result,
   ...props
 }) => {
-  // 添加默认值处理，防止访问 undefined 属性
+  // 验证结果是否有效（AI分析失败时不应该到达这里，但作为安全措施）
+  if (!result || !result.personalityType || !result.detailedAnalysis) {
+    return (
+      <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId} {...props}>
+        <div className="max-w-6xl mx-auto">
+          <Card className="p-8 text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Analysis Not Available</h2>
+            <p className="text-gray-600 mb-4">
+              Unable to generate AI analysis for your MBTI test results. Please try submitting again.
+            </p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // 使用实际结果，不提供默认值
   const safeResult = {
-    personalityType: result?.personalityType || '',
-    typeName: result?.typeName || 'Unknown Type',
-    typeDescription: result?.typeDescription || 'No description available',
-    detailedAnalysis: result?.detailedAnalysis || 'No detailed analysis available',
-    dimensions: result?.dimensions || [],
-    strengths: result?.strengths || [],
-    blindSpots: result?.blindSpots || [],
-    careerSuggestions: result?.careerSuggestions || [],
-    relationshipPerformance: result?.relationshipPerformance || {
-      workplace: {
-        leadershipStyle: 'Not specified',
-        teamCollaboration: 'Not specified',
-        decisionMaking: 'Not specified'
-      },
-      family: {
-        role: 'Not specified',
-        communication: 'Not specified',
-        emotionalExpression: 'Not specified'
-      },
-      friendship: {
-        preferences: 'Not specified',
-        socialPattern: 'Not specified',
-        supportStyle: 'Not specified'
-      },
-      romance: {
-        datingStyle: 'Not specified',
-        emotionalNeeds: 'Not specified',
-        relationshipPattern: 'Not specified'
-      }
-    },
-    relationshipCompatibility: result?.relationshipCompatibility || {}
+    personalityType: result.personalityType,
+    typeName: result.typeName || '',
+    typeDescription: result.typeDescription || '',
+    detailedAnalysis: result.detailedAnalysis,
+    dimensions: result.dimensions || [],
+    strengths: result.strengths || [],
+    blindSpots: result.blindSpots || [],
+    careerSuggestions: result.careerSuggestions || [],
+    relationshipPerformance: result.relationshipPerformance,
+    relationshipCompatibility: result.relationshipCompatibility || {}
   };
   return (
     <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId} {...props}>
@@ -79,7 +77,7 @@ export const MBTIResultDisplay: React.FC<MBTIResultDisplayProps> = ({
                 </span>
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {safeResult.detailedAnalysis || 'Analysis not available'}
+                {safeResult.detailedAnalysis}
               </p>
             </div>
           </div>

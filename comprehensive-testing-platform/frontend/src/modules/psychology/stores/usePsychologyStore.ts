@@ -145,24 +145,20 @@ export const usePsychologyStore = () => {
       const result = await unifiedEndTest();
       
       if (result) {
-        // 检查AI分析是否失败
-        if (result.aiAnalysisFailed) {
-          throw new Error(`AI analysis failed: ${result.aiError || 'Unknown error'}. Please try again.`);
-        }
-        
         setCurrentTestResult(result);
         setResults(prev => ({
           ...prev,
           [currentSession.testType]: result
         }));
+        setShowResults(true);
       }
       
-      setShowResults(true);
-      
     } catch (error) {
+      // AI分析失败时，不设置showResults，保持在答题界面
       const errorMessage = error instanceof Error ? error.message : 'Failed to submit test';
       setError(errorMessage);
-      throw new Error(errorMessage);
+      setShowResults(false); // 确保不显示结果页面
+      // 不抛出错误，让组件可以显示错误弹窗
     } finally {
       setLoading(false);
     }

@@ -16,43 +16,48 @@ export const PHQ9ResultDisplay: React.FC<PHQ9ResultDisplayProps> = ({
   result,
   ...props
 }) => {
-  if (!result) {
+  // 验证结果是否有效（AI分析失败时不应该到达这里，但作为安全措施）
+  if (!result || result.totalScore === undefined || !result.physicalAnalysis || !result.psychologicalAnalysis) {
     return (
-      <div className="p-8 text-center">
-        <p className="text-red-600">No test results available</p>
+      <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId} {...props}>
+        <div className="max-w-6xl mx-auto">
+          <Card className="p-8 text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Analysis Not Available</h2>
+            <p className="text-gray-600 mb-4">
+              Unable to generate AI analysis for your PHQ-9 test results. Please try submitting again.
+            </p>
+          </Card>
+        </div>
       </div>
     );
   }
 
+  // 使用实际结果，不提供AI分析字段的默认值
   const safeResult: PHQ9Result = {
-    totalScore: result.totalScore || 0,
+    totalScore: result.totalScore,
     severity: result.severity || 'minimal',
     riskLevel: result.riskLevel || 'low',
     riskLevelName: result.riskLevelName || 'Minimal Risk',
-    riskDescription: result.riskDescription || 'No description available',
-    lifestyleInterventions: {
-      sleepHygiene: result.lifestyleInterventions?.sleepHygiene || 'No sleep hygiene tips available',
-      physicalActivity: result.lifestyleInterventions?.physicalActivity || 'No physical activity recommendations available',
-      nutrition: result.lifestyleInterventions?.nutrition || 'No nutrition recommendations available',
-      socialSupport: result.lifestyleInterventions?.socialSupport || 'No social support strategies available'
+    riskDescription: result.riskDescription || '',
+    lifestyleInterventions: result.lifestyleInterventions || {
+      sleepHygiene: '',
+      physicalActivity: '',
+      nutrition: '',
+      socialSupport: ''
     },
-    followUpAdvice: result.followUpAdvice || 'No follow-up advice available',
-    physicalAnalysis: result.physicalAnalysis || 'No physical analysis available',
-    psychologicalAnalysis: result.psychologicalAnalysis || 'No psychological analysis available'
+    followUpAdvice: result.followUpAdvice || '',
+    physicalAnalysis: result.physicalAnalysis,
+    psychologicalAnalysis: result.psychologicalAnalysis
   };
-
-
-
 
   // Get AI-generated professional analysis
-  const getProfessionalAnalysis = () => {
-    return {
-      physicalAnalysis: safeResult.physicalAnalysis || 'No physical analysis available',
-      psychologicalAnalysis: safeResult.psychologicalAnalysis || 'No psychological analysis available'
-    };
+  const professionalAnalysis = {
+    physicalAnalysis: safeResult.physicalAnalysis,
+    psychologicalAnalysis: safeResult.psychologicalAnalysis
   };
-
-  const professionalAnalysis = getProfessionalAnalysis();
 
   return (
     <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId} {...props}>
@@ -82,7 +87,7 @@ export const PHQ9ResultDisplay: React.FC<PHQ9ResultDisplayProps> = ({
                 </span>
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
-                {safeResult.riskDescription || 'Assessment not available'}
+                {safeResult.riskDescription}
               </p>
             </div>
           </div>
