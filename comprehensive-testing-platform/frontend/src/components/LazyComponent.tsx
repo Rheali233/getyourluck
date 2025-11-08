@@ -111,7 +111,8 @@ export const preloadCriticalComponents = () => {
   
   // 预加载主要测试模块
   preloadComponent(() => import('@/modules/psychology/components/PsychologyHomePage'))();
-  preloadComponent(() => import('@/modules/astrology/components/AstrologyHomePage'))();
+  // 修复：注释掉 astrology 预加载，避免初始化顺序问题
+  // preloadComponent(() => import('@/modules/astrology/components/AstrologyHomePage'))();
   preloadComponent(() => import('@/modules/tarot/components/TarotHomePage'))();
 };
 

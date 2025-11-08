@@ -56,10 +56,11 @@ export const Preload: React.FC<PreloadProps> = ({
 export const PreloadCriticalModules: React.FC = () => {
   useEffect(() => {
     // 预加载关键路由
+    // 修复：移除 astrology 预加载，避免初始化顺序问题
     const criticalRoutes = [
       '/tests/psychology',
       '/tests/career',
-      '/tests/astrology',
+      // '/tests/astrology', // 注释掉，避免初始化顺序问题
       '/tests/tarot',
       '/tests/numerology',
     ];
