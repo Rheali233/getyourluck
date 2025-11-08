@@ -3,7 +3,7 @@
  * 遵循统一开发标准的数据库连接和管理规范
  */
 
-import type { Env } from '../index'
+import type { Env } from '../types/env'
 import { MigrationRunner } from './migrationRunner'
 import { migrations } from './migrations'
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'

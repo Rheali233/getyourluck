@@ -3,7 +3,7 @@
  * 遵循统一开发标准的数据库迁移规范
  */
 
-import type { Env } from '../index'
+import type { Env } from '../types/env'
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
 
 export interface Migration {

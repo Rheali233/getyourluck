@@ -4,7 +4,7 @@
  */
 
 import { BaseModel } from './BaseModel'
-import type { Env } from '../index'
+import type { Env } from '../types/env'
 import { DB_TABLES } from '../../../shared/constants'
 
 async function hashString(input: string): Promise<string> {

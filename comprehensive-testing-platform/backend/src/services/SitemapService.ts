@@ -128,19 +128,13 @@ export class SitemapService {
       const articles = await this.getBlogArticles();
       
       for (const article of articles) {
-        // 为每种语言生成URL
-        for (const lang of this.config.supportedLanguages) {
-          urls.push({
-            loc: `${this.config.baseUrl}/${lang}/blog/${article.slug}`,
-            lastmod: article.updatedAt || new Date().toISOString(),
-            changefreq: 'monthly',
-            priority: 0.6,
-            hreflang: this.config.supportedLanguages.map(l => ({
-              lang: l,
-              url: `${this.config.baseUrl}/${l}/blog/${article.slug}`
-            }))
-          });
-        }
+        // 生成blog文章URL（不使用语言前缀）
+        urls.push({
+          loc: `${this.config.baseUrl}/blog/${article.slug}`,
+          lastmod: article.updatedAt || new Date().toISOString(),
+          changefreq: 'monthly',
+          priority: 0.6
+        });
       }
 
       return this.generateSitemapXml(urls);

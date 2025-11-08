@@ -39,25 +39,25 @@ export class AuthenticationError extends AppError {
 }
 
 export class AuthorizationError extends AppError {
-  constructor(message: string = '权限不足', code?: string) {
+  constructor(message: string = 'Access denied', code?: string) {
     super(message, 403, code);
   }
 }
 
 export class NotFoundError extends AppError {
-  constructor(message: string = '资源未找到', code?: string) {
+  constructor(message: string = 'Resource not found', code?: string) {
     super(message, 404, code);
   }
 }
 
 export class ConflictError extends AppError {
-  constructor(message: string = '资源冲突', code?: string) {
+  constructor(message: string = 'Resource conflict', code?: string) {
     super(message, 409, code);
   }
 }
 
 export class RateLimitError extends AppError {
-  constructor(message: string = '请求过于频繁', code?: string) {
+  constructor(message: string = 'Too many requests', code?: string) {
     super(message, 429, code);
   }
 }
@@ -144,8 +144,10 @@ function logError(error: unknown, c: Context) {
 
   // 根据错误类型选择日志级别
   if (error instanceof AppError && error.isOperational) {
+    // eslint-disable-next-line no-console
     console.warn('Operational Error:', errorLog);
   } else {
+    // eslint-disable-next-line no-console
     console.error('System Error:', errorLog);
   }
 
@@ -204,27 +206,15 @@ function formatErrorResponse(error: unknown): { body: APIResponse; status: numbe
 }
 
 // 发送错误到监控系统
-async function sendErrorToMonitoring(_errorLog: any) {
-  try {
-    // 无法使用process.env，在Workers中应通过Env注入；此处跳过外部上报
-    return;
-  } catch (e) {
-    // no-op
-  }
+async function sendErrorToMonitoring(_errorLog: unknown) {
+  // TODO: 集成外部监控系统时在此实现上报逻辑
 }
 
 // 异步错误包装器
 export function asyncErrorHandler<T extends any[], R>(
   fn: (...args: T) => Promise<R>
 ) {
-  return async (...args: T): Promise<R> => {
-    try {
-      return await fn(...args);
-    } catch (error) {
-      // 重新抛出错误，让错误处理中间件处理
-      throw error;
-    }
-  };
+  return async (...args: T): Promise<R> => fn(...args);
 }
 
 // 验证错误处理
@@ -236,11 +226,11 @@ export function handleValidationError(errors: any[]): ValidationError {
 // 数据库错误处理
 export function handleDatabaseError(error: any): AppError {
   if (error.code === 'SQLITE_CONSTRAINT') {
-    return new ConflictError('数据约束冲突', ERROR_CODES.DATA_CONFLICT);
+    return new ConflictError('Database constraint violation', ERROR_CODES.DATA_CONFLICT);
   }
 
   if (error.code === 'SQLITE_BUSY') {
-    return new AppError('数据库繁忙，请稍后重试', 503, ERROR_CODES.DATABASE_ERROR);
+    return new AppError('Database is busy, please retry later', 503, ERROR_CODES.DATABASE_ERROR);
   }
 
   return new AppError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
@@ -253,7 +243,7 @@ export function handleNetworkError(error: any): AppError {
   }
 
   if (error.code === 'ETIMEDOUT') {
-    return new AppError('请求超时', 504, ERROR_CODES.TIMEOUT_ERROR);
+    return new AppError('Request timed out', 504, ERROR_CODES.TIMEOUT_ERROR);
   }
 
   return new AppError('Network error', 503, ERROR_CODES.NETWORK_ERROR);

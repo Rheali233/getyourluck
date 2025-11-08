@@ -5,7 +5,7 @@
  */
 
 import { BaseModel } from "./BaseModel";
-import type { Env } from "../index";
+import type { Env } from "../types/env";
 import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 
 // Question bank category data interface

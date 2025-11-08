@@ -2,7 +2,7 @@
  * 详细反馈模型（结构化反馈）
  */
 import { BaseModel } from './BaseModel'
-import type { Env } from '../index'
+import type { Env } from '../types/env'
 
 export interface FeedbackDetailsRecord {
   id: string

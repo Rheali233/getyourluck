@@ -18,7 +18,7 @@ import {
   type CreateQuestionConfigData,
   type CreateQuestionVersionData
 } from "../models";
-import type { Env } from "../index";
+import type { Env } from "../types/env";
 
 /**
  * 题库查询参数接口

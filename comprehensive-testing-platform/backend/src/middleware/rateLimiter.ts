@@ -4,7 +4,7 @@
  */
 
 import type { Context, Next } from "hono";
-import type { Env } from "../index";
+import type { Env } from "../types/env";
 import { ModuleError, ERROR_CODES } from "../../../shared/types/errors";
 
 export const rateLimiter = (requests: number = 100, windowMs: number = 60000) => {

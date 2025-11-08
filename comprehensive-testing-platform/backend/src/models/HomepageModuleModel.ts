@@ -26,8 +26,7 @@ export class HomepageModuleModel extends BaseModel {
 
       return result.results?.map(this.mapDatabaseRowToModule) || [];
     } catch (error) {
-      console.error('获取活跃测试模块失败:', error);
-      throw new Error('获取测试模块失败');
+      throw new Error('Failed to fetch active modules');
     }
   }
 
@@ -47,8 +46,7 @@ export class HomepageModuleModel extends BaseModel {
 
       return result.results?.map(this.mapDatabaseRowToModule) || [];
     } catch (error) {
-      console.error(`获取${theme}主题测试模块失败:`, error);
-      throw new Error(`获取${theme}主题测试模块失败`);
+      throw new Error(`Failed to fetch modules for theme ${theme}`);
     }
   }
 
@@ -64,8 +62,7 @@ export class HomepageModuleModel extends BaseModel {
 
       return result ? this.mapDatabaseRowToModule(result) : null;
     } catch (error) {
-      console.error(`获取测试模块${id}失败:`, error);
-      throw new Error(`获取测试模块失败`);
+      throw new Error('Failed to fetch module');
     }
   }
 
@@ -83,8 +80,7 @@ export class HomepageModuleModel extends BaseModel {
         .bind(testCount, rating, id)
         .run();
     } catch (error) {
-      console.error(`更新测试模块${id}统计信息失败:`, error);
-      throw new Error('更新统计信息失败');
+      throw new Error('Failed to update module statistics');
     }
   }
 
@@ -127,8 +123,7 @@ export class HomepageModuleModel extends BaseModel {
         activeThemes: themesResult.results?.map((row: any) => row.theme as string) || [],
       };
     } catch (error) {
-      console.error('获取测试模块统计摘要失败:', error);
-      throw new Error('获取统计摘要失败');
+      throw new Error('Failed to retrieve module statistics summary');
     }
   }
 

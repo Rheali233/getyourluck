@@ -5,7 +5,7 @@
  */
 
 import { BaseModel } from './BaseModel'
-import type { Env } from '../index'
+import type { Env } from '../types/env'
 import { CACHE_KEYS, DB_TABLES } from '../../../shared/constants'
 
 // 统一的会话状态枚举

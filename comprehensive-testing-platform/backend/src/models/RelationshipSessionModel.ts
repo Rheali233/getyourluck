@@ -4,7 +4,7 @@
  */
 
 import { BaseModel } from "./BaseModel";
-import type { Env } from "../index";
+import type { Env } from "../types/env";
 
 export interface RelationshipSessionData {
   id: string;

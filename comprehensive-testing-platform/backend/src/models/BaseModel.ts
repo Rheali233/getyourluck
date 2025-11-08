@@ -3,7 +3,7 @@
  * 遵循统一开发标准的数据访问层规范
  */
 
-import type { Env } from '../index'
+import type { Env } from '../types/env'
 import { ModuleError, ERROR_CODES } from '../../../shared/types/errors'
 // 本地实现通用工具，避免对shared/utils直接编译依赖
 

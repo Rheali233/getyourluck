@@ -5,7 +5,7 @@
  */
 
 import { BaseModel } from './BaseModel'
-import type { Env } from '../index'
+import type { Env } from '../types/env'
 import { TestCategory } from './UnifiedSessionModel'
 
 // 统一的结果类型枚举
