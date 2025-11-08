@@ -17,7 +17,7 @@ export async function onRequest(context) {
   // 但为了安全起见，我们在这里也进行检查
   const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/scripts/'];
   const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot', '.json', '.xml', '.txt', '.map'];
-  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json', '/index.html'];
+  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json'];
   const staticFilePrefixes = ['/favicon', '/apple-touch-icon'];
 
   // Check if the request is for a static file
@@ -31,23 +31,15 @@ export async function onRequest(context) {
     // Check static file prefixes
     staticFilePrefixes.some(prefix => pathname.startsWith(prefix));
 
-  // If it's a static file, immediately pass through without any processing
-  // 🔥 关键：静态文件必须最先处理，直接返回，不经过任何中间件逻辑
-  // 如果静态文件请求到达这里，说明 _routes.json 可能没有正确排除
-  // 但我们仍然需要确保它们能够正确返回
+  // If it's a static file, immediately return without processing
+  // 🔥 关键：如果静态文件请求到达这里，说明 _routes.json 没有正确排除
+  // 我们应该立即返回，让 Cloudflare Pages 的静态文件服务处理
+  // 不要调用 next()，因为那可能会路由到 index.html
   if (isStaticFile) {
-    // 直接调用 next() 让 Cloudflare Pages 的静态文件服务处理
-    // 不要做任何额外的处理，确保静态资源能够正确返回
-    const staticResponse = await next();
-    
-    // 🔥 关键修复：如果返回的是 HTML（说明路由到了 index.html），直接返回 404
-    // 这样可以避免静态资源被错误地返回为 HTML MIME 类型
-    const contentType = staticResponse.headers.get('content-type') || '';
-    if (contentType.includes('text/html') && pathname !== '/index.html') {
-      return new Response('Not Found', { status: 404 });
-    }
-    
-    return staticResponse;
+    // 直接返回，让 Cloudflare Pages 的静态文件服务处理
+    // 如果文件不存在，Cloudflare Pages 会返回 404
+    // 这样避免了被错误路由到 index.html
+    return next();
   }
 
   // 🔥 HTTP 到 HTTPS 重定向（仅在生产环境）
