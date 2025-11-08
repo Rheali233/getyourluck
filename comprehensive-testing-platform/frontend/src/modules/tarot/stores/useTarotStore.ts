@@ -281,7 +281,35 @@ export const useTarotStore = () => {
       // 结束测试，这会自动调用AI分析
       const testResult = await unifiedStore.endTest();
       
+      if (!testResult || !testResult.result) {
+        throw new Error('No test result returned from unified store');
+      }
+      
+      // 检查 AI 分析是否失败
+      if (testResult.result.aiAnalysisFailed || testResult.result.aiError) {
+        const errorMessage = testResult.result.aiError || 'AI analysis failed. Please try again.';
+        setError(errorMessage);
+        unifiedStore.setError(errorMessage);
+        unifiedStore.setLoading(false);
+        unifiedStore.setShowResults(false); // 确保不显示结果页面
+        
+        // 确保最小加载时间
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+        
+        if (remainingTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+        
+        setLoading(false);
+        throw new Error(errorMessage);
+      }
+      
       if (testResult) {
+        // 提取 AI 分析结果
+        // 后端返回的格式：result.aiReading 包含完整的 AI 分析
+        const aiReadingData = testResult.result.aiReading;
+        
         // 创建完整的会话数据
         const sessionData = {
           id: testResult.result.sessionId || `tarot_${Date.now()}`,
@@ -294,21 +322,20 @@ export const useTarotStore = () => {
             key_themes: drawnCards.map(card => card.card.name_en),
             general_advice: 'Review the cards for guidance'
           },
-          // AI分析结果可能在不同的字段中
-          aiReading: testResult.result.aiReading || 
-                    testResult.result.overall_interpretation ? {
-                      sessionId: testResult.result.sessionId || `tarot_${Date.now()}`,
-                      overall_interpretation: testResult.result.overall_interpretation,
-                      card_interpretations: testResult.result.card_interpretations || [],
-                      synthesis: testResult.result.synthesis,
-                      action_guidance: testResult.result.action_guidance || [],
-                      timing_advice: testResult.result.timing_advice,
-                      emotional_insights: testResult.result.emotional_insights,
-                      spiritual_guidance: testResult.result.spiritual_guidance,
-                      warning_signs: testResult.result.warning_signs,
-                      opportunities: testResult.result.opportunities,
-                      generated_at: testResult.result.generated_at || new Date().toISOString()
-                    } : null,
+          // AI分析结果：优先使用 aiReading 字段，如果没有则尝试从顶层字段构建
+          aiReading: aiReadingData || (testResult.result.overall_interpretation ? {
+            sessionId: testResult.result.sessionId || `tarot_${Date.now()}`,
+            overall_interpretation: testResult.result.overall_interpretation,
+            card_interpretations: testResult.result.card_interpretations || [],
+            synthesis: testResult.result.synthesis,
+            action_guidance: testResult.result.action_guidance || [],
+            timing_advice: testResult.result.timing_advice,
+            emotional_insights: testResult.result.emotional_insights,
+            spiritual_guidance: testResult.result.spiritual_guidance,
+            warning_signs: testResult.result.warning_signs,
+            opportunities: testResult.result.opportunities,
+            generated_at: testResult.result.generated_at || new Date().toISOString()
+          } : null),
           createdAt: new Date().toISOString()
         };
 

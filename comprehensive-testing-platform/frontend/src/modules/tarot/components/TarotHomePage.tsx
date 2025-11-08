@@ -4,7 +4,7 @@
  * 遵循统一开发标准的组件架构
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTarotStore } from '../stores/useTarotStore';
 import { useUnifiedTestStore } from '@/stores/unifiedTestStore';
@@ -18,7 +18,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { ContextualLinks } from '@/components/InternalLinks';
 import { trackEvent, buildBaseContext } from '@/services/analyticsService';
 import { FAQ_CONFIG } from '@/shared/configs/FAQ_CONFIG';
-import { TarotPerformanceMonitor, useTarotPerformance } from './TarotPerformanceMonitor';
+import { TarotPerformanceMonitor, TarotPerformanceMonitorRef } from './TarotPerformanceMonitor';
 import { resolveAbsoluteUrl } from '@/utils/browserEnv';
 import { buildAbsoluteUrl } from '@/config/seo';
 
@@ -38,7 +38,11 @@ export const TarotHomePage: React.FC = () => {
     questionText
   } = useTarotStore();
   const { isLoading } = useUnifiedTestStore();
-  const { startDataLoad, endDataLoad, markFirstCardRender } = useTarotPerformance();
+  const monitorRef = useRef<TarotPerformanceMonitorRef>(null);
+  
+  const startDataLoad = () => monitorRef.current?.startDataLoad();
+  const endDataLoad = () => monitorRef.current?.endDataLoad();
+  const markFirstCardRender = () => monitorRef.current?.markFirstCardRender();
 
   // SEO配置
   const canonical = resolveAbsoluteUrl('/tests/tarot');
@@ -367,6 +371,7 @@ export const TarotHomePage: React.FC = () => {
     
     {/* 性能监控组件 */}
     <TarotPerformanceMonitor 
+      ref={monitorRef}
       enabled={process.env['NODE_ENV'] === 'development'}
     />
     </>

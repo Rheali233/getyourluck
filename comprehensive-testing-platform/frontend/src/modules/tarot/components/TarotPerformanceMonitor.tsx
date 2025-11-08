@@ -4,7 +4,7 @@
  * 监控加载时间和用户体验指标
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { trackEvent } from '@/services/analyticsService';
 
 interface PerformanceMetrics {
@@ -20,10 +20,19 @@ interface TarotPerformanceMonitorProps {
   onMetricsUpdate?: (metrics: PerformanceMetrics) => void;
 }
 
-export const TarotPerformanceMonitor: React.FC<TarotPerformanceMonitorProps> = ({
+export interface TarotPerformanceMonitorRef {
+  startDataLoad: () => void;
+  endDataLoad: () => void;
+  startImageLoad: () => void;
+  endImageLoad: () => void;
+  markFirstCardRender: () => void;
+  markUserInteraction: () => void;
+}
+
+export const TarotPerformanceMonitor = forwardRef<TarotPerformanceMonitorRef, TarotPerformanceMonitorProps>(({
   enabled = process.env['NODE_ENV'] === 'development',
   onMetricsUpdate
-}) => {
+}, ref) => {
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     pageLoadTime: 0,
     dataLoadTime: 0,
@@ -157,14 +166,14 @@ export const TarotPerformanceMonitor: React.FC<TarotPerformanceMonitorProps> = (
   }, [metrics, onMetricsUpdate]);
 
   // 暴露方法给父组件使用
-  React.useImperativeHandle(React.forwardRef(() => null), () => ({
+  useImperativeHandle(ref, () => ({
     startDataLoad,
     endDataLoad,
     startImageLoad,
     endImageLoad,
     markFirstCardRender,
     markUserInteraction
-  }));
+  }), [enabled, dataLoadStartTime, imageLoadStartTime, firstCardRendered, startTime]);
 
   if (!enabled) {
     return null;
@@ -207,21 +216,23 @@ export const TarotPerformanceMonitor: React.FC<TarotPerformanceMonitorProps> = (
       </div>
     </div>
   );
-};
+});
+
+TarotPerformanceMonitor.displayName = 'TarotPerformanceMonitor';
 
 // Hook for using performance monitor
 export const useTarotPerformance = () => {
-  const [monitorRef, setMonitorRef] = useState<any>(null);
+  const monitorRef = React.useRef<TarotPerformanceMonitorRef>(null);
 
-  const startDataLoad = () => monitorRef?.startDataLoad();
-  const endDataLoad = () => monitorRef?.endDataLoad();
-  const startImageLoad = () => monitorRef?.startImageLoad();
-  const endImageLoad = () => monitorRef?.endImageLoad();
-  const markFirstCardRender = () => monitorRef?.markFirstCardRender();
-  const markUserInteraction = () => monitorRef?.markUserInteraction();
+  const startDataLoad = () => monitorRef.current?.startDataLoad();
+  const endDataLoad = () => monitorRef.current?.endDataLoad();
+  const startImageLoad = () => monitorRef.current?.startImageLoad();
+  const endImageLoad = () => monitorRef.current?.endImageLoad();
+  const markFirstCardRender = () => monitorRef.current?.markFirstCardRender();
+  const markUserInteraction = () => monitorRef.current?.markUserInteraction();
 
   return {
-    setMonitorRef,
+    monitorRef,
     startDataLoad,
     endDataLoad,
     startImageLoad,

@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTarotStore } from '../stores/useTarotStore';
 import { useUnifiedTestStore } from '@/stores/unifiedTestStore';
-import { Card, Breadcrumb } from '@/components/ui';
+import { Card, Breadcrumb, Modal, Input, Button } from '@/components/ui';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/Alert';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
@@ -34,12 +34,21 @@ export const CardDrawingPage: React.FC = () => {
     processSelectedCards,
     error,
     showResults,
-    currentSession
+    currentSession,
+    resetTarotAnalysis
   } = useTarotStore();
-  const { isLoading } = useUnifiedTestStore();
+  const { isLoading, clearError } = useUnifiedTestStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
+  
+  // 错误弹窗状态（参照 psychology 模块）
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbackEmail, setFeedbackEmail] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('Failed to get AI analysis results for the tarot reading');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // SEO配置
   const canonical = buildAbsoluteUrl(`/tests/tarot/drawing${spreadId ? `?spread=${spreadId}` : ''}`);
@@ -122,6 +131,32 @@ export const CardDrawingPage: React.FC = () => {
       navigate('/tests/tarot/reading');
     }
   }, [showResults, showLoadingModal, currentSession, navigate]);
+  
+  // 当有错误且不在 loading 状态时，显示错误弹窗（参照 psychology 模块）
+  useEffect(() => {
+    if (!error || isLoading) {
+      setShowErrorModal(false);
+      return;
+    }
+    
+    // 检查是否是 AI 分析错误
+    const isAIAnalysisError = (
+      error.toLowerCase().includes('ai analysis') ||
+      error.toLowerCase().includes('ai service') ||
+      error.toLowerCase().includes('analysis failed') ||
+      error.toLowerCase().includes('failed to parse') ||
+      error.toLowerCase().includes('ai analysis is required') ||
+      error.toLowerCase().includes('tarot analysis failed') ||
+      error.toLowerCase().includes('test result analysis failed')
+    );
+    
+    // 如果是 AI 分析错误，显示错误弹窗
+    if (isAIAnalysisError || !showResults) {
+      setShowErrorModal(true);
+    } else {
+      setShowErrorModal(false);
+    }
+  }, [error, isLoading, showResults]);
 
   const handleCardsSelected = async (drawnCards: DrawnCard[]) => {
     // 记录抽牌事件
@@ -136,6 +171,10 @@ export const CardDrawingPage: React.FC = () => {
       },
     });
     
+    // 清除之前的错误
+    clearError();
+    setShowErrorModal(false);
+    
     setIsProcessing(true);
     setShowLoadingModal(true);
     try {
@@ -144,6 +183,42 @@ export const CardDrawingPage: React.FC = () => {
     } catch (error) {
       setShowLoadingModal(false);
       setIsProcessing(false);
+    }
+  };
+  
+  // 处理重试提交（参照 psychology 模块）
+  const handleRetrySubmit = async () => {
+    setShowErrorModal(false);
+    setShowFeedbackForm(false);
+    clearError();
+    // 重新处理选中的牌（需要从当前会话中获取）
+    if (currentSession?.drawnCards && currentSession?.selectedSpread) {
+      setIsProcessing(true);
+      setShowLoadingModal(true);
+      try {
+        await processSelectedCards(currentSession.selectedSpread.id, currentSession.drawnCards);
+      } catch (error) {
+        setShowLoadingModal(false);
+        setIsProcessing(false);
+      }
+    }
+  };
+  
+  // 处理反馈提交（参照 psychology 模块）
+  const handleSubmitFeedback = async () => {
+    if (!feedbackEmail || !feedbackMessage) {
+      return;
+    }
+    
+    setIsSubmittingFeedback(true);
+    try {
+      // 这里可以调用反馈 API
+      // await feedbackService.submitFeedback({ email: feedbackEmail, message: feedbackMessage });
+      setFeedbackSubmitted(true);
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
@@ -246,6 +321,160 @@ export const CardDrawingPage: React.FC = () => {
           </div>
         </div>
       )}
+      
+      {/* AI分析失败错误弹窗（参照 psychology 模块） */}
+      <Modal
+        isOpen={showErrorModal}
+        onClose={() => {
+          setShowErrorModal(false);
+          setShowFeedbackForm(false);
+          setFeedbackSubmitted(false);
+          setFeedbackEmail('');
+          setFeedbackMessage('Failed to get AI analysis results for the tarot reading');
+        }}
+        title={showFeedbackForm ? "Report Issue" : "Analysis Temporarily Unavailable"}
+        size="medium"
+        closeOnOverlayClick={false}
+      >
+        {!showFeedbackForm ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">⚠️</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                AI Analysis Temporarily Unavailable
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">
+                We encountered an issue while generating your AI-powered analysis. Your card selection has been saved, and you can try submitting again.
+              </p>
+              <p className="text-sm text-gray-500 mb-4">
+                If this problem persists, please contact us at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a> or report the issue using the form below.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleRetrySubmit}
+                className="flex-1 bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-700 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Retrying...' : 'Try Again'}
+              </Button>
+              <Button
+                onClick={() => setShowFeedbackForm(true)}
+                variant="outline"
+                className="flex-1 border-violet-300 text-violet-700 hover:bg-violet-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Report Issue
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowErrorModal(false);
+                  resetTarotAnalysis();
+                  navigate('/tests/tarot');
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Start Over
+              </Button>
+            </div>
+          </div>
+        ) : feedbackSubmitted ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">✓</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Thank You for Your Feedback
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                We've received your report and will look into this issue. You can also reach us directly at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a>.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleRetrySubmit}
+                className="flex-1 bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-700 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Retrying...' : 'Try Again'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowErrorModal(false);
+                  resetTarotAnalysis();
+                  navigate('/tests/tarot');
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Start Over
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Help Us Improve
+              </h3>
+              <p className="text-sm text-gray-600">
+                Please provide your email and describe the issue you encountered. This will help us fix the problem quickly.
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="email"
+                value={feedbackEmail}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedbackEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Issue Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={feedbackMessage}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFeedbackMessage(e.target.value)}
+                placeholder="Describe the issue you encountered..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
+                rows={4}
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleSubmitFeedback}
+                className="flex-1 bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-700 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isSubmittingFeedback || !feedbackEmail || !feedbackMessage}
+              >
+                {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowFeedbackForm(false);
+                  setFeedbackEmail('');
+                  setFeedbackMessage('Failed to get AI analysis results for the tarot reading');
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </TarotTestContainer>
     </>
   );
