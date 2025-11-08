@@ -460,20 +460,24 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
               showResults: true,
               currentTestResult: testResult,
               isTestCompleted: true,
-              progress: 100
+              progress: 100,
+              error: null // 清除之前的错误
             });
             
             return testResult;
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to generate test results';
+            // AI分析失败时，保持在答题界面，不清除会话状态
             set({
-              currentSession: { ...currentSession, status: TestStatus.COMPLETED },
+              // 保持 currentSession 不变，让用户可以重试
               showResults: false,
               error: errorMessage,
-              isTestCompleted: true
+              isLoading: false,
+              // 不设置 isTestCompleted，保持在测试进行中状态
             });
             
-            return null;
+            // 重新抛出错误，让调用者可以处理
+            throw error;
           }
         }
         return null;
@@ -672,6 +676,25 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
         }
 
         try {
+          // 前端验证：PHQ-9 测试需要 9 个答案
+          if (testType === 'phq9') {
+            if (currentSession.answers.length !== 9) {
+              throw new Error(`Please answer all 9 questions. You have answered ${currentSession.answers.length} out of 9.`);
+            }
+            
+            // 验证每个答案都有有效的值
+            for (let i = 0; i < currentSession.answers.length; i++) {
+              const answer = currentSession.answers[i];
+              if (answer.answer === undefined || answer.answer === null) {
+                throw new Error(`Question ${i + 1} is not answered. Please answer all questions.`);
+              }
+              const numericValue = Number(answer.answer);
+              if (isNaN(numericValue) || numericValue < 0 || numericValue > 3) {
+                throw new Error(`Question ${i + 1} has invalid value. Please select a value between 0 and 3.`);
+              }
+            }
+          }
+          
           // 调用后端统一测试结果处理服务
           // 使用 testService 以获得超时控制和错误处理
           const submission = {
@@ -682,6 +705,18 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
                   const cardId = (answer as any)?.answer?.card?.id;
                   const position = (answer as any)?.answer?.position;
                   const basicValue = String(cardId ?? position ?? 'unknown');
+                  return {
+                    questionId: answer.questionId,
+                    value: basicValue,
+                    // 保留对象以便后端 AIService 使用 answer.answer
+                    answer: (answer as any).answer,
+                    timestamp: answer.timestamp
+                  };
+                }
+                // Numerology: 同时发送基础类型的 value（用于后端校验）与完整的 answer 对象（供 AI 使用）
+                if (testType === 'numerology') {
+                  const analysisType = (answer as any)?.answer?.type || 'bazi';
+                  const basicValue = String(analysisType);
                   return {
                     questionId: answer.questionId,
                     value: basicValue,
@@ -772,6 +807,23 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
             throw new Error(result.error || 'Test result generation failed');
           }
 
+          // 检查后端返回的数据中是否包含 AI 分析失败标记
+          if (result.data && (result.data.aiAnalysisFailed || result.data.aiError)) {
+            const errorMessage = result.data.aiError || 'AI analysis failed. Please try again.';
+            // 创建一个包含错误信息的 TestResult，让调用者可以检查
+            const testResult: TestResult = {
+              testType,
+              result: result.data,
+              aiAnalysisFailed: true,
+              aiError: errorMessage,
+              metadata: {
+                processingTime: new Date().toISOString(),
+                processor: 'UnifiedTestStore'
+              }
+            };
+            return testResult;
+          }
+
           const testResult = {
             testType,
             result: result.data,
@@ -783,7 +835,14 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
           
           return testResult;
         } catch (error) {
-          // // 如果API调用失败，返回模拟结果
+          // 对于需要AI分析的测试类型，失败时抛出错误，不返回模拟结果
+          const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'disc', 'holland', 'leadership', 'love_language', 'love_style', 'interpersonal', 'vark'];
+          if (aiTestTypes.includes(testType)) {
+            // 重新抛出错误，让调用者处理
+            throw error;
+          }
+          
+          // 对于其他测试类型，返回模拟结果（向后兼容）
           const mockResult: TestResult = {
             testType,
             result: {

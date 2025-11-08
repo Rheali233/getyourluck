@@ -121,6 +121,7 @@ export interface TestStoreState {
   // Utility actions
   setLoading: (_loading: boolean) => void;
   setError: (_error: string | null) => void;
+  clearError: () => void;
   setQuestions: (_questions: Question[]) => void;
   setShowResults: (_show: boolean) => void;
   
@@ -404,21 +405,40 @@ export const useTestStore = create<TestStoreState>()(
               }
             } catch (apiError) {
               const errorMessage = apiError instanceof Error ? apiError.message : 'Failed to get test results from backend';
-              set({ error: errorMessage });
               
-              // 即使API失败，也要完成测试流程，创建基本结果
-              testResult = {
-                testType: currentTestType,
-                sessionId: currentSession.id,
-                scores: {},
-                categories: [],
-                dimensions: {},
-                analysis: 'Test completed but results could not be calculated. Please try again later.',
-                recommendations: ['Contact support if the problem persists.'],
-                timestamp: new Date().toISOString(),
-                data: null
-              };
+              // 对于需要AI分析的测试类型，失败时不设置showResults，保持在答题界面
+              const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'disc', 'holland', 'leadership', 'love_language', 'love_style', 'interpersonal', 'vark'];
+              const isAITest = currentTestType && aiTestTypes.includes(currentTestType);
+              
+              if (isAITest) {
+                // AI测试失败时，保持在答题界面，不跳转到结果页
+                set({ 
+                  error: errorMessage,
+                  isLoading: false
+                });
+                // 不设置showResults，保持在答题界面
+                return null;
+              } else {
+                // 非AI测试失败时，创建基本结果（向后兼容）
+                set({ error: errorMessage });
+                testResult = {
+                  testType: currentTestType,
+                  sessionId: currentSession.id,
+                  scores: {},
+                  categories: [],
+                  dimensions: {},
+                  analysis: 'Test completed but results could not be calculated. Please try again later.',
+                  recommendations: ['Contact support if the problem persists.'],
+                  timestamp: new Date().toISOString(),
+                  data: null
+                };
+              }
             }
+          }
+          
+          // 如果testResult为null（AI测试失败），不更新状态，保持在答题界面
+          if (!testResult) {
+            return null;
           }
           
           // 更新全局状态（不设置showResults和currentTestResult，避免影响其他测试）
@@ -673,6 +693,7 @@ export const useTestStore = create<TestStoreState>()(
       // Utility actions
       setLoading: (loading: boolean) => set({ isLoading: loading }),
       setError: (error: string | null) => set({ error }),
+      clearError: () => set({ error: null }),
       setQuestions: (questions: Question[]) => set({ questions, totalQuestions: questions.length }),
       setShowResults: (show: boolean) => set({ showResults: show }),
       

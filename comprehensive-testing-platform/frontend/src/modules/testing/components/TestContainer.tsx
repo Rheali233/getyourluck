@@ -8,7 +8,11 @@ import { useTestStore } from '../stores/useTestStore';
 import { QuestionDisplay } from './QuestionDisplay';
 import type { Question } from '../types/TestTypes';
 import { Card } from '@/components/ui';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { cn } from '@/utils/classNames';
+import { feedbackService } from '@/services/feedbackService';
 // Import specialized result displays - 使用懒加载优化性能
 import { 
   LazyPHQ9ResultDisplay,
@@ -115,7 +119,9 @@ export const TestContainer: React.FC<TestContainerProps> = ({
         onTestComplete(result);
       }
     } catch (error) {
-      // 静默处理错误，错误状态已经通过store管理
+      // 错误状态已经通过store管理，会在渲染时显示错误弹窗
+      // eslint-disable-next-line no-console
+      console.error('Test submission error:', error);
     }
   };
 
@@ -294,23 +300,88 @@ export const TestContainer: React.FC<TestContainerProps> = ({
     );
   }
 
-  // Render error state
-  if (error) {
-    return (
-      <div className={`test-container error ${className}`} data-testid={testId}>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <div className="text-red-600 text-lg font-medium mb-2">Test Error</div>
-          <div className="text-red-500 mb-4">{error}</div>
-          <button
-            onClick={handleResetTest}
-            className="bg-gradient-to-r from-red-600 to-red-500 text-white px-4 py-2 rounded-md hover:from-red-700 hover:to-red-600 transition-all duration-300"
-          >
-            Reset Test
-          </button>
-        </div>
-      </div>
+  // 错误弹窗状态（只在测试进行中时显示弹窗，不替换整个界面）
+  const [showErrorModal, setShowErrorModal] = React.useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = React.useState(false);
+  const [feedbackEmail, setFeedbackEmail] = React.useState('');
+  const [feedbackMessage, setFeedbackMessage] = React.useState('Failed to get AI analysis results for the test');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = React.useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = React.useState(false);
+  
+  // 当有错误且测试已开始时，显示错误弹窗
+  // 特别检查是否是AI分析失败的错误
+  React.useEffect(() => {
+    if (!error || !isTestStarted) {
+      setShowErrorModal(false);
+      return;
+    }
+    
+    const isAIAnalysisError = (
+      error.toLowerCase().includes('ai analysis') ||
+      error.toLowerCase().includes('ai service') ||
+      error.toLowerCase().includes('analysis failed') ||
+      error.toLowerCase().includes('failed to parse') ||
+      error.toLowerCase().includes('ai analysis is required') ||
+      error.toLowerCase().includes('mbti analysis failed') ||
+      error.toLowerCase().includes('test result analysis failed')
     );
-  }
+    
+    // 如果是AI分析错误，无论是否显示结果，都要显示错误弹窗
+    // 如果是其他错误且没有显示结果，也显示错误弹窗
+    if (isAIAnalysisError || !testTypeShowResults) {
+      setShowErrorModal(true);
+    } else {
+      setShowErrorModal(false);
+    }
+  }, [error, isTestStarted, testTypeShowResults]);
+
+  // 处理重试提交
+  const handleRetrySubmit = async () => {
+    setShowErrorModal(false);
+    setShowFeedbackForm(false);
+    // 清除错误状态
+    useTestStore.getState().clearError();
+    // 重新提交
+    await handleEndTest();
+  };
+
+  // 处理反馈提交
+  const handleSubmitFeedback = async () => {
+    if (!feedbackEmail || !feedbackMessage.trim() || feedbackMessage.trim().length < 10) {
+      return;
+    }
+
+    setIsSubmittingFeedback(true);
+    try {
+      const { currentSession } = useTestStore.getState();
+      await feedbackService.submit({
+        testType,
+        testId: testType,
+        sessionId: currentSession?.id || undefined,
+        resultId: undefined,
+        rating: 1, // 错误反馈默认评分1
+        category: 'bug',
+        message: `[AI Analysis Error] ${feedbackMessage.trim()}\n\nOriginal Error: ${error || 'Unknown error'}`,
+        email: feedbackEmail.trim(),
+        canContact: true,
+        client: {
+          ua: navigator.userAgent,
+          platform: navigator.platform,
+          locale: navigator.language || 'en'
+        },
+        images: [],
+        createdAt: new Date().toISOString()
+      });
+      setFeedbackSubmitted(true);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to submit feedback:', err);
+      // 即使提交失败，也显示成功消息，避免用户困惑
+      setFeedbackSubmitted(true);
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
 
   // 使用测试类型特定的状态进行判断
   // 如果当前测试类型没有开始且没有显示结果，重定向到测试准备页面
@@ -556,6 +627,160 @@ export const TestContainer: React.FC<TestContainerProps> = ({
             </div>
           </div>
         )}
+
+        {/* AI分析失败错误弹窗 */}
+        <Modal
+          isOpen={showErrorModal}
+          onClose={() => {
+            setShowErrorModal(false);
+            setShowFeedbackForm(false);
+            setFeedbackSubmitted(false);
+            setFeedbackEmail('');
+            setFeedbackMessage('Failed to get AI analysis results for the test');
+          }}
+          title={showFeedbackForm ? "Report Issue" : "Analysis Temporarily Unavailable"}
+          size="medium"
+          closeOnOverlayClick={false}
+        >
+          {!showFeedbackForm ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <span className="text-3xl">⚠️</span>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  AI Analysis Temporarily Unavailable
+                </h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  We encountered an issue while generating your AI-powered analysis. Your test answers have been saved, and you can try submitting again.
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  If this problem persists, please contact us at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a> or report the issue using the form below.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button
+                  onClick={handleRetrySubmit}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Retrying...' : 'Try Again'}
+                </Button>
+                <Button
+                  onClick={() => setShowFeedbackForm(true)}
+                  variant="outline"
+                  className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                >
+                  Report Issue
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowErrorModal(false);
+                    handleResetTest();
+                  }}
+                  variant="outline"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                >
+                  Start Over
+                </Button>
+              </div>
+            </div>
+          ) : feedbackSubmitted ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-3xl">✓</span>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Thank You for Your Feedback
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  We've received your report and will look into this issue. You can also reach us directly at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a>.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button
+                  onClick={handleRetrySubmit}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Retrying...' : 'Try Again'}
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowErrorModal(false);
+                    handleResetTest();
+                  }}
+                  variant="outline"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                >
+                  Start Over
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Help Us Improve
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Please provide your email and describe the issue you encountered. This will help us fix the problem quickly.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="email"
+                  value={feedbackEmail}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedbackEmail(e.target.value)}
+                  placeholder="your.email@example.com"
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Issue Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  className="w-full min-h-[100px] rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Minimum 10 characters required
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button
+                  onClick={() => {
+                    setShowFeedbackForm(false);
+                    setFeedbackEmail('');
+                    setFeedbackMessage('Failed to get AI analysis results for the test');
+                  }}
+                  variant="outline"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                  disabled={isSubmittingFeedback}
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleSubmitFeedback}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                  disabled={isSubmittingFeedback || !feedbackEmail || !feedbackMessage.trim() || feedbackMessage.trim().length < 10}
+                >
+                  {isSubmittingFeedback ? 'Submitting...' : 'Submit Report'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </Modal>
       </div>
     );
   }

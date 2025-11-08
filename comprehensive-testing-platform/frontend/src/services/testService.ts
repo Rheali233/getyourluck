@@ -27,7 +27,7 @@ export const testService = {
    */
   async submitTest(submission: TestSubmission): Promise<APIResponse<TestResult>> {
     // 需要 AI 分析的测试类型，设置 120 秒超时
-    const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'birth-chart', 'compatibility', 'fortune'];
+    const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'disc', 'holland', 'leadership', 'love_language', 'love_style', 'interpersonal', 'vark', 'tarot', 'numerology', 'birth-chart', 'compatibility', 'fortune'];
     const timeout = aiTestTypes.includes(submission.testType) ? 120000 : 60000; // 120秒或60秒
     
     return apiClient.post(`/v1/tests/${submission.testType}/submit`, submission, { timeout })
