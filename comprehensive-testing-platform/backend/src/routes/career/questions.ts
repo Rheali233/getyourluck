@@ -15,21 +15,49 @@ careerQuestionsRouter.get('/', async (c) => {
     const dbService = c.get('dbService');
     const questionModel = new QuestionBankModel(dbService.env);
     
-    // Get questions for all career test categories
-    const categories = ['cat_holland', 'cat_disc', 'cat_leadership'];
+    // Get questions for all career test categories (try multiple possible IDs)
+    const categoryMap: { [key: string]: string[] } = {
+      'holland': ['cat_holland', 'holland-category'],
+      'disc': ['cat_disc', 'disc-category'],
+      'leadership': ['cat_leadership', 'leadership-category']
+    };
     const allQuestions: any = {};
     
-    for (const categoryId of categories) {
-      try {
-        console.log(`Fetching questions for category: ${categoryId}`);
-        const questions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
-        console.log(`Found ${questions.length} questions for ${categoryId}`);
-        console.log(`First question sample:`, questions[0]);
-        const categoryCode = categoryId.replace('cat_', '');
-        allQuestions[categoryCode] = questions;
-      } catch (error) {
-        console.error(`Failed to get questions for ${categoryId}:`, error);
-        allQuestions[categoryId.replace('cat_', '')] = [];
+    for (const [categoryCode, possibleIds] of Object.entries(categoryMap)) {
+      let questions: any[] = [];
+      
+      // Try each possible category ID
+      for (const categoryId of possibleIds) {
+        try {
+          console.log(`Fetching questions for category: ${categoryId}`);
+          const testQuestions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
+          if (testQuestions.length > 0) {
+            questions = testQuestions;
+            console.log(`Found ${questions.length} questions for ${categoryId}`);
+            break;
+          }
+        } catch (error) {
+          console.log(`Category ${categoryId} not found, trying next...`);
+          continue;
+        }
+      }
+      
+      // If still no questions, try finding by code
+      if (questions.length === 0) {
+        try {
+          const category = await questionModel.findCategoryByCode(categoryCode);
+          if (category) {
+            questions = await questionModel.getQuestionsWithOptionsByCategory(category.id);
+            console.log(`Found ${questions.length} questions by code for ${categoryCode}`);
+          }
+        } catch (error) {
+          console.error(`Failed to find category by code for ${categoryCode}:`, error);
+        }
+      }
+      
+      allQuestions[categoryCode] = questions;
+      if (questions.length > 0) {
+        console.log(`First question sample for ${categoryCode}:`, questions[0]);
       }
     }
     
@@ -72,15 +100,15 @@ careerQuestionsRouter.get('/:testType', async (c) => {
     const dbService = c.get('dbService');
     const questionModel = new QuestionBankModel(dbService.env);
     
-    // Map testType to category_id
-    const categoryIdMap: { [key: string]: string } = {
-      'holland': 'cat_holland',
-      'disc': 'cat_disc',
-      'leadership': 'cat_leadership'
+    // Map testType to category_id (try multiple possible IDs)
+    const categoryIdMap: { [key: string]: string[] } = {
+      'holland': ['cat_holland', 'holland-category'],
+      'disc': ['cat_disc', 'disc-category'],
+      'leadership': ['cat_leadership', 'leadership-category']
     };
     
-    const categoryId = categoryIdMap[testType];
-    if (!categoryId) {
+    const possibleCategoryIds = categoryIdMap[testType];
+    if (!possibleCategoryIds) {
       return c.json({
         success: false,
         error: 'Invalid test type',
@@ -90,10 +118,46 @@ careerQuestionsRouter.get('/:testType', async (c) => {
       }, 400);
     }
     
-    console.log(`Fetching questions for categoryId: ${categoryId}`);
-    const questions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
-    console.log(`Retrieved ${questions.length} questions for ${testType}`);
-    console.log('First question sample:', questions[0]);
+    // Try each possible category ID until we find one with questions
+    let questions: any[] = [];
+    let categoryId: string | null = null;
+    
+    for (const id of possibleCategoryIds) {
+      try {
+        console.log(`Trying categoryId: ${id}`);
+        const testQuestions = await questionModel.getQuestionsWithOptionsByCategory(id);
+        if (testQuestions.length > 0) {
+          questions = testQuestions;
+          categoryId = id;
+          console.log(`Found ${questions.length} questions for categoryId: ${id}`);
+          break;
+        }
+      } catch (error) {
+        console.log(`Category ${id} not found or has no questions, trying next...`);
+        continue;
+      }
+    }
+    
+    // If no questions found by ID, try finding by code
+    if (questions.length === 0) {
+      try {
+        const category = await questionModel.findCategoryByCode(testType);
+        if (category) {
+          categoryId = category.id;
+          questions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
+          console.log(`Found ${questions.length} questions by code for ${testType}`);
+        }
+      } catch (error) {
+        console.error(`Failed to find category by code: ${error}`);
+      }
+    }
+    
+    if (questions.length === 0) {
+      console.log(`No questions found for ${testType} with any category ID`);
+    } else {
+      console.log(`Retrieved ${questions.length} questions for ${testType} (category: ${categoryId})`);
+      console.log('First question sample:', questions[0]);
+    }
     
     return c.json({
       success: true,

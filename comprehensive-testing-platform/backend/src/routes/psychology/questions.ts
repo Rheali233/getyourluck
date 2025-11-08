@@ -100,16 +100,16 @@ questionsRouter.get('/:testType', async (c) => {
     const dbService = c.get('dbService');
     const questionModel = new QuestionBankModel(dbService.env);
     
-    // 映射testType到category_id
-    const categoryIdMap: { [key: string]: string } = {
-      'mbti': 'cat_mbti',
-      'phq9': 'cat_phq9',
-      'eq': 'cat_eq',
-      'happiness': 'cat_happiness'
+    // 映射testType到category_id（支持多种可能的ID）
+    const categoryIdMap: { [key: string]: string[] } = {
+      'mbti': ['cat_mbti', 'mbti-category'],
+      'phq9': ['cat_phq9', 'phq9-category'],
+      'eq': ['cat_eq', 'eq-category'],
+      'happiness': ['cat_happiness', 'happiness-category']
     };
     
-    const categoryId = categoryIdMap[testType];
-    if (!categoryId) {
+    const categoryIds = categoryIdMap[testType];
+    if (!categoryIds) {
       return c.json({
         success: false,
         error: '无效的测试类型',
@@ -119,7 +119,37 @@ questionsRouter.get('/:testType', async (c) => {
       }, 400);
     }
     
-    const questions = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
+    // 尝试多个可能的 category_id
+    let questions: any[] = [];
+    for (const categoryId of categoryIds) {
+      try {
+        const result = await questionModel.getQuestionsWithOptionsByCategory(categoryId);
+        if (result && result.length > 0) {
+          questions = result;
+          break;
+        }
+      } catch (error) {
+        // 继续尝试下一个
+        continue;
+      }
+    }
+    
+    // 如果都没找到，尝试通过 code 查询 category，然后再查询题目
+    if (questions.length === 0) {
+      try {
+        // 先通过 code 查找 category_id
+        const db = dbService.env.DB;
+        const categoryResult = await db.prepare(
+          `SELECT id FROM psychology_question_categories WHERE code = ? LIMIT 1`
+        ).bind(testType).first() as { id: string } | null;
+        
+        if (categoryResult?.id) {
+          questions = await questionModel.getQuestionsWithOptionsByCategory(categoryResult.id);
+        }
+      } catch (error) {
+        // 忽略错误
+      }
+    }
     
     return c.json({
       success: true,

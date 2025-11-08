@@ -4,19 +4,20 @@
  */
 
 import { Hono } from 'hono';
+import type { AppContext } from '../../types/env';
 import { LearningQuestionBankModel } from '../../models/learningQuestionBank';
 
-const learningQuestionsRoutes = new Hono();
+const learningQuestionsRoutes = new Hono<AppContext>();
 
 // Get all learning test questions
 learningQuestionsRoutes.get('/', async (c) => {
   try {
-    if (!(c.env as any)?.['DB']) {
+    if (!c.env.DB) {
       return c.json({
         success: false,
         error: 'Database not available',
         timestamp: new Date().toISOString(),
-        requestId: '',
+        requestId: (c.get('requestId') as string) || '',
       }, 500);
     }
     
@@ -29,13 +30,15 @@ learningQuestionsRoutes.get('/', async (c) => {
         vark: varkQuestions
       },
       message: 'Learning questions retrieved successfully',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     });
   } catch (error) {
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to retrieve learning questions',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     }, 500);
   }
 });
@@ -43,12 +46,12 @@ learningQuestionsRoutes.get('/', async (c) => {
 // Get VARK learning style questions
 learningQuestionsRoutes.get('/vark', async (c) => {
   try {
-    if (!(c.env as any)?.['DB']) {
+    if (!c.env.DB) {
       return c.json({
         success: false,
         error: 'Database not available',
         timestamp: new Date().toISOString(),
-        requestId: '',
+        requestId: (c.get('requestId') as string) || '',
       }, 500);
     }
     
@@ -61,13 +64,15 @@ learningQuestionsRoutes.get('/vark', async (c) => {
         vark: questions
       },
       message: 'VARK questions retrieved successfully',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     });
   } catch (error) {
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to retrieve VARK questions',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     }, 500);
   }
 });

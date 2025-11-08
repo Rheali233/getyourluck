@@ -4,19 +4,20 @@
  */
 
 import { Hono } from 'hono';
+import type { AppContext } from '../../types/env';
 import { LearningTestModel } from '../../models/learningTest';
 
-const learningTestRoutes = new Hono();
+const learningTestRoutes = new Hono<AppContext>();
 
 // Create new test session
 learningTestRoutes.post('/create-session', async (c) => {
   try {
-    if (!(c.env as any)?.['DB']) {
+    if (!c.env.DB) {
       return c.json({
         success: false,
         error: 'Database not available',
         timestamp: new Date().toISOString(),
-        requestId: '',
+        requestId: (c.get('requestId') as string) || '',
       }, 500);
     }
     
@@ -40,13 +41,15 @@ learningTestRoutes.post('/create-session', async (c) => {
       success: true,
       data: { sessionId },
       message: 'Test session created successfully',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     });
   } catch (error) {
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create test session',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     }, 500);
   }
 });
@@ -54,12 +57,12 @@ learningTestRoutes.post('/create-session', async (c) => {
 // Submit test answers and generate results
 learningTestRoutes.post('/submit', async (c) => {
   try {
-    if (!(c.env as any)?.['DB']) {
+    if (!c.env.DB) {
       return c.json({
         success: false,
         error: 'Database not available',
         timestamp: new Date().toISOString(),
-        requestId: '',
+        requestId: (c.get('requestId') as string) || '',
       }, 500);
     }
     
@@ -121,13 +124,15 @@ learningTestRoutes.post('/submit', async (c) => {
       success: true,
       data: result,
       message: 'Test submitted and analyzed successfully',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     });
   } catch (error) {
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to process test submission',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     }, 500);
   }
 });
@@ -135,12 +140,12 @@ learningTestRoutes.post('/submit', async (c) => {
 // Get test result by session ID
 learningTestRoutes.get('/result/:sessionId', async (c) => {
   try {
-    if (!(c.env as any)?.['DB']) {
+    if (!c.env.DB) {
       return c.json({
         success: false,
         error: 'Database not available',
         timestamp: new Date().toISOString(),
-        requestId: '',
+        requestId: (c.get('requestId') as string) || '',
       }, 500);
     }
     
@@ -152,13 +157,15 @@ learningTestRoutes.get('/result/:sessionId', async (c) => {
       success: true,
       data: result,
       message: 'Test result retrieved successfully',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     });
   } catch (error) {
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to retrieve test result',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     }, 500);
   }
 });
@@ -166,12 +173,12 @@ learningTestRoutes.get('/result/:sessionId', async (c) => {
 // Submit feedback for test result
 learningTestRoutes.post('/feedback/:sessionId', async (c) => {
   try {
-    if (!(c.env as any)?.['DB']) {
+    if (!c.env.DB) {
       return c.json({
         success: false,
         error: 'Database not available',
         timestamp: new Date().toISOString(),
-        requestId: '',
+        requestId: (c.get('requestId') as string) || '',
       }, 500);
     }
     
@@ -185,13 +192,15 @@ learningTestRoutes.post('/feedback/:sessionId', async (c) => {
     return c.json({
       success: true,
       message: 'Feedback submitted successfully',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     });
   } catch (error) {
     return c.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to submit feedback',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      requestId: (c.get('requestId') as string) || '',
     }, 500);
   }
 });

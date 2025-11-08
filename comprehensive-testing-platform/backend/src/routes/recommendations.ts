@@ -1,337 +1,524 @@
 /**
  * 推荐系统API路由
- * Provides personalized recommendations and test module statistics
+ * 提供英文统一的推荐与模块统计接口
  */
 
 import { Hono } from 'hono';
+import type { APIResponse } from '../../../shared/types/apiResponse';
+import type { HomepageModule } from '../../../shared/types/homepage';
 import { HomepageModuleModel } from '../models/HomepageModuleModel';
+import { UserPreferencesModel, type UserPreferencesData } from '../models/UserPreferencesModel';
+import type { AppContext } from '../types/env';
 
-import { UserPreferencesModel } from '../models/UserPreferencesModel';
-import type { Context } from 'hono';
+interface RecommendationItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  route: string;
+  theme: HomepageModule['theme'];
+  relevanceScore: number;
+  reasons: string[];
+  metrics: {
+    averageRating: number;
+    totalSessions: number;
+    estimatedTime: string;
+    lastUpdated: string;
+  };
+}
 
-const recommendationsRoutes = new Hono();
+interface RecommendationPayload {
+  items: RecommendationItem[];
+  totalModules: number;
+}
+
+const DEFAULT_LIMIT = 6;
+const MAX_LIMIT = 12;
+
+const recommendationsRoutes = new Hono<AppContext>();
 
 // 获取个性化推荐
-recommendationsRoutes.get('/', async (c: Context) => {
+recommendationsRoutes.get('/', async (c) => {
   try {
-    const { userId, sessionId, limit = "6" } = c.req.query();
-    
-    // 获取用户偏好
-    let userPreferences = null;
-    if (userId || sessionId) {
-      const preferencesModel = new UserPreferencesModel(c.env.DB);
-      userPreferences = await preferencesModel.getPreferencesBySessionId(sessionId || userId || '');
+    const { userId, sessionId, limit } = c.req.query();
+
+    const limitValue = normalizeLimit(limit);
+
+    const moduleModel = new HomepageModuleModel(c.env);
+    const modules = await moduleModel.getAllActiveModules();
+
+    const preferenceKey = sessionId || userId;
+    let preferences: UserPreferencesData | null = null;
+    if (preferenceKey) {
+      const preferencesModel = new UserPreferencesModel(c.env);
+      preferences = await preferencesModel.getPreferencesBySessionId(preferenceKey);
     }
 
-    // 获取热门测试模块
-    const moduleModel = new HomepageModuleModel(c.env.DB);
-    const popularModules = await moduleModel.getModulesStats();
+    const items = generateRecommendations(modules, preferences, limitValue);
 
-    // 获取搜索历史（如果有sessionId）
-    let searchHistory: any[] = [];
-    if (sessionId) {
-  
-    }
-
-    // 生成推荐逻辑
-    const recommendations = await generateRecommendations(
-      Array.isArray(popularModules) ? popularModules : [popularModules],
-      userPreferences,
-      searchHistory,
-      parseInt(limit) || 6
-    );
-
-    return c.json({
+    const response: APIResponse<RecommendationPayload> = {
       success: true,
-      data: recommendations,
-      message: 'Recommendations retrieved successfully'
-    });
-  } catch (error) {
-    console.error('Failed to get recommendations:', error);
-    return c.json({
-      success: false,
-      error: 'Failed to get recommendations',
-      message: '服务器内部错误'
-    }, 500);
-  }
-});
-
-// 获取测试模块统计
-recommendationsRoutes.get('/modules/:moduleId/stats', async (c: Context) => {
-  try {
-    const { moduleId } = c.req.param();
-    if (!moduleId) {
-      return c.json({
-        success: false,
-        error: 'Module ID cannot be empty',
-        message: 'Please provide a valid module ID'
-      }, 400);
-    }
-    
-    const moduleModel = new HomepageModuleModel(c.env.DB);
-    const stats = await moduleModel.getModulesStats();
-
-    if (!stats) {
-      return c.json({
-        success: false,
-        error: 'Module does not exist',
-        message: '指定的测试Module does not exist'
-      }, 404);
-    }
-
-    return c.json({
-      success: true,
-      data: stats,
-      message: 'Statistics retrieved successfully'
-    });
-  } catch (error) {
-    console.error('Failed to get module stats:', error);
-    return c.json({
-      success: false,
-      error: 'Failed to get statistics',
-      message: '服务器内部错误'
-    }, 500);
-  }
-});
-
-// 获取测试模块评分
-recommendationsRoutes.get('/modules/:moduleId/rating', async (c: Context) => {
-  try {
-    const { moduleId } = c.req.param();
-    
-    // 这里应该从评分系统获取数据
-    // 暂时返回模拟数据
-    const rating = {
-      moduleId,
-      averageRating: 4.2,
-      totalRatings: 1250,
-      ratingDistribution: {
-        5: 45,
-        4: 35,
-        3: 15,
-        2: 3,
-        1: 2
+      data: {
+        items,
+        totalModules: modules.length,
       },
-      lastUpdated: new Date().toISOString()
+      message: 'Recommendations generated successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
     };
 
-    return c.json({
-      success: true,
-      data: rating,
-      message: '评分数据获取成功'
-    });
+    return c.json(response);
   } catch (error) {
-    console.error('Failed to get module rating:', error);
-    return c.json({
-      success: false,
-      error: '获取评分数据失败',
-      message: '服务器内部错误'
-    }, 500);
-  }
-});
 
-// 获取测试模块使用情况
-recommendationsRoutes.get('/modules/:moduleId/usage', async (c: Context) => {
-  try {
-    const { moduleId } = c.req.param();
-    
-    // 这里应该从使用统计系统获取数据
-    // 暂时返回模拟数据
-    const usage = {
-      moduleId,
-      totalUsers: 8500,
-      activeUsers: 3200,
-      completionRate: 0.78,
-      averageTime: 420, // 秒
-      popularTests: ['MBTI测试', '抑郁自评量表', '情商测试'],
-      lastUpdated: new Date().toISOString()
+    const response: APIResponse = {
+      success: false,
+      error: 'Unable to build recommendations',
+      message: 'An unexpected error occurred while building recommendations',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
     };
 
-    return c.json({
-      success: true,
-      data: usage,
-      message: '使用数据获取成功'
-    });
-  } catch (error) {
-    console.error('Failed to get module usage:', error);
-    return c.json({
-      success: false,
-      error: '获取使用数据失败',
-      message: '服务器内部错误'
-    }, 500);
+    return c.json(response, 500);
   }
 });
 
-// 获取热门测试模块
-recommendationsRoutes.get('/modules/popular', async (c: Context) => {
-  try {
-    // const { limit = 6 } = c.req.query(); // 未使用，暂时注释
-    
-    const moduleModel = new HomepageModuleModel(c.env.DB);
-    const popularModules = await moduleModel.getModulesStats();
-
-    return c.json({
-      success: true,
-      data: popularModules,
-      message: '热门模块获取成功'
-    });
-  } catch (error) {
-    console.error('Failed to get popular modules:', error);
-    return c.json({
-      success: false,
-      error: '获取热门模块失败',
-      message: '服务器内部错误'
-    }, 500);
-  }
-});
-
-// 获取新发布的测试模块
-recommendationsRoutes.get('/modules/new', async (c: Context) => {
-  try {
-    // const { limit = 4 } = c.req.query(); // 未使用，暂时注释
-    
-    const moduleModel = new HomepageModuleModel(c.env.DB);
-    const newModules = await moduleModel.getModulesByTheme('new');
-
-    return c.json({
-      success: true,
-      data: newModules,
-      message: '新模块获取成功'
-    });
-  } catch (error) {
-    console.error('Failed to get new modules:', error);
-    return c.json({
-      success: false,
-      error: '获取新模块失败',
-      message: '服务器内部错误'
-    }, 500);
-  }
-});
-
-// 检查测试模块可用性
-recommendationsRoutes.get('/modules/:moduleId/status', async (c: Context) => {
+// 获取单个模块的核心统计
+recommendationsRoutes.get('/modules/:moduleId/stats', async (c) => {
   try {
     const { moduleId } = c.req.param();
-    
-    const moduleModel = new HomepageModuleModel(c.env.DB);
-    const module = await moduleModel.getModuleById(moduleId || '');
 
-    const isAvailable = module && module.isActive;
+    if (!moduleId) {
+      const response: APIResponse = {
+        success: false,
+        error: 'Module ID is required',
+        message: 'Please provide a valid module identifier',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId'),
+      };
 
-    return c.json({
+      return c.json(response, 400);
+    }
+
+    const moduleModel = new HomepageModuleModel(c.env);
+    const module = await moduleModel.getModuleById(moduleId);
+
+    if (!module) {
+      const response: APIResponse = {
+        success: false,
+        error: 'Module not found',
+        message: 'The requested module does not exist or is inactive',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId'),
+      };
+
+      return c.json(response, 404);
+    }
+
+    const response: APIResponse = {
+      success: true,
+      data: {
+        id: module.id,
+        name: module.name,
+        description: module.description,
+        theme: module.theme,
+        testCount: module.testCount,
+        rating: module.rating,
+        route: module.route,
+        features: module.features,
+        estimatedTime: module.estimatedTime,
+        updatedAt: module.updatedAt.toISOString(),
+      },
+      message: 'Module statistics retrieved successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response);
+  } catch (error) {
+
+    const response: APIResponse = {
+      success: false,
+      error: 'Failed to retrieve module statistics',
+      message: 'An unexpected error occurred while retrieving module statistics',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response, 500);
+  }
+});
+
+// 获取模块评分摘要
+recommendationsRoutes.get('/modules/:moduleId/rating', async (c) => {
+  try {
+    const { moduleId } = c.req.param();
+
+    const moduleModel = new HomepageModuleModel(c.env);
+    const module = await moduleModel.getModuleById(moduleId);
+
+    if (!module) {
+      const response: APIResponse = {
+        success: false,
+        error: 'Module not found',
+        message: 'The requested module does not exist or is inactive',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId'),
+      };
+
+      return c.json(response, 404);
+    }
+
+    const response: APIResponse = {
+      success: true,
+      data: {
+        moduleId: module.id,
+        averageRating: Number(module.rating?.toFixed(2)),
+        totalRatings: Math.max(module.testCount, 0),
+        lastUpdated: module.updatedAt.toISOString(),
+      },
+      message: 'Module rating summary retrieved successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response);
+  } catch (error) {
+
+    const response: APIResponse = {
+      success: false,
+      error: 'Failed to retrieve rating summary',
+      message: 'An unexpected error occurred while retrieving rating information',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response, 500);
+  }
+});
+
+// 获取模块使用情况
+recommendationsRoutes.get('/modules/:moduleId/usage', async (c) => {
+  try {
+    const { moduleId } = c.req.param();
+
+    const moduleModel = new HomepageModuleModel(c.env);
+    const module = await moduleModel.getModuleById(moduleId);
+
+    if (!module) {
+      const response: APIResponse = {
+        success: false,
+        error: 'Module not found',
+        message: 'The requested module does not exist or is inactive',
+        timestamp: new Date().toISOString(),
+        requestId: c.get('requestId'),
+      };
+
+      return c.json(response, 404);
+    }
+
+    const engagementRate = module.testCount > 0 ? Math.min(module.testCount / 5000, 1) : 0;
+
+    const response: APIResponse = {
+      success: true,
+      data: {
+        moduleId: module.id,
+        estimatedSessions: module.testCount,
+        completionRate: Number(engagementRate.toFixed(2)),
+        averageDuration: module.estimatedTime,
+        trend: engagementRate > 0.75 ? 'growing' : engagementRate > 0.5 ? 'stable' : 'emerging',
+        lastUpdated: module.updatedAt.toISOString(),
+      },
+      message: 'Module usage metrics retrieved successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response);
+  } catch (error) {
+
+    const response: APIResponse = {
+      success: false,
+      error: 'Failed to retrieve module usage metrics',
+      message: 'An unexpected error occurred while retrieving module usage information',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response, 500);
+  }
+});
+
+// 获取热门模块
+recommendationsRoutes.get('/modules/popular', async (c) => {
+  try {
+    const { limit } = c.req.query();
+    const limitValue = normalizeLimit(limit);
+
+    const moduleModel = new HomepageModuleModel(c.env);
+    const modules = await moduleModel.getAllActiveModules();
+
+    const popularModules = modules
+      .slice()
+      .sort((a, b) => b.testCount - a.testCount)
+      .slice(0, limitValue)
+      .map(mapModuleSummary);
+
+    const response: APIResponse = {
+      success: true,
+      data: {
+        items: popularModules,
+        total: modules.length,
+      },
+      message: 'Popular modules retrieved successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response);
+  } catch (error) {
+
+    const response: APIResponse = {
+      success: false,
+      error: 'Failed to retrieve popular modules',
+      message: 'An unexpected error occurred while retrieving popular modules',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response, 500);
+  }
+});
+
+// 获取最新模块
+recommendationsRoutes.get('/modules/new', async (c) => {
+  try {
+    const { limit } = c.req.query();
+    const limitValue = normalizeLimit(limit);
+
+    const moduleModel = new HomepageModuleModel(c.env);
+    const modules = await moduleModel.getAllActiveModules();
+
+    const newestModules = modules
+      .slice()
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limitValue)
+      .map(mapModuleSummary);
+
+    const response: APIResponse = {
+      success: true,
+      data: {
+        items: newestModules,
+        total: modules.length,
+      },
+      message: 'Newest modules retrieved successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response);
+  } catch (error) {
+
+    const response: APIResponse = {
+      success: false,
+      error: 'Failed to retrieve newest modules',
+      message: 'An unexpected error occurred while retrieving newest modules',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response, 500);
+  }
+});
+
+// 检查模块可用性
+recommendationsRoutes.get('/modules/:moduleId/status', async (c) => {
+  try {
+    const { moduleId } = c.req.param();
+
+    const moduleModel = new HomepageModuleModel(c.env);
+    const module = await moduleModel.getModuleById(moduleId);
+
+    const response: APIResponse = {
       success: true,
       data: {
         moduleId,
-        isAvailable,
-        lastChecked: new Date().toISOString()
+        isAvailable: Boolean(module?.isActive),
+        lastChecked: new Date().toISOString(),
       },
-      message: '状态检查成功'
-    });
+      message: 'Module availability checked successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response);
   } catch (error) {
-    console.error('Failed to check module status:', error);
-    return c.json({
+
+    const response: APIResponse = {
       success: false,
-      error: '状态检查失败',
-      message: '服务器内部错误'
-    }, 500);
+      error: 'Failed to verify module availability',
+      message: 'An unexpected error occurred while checking module availability',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
+    };
+
+    return c.json(response, 500);
   }
 });
 
 /**
- * 生成推荐逻辑
+ * 生成推荐列表
  */
-async function generateRecommendations(
-  popularModules: any[],
-  userPreferences: any,
-  searchHistory: any[],
-  limit: number
-) {
-  const recommendations = [];
+function generateRecommendations(
+  modules: HomepageModule[],
+  preferences: UserPreferencesData | null,
+  limit: number,
+): RecommendationItem[] {
+  return modules
+    .map((module) => {
+      const evaluation = evaluateRelevance(module, preferences);
 
-  // 基于热门模块生成推荐
-  for (const module of popularModules.slice(0, limit)) {
-    const relevanceScore = calculateRelevanceScore(module, userPreferences, searchHistory);
-    
-    recommendations.push({
-      id: module.id,
-      type: 'test' as const,
-      title: module.name,
-      titleEn: module.nameEn || module.name,
-      description: module.description,
-      descriptionEn: module.descriptionEn || module.description,
-      icon: module.icon || '📋',
-      category: module.theme || 'general',
-      categoryEn: module.themeEn || module.theme || 'general',
-      relevanceScore,
-      reason: getRecommendationReason(relevanceScore, module),
-      reasonEn: getRecommendationReasonEn(relevanceScore, module),
-      metadata: {
-        totalUsers: module.totalUsers || 0,
-        averageRating: module.averageRating || 0,
-        completionRate: module.completionRate || 0
-      }
-    });
-  }
+      return {
+        id: module.id,
+        title: module.name,
+        description: module.description,
+        icon: module.icon || '📋',
+        route: module.route,
+        theme: module.theme,
+        relevanceScore: evaluation.score,
+        reasons: buildRecommendationReasons(module, evaluation, preferences),
+        metrics: {
+          averageRating: Number(module.rating?.toFixed(2)),
+          totalSessions: module.testCount,
+          estimatedTime: module.estimatedTime,
+          lastUpdated: module.updatedAt.toISOString(),
+        },
+      } satisfies RecommendationItem;
+    })
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, limit);
+}
 
-  // 按相关性排序
-  recommendations.sort((a, b) => b.relevanceScore - a.relevanceScore);
-
-  return recommendations.slice(0, limit);
+interface RelevanceEvaluation {
+  score: number;
+  highlyRated: boolean;
+  widelyUsed: boolean;
+  recentlyUpdated: boolean;
 }
 
 /**
- * 计算相关性分数
+ * 计算推荐权重
  */
-function calculateRelevanceScore(module: any, userPreferences: any, searchHistory: any[]): number {
-  let score = 0.5; // 基础分数
+function evaluateRelevance(
+  module: HomepageModule,
+  preferences: UserPreferencesData | null,
+): RelevanceEvaluation {
+  let score = 0.4;
+  let highlyRated = false;
+  let widelyUsed = false;
+  let recentlyUpdated = false;
 
-  // 基于用户偏好调整分数
-  if (userPreferences) {
-    if (userPreferences.preferredThemes?.includes(module.theme)) {
-      score += 0.2;
-    }
-    if (userPreferences.preferredCategories?.includes(module.category)) {
-      score += 0.15;
-    }
+  if (module.rating >= 4.5) {
+    score += 0.25;
+    highlyRated = true;
+  } else if (module.rating >= 4.0) {
+    score += 0.15;
+    highlyRated = true;
   }
 
-  // 基于搜索历史调整分数
-  if (searchHistory.length > 0) {
-    const relevantSearches = searchHistory.filter(search => 
-      search.query.toLowerCase().includes(module.name.toLowerCase()) ||
-      search.query.toLowerCase().includes(module.theme?.toLowerCase() || '')
-    );
-    
-    if (relevantSearches.length > 0) {
-      score += 0.1;
-    }
+  if (module.testCount >= 2000) {
+    score += 0.2;
+    widelyUsed = true;
+  } else if (module.testCount >= 500) {
+    score += 0.1;
+    widelyUsed = true;
   }
 
-  // 基于模块热度调整分数
-  if (module.totalUsers > 1000) score += 0.1;
-  if (module.averageRating > 4.0) score += 0.05;
+  const updatedWithin30Days = (Date.now() - module.updatedAt.getTime()) <= 30 * 24 * 60 * 60 * 1000;
+  if (updatedWithin30Days) {
+    score += 0.1;
+    recentlyUpdated = true;
+  }
 
-  return Math.min(score, 1.0);
+  if (preferences?.personalizedContent) {
+    score += 0.05;
+  }
+
+  return {
+    score: Math.min(Number(score.toFixed(2)), 1),
+    highlyRated,
+    widelyUsed,
+    recentlyUpdated,
+  };
 }
 
 /**
-       * Get recommendation reason (English)
+ * 生成推荐理由
  */
-function getRecommendationReason(score: number, _module: any): string {
-  if (score >= 0.8) return '高度匹配您的兴趣';
-  if (score >= 0.6) return '基于您的偏好推荐';
-  if (score >= 0.4) return '热门测试推荐';
-  return '为您精选推荐';
+function buildRecommendationReasons(
+  module: HomepageModule,
+  evaluation: RelevanceEvaluation,
+  preferences: UserPreferencesData | null,
+): string[] {
+  const reasons: string[] = [];
+
+  if (evaluation.highlyRated) {
+    reasons.push('Consistently high participant rating');
+  }
+
+  if (evaluation.widelyUsed) {
+    reasons.push('Popular choice among platform participants');
+  }
+
+  if (evaluation.recentlyUpdated) {
+    reasons.push('Content refreshed recently to include the latest insights');
+  }
+
+  if (preferences?.personalizedContent) {
+    reasons.push('Personalized recommendations are enabled for your profile');
+  }
+
+  if (!reasons.length) {
+    reasons.push('Curated to broaden your testing experience');
+  }
+
+  if (module.theme === 'learning') {
+    reasons.push('Designed to enhance learning strategies and study habits');
+  }
+
+  return Array.from(new Set(reasons));
 }
 
 /**
- * 获取推荐原因（英文）
+ * 格式化模块摘要
  */
-function getRecommendationReasonEn(score: number, _module: any): string {
-  if (score >= 0.8) return 'Highly matches your interests';
-  if (score >= 0.6) return 'Recommended based on your preferences';
-  if (score >= 0.4) return 'Popular test recommendation';
-  return 'Curated for you';
+function mapModuleSummary(module: HomepageModule) {
+  return {
+    id: module.id,
+    name: module.name,
+    description: module.description,
+    theme: module.theme,
+    route: module.route,
+    rating: Number(module.rating?.toFixed(2)),
+    totalSessions: module.testCount,
+    estimatedTime: module.estimatedTime,
+    updatedAt: module.updatedAt.toISOString(),
+  };
+}
+
+/**
+ * 解析limit参数
+ */
+function normalizeLimit(rawValue?: string, fallback: number = DEFAULT_LIMIT): number {
+  if (!rawValue) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    return fallback;
+  }
+
+  return Math.min(parsed, MAX_LIMIT);
 }
 
 export default recommendationsRoutes;

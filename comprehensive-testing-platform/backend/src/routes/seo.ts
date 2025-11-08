@@ -5,19 +5,37 @@
 
 import { Hono } from 'hono';
 import { SitemapService } from '../services/SitemapService';
+import type { APIResponse } from '../../../shared/types/apiResponse';
 import type { Context } from 'hono';
+import type { AppContext } from '../types/env';
 
-const seoRoutes = new Hono();
+const seoRoutes = new Hono<AppContext>();
+
+const respondDatabaseUnavailable = (c: Context<AppContext>) => {
+  const response: APIResponse = {
+    success: false,
+    error: 'Database not available',
+    message: 'Database connection is required to generate SEO resources',
+    timestamp: new Date().toISOString(),
+    requestId: c.get('requestId'),
+  };
+
+  return c.json(response, 500);
+};
 
 // 获取sitemap索引
-seoRoutes.get('/sitemap.xml', async (c: Context) => {
+seoRoutes.get('/sitemap.xml', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/sitemap.xml', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     const sitemapIndex = await sitemapService.generateSitemapIndex();
@@ -27,7 +45,6 @@ seoRoutes.get('/sitemap.xml', async (c: Context) => {
     
     return c.text(sitemapIndex);
   } catch (error) {
-    console.error('Failed to generate sitemap index:', error);
     return c.json({
       success: false,
       error: 'Failed to generate sitemap',
@@ -37,14 +54,18 @@ seoRoutes.get('/sitemap.xml', async (c: Context) => {
 });
 
 // 获取首页sitemap
-seoRoutes.get('/sitemap-homepage.xml', async (c: Context) => {
+seoRoutes.get('/sitemap-homepage.xml', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/sitemap-homepage.xml', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     const sitemap = await sitemapService.generateHomepageSitemap();
@@ -54,7 +75,6 @@ seoRoutes.get('/sitemap-homepage.xml', async (c: Context) => {
     
     return c.text(sitemap);
   } catch (error) {
-    console.error('Failed to generate homepage sitemap:', error);
     return c.json({
       success: false,
       error: 'Failed to generate homepage sitemap',
@@ -64,14 +84,18 @@ seoRoutes.get('/sitemap-homepage.xml', async (c: Context) => {
 });
 
 // 获取测试模块sitemap
-seoRoutes.get('/sitemap-tests.xml', async (c: Context) => {
+seoRoutes.get('/sitemap-tests.xml', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/sitemap-tests.xml', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     const sitemap = await sitemapService.generateTestModulesSitemap();
@@ -81,7 +105,6 @@ seoRoutes.get('/sitemap-tests.xml', async (c: Context) => {
     
     return c.text(sitemap);
   } catch (error) {
-    console.error('Failed to generate tests sitemap:', error);
     return c.json({
       success: false,
       error: 'Failed to generate tests sitemap',
@@ -91,14 +114,18 @@ seoRoutes.get('/sitemap-tests.xml', async (c: Context) => {
 });
 
 // 获取博客sitemap
-seoRoutes.get('/sitemap-blog.xml', async (c: Context) => {
+seoRoutes.get('/sitemap-blog.xml', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/sitemap-blog.xml', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     const sitemap = await sitemapService.generateBlogSitemap();
@@ -108,7 +135,6 @@ seoRoutes.get('/sitemap-blog.xml', async (c: Context) => {
     
     return c.text(sitemap);
   } catch (error) {
-    console.error('Failed to generate blog sitemap:', error);
     return c.json({
       success: false,
       error: 'Failed to generate blog sitemap',
@@ -118,14 +144,18 @@ seoRoutes.get('/sitemap-blog.xml', async (c: Context) => {
 });
 
 // 获取搜索sitemap
-seoRoutes.get('/sitemap-search.xml', async (c: Context) => {
+seoRoutes.get('/sitemap-search.xml', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/sitemap-search.xml', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     const sitemap = await sitemapService.generateSearchSitemap();
@@ -135,7 +165,6 @@ seoRoutes.get('/sitemap-search.xml', async (c: Context) => {
     
     return c.text(sitemap);
   } catch (error) {
-    console.error('Failed to generate search sitemap:', error);
     return c.json({
       success: false,
       error: 'Failed to generate search sitemap',
@@ -145,14 +174,18 @@ seoRoutes.get('/sitemap-search.xml', async (c: Context) => {
 });
 
 // 获取robots.txt
-seoRoutes.get('/robots.txt', async (c: Context) => {
+seoRoutes.get('/robots.txt', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/robots.txt', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     const robotsTxt = sitemapService.generateRobotsTxt();
@@ -162,7 +195,6 @@ seoRoutes.get('/robots.txt', async (c: Context) => {
     
     return c.text(robotsTxt);
   } catch (error) {
-    console.error('Failed to generate robots.txt:', error);
     return c.json({
       success: false,
       error: 'Failed to generate robots.txt',
@@ -172,14 +204,18 @@ seoRoutes.get('/robots.txt', async (c: Context) => {
 });
 
 // 提交sitemap到搜索引擎
-seoRoutes.post('/submit', async (c: Context) => {
+seoRoutes.post('/submit', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/submit', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     const results = await sitemapService.submitToSearchEngines();
@@ -187,10 +223,11 @@ seoRoutes.post('/submit', async (c: Context) => {
     return c.json({
       success: true,
       data: results,
-      message: 'Sitemap提交完成'
+      message: 'Sitemap submission completed',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
     });
   } catch (error) {
-    console.error('Failed to submit sitemap:', error);
     return c.json({
       success: false,
       error: 'Failed to submit sitemap',
@@ -200,14 +237,18 @@ seoRoutes.post('/submit', async (c: Context) => {
 });
 
 // 获取SEO统计信息
-seoRoutes.get('/stats', async (c: Context) => {
+seoRoutes.get('/stats', async (c) => {
   try {
-    const sitemapService = new SitemapService(c.env.DB, {
+    if (!c.env.DB) {
+      return respondDatabaseUnavailable(c);
+    }
+
+    const sitemapService = new SitemapService(c.env.DB!, {
       baseUrl: c.req.url.replace('/api/seo/stats', ''),
       defaultPriority: 0.5,
       defaultChangefreq: 'weekly',
       maxUrlsPerSitemap: 50000,
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     });
 
     // 获取各种sitemap的URL数量
@@ -228,16 +269,17 @@ seoRoutes.get('/stats', async (c: Context) => {
         search: searchUrls.split('<url>').length - 1
       },
       lastUpdated: new Date().toISOString(),
-      supportedLanguages: ['zh-CN', 'en-US']
+      supportedLanguages: ['en-US']
     };
 
     return c.json({
       success: true,
       data: stats,
-      message: 'SEO统计信息获取成功'
+      message: 'SEO statistics retrieved successfully',
+      timestamp: new Date().toISOString(),
+      requestId: c.get('requestId'),
     });
   } catch (error) {
-    console.error('Failed to get SEO stats:', error);
     return c.json({
       success: false,
       error: 'Failed to get SEO stats',
