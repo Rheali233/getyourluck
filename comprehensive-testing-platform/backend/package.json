@@ -19,12 +19,17 @@
     "pre-commit": "npm run code-quality"
   },
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "hono": "^4.0.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^8.6.7",
+    "sanitize-html": "^2.13.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231025.0",
     "@types/node": "^20.0.0",
+    "@types/markdown-it-anchor": "^7.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0",
     "wrangler": "^4.43.0",

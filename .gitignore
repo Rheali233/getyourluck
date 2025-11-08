@@ -56,6 +56,11 @@ coverage/
 tmp/
 temp/
 
+# Archive & backup artifacts
+*.zip
+*.bak
+*.backup
+
 # Local development
 .wrangler/
 .dev.vars

@@ -5,10 +5,10 @@
 
 // API端点常量
 export const API_ENDPOINTS = {
-  TESTS: "/api/tests",
-  BLOG: "/api/blog",
-  FEEDBACK: "/api/feedback",
-  ANALYTICS: "/api/analytics",
+  TESTS: "/tests",
+  BLOG: "/blog",
+  FEEDBACK: "/feedback",
+  ANALYTICS: "/analytics",
 } as const;
 
 // 测试类型常量
