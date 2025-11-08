@@ -92,6 +92,21 @@ class ApiClient {
         )
       }
 
+      // 处理连接关闭错误（ERR_CONNECTION_CLOSED）
+      if (error instanceof Error && (
+        error.message.includes('ERR_CONNECTION_CLOSED') ||
+        error.message.includes('connection closed') ||
+        error.message.includes('Connection closed') ||
+        error.message.includes('Failed to fetch') ||
+        error.name === 'TypeError' && error.message.includes('fetch')
+      )) {
+        throw new ModuleError(
+          'Network connection lost. The server may be processing your request. Please try again.',
+          ERROR_CODES.NETWORK_ERROR,
+          0
+        )
+      }
+
       // 处理网络错误（包括 ERR_NETWORK_CHANGED）
       if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('network'))) {
         throw new ModuleError(

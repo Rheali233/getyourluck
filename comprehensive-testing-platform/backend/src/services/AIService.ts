@@ -59,26 +59,24 @@ export class AIService {
   /**
    * 调用DeepSeek API，包含重试逻辑
    */
-  private async callDeepSeek(prompt: string, retryCount = 0): Promise<any> {
+  private async callDeepSeek(prompt: string, retryCount = 0, customTimeout?: number): Promise<any> {
     try {
+      // 使用自定义超时或默认超时
+      const timeout = customTimeout || this.timeout;
+      
       // eslint-disable-next-line no-console
       console.log(`[AI Debug] Calling DeepSeek API (attempt ${retryCount + 1})`, {
         hasApiKey: !!this.apiKey,
         apiKeyPrefix: this.apiKey ? this.apiKey.substring(0, 10) + '...' : 'NO KEY',
         promptLength: prompt.length,
+        timeout: timeout,
         baseURL: this.baseURL
       });
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-      const response = await fetch(this.baseURL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify({
+      const requestBody = {
           model: 'deepseek-chat',
           messages: [
             { role: 'system', content: UnifiedPromptBuilder.getSystemRole() },
@@ -86,33 +84,146 @@ export class AIService {
           ],
           temperature: 0.7,
           max_tokens: 4000
-        }),
+      };
+      
+      const bodyString = JSON.stringify(requestBody);
+      const bodySizeKB = bodyString.length / 1024;
+      
+      // eslint-disable-next-line no-console
+      console.log(`[AI Debug] Request body size: ${bodySizeKB.toFixed(2)} KB, prompt length: ${prompt.length} chars`);
+      
+      const fetchStartTime = Date.now();
+      const response = await fetch(this.baseURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: bodyString,
         signal: controller.signal
       });
 
       clearTimeout(timeoutId);
+      
+      const fetchTime = Date.now() - fetchStartTime;
+      // eslint-disable-next-line no-console
+      console.log(`[AI Debug] Fetch completed in ${fetchTime}ms, status: ${response.status}`);
+      
+      // 检查响应头
+      const contentType = response.headers.get('content-type') || '';
+      const contentLength = response.headers.get('content-length');
+      // eslint-disable-next-line no-console
+      console.log(`[AI Debug] Response headers: content-type=${contentType}, content-length=${contentLength}`);
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text().catch(() => 'Unable to read error response');
+        throw new Error(`HTTP ${response.status}: ${response.statusText}. Response: ${errorText.substring(0, 200)}`);
       }
 
-      const data = await response.json();
+      // 在 Cloudflare Workers 环境中读取响应体
+      // 尝试多种方法以确保兼容性
+      let data: any;
+      try {
+        // 方法1: 尝试直接使用 response.json()（最简单的方法）
+        // 如果失败，再尝试其他方法
+        try {
+          data = await response.json();
+          // eslint-disable-next-line no-console
+          console.log('[AI Debug] Successfully parsed response using response.json()');
+          // eslint-disable-next-line no-console
+          console.log('[AI Debug] Response keys:', Object.keys(data));
+        } catch (jsonError) {
+          // eslint-disable-next-line no-console
+          console.log('[AI Debug] response.json() failed, trying arrayBuffer() method');
+          
+          // 方法2: 使用 arrayBuffer 读取
+          // 注意：需要克隆 response，因为 response 只能读取一次
+          const clonedResponse = response.clone();
+          const arrayBuffer = await clonedResponse.arrayBuffer();
+          // eslint-disable-next-line no-console
+          console.log(`[AI Debug] Response arrayBuffer size: ${arrayBuffer.byteLength} bytes`);
+          
+          if (arrayBuffer.byteLength === 0) {
+            throw new Error('Empty response body from AI service');
+          }
+          
+          // 将 ArrayBuffer 转换为文本
+          const decoder = new TextDecoder('utf-8');
+          const responseText = decoder.decode(arrayBuffer);
+          // eslint-disable-next-line no-console
+          console.log(`[AI Debug] Response text length: ${responseText.length} chars`);
+          
+          if (!responseText || responseText.trim().length === 0) {
+            throw new Error('Empty response text after decoding');
+          }
+          
+          data = JSON.parse(responseText);
+          // eslint-disable-next-line no-console
+          console.log('[AI Debug] Successfully parsed response using arrayBuffer() method');
+        }
+      } catch (parseError) {
+        // eslint-disable-next-line no-console
+        console.error('[AI Debug] Failed to parse response:', parseError);
+        // eslint-disable-next-line no-console
+        console.error('[AI Debug] Parse error details:', {
+          name: parseError instanceof Error ? parseError.name : 'Unknown',
+          message: parseError instanceof Error ? parseError.message : String(parseError),
+          stack: parseError instanceof Error ? parseError.stack?.substring(0, 500) : 'No stack'
+        });
+        
+        // 检查是否是网络连接错误
+        if (parseError instanceof Error && parseError.message.includes('Network connection lost')) {
+          throw new Error(`Network connection lost while reading response body. This may be a Cloudflare Workers local development environment limitation. Please try deploying to staging/production or check your network connection.`);
+        }
+        throw new Error(`Failed to parse AI response: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+      }
+      
       // eslint-disable-next-line no-console
       console.log('AI raw response:', JSON.stringify(data, null, 2));
       return data;
     } catch (error) {
+      // 详细记录错误信息，帮助排查问题
+      const errorDetails = {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        isAbortError: error instanceof Error && error.name === 'AbortError',
+        retryCount,
+        maxRetries: this.maxRetries,
+        timeout: customTimeout || this.timeout,
+        promptLength: prompt.length
+      };
+      
       // eslint-disable-next-line no-console
-      console.error(`[AI Debug] Error in attempt ${retryCount + 1}:`, error);
+      console.error(`[AI Debug] Error in attempt ${retryCount + 1}:`, errorDetails);
+      // eslint-disable-next-line no-console
+      console.error(`[AI Debug] Error stack:`, error instanceof Error ? error.stack?.substring(0, 500) : 'No stack trace');
 
       if (retryCount < this.maxRetries && this.isRetryableError(error)) {
+        const delayMs = 1000 * Math.pow(2, retryCount);
         // eslint-disable-next-line no-console
-        console.log(`[AI Debug] Retrying DeepSeek API call (attempt ${retryCount + 1}/${this.maxRetries})`);
-        await this.delay(1000 * Math.pow(2, retryCount)); // Exponential backoff
-        return this.callDeepSeek(prompt, retryCount + 1);
+        console.log(`[AI Debug] Retrying DeepSeek API call (attempt ${retryCount + 1}/${this.maxRetries}) after ${delayMs}ms delay`);
+        await this.delay(delayMs);
+        return this.callDeepSeek(prompt, retryCount + 1, customTimeout);
       }
 
       // eslint-disable-next-line no-console
-      console.error('[AI Debug] DeepSeek API call failed after all retries:', error);
+      console.error('[AI Debug] DeepSeek API call failed after all retries:', errorDetails);
+      
+      // 将错误转换为更友好的消息
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error(`Request timeout after ${(customTimeout || this.timeout) / 1000} seconds. The AI analysis is taking longer than expected. Please try again.`);
+        }
+        // 处理连接关闭错误
+        if (error.message.includes('ERR_CONNECTION_CLOSED') || 
+            error.message.includes('connection closed') ||
+            error.message.includes('Connection closed') ||
+            error.message.includes('Network connection lost') || 
+            error.message.includes('fetch')) {
+          throw new Error(`Network connection lost. The server may be processing your request. Please try again.`);
+        }
+      }
+      
       throw error;
     }
   }
@@ -131,12 +242,15 @@ export class AIService {
       return statusCode >= 500;
     }
     
-    // 网络错误可重试
-    return error.message && (
-      error.message.includes('Network error') ||
-      error.message.includes('fetch') ||
-      error.message.includes('Failed to fetch')
-    );
+    // 网络错误可重试（包括各种网络连接错误）
+    const errorMessage = error.message?.toLowerCase() || '';
+    return errorMessage.includes('network') ||
+           errorMessage.includes('connection') ||
+           errorMessage.includes('fetch') ||
+           errorMessage.includes('timeout') ||
+           errorMessage.includes('econnreset') ||
+           errorMessage.includes('enotfound') ||
+           errorMessage.includes('etimedout');
   }
 
   /**
@@ -417,12 +531,32 @@ export class AIService {
     try {
       const content = response?.choices?.[0]?.message?.content || '';
       if (!content) {
+        // eslint-disable-next-line no-console
+        console.error('[AIService] MBTI response content is empty');
         throw new Error('Empty response content');
       }
       
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI raw response length: ${content.length}`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI raw response preview (first 500 chars):`, content.substring(0, 500));
+      
       // 处理模型返回中可能包含的 ```json 代码块，并使用健壮解析
       const cleaned = this.sanitizeAIJSON(content);
-      const parsed = this.parseJSONRobust(cleaned, 'VARK');
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI cleaned response length: ${cleaned.length}`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI cleaned response preview (first 500 chars):`, cleaned.substring(0, 500));
+      
+      const parsed = this.parseJSONRobust(cleaned, 'MBTI');
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI JSON parsed successfully, parsed keys:`, Object.keys(parsed));
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI parsed has personalityType:`, !!parsed.personalityType, parsed.personalityType);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI parsed has detailedAnalysis:`, !!parsed.detailedAnalysis);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI parsed has type:`, !!parsed.type, parsed.type);
       
       // 填充必要字段的默认值，避免前端空白
       const safe: any = {
@@ -459,8 +593,30 @@ export class AIService {
         relationshipCompatibility: parsed.relationshipCompatibility || {}
       }
       
+      // 验证关键字段是否存在
+      if (!safe.detailedAnalysis || safe.detailedAnalysis === 'No detailed analysis available') {
+        // eslint-disable-next-line no-console
+        console.warn('[AIService] MBTI response missing detailedAnalysis, using fallback');
+      }
+      
+      if (!safe.personalityType || safe.personalityType === 'UNKNOWN') {
+        // eslint-disable-next-line no-console
+        console.warn('[AIService] MBTI response missing personalityType, using fallback');
+      }
+      
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] MBTI safe result prepared, personalityType: ${safe.personalityType}, has detailedAnalysis: ${!!safe.detailedAnalysis}`);
+      
       return safe;
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[AIService] MBTI parse error:', error);
+      // eslint-disable-next-line no-console
+      console.error('[AIService] MBTI parse error details:', error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.substring(0, 1000)
+      } : error);
       throw new Error(`Failed to parse MBTI response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -551,7 +707,9 @@ export class AIService {
       return JSON.parse(cleaned);
     } catch (parseError) {
       // eslint-disable-next-line no-console
-      console.warn(`${testType}: First JSON parse attempt failed, trying alternative method:`, parseError instanceof Error ? parseError.message : 'Unknown error');
+      console.warn(`[AIService] ${testType}: First JSON parse attempt failed, trying alternative method:`, parseError instanceof Error ? parseError.message : 'Unknown error');
+      // eslint-disable-next-line no-console
+      console.warn(`[AIService] ${testType}: Failed JSON content preview (last 500 chars):`, cleaned.substring(Math.max(0, cleaned.length - 500)));
       
       // 尝试更激进的清理方法
       let alternativeText = cleaned;
@@ -565,10 +723,24 @@ export class AIService {
       alternativeText = alternativeText.replace(/\s+/g, ' ');
       
       try {
-        return JSON.parse(alternativeText);
+        const parsed = JSON.parse(alternativeText);
+        // eslint-disable-next-line no-console
+        console.log(`[AIService] ${testType}: JSON parse succeeded with alternative method`);
+        return parsed;
       } catch (secondError) {
+        // eslint-disable-next-line no-console
+        console.warn(`[AIService] ${testType}: Second JSON parse attempt also failed:`, secondError instanceof Error ? secondError.message : 'Unknown error');
         // 如果仍然失败，尝试修复截断的JSON
-        return this.repairTruncatedJSON(alternativeText, testType);
+        try {
+          const repaired = this.repairTruncatedJSON(alternativeText, testType);
+          // eslint-disable-next-line no-console
+          console.log(`[AIService] ${testType}: JSON repair succeeded`);
+          return repaired;
+        } catch (repairError) {
+          // eslint-disable-next-line no-console
+          console.error(`[AIService] ${testType}: JSON repair also failed:`, repairError instanceof Error ? repairError.message : 'Unknown error');
+          throw new Error(`Failed to parse ${testType} JSON response after all attempts: ${repairError instanceof Error ? repairError.message : 'Unknown error'}`);
+        }
       }
     }
   }
@@ -755,20 +927,59 @@ export class AIService {
     try {
       const content = response?.choices?.[0]?.message?.content || '';
       if (!content) {
+        // eslint-disable-next-line no-console
+        console.error('[AIService] Love Language response content is empty');
         throw new Error('Empty response content');
       }
       
-      // 处理模型返回中可能包含的 ```json 代码块
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Language raw response length: ${content.length}`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Language raw response preview (first 500 chars):`, content.substring(0, 500));
+      
+      // 处理模型返回中可能包含的 ```json 代码块，并使用健壮解析
       const cleaned = this.sanitizeAIJSON(content);
-      const parsed = JSON.parse(cleaned);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Language cleaned response length: ${cleaned.length}`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Language cleaned response preview (first 500 chars):`, cleaned.substring(0, 500));
+      
+      // 使用健壮的JSON解析方法，与PHQ9和Happiness保持一致
+      const parsed = this.parseJSONRobust(cleaned, 'Love Language');
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Language JSON parsed successfully, parsed keys:`, Object.keys(parsed));
       
       // 验证必要字段
       if (!parsed.primaryLanguage || !parsed.analysis) {
-        throw new Error('Missing required fields: primaryLanguage or analysis');
+        // eslint-disable-next-line no-console
+        console.warn('[AIService] Love Language response missing required fields, checking alternatives');
+        // 尝试使用备用字段名
+        if (!parsed.primaryLanguage && parsed.primary) {
+          parsed.primaryLanguage = parsed.primary;
+        }
+        if (!parsed.analysis && parsed.interpretation) {
+          parsed.analysis = parsed.interpretation;
+        }
+        
+        // 如果仍然缺少必要字段，抛出错误
+        if (!parsed.primaryLanguage || !parsed.analysis) {
+          throw new Error('Missing required fields: primaryLanguage or analysis');
+        }
       }
+      
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Language parse successful, primaryLanguage: ${parsed.primaryLanguage}`);
       
       return parsed;
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[AIService] Love Language parse error:', error);
+      // eslint-disable-next-line no-console
+      console.error('[AIService] Love Language parse error details:', error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.substring(0, 1000)
+      } : error);
       throw new Error(`Failed to parse Love Language response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -1274,14 +1485,27 @@ export class AIService {
       // eslint-disable-next-line no-console
       console.log(`[AIService] Prompt built, length: ${prompt.length}`);
       
-      const response = await this.callDeepSeek(prompt);
+      // 根据测试类型设置不同的超时时间
+      // 复杂分析（如 numerology, tarot, birth-chart）需要更长时间
+      const complexAnalysisTypes = ['numerology', 'tarot', 'birth-chart', 'compatibility', 'fortune'];
+      const customTimeout = complexAnalysisTypes.includes(data.testType) ? 120000 : 45000; // 120秒或45秒
+      
+      const response = await this.callDeepSeek(prompt, 0, customTimeout);
       // eslint-disable-next-line no-console
       console.log(`[AIService] DeepSeek API call successful, parsing response for ${data.testType}`);
       
       // 根据测试类型使用专门的解析方法
       let parsedResult;
       if (data.testType === 'mbti') {
+        // eslint-disable-next-line no-console
+        console.log(`[AIService] Parsing MBTI response`);
         parsedResult = this.parseMBTIResponse(response);
+        // eslint-disable-next-line no-console
+        console.log(`[AIService] MBTI response parsed successfully, keys:`, Object.keys(parsedResult));
+        // eslint-disable-next-line no-console
+        console.log(`[AIService] MBTI parsed result has detailedAnalysis:`, !!parsedResult.detailedAnalysis);
+        // eslint-disable-next-line no-console
+        console.log(`[AIService] MBTI parsed result has personalityType:`, parsedResult.personalityType);
       } else if (data.testType === 'phq9') {
         // eslint-disable-next-line no-console
         console.log(`[AIService] Parsing PHQ-9 response`);
@@ -1333,7 +1557,19 @@ export class AIService {
       console.error(`[AIService] analyzeTestResult error for ${data.testType}:`, error);
       // eslint-disable-next-line no-console
       console.error(`[AIService] Error stack:`, error instanceof Error ? error.stack : 'No stack trace');
-      throw new Error(`Test result analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // 将错误转换为更友好的消息，保留原始错误信息以便调试
+      let errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // 处理连接关闭错误
+      if (errorMessage.includes('ERR_CONNECTION_CLOSED') || 
+          errorMessage.includes('connection closed') ||
+          errorMessage.includes('AbortError') ||
+          errorMessage.includes('timeout')) {
+        errorMessage = `AI analysis timeout or connection lost: ${errorMessage}`;
+      }
+      
+      throw new Error(`Test result analysis failed: ${errorMessage}`);
     }
   }
 
@@ -1402,11 +1638,23 @@ export class AIService {
     
     if (data.testType === 'mbti') {
       // 转换answers格式以匹配MBTI方法期望的格式
-      const mbtiAnswers: UserAnswer[] = data.answers.map((answer: any) => ({
-        questionId: answer.questionId,
-        answer: answer.value,
-        score: typeof answer.value === 'number' ? answer.value : 0
-      }));
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] buildAnalysisPrompt for MBTI: received ${data.answers.length} answers`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] buildAnalysisPrompt for MBTI: first answer sample:`, data.answers[0]);
+      
+      const mbtiAnswers: UserAnswer[] = data.answers.map((answer: any) => {
+        // 支持多种答案格式：value字段或answer字段
+        const answerValue = answer.value !== undefined ? answer.value : answer.answer;
+        return {
+          questionId: answer.questionId,
+          answer: answerValue,
+          score: typeof answerValue === 'number' ? answerValue : 0
+        };
+      });
+      
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] buildAnalysisPrompt for MBTI: converted ${mbtiAnswers.length} answers, first converted:`, mbtiAnswers[0]);
       
       const context: TestContext = {
         testType: data.testType,
@@ -1584,7 +1832,7 @@ export class AIService {
         return this.buildZiWeiPrompt(fullName, birthDate, birthTime, gender, birthPlace, calendarType);
       }
       
-      return `You are a professional numerology and BaZi (Four Pillars of Destiny) analyst. Please provide a comprehensive analysis based on the following information:
+      return `You are a professional numerology and BaZi (Four Pillars of Destiny) analyst. Provide a comprehensive analysis based on:
 
 **Personal Information:**
 - Name: ${fullName}
@@ -1594,188 +1842,125 @@ export class AIService {
 - Calendar Type: ${calendarType}
 - Analysis Type: ${type}
 
-**Required Analysis Structure:**
-Please provide your analysis in the following comprehensive JSON format:
-
+**Required JSON Structure:**
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "${type}",
-    "overview": "Comprehensive overview of the BaZi analysis",
-    
+    "overview": "string - comprehensive overview",
     "keyInsights": [
-      {
-        "pillar": "Year Pillar",
-        "element": "Heavenly Stem over Earthly Branch"
-      },
-      {
-        "pillar": "Month Pillar",
-        "element": "Heavenly Stem over Earthly Branch"
-      },
-      {
-        "pillar": "Day Pillar",
-        "element": "Heavenly Stem over Earthly Branch"
-      },
-      {
-        "pillar": "Hour Pillar",
-        "element": "Heavenly Stem over Earthly Branch"
-      }
+      { "pillar": "Year Pillar|Month Pillar|Day Pillar|Hour Pillar", "element": "string - format: 'Heavenly Stem over Earthly Branch' (e.g., 'Metal over Dragon')" }
     ],
-    
-    "strengths": [
-      "List of personal strengths based on the analysis"
-    ],
-    "potentialChallenges": [
-      "List of potential challenges or areas for growth"
-    ],
-    "careerSuggestions": [
-      "Career advice based on the analysis"
-    ],
-    "relationshipInsights": [
-      "Relationship guidance based on the analysis"
-    ],
-    "personalGrowthRecommendations": [
-      "Personal development recommendations"
-    ],
-    
+    "strengths": ["string[]"],
+    "potentialChallenges": ["string[]"],
+    "careerSuggestions": ["string[]"],
+    "relationshipInsights": ["string[]"],
+    "personalGrowthRecommendations": ["string[]"],
     "wealthAnalysis": {
-      "wealthLevel": "medium",
-      "wealthSource": ["Career development", "Investment opportunities"],
-      "investmentAdvice": ["Focus on stable investments", "Consider real estate"],
-      "wealthRisks": ["Avoid high-risk investments", "Be cautious with loans"],
-      "wealthLuckyPeriods": ["Spring and Autumn seasons"],
-      "wealthPrecautions": ["Avoid impulsive spending", "Maintain emergency fund"]
+      "wealthLevel": "string (low/medium/high)",
+      "wealthSource": ["string[]"],
+      "investmentAdvice": ["string[]"],
+      "wealthRisks": ["string[]"],
+      "wealthLuckyPeriods": ["string[]"],
+      "wealthPrecautions": ["string[]"]
     },
-    
     "relationshipAnalysis": {
-      "marriageTiming": "Late 20s to early 30s",
-      "partnerCharacteristics": ["Compatible element", "Supportive nature"],
-      "relationshipChallenges": ["Communication differences", "Different priorities"],
-      "compatibilityElements": ["Wood and Water", "Earth and Metal"],
-      "marriageAdvice": ["Focus on communication", "Respect differences"],
-      "relationshipLuckyPeriods": ["Spring and Summer"]
+      "marriageTiming": "string",
+      "partnerCharacteristics": ["string[]"],
+      "relationshipChallenges": ["string[]"],
+      "compatibilityElements": ["string[]"],
+      "marriageAdvice": ["string[]"],
+      "relationshipLuckyPeriods": ["string[]"]
     },
-    
     "healthAnalysis": {
-      "overallHealth": "good",
-      "healthWeakAreas": ["Digestive system", "Respiratory system"],
-      "healthAdvice": ["Regular exercise", "Balanced diet"],
-      "preventiveMeasures": ["Annual check-ups", "Stress management"],
-      "beneficialActivities": ["Yoga", "Meditation", "Nature walks"],
-      "healthWarningSigns": ["Persistent fatigue", "Sleep disturbances"]
+      "overallHealth": "string (good/fair/poor)",
+      "healthWeakAreas": ["string[]"],
+      "healthAdvice": ["string[]"],
+      "preventiveMeasures": ["string[]"],
+      "beneficialActivities": ["string[]"],
+      "healthWarningSigns": ["string[]"]
     },
-    
     "fortuneAnalysis": {
       "currentYear": {
-        "year": 2024,
-        "overall": 7,
-        "career": 8,
-        "wealth": 6,
-        "health": 7,
-        "relationships": 8,
-        "overallDescription": "This year brings a balanced mix of opportunities and challenges, requiring careful navigation and strategic planning. The cosmic influences favor steady progress with occasional breakthroughs.",
-        "careerDescription": "Your career path shows steady progress with potential for advancement through focused effort and strategic networking. Leadership opportunities may arise.",
-        "wealthDescription": "Financial opportunities may arise, but require careful evaluation and prudent decision-making to maximize benefits. Avoid impulsive investments.",
-        "healthDescription": "Maintaining good health requires attention to both physical and mental well-being, with particular focus on stress management and regular exercise.",
-        "relationshipsDescription": "Your relationships may deepen this year, with opportunities for meaningful connections and personal growth through social interactions.",
-        "keyEvents": ["Career advancement opportunity in Q2", "Important relationship milestone in Q3"],
-        "advice": ["Focus on building strong professional networks", "Maintain work-life balance", "Invest in personal relationships"]
+        "year": "number",
+        "overall": "number (1-10)",
+        "career": "number (1-10)",
+        "wealth": "number (1-10)",
+        "health": "number (1-10)",
+        "relationships": "number (1-10)",
+        "overallDescription": "string - detailed narrative",
+        "careerDescription": "string - detailed narrative",
+        "wealthDescription": "string - detailed narrative",
+        "healthDescription": "string - detailed narrative",
+        "relationshipsDescription": "string - detailed narrative",
+        "keyEvents": ["string[]"],
+        "advice": ["string[]"]
       },
       "nextYear": {
-        "year": 2025,
-        "overall": 8,
-        "overallDescription": "The coming year promises significant developments across multiple life areas, with particular emphasis on personal growth and new opportunities.",
-        "keyTrends": ["Major career breakthrough expected", "Financial stability improvement", "New relationship opportunities", "Health optimization focus"],
-        "opportunities": ["Career advancement", "Financial growth", "New partnerships", "Personal development"],
-        "challenges": ["Work-life balance", "Health maintenance", "Decision making pressure"]
+        "year": "number",
+        "overall": "number (1-10)",
+        "overallDescription": "string - detailed narrative",
+        "keyTrends": ["string[]"],
+        "opportunities": ["string[]"],
+        "challenges": ["string[]"]
       }
     },
-    
-    "overallInterpretation": "Comprehensive overall interpretation of the BaZi analysis",
-    
-    "personalityTraits": [
-      "Key personality traits based on the analysis"
-    ],
-    
-    "careerGuidance": [
-      "Specific career guidance and recommendations"
-    ],
-    
+    "overallInterpretation": "string - comprehensive interpretation",
+    "personalityTraits": ["string[]"],
+    "careerGuidance": ["string[]"],
     "baZiAnalysis": {
       "tenGods": {
-        "biJian": { "name": "Bi Jian (Equal)", "element": "Wood", "strength": "balanced", "meaning": "Self-reliance and independence" },
-        "jieCai": { "name": "Jie Cai (Rob Wealth)", "element": "Wood", "strength": "weak", "meaning": "Competition and challenges" },
-        "shiShen": { "name": "Shi Shen (Food God)", "element": "Fire", "strength": "strong", "meaning": "Creativity and expression" },
-        "shangGuan": { "name": "Shang Guan (Hurt Officer)", "element": "Fire", "strength": "balanced", "meaning": "Intelligence and innovation" },
-        "pianCai": { "name": "Pian Cai (Partial Wealth)", "element": "Metal", "strength": "weak", "meaning": "Unexpected wealth" },
-        "zhengCai": { "name": "Zheng Cai (Direct Wealth)", "element": "Metal", "strength": "strong", "meaning": "Stable income" },
-        "qiSha": { "name": "Qi Sha (Seven Killings)", "element": "Water", "strength": "balanced", "meaning": "Authority and pressure" },
-        "zhengGuan": { "name": "Zheng Guan (Direct Officer)", "element": "Water", "strength": "strong", "meaning": "Official position" },
-        "pianYin": { "name": "Pian Yin (Partial Seal)", "element": "Earth", "strength": "weak", "meaning": "Unconventional wisdom" },
-        "zhengYin": { "name": "Zheng Yin (Direct Seal)", "element": "Earth", "strength": "strong", "meaning": "Traditional wisdom" }
+        "biJian": { "name": "string", "element": "string", "strength": "string (weak/balanced/strong)", "meaning": "string" },
+        "jieCai": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "shiShen": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "shangGuan": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "pianCai": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "zhengCai": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "qiSha": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "zhengGuan": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "pianYin": { "name": "string", "element": "string", "strength": "string", "meaning": "string" },
+        "zhengYin": { "name": "string", "element": "string", "strength": "string", "meaning": "string" }
       },
-      
       "dayMasterStrength": {
-        "strength": "balanced",
-        "description": "Detailed description of Day Master strength",
-        "recommendations": ["Personalized recommendations based on Day Master strength"]
+        "strength": "string (weak/balanced/strong)",
+        "description": "string - detailed description",
+        "recommendations": ["string[]"]
       },
-      
       "favorableElements": {
-        "useful": ["List of useful elements"],
-        "harmful": ["List of harmful elements"],
-        "neutral": ["List of neutral elements"],
-        "explanation": "Explanation of favorable elements analysis"
+        "useful": ["string[]"],
+        "harmful": ["string[]"],
+        "neutral": ["string[]"],
+        "explanation": "string"
       },
-      
       "fiveElements": {
-        "elements": {
-          "metal": 2,
-          "wood": 2,
-          "water": 1,
-          "fire": 2,
-          "earth": 2
-        },
-        "dominantElement": "earth",
-        "weakElement": "water",
-        "balance": "balanced"
+        "elements": { "metal": "number", "wood": "number", "water": "number", "fire": "number", "earth": "number" },
+        "dominantElement": "string",
+        "weakElement": "string",
+        "balance": "string (balanced/unbalanced)"
       }
+    },
+    "luckyElements": {
+      "colors": ["string[]"],
+      "numbers": ["number[]"],
+      "directions": ["string[]"],
+      "seasons": ["string[]"]
     }
   }
 }
 
 **Analysis Requirements:**
-1. **BaZi Fundamentals**: Analyze the Four Pillars (Year, Month, Day, Hour) with proper Heavenly Stems and Earthly Branches
-2. **Five Elements Balance**: Assess the balance of Metal, Wood, Water, Fire, and Earth elements
-3. **Ten Gods Analysis**: Include analysis of the Ten Gods (Bi Jian, Jie Cai, Shi Shen, Shang Guan, Pian Cai, Zheng Cai, Qi Sha, Zheng Guan, Pian Yin, Zheng Yin)
-4. **Day Master Strength**: Evaluate the strength of the Day Master (日主)
-5. **Favorable Elements**: Identify useful (用神), harmful (忌神), and neutral (闲神) elements
-6. **Life Applications**: Provide practical guidance for career, wealth, relationships, and health
-7. **Fortune Timing**: Include current year and next year predictions with rich descriptive language
-8. **Lucky Elements**: Suggest beneficial colors, directions, seasons, and numbers
+1. Analyze Four Pillars (Year, Month, Day, Hour) with proper Heavenly Stems and Earthly Branches
+2. Assess Five Elements balance (Metal, Wood, Water, Fire, Earth)
+3. Include Ten Gods analysis (Bi Jian, Jie Cai, Shi Shen, Shang Guan, Pian Cai, Zheng Cai, Qi Sha, Zheng Guan, Pian Yin, Zheng Yin)
+4. Evaluate Day Master strength and identify favorable elements (useful/harmful/neutral)
+5. Provide practical guidance for career, wealth, relationships, and health
+6. Include current year and next year predictions with rich narrative descriptions
 
-**IMPORTANT FORMAT REQUIREMENTS:**
-- For keyInsights element field: Use ONLY English format "Heavenly Stem over Earthly Branch" (e.g., "Metal over Dragon", "Wood over Rat")
-- Do NOT include Chinese characters in parentheses (e.g., avoid "Metal (庚) over Dragon (辰)")
-- Use English pillar names only: "Year Pillar", "Month Pillar", "Day Pillar", "Hour Pillar"
-- All element names should be in English: Metal, Wood, Water, Fire, Earth, Dragon, Rat, Tiger, etc.
-
-**Language Style Requirements:**
-- Use rich, descriptive language instead of simple scores or ratings
-- Provide detailed explanations for fortune analysis with narrative descriptions
-- Focus on storytelling and interpretation rather than numerical data
-- Use encouraging and professional tone throughout
-- Include specific, actionable advice with context
-- Write in flowing, engaging English that feels personal and insightful
-
-Please ensure the analysis is:
-1. Professional and encouraging with rich descriptive language
-2. Based on traditional BaZi principles with modern interpretation
-3. Specific to the provided birth information with personalized insights
-4. Practical and actionable with detailed guidance
-5. Written in engaging, flowing English
-6. Comprehensive and detailed with narrative descriptions
-7. Focus on interpretation and meaning rather than numerical scores`;
+**Format & Style Requirements:**
+- Use English only: pillar names ("Year Pillar", "Month Pillar", "Day Pillar", "Hour Pillar"), element names (Metal, Wood, Water, Fire, Earth), animal names (Dragon, Rat, Tiger, etc.)
+- For keyInsights element field: Use format "Heavenly Stem over Earthly Branch" (e.g., "Metal over Dragon") - NO Chinese characters
+- Use rich descriptive language, narrative descriptions, encouraging professional tone, specific actionable advice
+- Focus on interpretation and meaning rather than numerical scores`;
     }
     
     // 其他测试类型使用通用prompt
@@ -2137,78 +2322,20 @@ Keep it concise but meaningful, focusing on the most important insights.`;
    * 解析命理分析响应
    */
   private parseNumerologyResponse(response: any): any {
-    try {
       const content = response?.choices?.[0]?.message?.content || '';
       if (!content) {
-        throw new Error('Empty response content');
+      throw new Error('Empty response content from AI');
       }
       
       const cleaned = this.sanitizeAIJSON(content);
       const parsed = JSON.parse(cleaned);
       
-      // 验证必需字段
+    // 验证必需字段 - 如果缺失则抛出错误，不使用默认值
       if (!parsed.analysis) {
         throw new Error('Missing analysis field in numerology response');
       }
       
       return parsed;
-    } catch (error) {
-      // 返回默认命理分析结构
-      return {
-        analysis: {
-          testType: 'numerology',
-          subtype: 'bazi',
-          overview: 'Your BaZi analysis reveals insights about your birth chart and five elements.',
-          keyInsights: [
-            {
-              pillar: 'Year Pillar (己 巳)',
-              element: 'Earth over Fire',
-              interpretation: 'You have a grounded, nurturing foundation with hidden passion and resilience.'
-            },
-            {
-              pillar: 'Month Pillar (乙 亥)',
-              element: 'Wood over Water',
-              interpretation: 'Your creative and intuitive nature allows you to connect deeply with others.'
-            },
-            {
-              pillar: 'Day Pillar (丙 午)',
-              element: 'Fire over Fire',
-              interpretation: 'As the Day Master, you possess strong leadership qualities and drive for growth.'
-            },
-            {
-              pillar: 'Hour Pillar (辛 未)',
-              element: 'Metal over Earth',
-              interpretation: 'Your later life shows refinement, discipline, and practical approach to results.'
-            }
-          ],
-          strengths: [
-            'Adaptability and emotional intelligence',
-            'Creative problem-solving abilities',
-            'Strong sense of purpose and leadership potential'
-          ],
-          potentialChallenges: [
-            'Be mindful of overextending yourself; practice setting boundaries',
-            'Balance your idealistic nature with practical steps',
-            'Your Metal and Earth elements suggest benefiting from routines'
-          ],
-          careerSuggestions: [
-            'Roles involving creativity, communication, or teaching',
-            'Fields requiring intuition and care, such as counseling',
-            'Strategic professions like planning, consulting, or entrepreneurship'
-          ],
-          relationshipInsights: [
-            'You likely seek deep, emotionally supportive partnerships',
-            'Your nurturing nature attracts others',
-            'Setting boundaries may be important for your energy balance'
-          ],
-          personalGrowthRecommendations: [
-            'Practice grounding techniques, such as meditation or nature walks',
-            'Set clear boundaries to preserve energy and focus',
-            'Celebrate small achievements to build confidence'
-          ]
-        }
-      };
-    }
   }
 
   // ==================== 中国生肖运势分析方法 ====================
@@ -2472,7 +2599,7 @@ Please ensure the analysis is:
    * 构建紫微斗数分析提示词
    */
   private buildZiWeiPrompt(fullName: string, birthDate: string, birthTime: string, gender: string, birthPlace: string, calendarType: string): string {
-    return `You are a professional ZiWei DouShu (Purple Star Astrology) master. Provide a comprehensive ZiWei chart analysis based on the following birth information.
+    return `You are a professional ZiWei DouShu (Purple Star Astrology) master. Provide a comprehensive ZiWei chart analysis based on:
 
 **Birth Information:**
 - Name: ${fullName}
@@ -2482,170 +2609,76 @@ Please ensure the analysis is:
 - Birth Place: ${birthPlace}
 - Calendar Type: ${calendarType}
 
-**Required Analysis Structure:**
-Please provide your analysis in the following comprehensive JSON format:
-
+**Required JSON Structure:**
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "ziwei",
-    "overview": "Comprehensive overview of the ZiWei chart analysis",
-    
+    "overview": "string - comprehensive overview",
     "ziWeiChart": {
       "palaces": {
-        "life": {
-          "mainStars": ["Zi Wei", "Tian Fu"],
-          "minorStars": ["Zuo Fu", "You Bi"],
-          "element": "Earth",
-          "meaning": "Life palace represents personality and life foundation"
-        },
-        "parents": {
-          "mainStars": ["Tian Ji", "Tai Yang"],
-          "minorStars": ["Tian Liang", "Tian Xiang"],
-          "element": "Fire",
-          "meaning": "Parents palace shows relationship with parents and authority figures"
-        },
-        "fortune": {
-          "mainStars": ["Tian Tong", "Tai Yin"],
-          "minorStars": ["Tian Xi", "Hong Luan"],
-          "element": "Water",
-          "meaning": "Fortune palace indicates spiritual fortune and inner happiness"
-        },
-        "property": {
-          "mainStars": ["Tian Liang", "Tian Xiang"],
-          "minorStars": ["Tian Ji", "Tai Yang"],
-          "element": "Earth",
-          "meaning": "Property palace shows real estate and material possessions"
-        },
-        "career": {
-          "mainStars": ["Qi Sha", "Po Jun"],
-          "minorStars": ["Wen Chang", "Wen Qu"],
-          "element": "Metal",
-          "meaning": "Career palace shows professional development and work style"
-        },
-        "friends": {
-          "mainStars": ["Tian Ji", "Tai Yang"],
-          "minorStars": ["Tian Liang", "Tian Xiang"],
-          "element": "Fire",
-          "meaning": "Friends palace indicates social relationships and networking"
-        },
-        "travel": {
-          "mainStars": ["Tian Tong", "Tai Yin"],
-          "minorStars": ["Tian Xi", "Hong Luan"],
-          "element": "Water",
-          "meaning": "Travel palace shows mobility and external opportunities"
-        },
-        "health": {
-          "mainStars": ["Tian Liang", "Tian Xiang"],
-          "minorStars": ["Tian Ji", "Tai Yang"],
-          "element": "Earth",
-          "meaning": "Health palace indicates physical health and vitality"
-        },
-        "wealth": {
-          "mainStars": ["Wu Qu", "Tian Fu"],
-          "minorStars": ["Lu Cun", "Hua Lu"],
-          "element": "Metal",
-          "meaning": "Wealth palace indicates financial fortune and money management"
-        },
-        "children": {
-          "mainStars": ["Tian Tong", "Tai Yin"],
-          "minorStars": ["Tian Xi", "Hong Luan"],
-          "element": "Water",
-          "meaning": "Children palace shows relationship with children and creativity"
-        },
-        "marriage": {
-          "mainStars": ["Tian Tong", "Tai Yin"],
-          "minorStars": ["Hong Luan", "Tian Xi"],
-          "element": "Water",
-          "meaning": "Marriage palace reveals relationship patterns and romantic fortune"
-        },
-        "siblings": {
-          "mainStars": ["Tian Ji", "Tai Yang"],
-          "minorStars": ["Tian Liang", "Tian Xiang"],
-          "element": "Fire",
-          "meaning": "Siblings palace shows relationship with siblings and peers"
+        "life|parents|fortune|property|career|friends|travel|health|wealth|children|marriage|siblings": {
+          "mainStars": ["string[] - pinyin names only (e.g., 'Zi Wei', 'Tian Fu')"],
+          "minorStars": ["string[] - pinyin names only"],
+          "element": "string (Metal|Wood|Water|Fire|Earth)",
+          "meaning": "string - brief description"
         }
       },
-      "lifePalace": "Detailed multi-sentence analysis of life palace characteristics, including specific star influences, personality traits, and life guidance",
-      "parentsPalace": "Detailed multi-sentence analysis of parents palace characteristics, including specific star influences, relationship patterns, and family guidance",
-      "fortunePalace": "Detailed multi-sentence analysis of fortune palace characteristics, including specific star influences, spiritual fortune, and inner happiness guidance",
-      "propertyPalace": "Detailed multi-sentence analysis of property palace characteristics, including specific star influences, real estate potential, and material wealth guidance",
-      "careerPalace": "Detailed multi-sentence analysis of career palace characteristics, including specific star influences, professional abilities, and career guidance",
-      "friendsPalace": "Detailed multi-sentence analysis of friends palace characteristics, including specific star influences, social relationships, and networking guidance",
-      "travelPalace": "Detailed multi-sentence analysis of travel palace characteristics, including specific star influences, mobility opportunities, and external growth guidance",
-      "healthPalace": "Detailed multi-sentence analysis of health palace characteristics, including specific star influences, physical vitality, and health maintenance guidance",
-      "wealthPalace": "Detailed multi-sentence analysis of wealth palace characteristics, including specific star influences, financial abilities, and wealth accumulation guidance",
-      "childrenPalace": "Detailed multi-sentence analysis of children palace characteristics, including specific star influences, creative expression, and nurturing relationships guidance",
-      "marriagePalace": "Detailed multi-sentence analysis of marriage palace characteristics, including specific star influences, relationship patterns, and romantic guidance",
-      "siblingsPalace": "Detailed multi-sentence analysis of siblings palace characteristics, including specific star influences, peer relationships, and social connections guidance"
+      "lifePalace": "string - detailed multi-sentence analysis (~30 words) with star influences, personality traits, and practical guidance",
+      "parentsPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "fortunePalace": "string - detailed multi-sentence analysis (~30 words)",
+      "propertyPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "careerPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "friendsPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "travelPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "healthPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "wealthPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "childrenPalace": "string - detailed multi-sentence analysis (~30 words)",
+      "marriagePalace": "string - detailed multi-sentence analysis (~30 words)",
+      "siblingsPalace": "string - detailed multi-sentence analysis (~30 words)"
     },
-    
-        "overallInterpretation": "Provide a comprehensive life guidance analysis based on the ZiWei chart. This should be a substantial paragraph (approximately 200 words) covering: personality characteristics and natural talents, life direction and career inclinations, relationship patterns and social tendencies, wealth accumulation potential, health considerations, major life themes and destiny patterns, and practical advice for maximizing potential. Make it personal, insightful, and actionable.",
-        "personalityTraits": ["Trait 1", "Trait 2", "Trait 3"],
-        "careerGuidance": ["Guidance 1", "Guidance 2", "Guidance 3"],
-        "relationshipAdvice": ["Advice 1", "Advice 2", "Advice 3"],
+    "overallInterpretation": "string - comprehensive life guidance (~200 words) covering personality, career, relationships, wealth, health, life themes, and practical advice",
+    "personalityTraits": ["string[]"],
+    "careerGuidance": ["string[]"],
+    "relationshipAdvice": ["string[]"],
         "luckyElements": {
-          "colors": ["red", "gold", "purple"],
-          "numbers": [1, 6, 8],
-          "directions": ["south", "center"],
-          "seasons": ["summer", "late summer"]
-        },
-        "improvementSuggestions": ["Suggestion 1", "Suggestion 2", "Suggestion 3"],
-        
+      "colors": ["string[]"],
+      "numbers": ["number[]"],
+      "directions": ["string[]"],
+      "seasons": ["string[]"]
+    },
+    "improvementSuggestions": ["string[]"],
         "starAnalysis": {
           "mainStars": {
-            "life": ["Zi Wei", "Tian Fu"],
-            "wealth": ["Wu Qu", "Tian Fu"],
-            "career": ["Qi Sha", "Po Jun"],
-            "marriage": ["Tian Tong", "Tai Yin"]
+        "life|wealth|career|marriage": ["string[] - pinyin names only"]
           },
-          "starMeanings": "Detailed analysis of the main stars and their influences on personality and destiny using pinyin names only"
+      "starMeanings": "string - detailed analysis using pinyin names only"
         },
-        
         "fourTransformations": {
-          "huaLu": {
-            "strength": "Strong",
-            "analysis": "Strong wealth transformation indicates multiple income opportunities and financial blessings throughout life, particularly in mid-career stages"
-          },
-          "huaQuan": {
-            "strength": "Balanced", 
-            "analysis": "Natural authority and leadership abilities that grow with experience and maturity"
-          },
-          "huaKe": {
-            "strength": "Moderate",
-            "analysis": "Recognition through academic or professional achievements, with potential for honors and awards"
-          },
-          "huaJi": {
-            "strength": "Weak",
-            "analysis": "Minor challenges in emotional expression that can be overcome through self-awareness and communication skills"
-          }
-        },
-        
+      "huaLu": { "strength": "string (Strong|Balanced|Weak|Moderate)", "analysis": "string - detailed analysis" },
+      "huaQuan": { "strength": "string", "analysis": "string" },
+      "huaKe": { "strength": "string", "analysis": "string" },
+      "huaJi": { "strength": "string", "analysis": "string" }
+    },
         "patterns": {
-          "mainPattern": "Zi Wei Tian Fu pattern in Life Palace",
-          "specialPatterns": ["Wealth accumulation pattern in Property Palace", "Career transformation pattern in Career Palace"]
-        },
-        
+      "mainPattern": "string",
+      "specialPatterns": ["string[]"]
+    }
   }
 }
 
 **Analysis Requirements:**
-1. Calculate the ZiWei chart based on birth information
-2. Analyze ALL 12 palaces with their main and minor stars
-3. Provide detailed multi-sentence interpretations for ALL palaces (not just key ones)
-4. Each palace analysis must include: specific star names, elemental influences, personality traits/abilities, and practical guidance
-5. Give practical life guidance based on the chart
-6. Include lucky elements and improvement suggestions
-7. Ensure all interpretations are positive and constructive
-8. Use traditional ZiWei terminology and concepts
-9. **IMPORTANT: Use pinyin names for all Chinese star names (e.g., "Zi Wei" instead of "紫微", "Tian Fu" instead of "天府")**
-10. **Do not use Chinese characters in star names - only use pinyin format**
-11. **CRITICAL: All 12 palace analyses must be detailed and comprehensive, following the same quality standard as Life Palace, Career Palace, Marriage Palace, and Wealth Palace. Each palace analysis must be approximately 30 words with specific star influences, elemental impacts, personality traits/abilities, and practical guidance. NO SHORT DESCRIPTIONS ALLOWED.**
+1. Calculate ZiWei chart based on birth information (time and location sensitive)
+2. Analyze ALL 12 palaces with main and minor stars
+3. Provide detailed multi-sentence interpretations (~30 words) for ALL palaces with: star names, elemental influences, personality traits/abilities, practical guidance
+4. Give comprehensive life guidance (~200 words) covering personality, career, relationships, wealth, health, life themes
+5. Include lucky elements and improvement suggestions
+6. Ensure all interpretations are positive and constructive
 
-**Important Notes:**
-- ZiWei DouShu is time and location sensitive
-- Gender affects star interpretations
-- Calendar type (solar/lunar) impacts calculations
+**Format & Style Requirements:**
+- Use pinyin names ONLY for Chinese star names (e.g., "Zi Wei" not "紫微", "Tian Fu" not "天府") - NO Chinese characters
+- Use English element names: Metal, Wood, Water, Fire, Earth
+- Use rich descriptive language, encouraging professional tone, specific actionable advice
 - Focus on practical life guidance rather than fatalistic predictions`;
   }
 

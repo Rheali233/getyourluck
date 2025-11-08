@@ -3,9 +3,8 @@
  * 命理分析模块状态管理
  */
 
-import { useCallback } from 'react';
 import { create, type StateCreator } from 'zustand';
-import { getApiBaseUrl } from '@/config/environment';
+import { useUnifiedTestStore } from '@/stores/unifiedTestStore';
 import type {
   NumerologyStore,
   NumerologyAnalysis,
@@ -63,34 +62,11 @@ const useNumerologyStoreStore = create<NumerologyStore>()(
 );
 
 // 命理模块状态管理 Hook
-export const useNumerologyStore = (): {
-  isLoading: boolean;
-  error: string | null;
-  analysisResult: NumerologyAnalysis | null;
-  showResults: boolean;
-  // eslint-disable-next-line no-unused-vars
-  processNumerologyData: (analysisType: NumerologyAnalysisType, inputData: NumerologyBasicInfo) => Promise<void>;
-  clearNumerologySession: () => void;
-  // eslint-disable-next-line no-unused-vars
-  setError: (error: string | null) => void;
-  // eslint-disable-next-line no-unused-vars
-  setLoading: (loading: boolean) => void;
-} => {
+export const useNumerologyStore = () => {
+  // 使用统一测试状态管理
+  const unifiedStore = useUnifiedTestStore();
   const numerologyStore = useNumerologyStoreStore();
 
-  // 获取生肖动物
-  const getZodiacAnimal = useCallback((birthDate: string) => {
-    const year = new Date(birthDate).getFullYear();
-    const animals = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake', 'horse', 'goat', 'monkey', 'rooster', 'dog', 'pig'];
-    return animals[(year - 4) % 12];
-  }, []);
-
-  // 获取五行元素
-  const getElement = useCallback((birthDate: string) => {
-    const year = new Date(birthDate).getFullYear();
-    const elements = ['wood', 'wood', 'fire', 'fire', 'earth', 'earth', 'metal', 'metal', 'water', 'water'];
-    return elements[(year - 4) % 10];
-  }, []);
 
   // 处理命理分析数据提交
   const processNumerologyData = async (
@@ -112,358 +88,244 @@ export const useNumerologyStore = (): {
         }
       ];
 
-      // 调用API进行分析
-      const response = await fetch(`${getApiBaseUrl()}/api/test-results`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          testType: 'numerology',
-          answers: answers,
-          sessionId: `numerology_${Date.now()}`
-        })
-      });
+      // 使用统一测试系统提交测试
+      unifiedStore.setLoading(true);
+      unifiedStore.clearError();
       
-      if (!response.ok) {
-        throw new Error(`API call failed: ${response.statusText}`);
+      // 开始测试会话
+      await unifiedStore.startTest('numerology');
+      
+      // 提交答案
+      for (const answer of answers) {
+        unifiedStore.submitAnswer(answer.questionId, answer.answer);
       }
       
-      const apiResult = await response.json();
+      // 结束测试，这会自动调用AI分析
+      const testResult = await unifiedStore.endTest();
       
-      if (apiResult?.data) {
-        const aiAnalysis = apiResult.data;
+      if (!testResult || !testResult.result) {
+        throw new Error('No test result returned from unified store');
+      }
+      
+      // 检查 AI 分析是否失败 - 必须严格检查，不允许使用默认值
+      // 检查 TestResult 本身和 result 中的错误信息
+      if (testResult.aiAnalysisFailed || testResult.aiError || testResult.result.aiAnalysisFailed || testResult.result.aiError) {
+        // 提取友好的错误信息（优先使用 TestResult 中的错误信息）
+        let errorMessage = testResult.aiError || testResult.result.aiError || 'AI analysis failed. Please try again.';
         
-        // 对于name类型，AI直接返回推荐数据，不需要从analysis字段提取
-        if (analysisType === 'name') {
-          const numerologyAnalysis: NumerologyAnalysis = {
-            basicInfo: inputData,
-            chineseNameRecommendation: aiAnalysis
-          } as NumerologyAnalysis;
-          
-          numerologyStore.setAnalysisResult(numerologyAnalysis);
-          numerologyStore.setShowResults(true);
-          numerologyStore.setLoading(false);
-          return;
+        // 将技术错误信息转换为用户友好的消息
+        if (errorMessage.includes('ERR_CONNECTION_CLOSED') || 
+            errorMessage.includes('connection closed') || 
+            errorMessage.includes('Connection closed') ||
+            errorMessage.includes('Network connection lost') || 
+            errorMessage.includes('network')) {
+          errorMessage = 'Network connection lost. The server may be processing your request. Please try again.';
+        } else if (errorMessage.includes('timeout') || errorMessage.includes('Request timeout')) {
+          errorMessage = 'Request timed out. The analysis is taking longer than expected. Please try again.';
+        } else if (errorMessage.includes('Test result analysis failed')) {
+          errorMessage = 'AI analysis failed. Please try again.';
+        } else if (errorMessage.includes('503') || errorMessage.includes('Service Unavailable')) {
+          errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
         }
         
-        // 其他类型从analysis字段提取
-        const analysis = aiAnalysis.analysis || {};
-        
-        // 从AI分析结果中提取关键信息
+        // 设置错误状态，确保停留在提交界面
+        numerologyStore.setError(errorMessage);
+        numerologyStore.setLoading(false);
+        numerologyStore.setShowResults(false); // 确保不显示结果页面
+        numerologyStore.setAnalysisResult(null); // 清除任何结果数据
+        unifiedStore.setError(errorMessage);
+        unifiedStore.setLoading(false);
+        unifiedStore.setShowResults(false); // 确保不显示结果页面
+        throw new Error(errorMessage);
+      }
+      
+      // 检查是否有有效的 AI 分析数据 - 严格验证，不允许不完整的数据
+      const aiAnalysis = testResult.result.analysis || testResult.result;
+      
+      // 验证 AI 分析数据的完整性
+      const hasValidData = aiAnalysis && (
+        // 对于 BaZi 类型，必须有 keyInsights 和 baZiAnalysis
+        (analysisType === 'bazi' && aiAnalysis.keyInsights && Array.isArray(aiAnalysis.keyInsights) && aiAnalysis.keyInsights.length > 0 && aiAnalysis.baZiAnalysis) ||
+        // 对于 Zodiac 类型，必须有 zodiacInfo 或 zodiacFortune
+        (analysisType === 'zodiac' && (aiAnalysis.zodiacInfo || aiAnalysis.zodiacFortune)) ||
+        // 对于 ZiWei 类型，必须有 ziWeiChart
+        (analysisType === 'ziwei' && aiAnalysis.ziWeiChart) ||
+        // 对于 Name 类型，必须有推荐数据
+        (analysisType === 'name' && (aiAnalysis.primaryRecommendation || aiAnalysis.alternativeRecommendations))
+      );
+      
+      if (!hasValidData) {
+        // 如果没有有效的 AI 分析数据，视为失败，不允许使用默认值
+        const errorMessage = 'AI analysis data is incomplete. Please try again.';
+        numerologyStore.setError(errorMessage);
+        numerologyStore.setLoading(false);
+        numerologyStore.setShowResults(false); // 确保不显示结果页面
+        numerologyStore.setAnalysisResult(null); // 清除任何结果数据
+        unifiedStore.setError(errorMessage);
+        unifiedStore.setLoading(false);
+        unifiedStore.setShowResults(false); // 确保不显示结果页面
+        throw new Error(errorMessage);
+      }
+      
+      // 对于name类型，AI直接返回推荐数据，不需要从analysis字段提取
+      if (analysisType === 'name') {
         const numerologyAnalysis: NumerologyAnalysis = {
           basicInfo: inputData,
-          baZi: extractBaZiData(analysis),
-          fiveElements: extractFiveElementsData(analysis),
-          zodiac: analysis.zodiacInfo || {
-            animal: getZodiacAnimal(inputData.birthDate) || 'dragon',
-            element: getElement(inputData.birthDate) || 'wood',
-            year: new Date(inputData.birthDate).getFullYear(),
-            isCurrentYear: false,
-            isConflictYear: false
-          },
-          zodiacFortune: analysis.zodiacFortune || {
-            period: 'year',
-            overall: 7,
-            career: 6,
-            wealth: 5,
-            love: 8,
-            health: 6,
-            luckyNumbers: [1, 2, 3, 4, 5],
-            luckyColors: ['yellow', 'red', 'orange'],
-            luckyDirection: 'south',
-            guardianAnimals: [],
-            warnings: [],
-            suggestions: []
-          },
-          nameAnalysis: {
-            fiveGrids: {
-              heavenGrid: 0,
-              personGrid: 0,
-              earthGrid: 0,
-              outerGrid: 0,
-              totalGrid: 0
-            },
-            threeTalents: {
-              heaven: '',
-              person: '',
-              earth: '',
-              configuration: ''
-            },
-            personality: '',
-            career: '',
-            marriage: '',
-            health: '',
-            overallScore: 0
-          },
-          ziWeiChart: analysis.ziWeiChart || {
-            palaces: analysis.ziWeiChart?.palaces || {},
-            lifePalace: analysis.ziWeiChart?.lifePalace || '',
-            wealthPalace: analysis.ziWeiChart?.wealthPalace || '',
-            careerPalace: analysis.ziWeiChart?.careerPalace || '',
-            marriagePalace: analysis.ziWeiChart?.marriagePalace || ''
-          },
-          // 新增专业分析维度
-          wealthAnalysis: extractWealthAnalysis(analysis),
-          relationshipAnalysis: extractRelationshipAnalysis(analysis),
-          healthAnalysis: extractHealthAnalysis(analysis),
-          fortuneAnalysis: extractFortuneAnalysis(analysis, analysisType),
-          // 优先使用AI返回的overview；没有则不展示（由界面层依据空值隐藏模块）
-          overallInterpretation: analysis.overallInterpretation || analysis.overview || null,
-          personalityTraits: analysis.personalityTraits || analysis.strengths || [],
-          careerGuidance: analysis.careerGuidance || analysis.careerSuggestions || [],
-          relationshipAdvice: analysis.relationshipAdvice || analysis.relationshipInsights || [],
-          healthTips: analysis.personalGrowthRecommendations || [],
-          luckyElements: analysis.luckyElements || {
-            colors: analysis.luckyElements?.colors || ['yellow', 'red', 'orange'],
-            numbers: analysis.luckyElements?.numbers || [1, 2, 3, 4, 5],
-            directions: analysis.luckyElements?.directions || ['south', 'center'],
-            seasons: analysis.luckyElements?.seasons || ['late summer']
-          },
-          improvementSuggestions: analysis.improvementSuggestions || analysis.personalGrowthRecommendations || [],
-          // 紫微斗数专业分析字段
-          starAnalysis: analysis.starAnalysis || null,
-          fourTransformations: analysis.fourTransformations || null,
-          patterns: analysis.patterns || null
-        };
-
+          chineseNameRecommendation: aiAnalysis
+        } as NumerologyAnalysis;
+        
         numerologyStore.setAnalysisResult(numerologyAnalysis);
         numerologyStore.setShowResults(true);
-        numerologyStore.setLoading(false);
-      } else {
-        throw new Error('No analysis data received from server');
+        numerologyStore.setLoading(false); // 修复：同步设置 numerologyStore 的 loading 状态
+        unifiedStore.setShowResults(true);
+        unifiedStore.setCurrentTestResult(testResult);
+        unifiedStore.setLoading(false);
+        return;
       }
+      
+      // 其他类型从analysis字段提取
+      const analysis = aiAnalysis.analysis || aiAnalysis;
+      
+      // 从AI分析结果中提取关键信息 - 只使用AI返回的数据，不使用默认值
+      const numerologyAnalysis: NumerologyAnalysis = {
+        basicInfo: inputData,
+        // 根据分析类型提取相应的数据
+        ...(analysisType === 'bazi' && (() => {
+          const baZiData = extractBaZiData(analysis);
+          return {
+            baZi: baZiData,
+            fiveElements: baZiData.fiveElements // 直接从 baZi 数据中获取
+          };
+        })()),
+        ...(analysisType === 'zodiac' && {
+          zodiac: analysis.zodiacInfo,
+          zodiacFortune: analysis.zodiacFortune
+        }),
+        ...(analysisType === 'ziwei' && {
+          ziWeiChart: analysis.ziWeiChart,
+          starAnalysis: analysis.starAnalysis,
+          fourTransformations: analysis.fourTransformations,
+          patterns: analysis.patterns
+        }),
+        // 通用字段 - 只使用AI返回的数据（不使用默认值）
+        wealthAnalysis: analysis.wealthAnalysis,
+        relationshipAnalysis: analysis.relationshipAnalysis,
+        healthAnalysis: analysis.healthAnalysis,
+        fortuneAnalysis: analysis.fortuneAnalysis,
+        // 允许从备选字段获取（这些字段都来自AI返回的数据）
+        overallInterpretation: analysis.overallInterpretation || analysis.overview,
+        personalityTraits: analysis.personalityTraits || analysis.strengths,
+        careerGuidance: analysis.careerGuidance || analysis.careerSuggestions,
+        relationshipAdvice: analysis.relationshipAdvice || analysis.relationshipInsights,
+        healthTips: analysis.personalGrowthRecommendations,
+        luckyElements: analysis.luckyElements,
+        improvementSuggestions: analysis.improvementSuggestions || analysis.personalGrowthRecommendations
+      };
+
+      numerologyStore.setAnalysisResult(numerologyAnalysis);
+      numerologyStore.setShowResults(true);
+      numerologyStore.setLoading(false); // 修复：同步设置 numerologyStore 的 loading 状态
+      unifiedStore.setShowResults(true);
+      unifiedStore.setCurrentTestResult(testResult);
+      unifiedStore.setLoading(false);
     } catch (error) {
-      numerologyStore.setError(error instanceof Error ? error.message : 'Unknown error occurred');
+      // 错误处理：确保停留在提交界面，不显示任何结果
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      // 设置错误状态
+      numerologyStore.setError(errorMessage);
       numerologyStore.setLoading(false);
+      numerologyStore.setShowResults(false); // 确保不显示结果页面
+      numerologyStore.setAnalysisResult(null); // 清除任何结果数据
+      
+      unifiedStore.setError(errorMessage);
+      unifiedStore.setLoading(false);
+      unifiedStore.setShowResults(false); // 确保不显示结果页面
+      
+      // 不重新抛出错误，让调用方处理（前端组件会显示错误弹窗）
+      // throw error; // 注释掉，避免重复处理
     }
   };
 
-  // 从AI分析中提取八字数据
+  // 从AI分析中提取八字数据 - 必须从AI数据中提取，不允许使用默认值
   const extractBaZiData = (analysis: any) => {
-    // 从AI的keyInsights中提取八字信息，如果没有则使用默认值
-    const insights = analysis.keyInsights || [];
+    // 验证必需的数据存在
+    if (!analysis.keyInsights || !Array.isArray(analysis.keyInsights) || analysis.keyInsights.length === 0) {
+      throw new Error('Missing keyInsights in AI analysis data');
+    }
+    
+    if (!analysis.baZiAnalysis) {
+      throw new Error('Missing baZiAnalysis in AI analysis data');
+    }
+    
+    // 从AI的keyInsights中提取八字信息
+    const insights = analysis.keyInsights;
     
     const pillars = {
-      year: insights.find((i: any) => i.pillar?.includes('Year') || i.pillar?.includes('年柱')) || { element: 'Earth over Fire' },
-      month: insights.find((i: any) => i.pillar?.includes('Month') || i.pillar?.includes('月柱')) || { element: 'Wood over Water' },
-      day: insights.find((i: any) => i.pillar?.includes('Day') || i.pillar?.includes('日柱')) || { element: 'Fire over Fire' },
-      hour: insights.find((i: any) => i.pillar?.includes('Hour') || i.pillar?.includes('时柱')) || { element: 'Metal over Earth' }
+      year: insights.find((i: any) => i.pillar?.includes('Year') || i.pillar?.includes('年柱')),
+      month: insights.find((i: any) => i.pillar?.includes('Month') || i.pillar?.includes('月柱')),
+      day: insights.find((i: any) => i.pillar?.includes('Day') || i.pillar?.includes('日柱')),
+      hour: insights.find((i: any) => i.pillar?.includes('Hour') || i.pillar?.includes('时柱'))
     };
 
-    // 从AI的baZiAnalysis中提取数据，如果没有则使用默认值
-    const baZiAnalysis = analysis.baZiAnalysis || {};
+    // 验证四柱数据都存在
+    if (!pillars.year || !pillars.month || !pillars.day || !pillars.hour) {
+      throw new Error('Incomplete pillar data in AI analysis');
+    }
+
+    // 从AI的baZiAnalysis中提取数据
+    const baZiAnalysis = analysis.baZiAnalysis;
+    
+    // 验证必需的分析数据存在
+    if (!baZiAnalysis.tenGods || !baZiAnalysis.dayMasterStrength || !baZiAnalysis.favorableElements || !baZiAnalysis.fiveElements) {
+      throw new Error('Incomplete baZiAnalysis data in AI response');
+    }
 
 
-    // 辅助函数：安全获取天干地支信息（只显示英文）
-    const getPillarInfo = (element: string, defaultHeavenly: string, defaultEarthly: string) => {
+    // 辅助函数：解析天干地支信息（只显示英文）
+    const getPillarInfo = (element: string) => {
       if (!element) {
-        // 如果没有element数据，使用默认值
-        return {
-          heavenlyStem: defaultHeavenly,
-          earthlyBranch: defaultEarthly,
-          element: defaultHeavenly,
-          animal: defaultEarthly
-        };
+        throw new Error('Missing element data in pillar information');
       }
       
       // 尝试解析 "Heavenly Stem over Earthly Branch" 格式
       const parts = element.split(' over ');
-      if (parts.length >= 2) {
-        const heavenlyElement = parts[0]?.trim() || '';
-        const earthlyElement = parts[1]?.trim() || '';
+      if (parts.length < 2) {
+        throw new Error(`Invalid element format: ${element}`);
+      }
+      
+      const heavenlyElement = parts[0]?.trim();
+      const earthlyElement = parts[1]?.trim();
+      
+      if (!heavenlyElement || !earthlyElement) {
+        throw new Error(`Incomplete element data: ${element}`);
+      }
         
         return {
           heavenlyStem: heavenlyElement,
           earthlyBranch: earthlyElement,
           element: heavenlyElement,
           animal: earthlyElement
-        };
-      }
-      
-      // 如果解析失败，使用默认值
-      return {
-        heavenlyStem: defaultHeavenly,
-        earthlyBranch: defaultEarthly,
-        element: defaultHeavenly,
-        animal: defaultEarthly
       };
     };
 
     return {
-      yearPillar: getPillarInfo(pillars.year.element, 'Earth', 'Snake'),
-      monthPillar: getPillarInfo(pillars.month.element, 'Wood', 'Pig'),
-      dayPillar: getPillarInfo(pillars.day.element, 'Fire', 'Horse'),
-      hourPillar: getPillarInfo(pillars.hour.element, 'Metal', 'Goat'),
-      // 十神分析 - 从AI数据中提取，如果没有则使用默认值
-      tenGods: baZiAnalysis.tenGods || {
-        biJian: { name: 'Bi Jian (Equal)', element: 'Wood', strength: 'balanced' as const, meaning: 'Self-reliance and independence' },
-        jieCai: { name: 'Jie Cai (Rob Wealth)', element: 'Wood', strength: 'weak' as const, meaning: 'Competition and challenges' },
-        shiShen: { name: 'Shi Shen (Food God)', element: 'Fire', strength: 'strong' as const, meaning: 'Creativity and expression' },
-        shangGuan: { name: 'Shang Guan (Hurt Officer)', element: 'Fire', strength: 'balanced' as const, meaning: 'Intelligence and innovation' },
-        pianCai: { name: 'Pian Cai (Partial Wealth)', element: 'Metal', strength: 'weak' as const, meaning: 'Unexpected wealth' },
-        zhengCai: { name: 'Zheng Cai (Direct Wealth)', element: 'Metal', strength: 'strong' as const, meaning: 'Stable income' },
-        qiSha: { name: 'Qi Sha (Seven Killings)', element: 'Water', strength: 'balanced' as const, meaning: 'Authority and pressure' },
-        zhengGuan: { name: 'Zheng Guan (Direct Officer)', element: 'Water', strength: 'strong' as const, meaning: 'Official position' },
-        pianYin: { name: 'Pian Yin (Partial Seal)', element: 'Earth', strength: 'weak' as const, meaning: 'Unconventional wisdom' },
-        zhengYin: { name: 'Zheng Yin (Direct Seal)', element: 'Earth', strength: 'strong' as const, meaning: 'Traditional wisdom' }
-      },
-      // 日主强弱分析 - 从AI数据中提取，如果没有则使用默认值
-      dayMasterStrength: baZiAnalysis.dayMasterStrength || {
-        strength: 'balanced' as const,
-        description: 'Your day master shows balanced strength, indicating good adaptability and resilience.',
-        recommendations: ['Focus on balanced development', 'Avoid extremes in decision making']
-      },
-      // 用神忌神分析 - 从AI数据中提取，如果没有则使用默认值
-      favorableElements: baZiAnalysis.favorableElements || {
-        useful: ['Wood', 'Water'],
-        harmful: ['Metal', 'Fire'],
-        neutral: ['Earth'],
-        explanation: 'Wood and Water elements are beneficial for your chart, while Metal and Fire should be used cautiously.'
-      }
+      yearPillar: getPillarInfo(pillars.year.element),
+      monthPillar: getPillarInfo(pillars.month.element),
+      dayPillar: getPillarInfo(pillars.day.element),
+      hourPillar: getPillarInfo(pillars.hour.element),
+      // 十神分析 - 必须从AI数据中提取
+      tenGods: baZiAnalysis.tenGods,
+      // 日主强弱分析 - 必须从AI数据中提取
+      dayMasterStrength: baZiAnalysis.dayMasterStrength,
+      // 用神忌神分析 - 必须从AI数据中提取
+      favorableElements: baZiAnalysis.favorableElements,
+      // 五行分析 - 必须从AI数据中提取
+      fiveElements: baZiAnalysis.fiveElements
     };
   };
 
-  // 从AI分析中提取五行数据
-  const extractFiveElementsData = (analysis: any) => {
-    // 优先从baZiAnalysis.fiveElements中提取，如果没有则从luckyAspects中提取
-    const baZiAnalysis = analysis.baZiAnalysis || {};
-    const fiveElementsData = baZiAnalysis.fiveElements;
-    
-    if (fiveElementsData) {
-      return fiveElementsData;
-    }
-    
-    // 备用方案：从luckyAspects中提取五行信息
-    const elements = analysis.luckyAspects?.elements || ['earth', 'fire', 'wood', 'metal'];
-    const elementCounts = elements.reduce((acc: any, element: string) => {
-      acc[element] = (acc[element] || 0) + 1;
-      return acc;
-    }, {});
 
-    return {
-      elements: {
-        metal: elementCounts.metal || 2,
-        wood: elementCounts.wood || 2,
-        water: elementCounts.water || 1,
-        fire: elementCounts.fire || 2,
-        earth: elementCounts.earth || 2
-      },
-      dominantElement: Object.keys(elementCounts).reduce((a, b) => elementCounts[a] > elementCounts[b] ? a : b) || 'earth',
-      weakElement: Object.keys(elementCounts).reduce((a, b) => elementCounts[a] < elementCounts[b] ? a : b) || 'water',
-      balance: 'balanced' as const
-    };
-  };
-
-  // 从AI分析中提取财运分析
-  const extractWealthAnalysis = (analysis: any) => {
-    const wealthAnalysis = analysis.wealthAnalysis || {};
-    return {
-      wealthLevel: wealthAnalysis.wealthLevel || 'medium' as const,
-      wealthSource: wealthAnalysis.wealthSource || ['Career development', 'Investment opportunities'],
-      investmentAdvice: wealthAnalysis.investmentAdvice || ['Focus on stable investments', 'Consider real estate'],
-      riskFactors: wealthAnalysis.wealthRisks || ['Avoid high-risk investments', 'Be cautious with loans'],
-      luckyPeriods: wealthAnalysis.wealthLuckyPeriods || ['Spring and Autumn seasons'],
-      precautions: wealthAnalysis.wealthPrecautions || ['Avoid impulsive spending', 'Maintain emergency fund']
-    };
-  };
-
-  // 从AI分析中提取感情婚姻分析
-  const extractRelationshipAnalysis = (analysis: any) => {
-    const relationshipAnalysis = analysis.relationshipAnalysis || {};
-    return {
-      marriageTiming: relationshipAnalysis.marriageTiming || 'Late 20s to early 30s',
-      partnerCharacteristics: relationshipAnalysis.partnerCharacteristics || ['Compatible element', 'Supportive nature'],
-      relationshipChallenges: relationshipAnalysis.relationshipChallenges || ['Communication differences', 'Different priorities'],
-      compatibilityElements: relationshipAnalysis.compatibilityElements || ['Wood and Water', 'Earth and Metal'],
-      marriageAdvice: relationshipAnalysis.marriageAdvice || ['Focus on communication', 'Respect differences'],
-      luckyPeriods: relationshipAnalysis.relationshipLuckyPeriods || ['Spring and Summer']
-    };
-  };
-
-  // 从AI分析中提取健康运势分析
-  const extractHealthAnalysis = (analysis: any) => {
-    const healthAnalysis = analysis.healthAnalysis || {};
-    return {
-      overallHealth: healthAnalysis.overallHealth || 'good' as const,
-      weakAreas: healthAnalysis.healthWeakAreas || ['Digestive system', 'Respiratory system'],
-      healthAdvice: healthAnalysis.healthAdvice || ['Regular exercise', 'Balanced diet'],
-      preventiveMeasures: healthAnalysis.preventiveMeasures || ['Annual check-ups', 'Stress management'],
-      beneficialActivities: healthAnalysis.beneficialActivities || ['Yoga', 'Meditation', 'Nature walks'],
-      warningSigns: healthAnalysis.healthWarningSigns || ['Persistent fatigue', 'Sleep disturbances']
-    };
-  };
-
-  // 从AI分析中提取运势分析
-  const extractFortuneAnalysis = (analysis: any, analysisType?: NumerologyAnalysisType) => {
-    const currentYear = new Date().getFullYear();
-    const fortuneAnalysis = analysis.fortuneAnalysis || {};
-    
-    // 如果是Chinese Zodiac Fortune分析，使用currentPeriod
-    if (analysisType === 'zodiac' || fortuneAnalysis.currentPeriod) {
-      return {
-        currentPeriod: {
-          year: currentYear,
-          overall: fortuneAnalysis.currentPeriod?.overall || 7,
-          career: fortuneAnalysis.currentPeriod?.career || 6,
-          wealth: fortuneAnalysis.currentPeriod?.wealth || 5,
-          health: fortuneAnalysis.currentPeriod?.health || 6,
-          love: fortuneAnalysis.currentPeriod?.love || 7,
-          overallDescription: fortuneAnalysis.currentPeriod?.overallDescription || 'This period brings a balanced mix of opportunities and challenges, requiring careful navigation and strategic planning. The cosmic influences favor steady progress with occasional breakthroughs.',
-          careerDescription: fortuneAnalysis.currentPeriod?.careerDescription || 'Your career path shows steady progress with potential for advancement through focused effort and strategic networking. Leadership opportunities may arise.',
-          wealthDescription: fortuneAnalysis.currentPeriod?.wealthDescription || 'Financial opportunities may arise, but require careful evaluation and prudent decision-making to maximize benefits. Avoid impulsive investments.',
-          healthDescription: fortuneAnalysis.currentPeriod?.healthDescription || 'Maintaining good health requires attention to both physical and mental well-being, with particular focus on stress management and regular exercise.',
-          loveDescription: fortuneAnalysis.currentPeriod?.loveDescription || 'Your relationships may deepen this period, with opportunities for meaningful connections and personal growth through social interactions.',
-          keyEvents: fortuneAnalysis.currentPeriod?.keyEvents || ['Career opportunities', 'Relationship developments'],
-          advice: fortuneAnalysis.currentPeriod?.advice || ['Focus on career growth', 'Nurture relationships']
-        }
-      };
-    } else {
-      // BaZi 使用 currentYear
-      return {
-        currentYear: {
-          year: currentYear,
-          overall: fortuneAnalysis.currentYear?.overall || 7,
-          career: fortuneAnalysis.currentYear?.career || 6,
-          wealth: fortuneAnalysis.currentYear?.wealth || 5,
-          health: fortuneAnalysis.currentYear?.health || 6,
-          relationships: fortuneAnalysis.currentYear?.relationships || 7,
-          overallDescription: fortuneAnalysis.currentYear?.overallDescription || 'This year brings a balanced mix of opportunities and challenges, requiring careful navigation and strategic planning. The cosmic influences favor steady progress with occasional breakthroughs.',
-          careerDescription: fortuneAnalysis.currentYear?.careerDescription || 'Your career path shows steady progress with potential for advancement through focused effort and strategic networking. Leadership opportunities may arise.',
-          wealthDescription: fortuneAnalysis.currentYear?.wealthDescription || 'Financial opportunities may arise, but require careful evaluation and prudent decision-making to maximize benefits. Avoid impulsive investments.',
-          healthDescription: fortuneAnalysis.currentYear?.healthDescription || 'Maintaining good health requires attention to both physical and mental well-being, with particular focus on stress management and regular exercise.',
-          relationshipsDescription: fortuneAnalysis.currentYear?.relationshipsDescription || 'Your relationships may deepen this year, with opportunities for meaningful connections and personal growth through social interactions.',
-          keyEvents: fortuneAnalysis.currentYear?.keyEvents || ['Career opportunities', 'Relationship developments'],
-          advice: fortuneAnalysis.currentYear?.advice || ['Focus on career growth', 'Nurture relationships']
-        },
-        nextYear: {
-          year: currentYear + 1,
-          overall: fortuneAnalysis.nextYear?.overall || 8,
-          overallDescription: fortuneAnalysis.nextYear?.overallDescription || 'The coming year promises significant developments across multiple life areas, with particular emphasis on personal growth and new opportunities.',
-          keyTrends: fortuneAnalysis.nextYear?.keyTrends || ['Positive changes', 'New opportunities'],
-          opportunities: fortuneAnalysis.nextYear?.opportunities || ['Career advancement', 'Financial growth'],
-          challenges: fortuneAnalysis.nextYear?.challenges || ['Work-life balance', 'Health maintenance']
-        },
-        lifeStages: {
-          youth: {
-            ageRange: '20-30',
-            characteristics: ['Learning phase', 'Career building'],
-            advice: ['Focus on education', 'Build strong foundations']
-          },
-          middle: {
-            ageRange: '30-50',
-            characteristics: ['Peak performance', 'Family building'],
-            advice: ['Balance work and family', 'Invest wisely']
-          },
-          senior: {
-            ageRange: '50+',
-            characteristics: ['Wisdom sharing', 'Legacy building'],
-            advice: ['Share knowledge', 'Enjoy life']
-          }
-        }
-      };
-    }
-  };
 
 
   return {
@@ -476,6 +338,10 @@ export const useNumerologyStore = (): {
     processNumerologyData,
     clearNumerologySession: numerologyStore.clearNumerologySession,
     setError: numerologyStore.setError,
+    clearError: () => {
+      numerologyStore.setError(null);
+      unifiedStore.clearError();
+    },
     setLoading: numerologyStore.setLoading
   };
 };
