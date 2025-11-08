@@ -13,18 +13,26 @@ export async function onRequest(context) {
   const pathname = url.pathname;
 
   // 🔥 关键修复：首先检查静态文件，确保静态资源不被中间件处理
-  // List of static file extensions and paths
-  const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/favicon', '/apple-touch-icon'];
+  // List of static file paths (must start with these paths)
+  const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/scripts/'];
   const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot', '.json', '.xml', '.txt', '.map'];
-  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json', '/index.html'];
+  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json'];
+  const staticFilePrefixes = ['/favicon', '/apple-touch-icon'];
 
   // Check if the request is for a static file
-  const isStaticFile = staticPaths.some(path => pathname.startsWith(path)) ||
-                       staticExtensions.some(ext => pathname.endsWith(ext)) ||
-                       staticFiles.includes(pathname);
+  const isStaticFile = 
+    // Check static paths (must be exact prefix match)
+    staticPaths.some(path => pathname.startsWith(path)) ||
+    // Check file extensions (must end with extension)
+    staticExtensions.some(ext => pathname.endsWith(ext)) ||
+    // Check exact static files
+    staticFiles.includes(pathname) ||
+    // Check static file prefixes
+    staticFilePrefixes.some(prefix => pathname.startsWith(prefix));
 
   // If it's a static file, let it pass through to Cloudflare Pages static hosting
   // 🔥 关键：静态文件必须最先处理，直接返回，不经过任何中间件逻辑
+  // 使用 next() 让 Cloudflare Pages 的静态文件服务处理这些请求
   if (isStaticFile) {
     return next();
   }

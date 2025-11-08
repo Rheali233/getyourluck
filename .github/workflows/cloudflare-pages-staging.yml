@@ -12,8 +12,8 @@ on:
       force_deploy:
         description: 'Force deploy even if no changes'
         required: false
-        default: 'false'
         type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -51,6 +51,20 @@ jobs:
           echo ""
           echo "📁 Checking functions directory..."
           ls -la dist/functions/ 2>/dev/null || echo "⚠️ functions directory not found"
+          echo ""
+          echo "📋 Checking _routes.json..."
+          if [ -f "dist/_routes.json" ]; then
+            echo "✅ _routes.json exists in dist/"
+            cat dist/_routes.json
+          else
+            echo "❌ _routes.json not found in dist/"
+            exit 1
+          fi
+          echo ""
+          echo "📋 Checking static asset directories..."
+          [ -d "dist/js" ] && echo "✅ dist/js directory exists" || echo "⚠️ dist/js directory not found"
+          [ -d "dist/css" ] && echo "✅ dist/css directory exists" || echo "⚠️ dist/css directory not found"
+          [ -d "dist/assets" ] && echo "✅ dist/assets directory exists" || echo "⚠️ dist/assets directory not found"
 
       - name: Install Wrangler CLI
         run: npm install -g wrangler@latest
