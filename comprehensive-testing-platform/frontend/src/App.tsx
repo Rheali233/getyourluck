@@ -24,7 +24,10 @@ import { LoveStyleTestPage } from '@/modules/relationship/components/LoveStyleTe
 import { InterpersonalTestPage } from '@/modules/relationship/components/InterpersonalTestPage';
 import { CareerModule } from '@/modules/career/CareerModule';
 // 使用懒加载避免初始化顺序问题和循环依赖
-const AstrologyModule = React.lazy(() => import('@/modules/astrology/AstrologyModule').then(m => ({ default: m.AstrologyModule })));
+// 修复：使用更明确的变量名避免初始化顺序问题
+const AstrologyModule = React.lazy(() => 
+  import('@/modules/astrology/AstrologyModule').then(module => ({ default: module.AstrologyModule }))
+);
 import { TarotModule } from '@/modules/tarot/TarotModule';
 import { NumerologyModule } from '@/modules/numerology/NumerologyModule';
 import { LearningAbilityHomePage } from '@/modules/learning-ability/components/LearningAbilityHomePage';
