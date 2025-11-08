@@ -38,7 +38,16 @@ export async function onRequest(context) {
   if (isStaticFile) {
     // 直接调用 next() 让 Cloudflare Pages 的静态文件服务处理
     // 不要做任何额外的处理，确保静态资源能够正确返回
-    return next();
+    const staticResponse = await next();
+    
+    // 🔥 关键修复：如果返回的是 HTML（说明路由到了 index.html），直接返回 404
+    // 这样可以避免静态资源被错误地返回为 HTML MIME 类型
+    const contentType = staticResponse.headers.get('content-type') || '';
+    if (contentType.includes('text/html') && pathname !== '/index.html') {
+      return new Response('Not Found', { status: 404 });
+    }
+    
+    return staticResponse;
   }
 
   // 🔥 HTTP 到 HTTPS 重定向（仅在生产环境）
