@@ -21,8 +21,6 @@ In the spiritual tradition of Kabbalah, the 72 Shemhamphorasch Angels—commonly
 
 By exploring your birthday angel, you can uncover your spiritual mission, latent potential, and connection to universal energies. This article dives into the history of the Kabbalistic angel system, the link between angels and birth dates, and how to integrate your birthday angel into your personal spiritual practice.
 
-[Explore Astrology →](/astrology) • [Visit Test Center →](/tests)
-
 ## What Are the 72 Guardian Angels?
 
 The 72 guardian angels in Kabbalah are more than mere celestial entities; they symbolize the division of the zodiac's 360-degree wheel into 72 distinct segments—each spanning 5 degrees. These angels are embodiments of divine energy, bridging human spirituality with the harmonious order of the cosmos.
@@ -114,4 +112,8 @@ The Kabbalistic guardian angel system provides a profound opportunity to unlock 
 
 Whether you're starting with meditation or delving into complex rituals, your birthday angel can guide you toward self-discovery and spiritual growth. Begin by calculating your Sun's degree with a natal chart tool and take your first step on this enlightening journey into the divine cosmos.
 
-[Start Your Birth Chart Now](/astrology) • [Explore Compatibility](/astrology) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/astrology">Start Your Birth Chart Now</a>
+  <a class="blog-cta" href="/astrology">Explore Compatibility</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>

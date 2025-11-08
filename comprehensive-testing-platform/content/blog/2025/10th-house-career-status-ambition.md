@@ -18,8 +18,6 @@ author: "Editorial Team"
 ## Introduction
 In astrology, the 10th House—often called the House of Career and Status—describes how we show up in the world and the legacy we build. It speaks to ambitions, profession, public image, and accountability. This article explains the symbolism, planetary influences, and sign-based interpretations of the 10th House, with actionable tips for reading your own chart.
 
-[Explore Astrology →](/astrology) • [Visit Test Center →](/tests)
-
 ## What Does the 10th House Represent?
 The 10th House centers on the external world—where people pursue goals, build careers, and earn recognition.
 
@@ -69,4 +67,8 @@ The 10th House centers on the external world—where people pursue goals, build 
 ## Conclusion
 The 10th House is a cornerstone for understanding career purpose, ambition, and public legacy. It shows how you rise to challenges, earn recognition, and contribute to society—whether through business, creativity, education, or service. Reading your 10th House offers a practical compass for building the life you envision.
 
-[Start Your Birth Chart Now](/astrology) • [Explore Compatibility](/astrology) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/astrology">Start Your Birth Chart Now</a>
+  <a class="blog-cta" href="/astrology">Explore Compatibility</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>

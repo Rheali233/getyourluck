@@ -21,8 +21,6 @@ The zodiac signs form the cornerstone of astrology, shaping our personalities, d
 
 Each angel not only symbolizes universal energy but serves as a guide for the soul, helping us establish a profound connection with our zodiac traits and the mysteries of the cosmos. In this article, we will explore the origins of the Zodiac Angels, their symbolic roles, and how their divine energy can ignite spiritual awakening and personal transformation.
 
-[Explore Astrology →](/astrology) • [Visit Test Center →](/tests)
-
 ![Celestial angel with golden wings and divine light](/assets/blog/astrology/zodiac-angels/inline-1.png)
 
 ## I. Origins and Foundations of the Zodiac Angels
@@ -122,4 +120,8 @@ The Zodiac Angels provide a profound connection between earthly experiences and 
 
 Take the leap today—invoke your Zodiac Angel and awaken to a deeper connection with your inner self and the universe!
 
-[Start Your Birth Chart Now](/astrology) • [Explore Compatibility](/astrology) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/astrology">Start Your Birth Chart Now</a>
+  <a class="blog-cta" href="/astrology">Explore Compatibility</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>

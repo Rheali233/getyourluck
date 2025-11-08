@@ -23,8 +23,6 @@ Thankfully, there's one book called "The Only Astrology Book You'll Ever Need" b
 
 If you've already discovered the richness of this foundational book, you might want to delve into deeper topics such as chart analysis, astrological relationships, or predictive astrology. In this article, we'll introduce you to why this book is your perfect starting point and provide a curated list of additional astrology classics that can further expand your knowledge.
 
-[Explore Astrology →](/astrology) • [Visit Test Center →](/tests)
-
 ## "The Only Astrology Book You'll Ever Need": A Must-Have Guide for Beginners and Beyond
 
 ### Why Do You Need This Book?
@@ -106,4 +104,8 @@ Starting with The Only Astrology Book You'll Ever Need gives you a solid foundat
 
 No matter your learning goals, astrology is a vast field with endless opportunities for self-discovery, and these books will guide you every step of the way. Embark on this cosmic journey today and unlock not only the mysteries of the stars but also the deeper truths within yourself!
 
-[Start Your Birth Chart Now](/astrology) • [Explore Compatibility](/astrology) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/astrology">Start Your Birth Chart Now</a>
+  <a class="blog-cta" href="/astrology">Explore Compatibility</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>

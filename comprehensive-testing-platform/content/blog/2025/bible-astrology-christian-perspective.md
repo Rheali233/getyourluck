@@ -21,8 +21,6 @@ Astrology has fascinated humanity for thousands of years, offering insights into
 
 Is astrology merely entertainment, or does it conflict with biblical teachings? Let's explore what the Bible says about astrology and its place in faith and spirituality.
 
-[Explore Astrology →](/astrology) • [Visit Test Center →](/tests)
-
 ## Astrology in Ancient Times
 
 Astrology dates back to ancient civilizations like Babylon, Egypt, and Greece, where people believed that celestial bodies influenced earthly events. These cultures studied the alignment of stars and planets as a way to predict future events or gain insight into human behavior.
@@ -111,4 +109,8 @@ Instead of relying on the movements of celestial bodies, believers are invited t
 
 If you're curious about life's meaning, God's plan, and His guidance, Scripture and prayer will always lead you to truth. Let the Creator—not creation—be your guide in navigating His beautiful design for your life.
 
-[Start Your Birth Chart Now](/astrology) • [Explore Compatibility](/astrology) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/astrology">Start Your Birth Chart Now</a>
+  <a class="blog-cta" href="/astrology">Explore Compatibility</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>

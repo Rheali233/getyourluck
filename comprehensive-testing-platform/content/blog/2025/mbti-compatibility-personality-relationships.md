@@ -23,8 +23,6 @@ The Myers-Briggs Type Indicator (MBTI), a widely used personality framework, sor
 
 Whether you're curious about improving your relationships or just exploring your unique interpersonal dynamics, understanding MBTI compatibility is a great place to start!
 
-[Take MBTI Test →](/tests/psychology/mbti) • [Visit Test Center →](/tests)
-
 ## What is MBTI Compatibility?
 
 MBTI compatibility refers to analyzing how well two personality types work together based on their preferences in the four dimensions of the MBTI framework:
@@ -128,4 +126,8 @@ While MBTI compatibility offers helpful insights into relationships, it's not a 
 
 Curious about your own MBTI type and how it influences your relationships? Take our free MBTI test today to get started. Learn more about your personality, unlock insights about the people around you, and take the first step toward improving your relationships—whether romantic, platonic, or professional!
 
-[Take MBTI Test Now](/tests/psychology/mbti) • [Explore Compatibility](/tests/psychology/mbti) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/tests/psychology/mbti">Take MBTI Test Now</a>
+  <a class="blog-cta" href="/tests/psychology/mbti">Explore Compatibility</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>

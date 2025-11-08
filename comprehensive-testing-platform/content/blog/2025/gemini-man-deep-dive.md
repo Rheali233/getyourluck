@@ -18,8 +18,6 @@ author: "Editorial Team"
 ## Introduction
 The Gemini man is one of the most intriguing and dynamic personalities in the zodiac. Represented by the twins in astrology and ruled by Mercury, he blends intellect, curiosity, and adaptability with a playful, magnetic charm. This guide explores his personality, strengths, challenges, relationships, career paths, and how to truly connect with him.
 
-[Explore Astrology →](/astrology) • [Visit Test Center →](/tests)
-
 ## Overview of a Gemini Man’s Personality
 ### Dual Nature
 The symbol of the twins reflects two distinct sides. One moment he is lively and talkative; the next, introspective and quiet. This contrast is often misread as inconsistency, but it is a nuanced adaptability.
@@ -99,4 +97,8 @@ Traits commonly seen in public Gemini figures include adaptability, wit, and cre
 ## Final Thoughts
 A Gemini man is multi‑faceted, energetic, and insightful. Understand his dual nature—playfulness and intellect alongside the need for independence—and you’ll build a meaningful connection.
 
-[Start Your Birth Chart Now](/astrology) • [Explore Compatibility](/astrology) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/astrology">Start Your Birth Chart Now</a>
+  <a class="blog-cta" href="/astrology">Explore Compatibility</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>

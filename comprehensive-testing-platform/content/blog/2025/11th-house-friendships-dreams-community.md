@@ -18,8 +18,6 @@ author: "Editorial Team"
 ## Introduction
 In astrology, the 11th House—often called the House of Friendships, Community, and Hopes & Dreams—connects us to networks, shared ideals, and the future we build together. It extends beyond individual success, highlighting the social ecosystems that nurture our visions.
 
-[Explore Astrology →](/astrology) • [Visit Test Center →](/tests)
-
 ![Community under the stars—shared ideals and friendship](/assets/blog/astrology/11th-house/inline-1.png)
 
 ## What Does the 11th House Represent?
@@ -67,6 +65,10 @@ The 11th House is synonymous with connections, aspirations, and support systems.
 ## Conclusion
 The 11th House bridges the personal and the collective. Through friendships, networks, and shared ambitions, it reveals how your dreams become possible with community support. By understanding this house in your natal chart, you can build meaningful connections, contribute to shared ideals, and move together toward a better tomorrow.
 
-[Explore Compatibility](/astrology) • [Start Your Birth Chart](/astrology) • [Visit Test Center](/tests)
+<div class="blog-cta-group">
+  <a class="blog-cta" href="/astrology">Explore Compatibility</a>
+  <a class="blog-cta" href="/astrology">Start Your Birth Chart</a>
+  <a class="blog-cta" href="/tests">Visit Test Center</a>
+</div>
 
 
