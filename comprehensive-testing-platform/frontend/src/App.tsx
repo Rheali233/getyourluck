@@ -23,7 +23,8 @@ import { LoveLanguageTestPage } from '@/modules/relationship/components/LoveLang
 import { LoveStyleTestPage } from '@/modules/relationship/components/LoveStyleTestPage';
 import { InterpersonalTestPage } from '@/modules/relationship/components/InterpersonalTestPage';
 import { CareerModule } from '@/modules/career/CareerModule';
-import { AstrologyModule } from '@/modules/astrology/AstrologyModule';
+// 使用懒加载避免初始化顺序问题和循环依赖
+const AstrologyModule = React.lazy(() => import('@/modules/astrology/AstrologyModule').then(m => ({ default: m.AstrologyModule })));
 import { TarotModule } from '@/modules/tarot/TarotModule';
 import { NumerologyModule } from '@/modules/numerology/NumerologyModule';
 import { LearningAbilityHomePage } from '@/modules/learning-ability/components/LearningAbilityHomePage';
@@ -148,7 +149,7 @@ function App() {
         <Route path="/tests/relationship/love_style" element={<Navigate to="/tests/relationship/love-style" replace />} />
         
         {/* Astrology Module Routes - Updated to /tests/astrology */}
-        <Route path="/tests/astrology/*" element={<AstrologyModule />} />
+        <Route path="/tests/astrology/*" element={<React.Suspense fallback={<SuspenseFallback message="Loading Astrology module…" description="We are preparing the astrology content." />}><AstrologyModule /></React.Suspense>} />
         {/* Tarot Module Routes - Updated to /tests/tarot */}
         <Route path="/tests/tarot/*" element={<TarotModule />} />
         {/* Numerology Module Routes - Updated to /tests/numerology */}
