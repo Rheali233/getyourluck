@@ -178,16 +178,20 @@ export class LoveLanguageResultProcessor implements TestResultProcessor {
       return merged
     }
 
-    // 没有AI分析时，返回基础结果
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for Love Language test. Please ensure AI service is available and try again.');
+    }
+
+    // 使用AI分析结果
     return {
       ...baseResult,
-      interpretation: this.generateInterpretation(primaryLanguage, secondaryLanguage),
-      recommendations: this.generateRecommendations(primaryLanguage),
-      expressionTips: this.generateExpressionTips(primaryLanguage),
-      receivingTips: this.generateReceivingTips(primaryLanguage),
-      relationshipInsights: this.generateRelationshipInsights(primaryLanguage),
-      communicationGuide: this.generateCommunicationGuide(primaryLanguage),
-      loveLanguageProfile: this.generateLoveLanguageProfile(primaryLanguage, secondaryLanguage)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      primaryLanguage: baseResult.primaryLanguage,
+      secondaryLanguage: baseResult.secondaryLanguage,
+      scores: baseResult.scores,
+      allLanguages: baseResult.allLanguages
     };
   }
   

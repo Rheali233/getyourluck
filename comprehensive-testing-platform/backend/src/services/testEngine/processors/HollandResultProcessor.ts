@@ -166,16 +166,22 @@ export class HollandResultProcessor implements TestResultProcessor {
       };
     }
 
-    // 没有AI分析时，返回基础结果
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for Holland test. Please ensure AI service is available and try again.');
+    }
+
+    // 使用AI分析结果
     return {
       ...baseResult,
-      interpretation: this.generateInterpretation(topTypes, scores),
-      recommendations: this.generateRecommendations(topTypes),
-      careerSuggestions: this.generateCareerSuggestions(topTypes),
-      workEnvironment: this.generateWorkEnvironment(topTypes),
-      skills: this.generateSkills(topTypes),
-      values: this.generateValues(topTypes),
-      developmentAreas: this.generateDevelopmentAreas(topTypes)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      scores: baseResult.scores,
+      topTypes: baseResult.topTypes,
+      primaryType: baseResult.primaryType,
+      secondaryType: baseResult.secondaryType,
+      tertiaryType: baseResult.tertiaryType,
+      individualScores: baseResult.individualScores
     };
   }
   

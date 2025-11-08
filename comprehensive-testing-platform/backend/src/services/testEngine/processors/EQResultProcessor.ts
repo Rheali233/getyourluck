@@ -66,45 +66,35 @@ export class EQResultProcessor implements TestResultProcessor {
       }
     };
 
-    // 如果有AI分析结果，使用AI分析；否则使用基础分析
-    if (aiAnalysis) {
-      // 调试信息
-      // eslint-disable-next-line no-console
-      console.log('EQ AI Analysis Debug:', {
-        hasAIAnalysis: !!aiAnalysis,
-        hasAIDimensions: !!aiAnalysis.dimensions,
-        aiDimensionsLength: aiAnalysis.dimensions?.length,
-        aiDimensions: aiAnalysis.dimensions,
-        baseDimensionsLength: baseResult.dimensions?.length,
-        baseDimensions: baseResult.dimensions
-      });
-      
-      return {
-        ...baseResult,
-        ...aiAnalysis,
-        // 确保基础字段不被覆盖
-        overallScore: baseResult.overallScore,
-        maxScore: baseResult.maxScore,
-        percentage: baseResult.percentage,
-        overallLevel: baseResult.overallLevel,
-        levelName: baseResult.levelName,
-        // 优先使用AI分析的dimensions，如果没有则使用baseResult的dimensions
-        dimensions: aiAnalysis.dimensions && aiAnalysis.dimensions.length > 0 ? aiAnalysis.dimensions : baseResult.dimensions,
-        individualScores: baseResult.individualScores
-      };
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for EQ test. Please ensure AI service is available and try again.');
     }
 
-    // 没有AI分析时，返回基础结果
+    // 调试信息
+    // eslint-disable-next-line no-console
+    console.log('EQ AI Analysis Debug:', {
+      hasAIAnalysis: !!aiAnalysis,
+      hasAIDimensions: !!aiAnalysis.dimensions,
+      aiDimensionsLength: aiAnalysis.dimensions?.length,
+      aiDimensions: aiAnalysis.dimensions,
+      baseDimensionsLength: baseResult.dimensions?.length,
+      baseDimensions: baseResult.dimensions
+    });
+    
+    // 使用AI分析结果
     return {
       ...baseResult,
-      overallAnalysis: `Your emotional intelligence level is ${overallLevel} (${Math.round(percentage)}%). Based on your responses, you demonstrate ${overallLevel.toLowerCase()} emotional intelligence across the four core dimensions.`,
-      interpretation: `Your emotional intelligence level is ${overallLevel} (${Math.round(percentage)}%).`,
-      recommendations: this.generateRecommendations(overallLevel),
-      improvementPlan: {
-        shortTerm: ['Focus on daily emotional awareness', 'Practice active listening', 'Develop stress management techniques'],
-        longTerm: ['Build stronger relationships', 'Enhance communication skills', 'Develop leadership capabilities'],
-        dailyPractices: ['Morning emotional check-in', 'Evening reflection', 'Mindful breathing exercises']
-      }
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      overallScore: baseResult.overallScore,
+      maxScore: baseResult.maxScore,
+      percentage: baseResult.percentage,
+      overallLevel: baseResult.overallLevel,
+      levelName: baseResult.levelName,
+      // 优先使用AI分析的dimensions，如果没有则使用baseResult的dimensions
+      dimensions: aiAnalysis.dimensions && aiAnalysis.dimensions.length > 0 ? aiAnalysis.dimensions : baseResult.dimensions,
+      individualScores: baseResult.individualScores
     };
   }
   

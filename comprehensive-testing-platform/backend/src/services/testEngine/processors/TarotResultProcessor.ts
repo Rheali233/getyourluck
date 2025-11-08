@@ -39,7 +39,7 @@ export class TarotResultProcessor implements TestResultProcessor {
     })
   }
   
-  async process(answers: any[]): Promise<any> {
+  async process(answers: any[], aiAnalysis?: any): Promise<any> {
     if (!this.validateAnswers(answers)) {
       throw new Error('Invalid Tarot answers format')
     }
@@ -75,7 +75,8 @@ export class TarotResultProcessor implements TestResultProcessor {
     // 生成整体主题分析
     const thematicAnalysis = this.analyzeThemes(drawnCards, answers[0]?.answer?.questionCategory)
     
-    return {
+    // 基础结果
+    const baseResult = {
       drawnCards,
       basicReading,
       cardConnections,
@@ -90,6 +91,16 @@ export class TarotResultProcessor implements TestResultProcessor {
         version: '2.0.0'
       }
     }
+    
+    // 如果有 AI 分析结果，将其作为 aiReading 字段添加
+    if (aiAnalysis) {
+      return {
+        ...baseResult,
+        aiReading: aiAnalysis
+      }
+    }
+    
+    return baseResult
   }
 
   /**

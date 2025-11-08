@@ -98,30 +98,20 @@ export class DISCResultProcessor implements TestResultProcessor {
       }
     };
 
-    // 如果有AI分析结果，使用AI分析；否则使用基础分析
-    if (aiAnalysis) {
-      return {
-        ...baseResult,
-        ...aiAnalysis,
-        // 确保基础字段不被覆盖
-        scores: baseResult.scores,
-        dominantType: baseResult.dominantType,
-        typeProfile: baseResult.typeProfile,
-        individualScores: baseResult.individualScores
-      };
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for DISC test. Please ensure AI service is available and try again.');
     }
 
-    // 没有AI分析时，返回基础结果
+    // 使用AI分析结果
     return {
       ...baseResult,
-      interpretation: this.generateInterpretation(dominantType, scores),
-      recommendations: this.generateRecommendations(dominantType),
-      workStyle: this.generateWorkStyle(dominantType),
-      communicationTips: this.generateCommunicationTips(dominantType),
-      strengths: this.generateStrengths(dominantType),
-      challenges: this.generateChallenges(dominantType),
-      leadershipStyle: this.generateLeadershipStyle(dominantType),
-      teamRole: this.generateTeamRole(dominantType)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      scores: baseResult.scores,
+      dominantType: baseResult.dominantType,
+      typeProfile: baseResult.typeProfile,
+      individualScores: baseResult.individualScores
     };
   }
   

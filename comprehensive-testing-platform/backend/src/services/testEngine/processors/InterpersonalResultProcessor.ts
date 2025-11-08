@@ -92,15 +92,22 @@ export class InterpersonalResultProcessor implements TestResultProcessor {
       };
     }
 
-    // 没有AI分析时，返回基础结果
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for Interpersonal test. Please ensure AI service is available and try again.');
+    }
+
+    // 使用AI分析结果
     return {
       ...baseResult,
-      interpretation: this.generateInterpretation(level, percentage),
-      recommendations: this.generateRecommendations(level),
-      // removed strengths/developmentAreas from backend output (kept internal helpers for potential future use)
-      interpersonalProfile: this.generateInterpersonalProfile(level, dimensionScores),
-      communicationStyle: this.generateCommunicationStyle(level, dimensionScores),
-      relationshipInsights: this.generateRelationshipInsights(level, dimensionScores)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      totalScore: baseResult.totalScore,
+      maxScore: baseResult.maxScore,
+      level: baseResult.level,
+      percentage: baseResult.percentage,
+      allDimensions: baseResult.allDimensions,
+      individualScores: baseResult.individualScores
     };
   }
   

@@ -1809,30 +1809,48 @@ export class AIService {
     }
     
     if (data.testType === 'numerology') {
-      // 命理模块使用专门的prompt
-      const analysisData = data.answers[0]?.answer;
-      if (!analysisData) {
-        throw new Error('Invalid numerology analysis data');
-      }
-      
-      const { type, inputData } = analysisData;
-      const { fullName, birthDate, birthTime, gender, calendarType } = inputData;
-      
-      // 根据分析类型选择不同的提示词
-      if (type === 'zodiac') {
-        return this.buildChineseZodiacPrompt(fullName, birthDate);
-      }
-      
-      if (type === 'name') {
-        return this.buildChineseNameRecommendationPrompt(inputData);
-      }
-      
-      if (type === 'ziwei') {
-        const { birthPlace } = inputData;
-        return this.buildZiWeiPrompt(fullName, birthDate, birthTime, gender, birthPlace, calendarType);
-      }
-      
-      return `You are a professional numerology and BaZi (Four Pillars of Destiny) analyst. Provide a comprehensive analysis based on:
+      return this.buildNumerologyPrompt(data.answers[0]?.answer);
+    }
+    
+    // 其他测试类型使用通用prompt
+    return `Please analyze the following ${data.testType} test results and provide comprehensive insights.
+
+Test Type: ${data.testType}
+Answers: ${JSON.stringify(data.answers)}
+User Context: ${JSON.stringify(data.userContext || {})}
+
+Please provide your analysis in JSON format with appropriate structure for the test type.`;
+  }
+
+  private buildNumerologyPrompt(analysisData: any): string {
+    if (!analysisData || typeof analysisData !== 'object') {
+      throw new Error('Invalid numerology analysis data');
+    }
+
+    const { type, inputData } = analysisData;
+    if (!type || !inputData) {
+      throw new Error('Missing numerology analysis type or input data');
+    }
+
+    const { fullName, birthDate, birthTime, gender, calendarType } = inputData;
+    if (!fullName || !birthDate) {
+      throw new Error('Missing required numerology input fields');
+    }
+
+    if (type === 'zodiac') {
+      return this.buildChineseZodiacPrompt(fullName, birthDate);
+    }
+
+    if (type === 'name') {
+      return this.buildChineseNameRecommendationPrompt(inputData);
+    }
+
+    if (type === 'ziwei') {
+      const { birthPlace } = inputData;
+      return this.buildZiWeiPrompt(fullName, birthDate, birthTime, gender, birthPlace, calendarType);
+    }
+
+    return `You are a professional numerology and BaZi (Four Pillars of Destiny) analyst. Provide a comprehensive analysis based on:
 
 **Personal Information:**
 - Name: ${fullName}
@@ -1961,16 +1979,39 @@ export class AIService {
 - For keyInsights element field: Use format "Heavenly Stem over Earthly Branch" (e.g., "Metal over Dragon") - NO Chinese characters
 - Use rich descriptive language, narrative descriptions, encouraging professional tone, specific actionable advice
 - Focus on interpretation and meaning rather than numerical scores`;
+  }
+
+  async analyzeNumerology(analysisData: any): Promise<any> {
+    const prompt = this.buildNumerologyPrompt(analysisData);
+    const analysisType = analysisData?.type || 'bazi';
+    const customTimeout = 120000;
+    const response = await this.callDeepSeek(prompt, 0, customTimeout);
+
+    if (analysisType === 'zodiac') {
+      const content = response?.choices?.[0]?.message?.content || '';
+      if (!content) {
+        throw new Error('Empty AI response content for numerology zodiac analysis');
+      }
+      return this.parseChineseZodiacResponse(content);
     }
-    
-    // 其他测试类型使用通用prompt
-    return `Please analyze the following ${data.testType} test results and provide comprehensive insights.
 
-Test Type: ${data.testType}
-Answers: ${JSON.stringify(data.answers)}
-User Context: ${JSON.stringify(data.userContext || {})}
+    if (analysisType === 'name') {
+      const content = response?.choices?.[0]?.message?.content || '';
+      if (!content) {
+        throw new Error('Empty AI response content for numerology name analysis');
+      }
+      return this.parseChineseNameRecommendationResponse(content);
+    }
 
-Please provide your analysis in JSON format with appropriate structure for the test type.`;
+    if (analysisType === 'ziwei') {
+      const content = response?.choices?.[0]?.message?.content || '';
+      if (!content) {
+        throw new Error('Empty AI response content for numerology ZiWei analysis');
+      }
+      return this.parseZiWeiResponse(content);
+    }
+
+    return this.parseNumerologyResponse(response);
   }
 
   private buildRecommendationsPrompt(data: { testType: string; results: any; userPreferences?: any; context?: any }): string {

@@ -10,26 +10,40 @@ export class PHQ9ResultProcessor implements TestResultProcessor {
     return 'phq9'
   }
   
-  validateAnswers(answers: any[]): boolean {
-    if (!Array.isArray(answers) || answers.length !== 9) {
-      return false;
+  validateAnswers(answers: any[]): { valid: boolean; error?: string } {
+    if (!Array.isArray(answers)) {
+      return { valid: false, error: 'Answers must be an array' };
+    }
+    
+    if (answers.length !== 9) {
+      return { valid: false, error: `Expected 9 answers, got ${answers.length}. Please answer all questions.` };
     }
     
     // 验证答案格式 (0-3分制) - 支持字符串和数字类型
-    return answers.every(answer => {
-      if (!answer || !answer.value) {
-        return false;
+    for (let i = 0; i < answers.length; i++) {
+      const answer = answers[i];
+      if (!answer || (answer.value === undefined && answer.value !== 0)) {
+        return { valid: false, error: `Answer ${i + 1} is missing value. Please answer all questions.` };
       }
       
       // 转换为数字进行验证
       const numericValue = Number(answer.value);
-      return !isNaN(numericValue) && numericValue >= 0 && numericValue <= 3;
-    });
+      if (isNaN(numericValue)) {
+        return { valid: false, error: `Answer ${i + 1} has invalid value: "${answer.value}". Value must be a number between 0 and 3.` };
+      }
+      
+      if (numericValue < 0 || numericValue > 3) {
+        return { valid: false, error: `Answer ${i + 1} has invalid value: ${numericValue}. Value must be between 0 and 3.` };
+      }
+    }
+    
+    return { valid: true };
   }
   
   async process(answers: any[], aiAnalysis?: any): Promise<any> {
-    if (!this.validateAnswers(answers)) {
-      throw new Error('Invalid PHQ-9 answers format');
+    const validation = this.validateAnswers(answers);
+    if (!validation.valid) {
+      throw new Error(validation.error || 'Invalid PHQ-9 answers format');
     }
     
     const totalScore = answers.reduce((sum, answer) => sum + Number(answer.value), 0);
@@ -56,29 +70,32 @@ export class PHQ9ResultProcessor implements TestResultProcessor {
     };
     
     // 如果有AI分析结果，使用AI分析；否则使用基础分析
-    if (aiAnalysis) {
-      return {
-        ...baseResult,
-        ...aiAnalysis,
-        // 确保基础字段不被覆盖
-        totalScore: baseResult.totalScore,
-        severity: baseResult.severity,
-        riskLevel: baseResult.riskLevel,
-        riskLevelName: baseResult.riskLevelName,
-        riskDescription: baseResult.riskDescription,
-        individualScores: baseResult.individualScores
-      };
-    }
+    // eslint-disable-next-line no-console
+    console.log(`[PHQ9ResultProcessor] Processing results - aiAnalysis provided:`, !!aiAnalysis);
+    // eslint-disable-next-line no-console
+    console.log(`[PHQ9ResultProcessor] aiAnalysis type:`, typeof aiAnalysis);
+    // eslint-disable-next-line no-console
+    console.log(`[PHQ9ResultProcessor] aiAnalysis keys:`, aiAnalysis ? Object.keys(aiAnalysis) : 'null');
     
-    // 没有AI分析时，返回基础结果
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for PHQ-9 test. Please ensure AI service is available and try again.');
+    }
+
+    // eslint-disable-next-line no-console
+    console.log(`[PHQ9ResultProcessor] Using AI analysis results`);
+    
+    // 使用AI分析结果
     return {
       ...baseResult,
-      interpretation: this.generateInterpretation(severity, totalScore),
-      recommendations: this.generateRecommendations(severity),
-      lifestyleInterventions: this.generateLifestyleInterventions(severity),
-      followUpAdvice: this.generateFollowUpAdvice(severity),
-      physicalAnalysis: this.generatePhysicalAnalysis(severity),
-      psychologicalAnalysis: this.generatePsychologicalAnalysis(severity)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      totalScore: baseResult.totalScore,
+      severity: baseResult.severity,
+      riskLevel: baseResult.riskLevel,
+      riskLevelName: baseResult.riskLevelName,
+      riskDescription: baseResult.riskDescription,
+      individualScores: baseResult.individualScores
     };
   }
   

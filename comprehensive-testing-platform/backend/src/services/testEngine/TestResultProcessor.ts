@@ -22,9 +22,9 @@ export interface TestResultProcessor {
   /**
    * 验证答案数据
    * @param answers 答案数据
-   * @returns 验证结果
+   * @returns 验证结果（可以是 boolean 或包含详细错误信息的对象）
    */
-  validateAnswers(answers: any[]): boolean
+  validateAnswers(answers: any[]): boolean | { valid: boolean; error?: string }
 }
 
 /**

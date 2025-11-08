@@ -121,29 +121,39 @@ export class MBTIResultProcessor implements TestResultProcessor {
       }
     };
 
-    // 如果有AI分析结果，使用AI分析；否则使用基础分析
-    if (aiAnalysis) {
-      return {
-        ...baseResult,
-        ...aiAnalysis,
-        // 确保基础字段不被覆盖
-        scores: baseResult.scores,
-        type: baseResult.type,
-        personalityType: baseResult.personalityType,
-        dimensions: baseResult.dimensions
-      };
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      // eslint-disable-next-line no-console
+      console.error('[MBTIResultProcessor] AI analysis is missing for MBTI test');
+      throw new Error('AI analysis is required for MBTI test. Please ensure AI service is available and try again.');
     }
 
-    // 没有AI分析时，返回基础结果
-    return {
+    // eslint-disable-next-line no-console
+    console.log('[MBTIResultProcessor] AI analysis received, keys:', Object.keys(aiAnalysis));
+    // eslint-disable-next-line no-console
+    console.log('[MBTIResultProcessor] AI analysis has detailedAnalysis:', !!aiAnalysis.detailedAnalysis);
+    // eslint-disable-next-line no-console
+    console.log('[MBTIResultProcessor] AI analysis has personalityType:', aiAnalysis.personalityType);
+
+    // 使用AI分析结果
+    const result = {
       ...baseResult,
-      interpretation: this.generateInterpretation(type, scores),
-      recommendations: this.generateRecommendations(type),
-      strengths: this.generateStrengths(type),
-      blindSpots: this.generateBlindSpots(type),
-      careerSuggestions: this.generateCareerSuggestions(type),
-      relationshipPerformance: this.generateRelationshipPerformance(type)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      scores: baseResult.scores,
+      type: baseResult.type,
+      personalityType: aiAnalysis.personalityType || baseResult.personalityType,
+      dimensions: aiAnalysis.dimensions && Array.isArray(aiAnalysis.dimensions) && aiAnalysis.dimensions.length > 0 
+        ? aiAnalysis.dimensions 
+        : baseResult.dimensions
     };
+
+    // eslint-disable-next-line no-console
+    console.log('[MBTIResultProcessor] Final result prepared, personalityType:', result.personalityType);
+    // eslint-disable-next-line no-console
+    console.log('[MBTIResultProcessor] Final result has detailedAnalysis:', !!result.detailedAnalysis);
+
+    return result;
   }
   
   private generateInterpretation(type: string, _scores: any): string {

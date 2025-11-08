@@ -51,35 +51,33 @@ export class HappinessResultProcessor implements TestResultProcessor {
     const percentage = (totalScore / maxScore) * 100
     const level = this.calculateLevel(percentage)
     
-    // 检查AI分析是否完整（如果提供的话）
-    if (aiAnalysis && aiAnalysis.error) {
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for Happiness test. Please ensure AI service is available and try again.');
+    }
+
+    // 检查AI分析是否完整
+    if (aiAnalysis.error) {
       throw new Error(`AI analysis failed: ${aiAnalysis.error}`);
     }
 
-    // 处理AI分析结果
-    let overallAnalysis = `Your happiness level is ${level} (${Math.round(percentage)}%).`;
-    let domains = this.generateDefaultDomains();
-    let improvementPlan = this.generateDefaultImprovementPlan();
-
-    if (aiAnalysis) {
-      // 使用AI的整体分析
-      if (aiAnalysis.overallAnalysis) {
-        overallAnalysis = aiAnalysis.overallAnalysis;
-      }
-      
-      // 直接使用AI的domains数组，但为每个domain添加level字段
-      if (aiAnalysis.domains && Array.isArray(aiAnalysis.domains)) {
-        domains = aiAnalysis.domains.map((domain: any) => ({
+    // 使用AI分析结果
+    const overallAnalysis = aiAnalysis.overallAnalysis || `Your happiness level is ${level} (${Math.round(percentage)}%).`;
+    
+    // 直接使用AI的domains数组，但为每个domain添加level字段
+    const domains = (aiAnalysis.domains && Array.isArray(aiAnalysis.domains)) 
+      ? aiAnalysis.domains.map((domain: any) => ({
           ...domain,
           level: this.getLevelName(level) // 使用整体的happinessLevel对应的levelName
-        }));
-      }
-      
-      // 使用AI的改进计划
-      if (aiAnalysis.improvementPlan) {
-        improvementPlan = aiAnalysis.improvementPlan;
-      }
-    }
+        }))
+      : [];
+    
+    // 使用AI的改进计划
+    const improvementPlan = aiAnalysis.improvementPlan || {
+      shortTerm: [],
+      longTerm: [],
+      dailyPractices: []
+    };
     
     return {
       totalScore,

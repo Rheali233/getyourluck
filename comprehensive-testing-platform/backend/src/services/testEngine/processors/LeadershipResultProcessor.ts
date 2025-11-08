@@ -68,29 +68,22 @@ export class LeadershipResultProcessor implements TestResultProcessor {
       }
     };
 
-    // 如果有AI分析结果，使用AI分析；否则使用基础分析
-    if (aiAnalysis) {
-      return {
-        ...baseResult,
-        ...aiAnalysis,
-        // 确保基础字段不被覆盖
-        overallScore: baseResult.overallScore,
-        maxScore: baseResult.maxScore,
-        leadershipLevel: baseResult.leadershipLevel,
-        leadershipDimensions: baseResult.leadershipDimensions,
-        strengths: baseResult.strengths,
-        leadershipChallenges: baseResult.leadershipChallenges
-      };
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for Leadership test. Please ensure AI service is available and try again.');
     }
 
-    // 没有AI分析时，返回基础结果
+    // 使用AI分析结果
     return {
       ...baseResult,
-      analysis: this.generateDetailedAnalysis(level, percentage, dimensionScores),
-      developmentPlan: this.generateDevelopmentPlan(level, dimensionScores),
-      mentoringAdvice: this.generateMentoringAdvice(level),
-      organizationalImpact: this.generateOrganizationalImpact(level),
-      recommendations: this.generateRecommendations(level)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      overallScore: baseResult.overallScore,
+      maxScore: baseResult.maxScore,
+      leadershipLevel: baseResult.leadershipLevel,
+      leadershipDimensions: baseResult.leadershipDimensions,
+      strengths: baseResult.strengths,
+      leadershipChallenges: baseResult.leadershipChallenges
     };
   }
   

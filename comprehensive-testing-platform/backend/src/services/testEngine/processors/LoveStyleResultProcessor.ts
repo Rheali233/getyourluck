@@ -197,16 +197,19 @@ export class LoveStyleResultProcessor implements TestResultProcessor {
       };
     }
 
-    // 没有AI分析时，返回基础结果
+    // 必须有AI分析结果，否则抛出错误
+    if (!aiAnalysis) {
+      throw new Error('AI analysis is required for Love Style test. Please ensure AI service is available and try again.');
+    }
+
+    // 使用AI分析结果
     return {
       ...baseResult,
-      interpretation: this.generateInterpretation(dominantStyle, secondaryStyle),
-      recommendations: this.generateRecommendations(dominantStyle),
-      relationshipTips: this.generateRelationshipTips(dominantStyle),
-      growthAreas: this.generateGrowthAreas(dominantStyle),
-      loveStyleProfile: this.generateLoveStyleProfile(dominantStyle, secondaryStyle),
-      compatibilityInsights: this.generateCompatibilityInsights(dominantStyle),
-      relationshipAdvice: this.generateRelationshipAdvice(dominantStyle)
+      ...aiAnalysis,
+      // 确保基础字段不被覆盖
+      dominantStyle: baseResult.dominantStyle,
+      secondaryStyle: baseResult.secondaryStyle,
+      allStyles: baseResult.allStyles
     };
   }
   

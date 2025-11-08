@@ -35,7 +35,7 @@ export class NumerologyResultProcessor implements TestResultProcessor {
     })
   }
   
-  async process(answers: any[]): Promise<any> {
+  async process(answers: any[], aiAnalysis?: any): Promise<any> {
     if (!this.validateAnswers(answers)) {
       throw new Error('Invalid Numerology answers format')
     }
@@ -57,7 +57,8 @@ export class NumerologyResultProcessor implements TestResultProcessor {
     // 生成建议和指导
     const guidance = this.generateGuidance(analysisResults)
     
-    return {
+    // 基础结果
+    const baseResult = {
       analysisResults,
       basicAnalysis,
       guidance,
@@ -69,6 +70,17 @@ export class NumerologyResultProcessor implements TestResultProcessor {
         version: '1.0.0'
       }
     }
+    
+    // 如果有 AI 分析结果，将其合并到结果中
+    if (aiAnalysis) {
+      return {
+        ...baseResult,
+        analysis: aiAnalysis.analysis || aiAnalysis, // 支持两种格式
+        ...aiAnalysis // 展开所有 AI 分析字段
+      }
+    }
+    
+    return baseResult
   }
 
   /**

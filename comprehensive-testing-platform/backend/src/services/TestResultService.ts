@@ -12,12 +12,10 @@ export class TestResultService {
   private processorFactory: TestResultProcessorFactory;
   private cacheService: CacheService;
   private aiService: AIService;
-  private env: any;
 
-  constructor(_dbService: DatabaseService, cacheService: CacheService, aiService: AIService, env?: any) {
+  constructor(_dbService: DatabaseService, cacheService: CacheService, aiService: AIService, _env?: any) {
     this.cacheService = cacheService;
     this.aiService = aiService;
-    this.env = env;
     
     // 初始化处理器工厂
     this.processorFactory = new TestResultProcessorFactory();
@@ -83,9 +81,11 @@ export class TestResultService {
       // 先获取AI分析结果（如果支持）
       // 对于需要 AI 的测试类型，设置超时保护
       let aiAnalysis = null;
+      let aiAnalysisFailed = false;
+      let aiError: string | null = null;
       let aiStartTime: number | null = null; // 在更外层作用域声明，以便在 catch 块中使用
       if (this.aiService) {
-        const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'birth-chart', 'compatibility', 'fortune'];
+        const aiTestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'disc', 'holland', 'leadership', 'love_language', 'love_style', 'interpersonal', 'vark', 'tarot', 'numerology', 'birth-chart', 'compatibility', 'fortune'];
         const needsAI = aiTestTypes.includes(testType);
         
         if (needsAI) {
@@ -93,28 +93,40 @@ export class TestResultService {
           try {
             console.log(`[TestResultService] Starting AI analysis for ${testType} with ${answers.length} answers`);
             
-            // 设置 AI 分析超时（30秒，确保在 Workers CPU 限制内）
-            const aiTimeoutPromise = new Promise((_, reject) => {
-              setTimeout(() => reject(new Error('AI analysis timeout')), 30000);
-            });
+            // 根据测试类型设置不同的超时时间
+            // 复杂分析（如 numerology, tarot, birth-chart）需要更长时间
+            // 注意：超时控制由 AIService 内部的 AbortController 处理
             
-            const aiAnalysisPromise = this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
-            
-            aiAnalysis = await Promise.race([aiAnalysisPromise, aiTimeoutPromise]) as any;
+            // 直接调用 AI 服务，超时控制由 AIService 内部的 AbortController 处理
+            // 移除 Promise.race，避免双重超时机制冲突导致的 "Network connection lost" 错误
+            // AIService 已经根据测试类型设置了合适的超时时间（120秒或45秒）
+            if (testType === 'numerology') {
+              const numerologyAnswer = answers[0]?.answer;
+              if (!numerologyAnswer) {
+                throw new Error('Invalid numerology analysis data');
+              }
+              aiAnalysis = await this.aiService.analyzeNumerology(numerologyAnswer);
+            } else {
+              aiAnalysis = await this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
+            }
             
             const aiTime = aiStartTime ? Date.now() - aiStartTime : 0;
             console.log(`[TestResultService] AI analysis completed for ${testType} in ${aiTime}ms`);
             console.log(`[TestResultService] AI analysis result keys:`, aiAnalysis ? Object.keys(aiAnalysis) : 'null');
             
-          } catch (aiError) {
+          } catch (aiErrorCaught) {
             // AI分析失败时记录警告，但不阻止测试结果处理
             const aiTime = aiStartTime ? Date.now() - aiStartTime : 0;
-            console.error(`[TestResultService] AI analysis failed for ${testType} after ${aiTime}ms:`, aiError instanceof Error ? aiError.message : 'Unknown error');
-            console.error(`[TestResultService] AI error details:`, aiError instanceof Error ? {
-              name: aiError.name,
-              message: aiError.message,
-              stack: aiError.stack?.substring(0, 500)
-            } : aiError);
+            const errorMessage = aiErrorCaught instanceof Error ? aiErrorCaught.message : 'Unknown error';
+            aiError = errorMessage;
+            aiAnalysisFailed = true;
+            
+            console.error(`[TestResultService] AI analysis failed for ${testType} after ${aiTime}ms:`, errorMessage);
+            console.error(`[TestResultService] AI error details:`, aiErrorCaught instanceof Error ? {
+              name: aiErrorCaught.name,
+              message: aiErrorCaught.message,
+              stack: aiErrorCaught.stack?.substring(0, 500)
+            } : aiErrorCaught);
             // 确保 aiAnalysis 保持为 null，这样处理器会使用基础结果
             aiAnalysis = null;
           }
@@ -129,17 +141,32 @@ export class TestResultService {
       // 检查处理器是否支持AI分析参数
       let result;
       if ((processor as any).process.length > 1) {
-        // 对于VARK处理器，传递env参数
-        if (testType === 'vark') {
-          result = await (processor as any).process(answers, this.env);
-        } else {
-          result = await (processor as any).process(answers, aiAnalysis);
-        }
+        // 所有支持AI分析的处理器都传递aiAnalysis参数
+        result = await (processor as any).process(answers, aiAnalysis);
       } else {
         result = await processor.process(answers);
         if (aiAnalysis) {
           Object.assign(result, aiAnalysis);
         }
+      }
+      
+      // 对于需要AI分析的测试类型，如果AI分析失败，抛出错误
+      // 注意：tarot 测试的 AI 分析失败不应该阻止结果返回，因为基础解读仍然可用
+      const criticalAITestTypes = ['mbti', 'phq9', 'eq', 'happiness', 'disc', 'holland', 'leadership', 'love_language', 'love_style', 'interpersonal', 'vark'];
+      if (criticalAITestTypes.includes(testType) && aiAnalysisFailed) {
+        throw new ModuleError(
+          `AI analysis failed for ${testType}: ${aiError || 'Unknown error'}. Please try again.`,
+          ERROR_CODES.INTERNAL_ERROR,
+          500
+        );
+      }
+
+      // 添加 AI 分析状态信息到结果中
+      if (aiAnalysisFailed) {
+        result.aiAnalysisFailed = true;
+        result.aiError = aiError;
+      } else if (aiAnalysis) {
+        result.aiAnalysisFailed = false;
       }
 
       // 添加testType字段到结果中
