@@ -37,8 +37,18 @@ export async function onRequest(context) {
       }
     }
 
-    // 如果 ASSETS API 不可用或返回 404，则交给 Cloudflare 默认处理
-    return next();
+    const response = await next();
+    const contentType = response.headers.get('content-type') || '';
+    if (response.status === 404 || (contentType.includes('text/html') && pathname !== '/index.html')) {
+      return new Response('Not Found', {
+        status: 404,
+        headers: {
+          'Content-Type': 'text/plain',
+        }
+      });
+    }
+
+    return response;
   }
 
   // 🔥 HTTP 到 HTTPS 重定向（仅在生产环境）
