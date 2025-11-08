@@ -22,23 +22,22 @@ export async function onRequest(context) {
 
   // Check if the request is for a static file
   const isStaticFile = 
-    // Check static paths (must be exact prefix match)
     staticPaths.some(path => pathname.startsWith(path)) ||
-    // Check file extensions (must end with extension)
     staticExtensions.some(ext => pathname.endsWith(ext)) ||
-    // Check exact static files
     staticFiles.includes(pathname) ||
-    // Check static file prefixes
     staticFilePrefixes.some(prefix => pathname.startsWith(prefix));
 
-  // If it's a static file, immediately return without processing
-  // 🔥 关键：如果静态文件请求到达这里，说明 _routes.json 没有正确排除
-  // 我们应该立即返回，让 Cloudflare Pages 的静态文件服务处理
-  // 不要调用 next()，因为那可能会路由到 index.html
+  // If it's a static file, use ASSETS API to fetch it directly
+  // 🔥 关键修复：使用 env.ASSETS 直接获取静态资源，避免被路由到 index.html
   if (isStaticFile) {
-    // 直接返回，让 Cloudflare Pages 的静态文件服务处理
-    // 如果文件不存在，Cloudflare Pages 会返回 404
-    // 这样避免了被错误路由到 index.html
+    if (env && env.ASSETS) {
+      const assetResponse = await env.ASSETS.fetch(request);
+      if (assetResponse && assetResponse.status !== 404) {
+        return assetResponse;
+      }
+    }
+
+    // 如果 ASSETS API 不可用或返回 404，则交给 Cloudflare 默认处理
     return next();
   }
 
@@ -171,12 +170,24 @@ export async function onRequest(context) {
   // This ensures that all routes work correctly when refreshed
   // 🔥 重要：只有非静态文件的 404 才返回 index.html
   try {
-    // Fetch index.html from the static files
+    if (env && env.ASSETS) {
+      const indexResponse = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
+      if (indexResponse && indexResponse.status === 200) {
+        return new Response(indexResponse.body, {
+          status: 200,
+          statusText: 'OK',
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'public, max-age=0, must-revalidate',
+          },
+        });
+      }
+    }
+
     const indexUrl = new URL('/index.html', request.url);
     const indexResponse = await fetch(indexUrl);
     
     if (indexResponse.ok) {
-      // Return index.html with original URL preserved (for client-side routing)
       return new Response(indexResponse.body, {
         status: 200,
         statusText: 'OK',
