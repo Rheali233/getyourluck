@@ -129,6 +129,7 @@ export async function onRequest(context) {
 
   // If it's a static file, let it pass through to Cloudflare Pages static hosting
   // 🔥 关键：不经过任何处理，直接返回静态文件
+  // 🔥 修复：确保静态文件请求不会被中间件拦截，直接调用 next() 让 Cloudflare Pages 处理
   if (isStaticFile) {
     return next();
   }
@@ -143,6 +144,7 @@ export async function onRequest(context) {
 
   // For 404 or any other status, return index.html for SPA routing
   // This ensures that all routes work correctly when refreshed
+  // 🔥 重要：只有非静态文件的 404 才返回 index.html
   try {
     // Fetch index.html from the static files
     const indexUrl = new URL('/index.html', request.url);
