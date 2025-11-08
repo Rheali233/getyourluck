@@ -34,7 +34,8 @@
     "/robots.txt",
     "/sitemap.xml",
     "/sw.js",
-    "/_routes.json"
+    "/_routes.json",
+    "/index.html"
   ]
 }
 
