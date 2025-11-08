@@ -239,7 +239,13 @@ export const ZiWeiResultPage: React.FC = () => {
             {/* Star Chart - 参照BaZi Chart布局 */}
             <div className="mb-8">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                {analysisResult.starAnalysis.mainStars && Object.entries(analysisResult.starAnalysis.mainStars).map(([palace, stars]) => {
+                {analysisResult.starAnalysis.mainStars && Object.entries(analysisResult.starAnalysis.mainStars)
+                  .filter(([palace]) => {
+                    // 只显示预定义的宫殿，不使用默认值
+                    const validPalaces = ['life', 'wealth', 'career', 'marriage'];
+                    return validPalaces.includes(palace);
+                  })
+                  .map(([palace, stars]) => {
                   const palaceNames: { [key: string]: { name: string; icon: string } } = {
                     life: { name: 'Life Palace', icon: '👑' },
                     wealth: { name: 'Wealth Palace', icon: '💰' },
@@ -247,7 +253,8 @@ export const ZiWeiResultPage: React.FC = () => {
                     marriage: { name: 'Marriage Palace', icon: '💕' }
                   };
                   
-                  const palaceInfo = palaceNames[palace] || { name: `${palace.charAt(0).toUpperCase() + palace.slice(1)} Palace`, icon: '⭐' };
+                  const palaceInfo = palaceNames[palace];
+                  if (!palaceInfo) return null; // 如果不在预定义列表中，不显示
                   
                   return (
                     <div key={palace} className="bg-red-50 rounded-lg p-6 text-center border border-red-200">

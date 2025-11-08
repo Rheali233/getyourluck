@@ -6,13 +6,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NumerologyTestContainer } from './NumerologyTestContainer';
-import { Card, Button, DateInput, TimeInput, Breadcrumb } from '@/components/ui';
+import { Card, Button, DateInput, TimeInput, Breadcrumb, Modal, Input } from '@/components/ui';
 import { useNumerologyStore } from '../stores/useNumerologyStore';
 import { getBreadcrumbConfig } from '@/utils/breadcrumbConfig';
 
 export const ZiWeiAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
-  const { processNumerologyData, isLoading, error, showResults, analysisResult, clearNumerologySession } = useNumerologyStore();
+  const { processNumerologyData, isLoading, error, showResults, analysisResult, clearNumerologySession, clearError } = useNumerologyStore();
+  
+  // 错误弹窗状态（参照 BaZiAnalysisPage）
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbackEmail, setFeedbackEmail] = useState('');
+  const [feedbackMessage, setFeedbackMessage] = useState('Failed to get AI analysis results for the ZiWei test');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -32,12 +40,42 @@ export const ZiWeiAnalysisPage: React.FC = () => {
     clearNumerologySession();
   }, []);
 
-  // 监听结果加载完成，只有当有ZiWei分析数据时才跳转到结果页面
+  // 当有错误且不在 loading 状态时，显示错误弹窗（参照 BaZiAnalysisPage）
   useEffect(() => {
-    if (showResults && analysisResult?.ziWeiChart) {
+    if (!error || isLoading) {
+      setShowErrorModal(false);
+      return;
+    }
+    
+    // 检查是否是 AI 分析错误
+    const isAIAnalysisError = (
+      error.toLowerCase().includes('ai analysis') ||
+      error.toLowerCase().includes('ai service') ||
+      error.toLowerCase().includes('analysis failed') ||
+      error.toLowerCase().includes('failed to parse') ||
+      error.toLowerCase().includes('ai analysis is required') ||
+      error.toLowerCase().includes('numerology analysis failed') ||
+      error.toLowerCase().includes('test result analysis failed') ||
+      error.toLowerCase().includes('network connection lost') ||
+      error.toLowerCase().includes('timeout') ||
+      error.toLowerCase().includes('service unavailable') ||
+      error.toLowerCase().includes('503')
+    );
+    
+    // 如果是 AI 分析错误，显示错误弹窗
+    if (isAIAnalysisError || !showResults) {
+      setShowErrorModal(true);
+    } else {
+      setShowErrorModal(false);
+    }
+  }, [error, isLoading, showResults]);
+
+  // 监听结果加载完成，只有当有ZiWei分析数据且没有错误时才跳转到结果页面
+  useEffect(() => {
+    if (showResults && analysisResult?.ziWeiChart && !error) {
       navigate('/tests/numerology/ziwei/result');
     }
-  }, [showResults, analysisResult, navigate]);
+  }, [showResults, analysisResult, error, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,13 +84,49 @@ export const ZiWeiAnalysisPage: React.FC = () => {
       return;
     }
 
-    await processNumerologyData('ziwei', {
-      fullName: formData.fullName,
-      birthDate: formData.birthDate,
-      birthTime: formData.birthTime,
-      gender: formData.gender,
-      calendarType: formData.calendarType
-    });
+    try {
+      // 清除之前的错误
+      clearError();
+      setShowErrorModal(false);
+      
+      await processNumerologyData('ziwei', {
+        fullName: formData.fullName,
+        birthDate: formData.birthDate,
+        birthTime: formData.birthTime,
+        gender: formData.gender,
+        calendarType: formData.calendarType
+      });
+      // 导航通过 useEffect 自动处理
+    } catch (error) {
+      // Error handling is done in the store
+    }
+  };
+  
+  // 处理重试提交（参照 BaZiAnalysisPage）
+  const handleRetrySubmit = async () => {
+    setShowErrorModal(false);
+    setShowFeedbackForm(false);
+    clearError();
+    // 重新提交
+    await handleSubmit(new Event('submit') as any);
+  };
+  
+  // 处理反馈提交（参照 BaZiAnalysisPage）
+  const handleSubmitFeedback = async () => {
+    if (!feedbackEmail || !feedbackMessage) {
+      return;
+    }
+    
+    setIsSubmittingFeedback(true);
+    try {
+      // 这里可以调用反馈 API
+      // await feedbackService.submitFeedback({ email: feedbackEmail, message: feedbackMessage });
+      setFeedbackSubmitted(true);
+    } catch (error) {
+      // Handle feedback submission error
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
   };
 
   return (
@@ -218,13 +292,6 @@ export const ZiWeiAnalysisPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Error Display */}
-          {error && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
-              <p className="text-red-800">{error}</p>
-            </div>
-          )}
-
           {/* Action Buttons */}
           <div className="flex justify-center">
             <Button
@@ -237,6 +304,158 @@ export const ZiWeiAnalysisPage: React.FC = () => {
           </div>
         </form>
       </div>
+      
+      {/* AI分析失败错误弹窗（参照 BaZiAnalysisPage） */}
+      <Modal
+        isOpen={showErrorModal}
+        onClose={() => {
+          setShowErrorModal(false);
+          setShowFeedbackForm(false);
+          setFeedbackSubmitted(false);
+          setFeedbackEmail('');
+          setFeedbackMessage('Failed to get AI analysis results for the ZiWei test');
+        }}
+        title={showFeedbackForm ? "Report Issue" : "Analysis Temporarily Unavailable"}
+        size="medium"
+        closeOnOverlayClick={false}
+      >
+        {!showFeedbackForm ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">⚠️</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                AI Analysis Temporarily Unavailable
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">
+                We encountered an issue while generating your AI-powered analysis. Your input data has been saved, and you can try submitting again.
+              </p>
+              <p className="text-sm text-gray-500 mb-4">
+                If this problem persists, please contact us at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a> or report the issue using the form below.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleRetrySubmit}
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Retrying...' : 'Try Again'}
+              </Button>
+              <Button
+                onClick={() => setShowFeedbackForm(true)}
+                variant="outline"
+                className="flex-1 border-red-300 text-red-700 hover:bg-red-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Report Issue
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowErrorModal(false);
+                  clearNumerologySession();
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Start Over
+              </Button>
+            </div>
+          </div>
+        ) : feedbackSubmitted ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-3xl">✓</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Thank You for Your Feedback
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                We've received your report and will look into this issue. You can also reach us directly at <a href="mailto:support@selfatlas.net" className="text-blue-600 hover:underline">support@selfatlas.net</a>.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleRetrySubmit}
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Retrying...' : 'Try Again'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowErrorModal(false);
+                  clearNumerologySession();
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Start Over
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Help Us Improve
+              </h3>
+              <p className="text-sm text-gray-600">
+                Please provide your email and describe the issue you encountered. This will help us fix the problem quickly.
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="email"
+                value={feedbackEmail}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFeedbackEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Issue Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={feedbackMessage}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFeedbackMessage(e.target.value)}
+                placeholder="Describe the issue you encountered..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                rows={4}
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <Button
+                onClick={handleSubmitFeedback}
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+                disabled={isSubmittingFeedback || !feedbackEmail || !feedbackMessage}
+              >
+                {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowFeedbackForm(false);
+                  setFeedbackEmail('');
+                  setFeedbackMessage('Failed to get AI analysis results for the ZiWei test');
+                }}
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </NumerologyTestContainer>
   );
 };
