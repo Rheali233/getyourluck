@@ -13,10 +13,11 @@ export async function onRequest(context) {
   const pathname = url.pathname;
 
   // 🔥 关键修复：首先检查静态文件，确保静态资源不被中间件处理
-  // List of static file paths (must start with these paths)
+  // 如果 _routes.json 配置正确，这些请求不应该到达中间件
+  // 但为了安全起见，我们在这里也进行检查
   const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/scripts/'];
   const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot', '.json', '.xml', '.txt', '.map'];
-  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json'];
+  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json', '/index.html'];
   const staticFilePrefixes = ['/favicon', '/apple-touch-icon'];
 
   // Check if the request is for a static file
@@ -30,10 +31,13 @@ export async function onRequest(context) {
     // Check static file prefixes
     staticFilePrefixes.some(prefix => pathname.startsWith(prefix));
 
-  // If it's a static file, let it pass through to Cloudflare Pages static hosting
+  // If it's a static file, immediately pass through without any processing
   // 🔥 关键：静态文件必须最先处理，直接返回，不经过任何中间件逻辑
-  // 使用 next() 让 Cloudflare Pages 的静态文件服务处理这些请求
+  // 如果静态文件请求到达这里，说明 _routes.json 可能没有正确排除
+  // 但我们仍然需要确保它们能够正确返回
   if (isStaticFile) {
+    // 直接调用 next() 让 Cloudflare Pages 的静态文件服务处理
+    // 不要做任何额外的处理，确保静态资源能够正确返回
     return next();
   }
 
@@ -148,7 +152,21 @@ export async function onRequest(context) {
     return response;
   }
 
-  // For 404 or any other status, return index.html for SPA routing
+  // For 404 or any other status, check if this is a static resource request
+  // 🔥 关键修复：静态资源请求如果返回 404，应该直接返回 404，而不是 index.html
+  // 这样可以避免静态资源被错误地返回为 HTML，导致 MIME 类型错误
+  const isStaticResourceRequest = 
+    staticPaths.some(path => pathname.startsWith(path)) ||
+    staticExtensions.some(ext => pathname.endsWith(ext)) ||
+    staticFiles.includes(pathname) ||
+    staticFilePrefixes.some(prefix => pathname.startsWith(prefix));
+
+  // 如果是静态资源请求且返回 404，直接返回 404，不要返回 index.html
+  if (isStaticResourceRequest && response.status === 404) {
+    return response;
+  }
+
+  // For non-static resource 404s, return index.html for SPA routing
   // This ensures that all routes work correctly when refreshed
   // 🔥 重要：只有非静态文件的 404 才返回 index.html
   try {
