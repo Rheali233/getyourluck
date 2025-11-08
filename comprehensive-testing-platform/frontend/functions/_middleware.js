@@ -12,6 +12,23 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
+  // 🔥 关键修复：首先检查静态文件，确保静态资源不被中间件处理
+  // List of static file extensions and paths
+  const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/favicon', '/apple-touch-icon'];
+  const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot', '.json', '.xml', '.txt', '.map'];
+  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json', '/index.html'];
+
+  // Check if the request is for a static file
+  const isStaticFile = staticPaths.some(path => pathname.startsWith(path)) ||
+                       staticExtensions.some(ext => pathname.endsWith(ext)) ||
+                       staticFiles.includes(pathname);
+
+  // If it's a static file, let it pass through to Cloudflare Pages static hosting
+  // 🔥 关键：静态文件必须最先处理，直接返回，不经过任何中间件逻辑
+  if (isStaticFile) {
+    return next();
+  }
+
   // 🔥 HTTP 到 HTTPS 重定向（仅在生产环境）
   if (url.protocol === 'http:' && (url.hostname === 'selfatlas.net' || url.hostname === 'www.selfatlas.net')) {
     url.protocol = 'https:';
@@ -113,25 +130,6 @@ export async function onRequest(context) {
         },
       });
     }
-  }
-
-  // List of static file extensions and paths
-  // 🔥 关键修复：优先检查路径前缀，确保所有静态资源都被正确识别
-  const staticPaths = ['/assets/', '/css/', '/js/', '/images/', '/favicon', '/apple-touch-icon'];
-  const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.woff', '.woff2', '.ttf', '.eot', '.json', '.xml', '.txt', '.map'];
-  const staticFiles = ['/robots.txt', '/sitemap.xml', '/sw.js', '/_routes.json', '/index.html'];
-
-  // Check if the request is for a static file
-  // 优先级：路径前缀 > 文件扩展名 > 特定文件
-  const isStaticFile = staticPaths.some(path => pathname.startsWith(path)) ||
-                       staticExtensions.some(ext => pathname.endsWith(ext)) ||
-                       staticFiles.includes(pathname);
-
-  // If it's a static file, let it pass through to Cloudflare Pages static hosting
-  // 🔥 关键：不经过任何处理，直接返回静态文件
-  // 🔥 修复：确保静态文件请求不会被中间件拦截，直接调用 next() 让 Cloudflare Pages 处理
-  if (isStaticFile) {
-    return next();
   }
 
   // For all other requests (SPA routes), try to get the requested resource first
