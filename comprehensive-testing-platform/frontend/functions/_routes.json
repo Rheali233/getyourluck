@@ -17,7 +17,6 @@
     "/robots.txt",
     "/sitemap.xml",
     "/sw.js",
-    "/_routes.json",
     "/*.js",
     "/*.css",
     "/*.png",
@@ -37,4 +36,3 @@
     "/*.map"
   ]
 }
-

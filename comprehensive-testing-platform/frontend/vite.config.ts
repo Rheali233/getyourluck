@@ -15,10 +15,6 @@ export default defineConfig({
           dest: 'scripts'
         },
         {
-          src: 'public/_routes.json',
-          dest: '.'
-        },
-        {
           src: 'functions/_middleware.js',
           dest: 'functions'
         },
@@ -57,23 +53,9 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false, // 生产环境关闭sourcemap以减小bundle大小
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // 生产环境移除console.log
-        drop_debugger: true, // 移除debugger
-        pure_funcs: ['console.log', 'console.info', 'console.debug'], // 移除特定console函数
-        passes: 1, // 减少压缩次数以避免初始化顺序问题
-        hoist_funs: false, // 禁用函数提升以避免初始化问题
-        hoist_vars: false, // 禁用变量提升以避免初始化问题
-      },
-      mangle: {
-        safari10: true, // 兼容Safari 10
-        properties: false, // 不混淆属性名
-        keep_classnames: true, // 保留类名
-        keep_fnames: true, // 保留函数名
-      },
-    },
+    minify: 'esbuild', // 改用 esbuild，更安全且更快
+    target: 'esnext',
+    terserOptions: undefined, // esbuild 不使用 terserOptions
     rollupOptions: {
       output: {
         manualChunks: {
@@ -102,36 +84,43 @@ export default defineConfig({
             './src/modules/career/components/DISCResultDisplay.tsx',
             './src/modules/career/components/LeadershipResultDisplay.tsx'
           ],
-          astrology: [
-            './src/modules/astrology/components/AstrologyHomePage.tsx',
-            './src/modules/astrology/components/FortuneTestPage.tsx',
-            './src/modules/astrology/components/CompatibilityTestPage.tsx',
-            './src/modules/astrology/components/BirthChartTestPage.tsx'
-          ],
-                 tarot: [
-                   './src/modules/tarot/components/TarotHomePage.tsx',
-                   './src/modules/tarot/components/CardDrawingPage.tsx',
-                   './src/modules/tarot/components/RecommendationPage.tsx',
-                   './src/modules/tarot/components/ReadingResultPage.tsx',
-                   './src/modules/tarot/components/LazyTarotCardImage.tsx'
-                 ],
-                 // 塔罗牌数据文件单独分割
-                 'tarot-data': [
-                   './src/modules/tarot/data/tarotCards.ts',
-                   './src/modules/tarot/data/tarotSpreads.ts'
-                 ],
-                 // 塔罗牌服务文件
-                 'tarot-services': [
-                   './src/modules/tarot/services/tarotService.ts',
-                   './src/modules/tarot/services/tarotDataLoader.ts'
-                 ],
-          numerology: [
-            './src/modules/numerology/components/NumerologyHomePage.tsx',
-            './src/modules/numerology/components/BaZiAnalysisPage.tsx',
-            './src/modules/numerology/components/ZodiacAnalysisPage.tsx',
-            './src/modules/numerology/components/NameAnalysisPage.tsx',
-            './src/modules/numerology/components/ZiWeiAnalysisPage.tsx'
-          ],
+          // Astrology 模块 - 移除 manualChunks，让 vite 自动处理依赖顺序
+          // astrology: [
+          //   './src/modules/astrology/AstrologyModule.tsx',
+          //   './src/modules/astrology/components/AstrologyHomePage.tsx',
+          //   './src/modules/astrology/components/FortuneTestPage.tsx',
+          //   './src/modules/astrology/components/CompatibilityTestPage.tsx',
+          //   './src/modules/astrology/components/BirthChartTestPage.tsx',
+          //   './src/modules/astrology/components/AstrologyTestContainer.tsx',
+          //   './src/modules/astrology/stores/useAstrologyStore.ts',
+          //   './src/modules/astrology/services/astrologyService.ts'
+          // ],
+                 // Tarot 模块 - 移除 manualChunks，让 vite 自动处理依赖顺序
+                 // tarot: [
+                 //   './src/modules/tarot/components/TarotHomePage.tsx',
+                 //   './src/modules/tarot/components/CardDrawingPage.tsx',
+                 //   './src/modules/tarot/components/RecommendationPage.tsx',
+                 //   './src/modules/tarot/components/ReadingResultPage.tsx',
+                 //   './src/modules/tarot/components/LazyTarotCardImage.tsx'
+                 // ],
+                 // // 塔罗牌数据文件单独分割
+                 // 'tarot-data': [
+                 //   './src/modules/tarot/data/tarotCards.ts',
+                 //   './src/modules/tarot/data/tarotSpreads.ts'
+                 // ],
+                 // // 塔罗牌服务文件
+                 // 'tarot-services': [
+                 //   './src/modules/tarot/services/tarotService.ts',
+                 //   './src/modules/tarot/services/tarotDataLoader.ts'
+                 // ],
+          // Numerology 模块 - 移除 manualChunks，让 vite 自动处理依赖顺序
+          // numerology: [
+          //   './src/modules/numerology/components/NumerologyHomePage.tsx',
+          //   './src/modules/numerology/components/BaZiAnalysisPage.tsx',
+          //   './src/modules/numerology/components/ZodiacAnalysisPage.tsx',
+          //   './src/modules/numerology/components/NameAnalysisPage.tsx',
+          //   './src/modules/numerology/components/ZiWeiAnalysisPage.tsx'
+          // ],
           learning: [
             './src/modules/learning-ability/components/LearningAbilityHomePage.tsx',
             './src/modules/learning-ability/components/LearningGenericTestPage.tsx'
@@ -168,7 +157,6 @@ export default defineConfig({
     },
     // 优化构建性能
     chunkSizeWarningLimit: 1000, // 增加chunk大小警告阈值
-    target: 'esnext', // 使用最新的ES特性
     cssCodeSplit: true, // 启用CSS代码分割
     assetsInlineLimit: 4096, // 小于4KB的资源内联
   },
