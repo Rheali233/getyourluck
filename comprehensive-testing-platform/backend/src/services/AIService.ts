@@ -131,111 +131,86 @@ export class AIService {
         console.warn(`[AI Debug] Low remaining time for response reading: ${remainingTime}ms`);
       }
 
-      // 重要：在读取之前先克隆 response，避免流锁定问题
-      // 这样如果一种方法失败，可以使用克隆的 response 尝试另一种方法
-      const clonedResponseForFallback = response.clone();
-      
+      // 由于 content-length=null 可能导致 response.json() 挂起，直接使用 arrayBuffer() 方法
+      // arrayBuffer() 方法更可靠，可以设置超时保护
       let data: any;
-      let readMethod = 'unknown';
       const readStartTime = Date.now();
       
       try {
-        // 方法1: 尝试直接使用 response.json()
-        // 不使用 Promise.race，因为这会干扰流的读取
-        // 如果超时，Worker 本身会终止，我们无法恢复
-        try {
-          // eslint-disable-next-line no-console
-          console.log('[AI Debug] Attempting to read response body using response.json()');
-          
-          // 直接读取，不使用超时包装（因为 Worker 本身有超时限制）
-          data = await response.json();
-          
-          const readTime = Date.now() - readStartTime;
-          readMethod = 'response.json()';
-          
-          // eslint-disable-next-line no-console
-          console.log(`[AI Debug] Successfully parsed response using ${readMethod} in ${readTime}ms`);
-          
-          // 验证响应数据
-          if (!data) {
-            throw new Error('Empty response data after parsing');
-          }
-          
-          // eslint-disable-next-line no-console
-          console.log('[AI Debug] Response keys:', Object.keys(data));
-          
-          // 检查是否有 choices 字段
-          if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
-            // eslint-disable-next-line no-console
-            console.error('[AI Debug] Missing or empty choices array in response');
-            // eslint-disable-next-line no-console
-            console.error('[AI Debug] Response structure:', JSON.stringify(data).substring(0, 500));
-            throw new Error('Invalid response structure: missing choices array');
-          }
-          
-        } catch (jsonError) {
-          // eslint-disable-next-line no-console
-          console.log('[AI Debug] response.json() failed, trying arrayBuffer() method');
-          // eslint-disable-next-line no-console
-          console.log('[AI Debug] JSON parse error:', jsonError instanceof Error ? jsonError.message : String(jsonError));
-          
-          // 检查是否是流锁定错误
-          if (jsonError instanceof Error && jsonError.message.includes('locked')) {
-            // eslint-disable-next-line no-console
-            console.log('[AI Debug] Stream locked, using cloned response for fallback');
-          }
-          
-          // 方法2: 使用克隆的 response 读取 arrayBuffer
-          // 使用克隆的 response，避免流锁定问题
-          const arrayBufferStartTime = Date.now();
-          
-          try {
-            const arrayBuffer = await clonedResponseForFallback.arrayBuffer();
-            
-            const arrayBufferTime = Date.now() - arrayBufferStartTime;
-            readMethod = 'arrayBuffer()';
-            
-            // eslint-disable-next-line no-console
-            console.log(`[AI Debug] Response arrayBuffer read in ${arrayBufferTime}ms, size: ${arrayBuffer.byteLength} bytes`);
-            
-            if (arrayBuffer.byteLength === 0) {
-              throw new Error('Empty response body from AI service');
-            }
-            
-            // 将 ArrayBuffer 转换为文本
-            const decoder = new TextDecoder('utf-8');
-            const responseText = decoder.decode(arrayBuffer);
-            // eslint-disable-next-line no-console
-            console.log(`[AI Debug] Response text length: ${responseText.length} chars`);
-            
-            if (!responseText || responseText.trim().length === 0) {
-              throw new Error('Empty response text after decoding');
-            }
-            
-            // eslint-disable-next-line no-console
-            console.log('[AI Debug] Response text preview (first 200 chars):', responseText.substring(0, 200));
-            
-            data = JSON.parse(responseText);
-            
-            const totalReadTime = Date.now() - readStartTime;
-            // eslint-disable-next-line no-console
-            console.log(`[AI Debug] Successfully parsed response using ${readMethod} in ${totalReadTime}ms`);
-            
-            // 验证响应数据
-            if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
-              throw new Error('Invalid response structure: missing choices array');
-            }
-            
-          } catch (arrayBufferError) {
-            // eslint-disable-next-line no-console
-            console.error('[AI Debug] arrayBuffer() method also failed:', arrayBufferError);
-            throw jsonError; // 抛出原始错误
-          }
+        // eslint-disable-next-line no-console
+        console.log('[AI Debug] Reading response body using arrayBuffer() method');
+        
+        // 创建超时保护，确保在 Worker 超时前完成读取
+        const readTimeout = Math.max(10000, Math.min(remainingTime - 2000, 35000)); // 至少10秒，最多35秒，留2秒缓冲
+        // eslint-disable-next-line no-console
+        console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms`);
+        
+        const arrayBuffer = await Promise.race([
+          response.arrayBuffer(),
+          new Promise<ArrayBuffer>((_, reject) => {
+            setTimeout(() => {
+              reject(new Error(`Response body reading timeout after ${readTimeout}ms`));
+            }, readTimeout);
+          })
+        ]);
+        
+        const readTime = Date.now() - readStartTime;
+        // eslint-disable-next-line no-console
+        console.log(`[AI Debug] Response arrayBuffer read in ${readTime}ms, size: ${arrayBuffer.byteLength} bytes`);
+        
+        if (arrayBuffer.byteLength === 0) {
+          throw new Error('Empty response body from AI service');
         }
+        
+        // 将 ArrayBuffer 转换为文本
+        const decoder = new TextDecoder('utf-8');
+        const responseText = decoder.decode(arrayBuffer);
+        // eslint-disable-next-line no-console
+        console.log(`[AI Debug] Response text length: ${responseText.length} chars`);
+        
+        if (!responseText || responseText.trim().length === 0) {
+          throw new Error('Empty response text after decoding');
+        }
+        
+        // eslint-disable-next-line no-console
+        console.log('[AI Debug] Response text preview (first 200 chars):', responseText.substring(0, 200));
+        
+        // 解析 JSON
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          // eslint-disable-next-line no-console
+          console.error('[AI Debug] JSON parse error:', parseError);
+          // eslint-disable-next-line no-console
+          console.error('[AI Debug] Response text (first 500 chars):', responseText.substring(0, 500));
+          throw new Error(`Failed to parse response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+        }
+        
+        const totalReadTime = Date.now() - readStartTime;
+        // eslint-disable-next-line no-console
+        console.log(`[AI Debug] Successfully parsed response in ${totalReadTime}ms`);
+        
+        // 验证响应数据
+        if (!data) {
+          throw new Error('Empty response data after parsing');
+        }
+        
+        // eslint-disable-next-line no-console
+        console.log('[AI Debug] Response keys:', Object.keys(data));
+        
+        // 检查是否有 choices 字段
+        if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+          // eslint-disable-next-line no-console
+          console.error('[AI Debug] Missing or empty choices array in response');
+          // eslint-disable-next-line no-console
+          console.error('[AI Debug] Response structure:', JSON.stringify(data).substring(0, 500));
+          throw new Error('Invalid response structure: missing choices array');
+        }
+        
       } catch (parseError) {
         const totalReadTime = Date.now() - readStartTime;
         // eslint-disable-next-line no-console
-        console.error('[AI Debug] Failed to parse response:', parseError);
+        console.error('[AI Debug] Failed to read/parse response:', parseError);
         // eslint-disable-next-line no-console
         console.error('[AI Debug] Parse error details:', {
           name: parseError instanceof Error ? parseError.name : 'Unknown',
@@ -243,14 +218,8 @@ export class AIService {
           stack: parseError instanceof Error ? parseError.stack?.substring(0, 500) : 'No stack',
           fetchTime: fetchTime,
           readTime: totalReadTime,
-          remainingTime: remainingTime,
-          readMethod: readMethod
+          remainingTime: remainingTime
         });
-        
-        // 检查是否是流锁定错误
-        if (parseError instanceof Error && parseError.message.includes('locked')) {
-          throw new Error(`Response stream is locked. This may occur if the response body is too large or reading takes too long. Read time: ${totalReadTime}ms, Remaining time: ${remainingTime}ms`);
-        }
         
         // 检查是否是超时错误
         if (parseError instanceof Error && (
@@ -262,8 +231,12 @@ export class AIService {
         }
         
         // 检查是否是网络连接错误
-        if (parseError instanceof Error && parseError.message.includes('Network connection lost')) {
-          throw new Error(`Network connection lost while reading response body. This may be a Cloudflare Workers local development environment limitation. Please try deploying to staging/production or check your network connection.`);
+        if (parseError instanceof Error && (
+          parseError.message.includes('Network connection lost') ||
+          parseError.message.includes('ERR_CONNECTION_CLOSED') ||
+          parseError.message.includes('connection closed')
+        )) {
+          throw new Error(`Network connection lost while reading response body. The connection was closed before the response could be fully read. Read time: ${totalReadTime}ms`);
         }
         
         throw new Error(`Failed to parse AI response: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
