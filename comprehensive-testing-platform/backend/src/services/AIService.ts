@@ -142,7 +142,9 @@ export class AIService {
         
         // 创建超时保护，确保在 Worker 超时前完成读取
         // 对于流式传输，需要更长的超时时间，但不超过 Worker 限制
-        const readTimeout = Math.max(15000, Math.min(remainingTime - 3000, 40000)); // 至少15秒，最多40秒，留3秒缓冲
+        // 对于 numerology 类型（BaZi/ZiWei），响应体可能较大，需要更长的读取时间
+        // 但也要确保不超过 Worker 的总体超时限制
+        const readTimeout = Math.max(20000, Math.min(remainingTime - 5000, 35000)); // 至少20秒，最多35秒，留5秒缓冲
         // eslint-disable-next-line no-console
         console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms`);
         
@@ -1615,7 +1617,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 1200; // BaZi/ZiWei分析：详细schema需要更多tokens
+        maxTokens = 800; // BaZi/ZiWei分析：平衡内容详细度和响应时间
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -2075,9 +2077,10 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no extra text. St
     const analysisType = analysisData?.type || 'bazi';
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
-    // BaZi分析：使用详细schema，适当增加max_tokens以提供更丰富的内容
+    // BaZi分析：使用详细schema，但限制max_tokens以避免响应体读取超时
     // 包含完整的分析字段：baZiAnalysis、wealthAnalysis、relationshipAnalysis、healthAnalysis、fortuneAnalysis
-    const maxTokens = 1200; // 详细schema需要更多tokens，但保持在合理范围内
+    // 降低到 800 tokens 以确保响应体能在超时时间内读取完成
+    const maxTokens = 800; // 平衡内容详细度和响应时间
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
