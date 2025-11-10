@@ -1557,7 +1557,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 800; // BaZi/ZiWei分析：最小化schema后，800 tokens足够
+        maxTokens = 1000; // BaZi/ZiWei分析：简化schema后，1000 tokens足够
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -1940,11 +1940,13 @@ Return JSON (minimal schema for fast response):
     "baZiAnalysis": {
       "dayMasterStrength": {
         "strength": "weak/balanced/strong",
-        "description": "1 sentence"
+        "description": "1 sentence",
+        "recommendations": ["2 items"]
       },
       "favorableElements": {
         "useful": ["2 elements"],
-        "harmful": ["2 elements"]
+        "harmful": ["2 elements"],
+        "neutral": ["1-2 elements"]
       },
       "fiveElements": {
         "elements": {"metal": 2, "wood": 3, "water": 1, "fire": 2, "earth": 2},
@@ -1965,6 +1967,34 @@ Return JSON (minimal schema for fast response):
         "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3-5 words"}
       }
     },
+    "wealthAnalysis": {
+      "wealthLevel": "low/medium/high",
+      "wealthSource": ["2 items"],
+      "investmentAdvice": ["2 items"]
+    },
+    "relationshipAnalysis": {
+      "marriageTiming": "Brief (1 sentence)",
+      "partnerCharacteristics": "Brief description (1-2 sentences)",
+      "marriageAdvice": "Brief advice (1-2 sentences)"
+    },
+    "healthAnalysis": {
+      "overallHealth": "good/fair/poor",
+      "weakAreas": ["2 items"],
+      "beneficialActivities": ["2 items"]
+    },
+    "fortuneAnalysis": {
+      "currentYear": {
+        "year": 2024,
+        "overall": 7,
+        "career": 7,
+        "wealth": 6,
+        "health": 7,
+        "relationships": 8,
+        "overallDescription": "1-2 sentences",
+        "keyEvents": ["2 items"],
+        "advice": ["2 items"]
+      }
+    },
     "luckyElements": {
       "colors": ["2 colors"],
       "numbers": [1, 3],
@@ -1973,7 +2003,7 @@ Return JSON (minimal schema for fast response):
   }
 }
 
-Focus ONLY on core: Four Pillars, Five Elements, Day Master, Ten Gods. Keep ALL text very brief. tenGods meanings: 3-5 words max. English only. Element format: "Stem over Branch". Return valid JSON only.`;
+Focus on core: Four Pillars, Five Elements, Day Master, Ten Gods. Keep ALL text brief. tenGods meanings: 3-5 words max. English only. Element format: "Stem over Branch". Return valid JSON only.`;
   }
 
   async analyzeNumerology(analysisData: any): Promise<any> {
@@ -1981,10 +2011,9 @@ Focus ONLY on core: Four Pillars, Five Elements, Day Master, Ten Gods. Keep ALL 
     const analysisType = analysisData?.type || 'bazi';
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
-    // BaZi分析：使用最小化schema，大幅降低max_tokens以确保快速响应
-    // 移除了wealthAnalysis、relationshipAnalysis、healthAnalysis、fortuneAnalysis等非核心字段
-    // 只保留核心的baZiAnalysis和基础信息
-    const maxTokens = 800; // 最小化schema后，800 tokens足够返回核心分析
+    // BaZi分析：使用简化schema，降低max_tokens以确保快速响应
+    // 保留了核心字段但简化了内容，确保前端兼容性
+    const maxTokens = 1000; // 简化schema后，1000 tokens足够返回核心分析
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
@@ -2692,10 +2721,18 @@ Return JSON (minimal schema for fast response):
         "marriage": {"mainStars": ["Ju Men"], "element": "Metal", "meaning": "Brief"},
         "siblings": {"mainStars": ["Po Jun"], "element": "Wood", "meaning": "Brief"}
       },
-      "lifePalace": "Brief (1-2 sentences)",
-      "careerPalace": "Brief (1-2 sentences)",
-      "wealthPalace": "Brief (1-2 sentences)",
-      "marriagePalace": "Brief (1-2 sentences)"
+      "lifePalace": "Brief analysis (2-3 sentences)",
+      "parentsPalace": "Brief analysis (2-3 sentences)",
+      "fortunePalace": "Brief analysis (2-3 sentences)",
+      "propertyPalace": "Brief analysis (2-3 sentences)",
+      "careerPalace": "Brief analysis (2-3 sentences)",
+      "friendsPalace": "Brief analysis (2-3 sentences)",
+      "travelPalace": "Brief analysis (2-3 sentences)",
+      "healthPalace": "Brief analysis (2-3 sentences)",
+      "wealthPalace": "Brief analysis (2-3 sentences)",
+      "childrenPalace": "Brief analysis (2-3 sentences)",
+      "marriagePalace": "Brief analysis (2-3 sentences)",
+      "siblingsPalace": "Brief analysis (2-3 sentences)"
     },
     "personalityTraits": ["2-3 items"],
     "careerGuidance": ["2 items"],
@@ -2708,7 +2745,7 @@ Return JSON (minimal schema for fast response):
   }
 }
 
-Focus on core: 12 palaces with main stars, life/career/wealth/marriage palaces. Keep ALL text very brief (1-2 sentences max). Use pinyin names only. English only. Return valid JSON only.`;
+Focus on core: ALL 12 palaces with main stars. Provide brief analysis (2-3 sentences) for each palace. Use pinyin names only. English only. Return valid JSON only.`;
   }
 
   /**
