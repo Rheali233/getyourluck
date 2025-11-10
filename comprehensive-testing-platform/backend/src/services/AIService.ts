@@ -137,15 +137,16 @@ export class AIService {
       const readStartTime = Date.now();
       
       try {
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
         console.log('[AI Debug] Reading response body using response.text() method');
         
         // 创建超时保护，确保在 Worker 超时前完成读取
         // 对于流式传输，需要更长的超时时间，但不超过 Worker 限制
-        // 对于 numerology 类型（BaZi/ZiWei），响应体可能较大，需要更长的读取时间
+        // 对于 VARK 和 numerology 类型，响应体可能较大，需要更长的读取时间
         // 但也要确保不超过 Worker 的总体超时限制
-        const readTimeout = Math.max(20000, Math.min(remainingTime - 5000, 35000)); // 至少20秒，最多35秒，留5秒缓冲
-        // eslint-disable-next-line no-console
+        // 对于 VARK，由于 max_tokens=5000，响应可能很大，需要更长的读取时间
+        const readTimeout = Math.max(30000, Math.min(remainingTime - 5000, 45000)); // 至少30秒，最多45秒，留5秒缓冲（VARK需要更长时间）
+          // eslint-disable-next-line no-console
         console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms`);
         
         // 使用 response.text() 而不是 arrayBuffer()，可能对流式传输更友好
@@ -159,14 +160,14 @@ export class AIService {
         ]);
         
         const readTime = Date.now() - readStartTime;
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
         console.log(`[AI Debug] Response text read in ${readTime}ms, length: ${responseText.length} chars`);
         
         if (!responseText || responseText.trim().length === 0) {
           throw new Error('Empty response text from AI service');
         }
         
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
         console.log('[AI Debug] Response text preview (first 200 chars):', responseText.substring(0, 200));
         
         // 解析 JSON
@@ -183,15 +184,15 @@ export class AIService {
         }
         
         const totalReadTime = Date.now() - readStartTime;
-        // eslint-disable-next-line no-console
+          // eslint-disable-next-line no-console
         console.log(`[AI Debug] Successfully parsed response in ${totalReadTime}ms`);
-        
+          
         // 验证响应数据
         if (!data) {
           throw new Error('Empty response data after parsing');
-        }
-        
-        // eslint-disable-next-line no-console
+          }
+          
+          // eslint-disable-next-line no-console
         console.log('[AI Debug] Response keys:', Object.keys(data));
         
         // 检查是否有 choices 字段
@@ -492,7 +493,8 @@ export class AIService {
     const context: TestContext = { testType: 'vark' };
     const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'vark');
     // VARK分析：增加max_tokens以确保完整响应（包含所有4个维度的分析）
-    const customTimeout = 30000;
+    // 增加超时时间以应对大响应体的读取
+    const customTimeout = 60000; // 60秒超时，给响应体读取更多时间
     const maxTokens = 5000; // 增加max_tokens以确保完整响应
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
     return this.parseVARKResponse(response);
@@ -2805,7 +2807,7 @@ Keep it concise but meaningful, focusing on the most important insights.`;
         
         // 如果所有修复尝试都失败，抛出错误
         if (!parsed) {
-          throw new Error(`Failed to parse AI response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+        throw new Error(`Failed to parse AI response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
         }
       }
       
@@ -3133,7 +3135,7 @@ Return JSON (minimal schema for fast response):
     "personalityTraits": ["2-3 items"],
     "careerGuidance": ["2 items"],
     "relationshipAdvice": ["2 items"],
-    "luckyElements": {
+        "luckyElements": {
       "colors": ["2 colors"],
       "numbers": [1, 3],
       "directions": ["2 directions"]
