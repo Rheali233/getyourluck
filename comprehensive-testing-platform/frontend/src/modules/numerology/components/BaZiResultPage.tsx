@@ -418,31 +418,37 @@ export const BaZiResultPage: React.FC = () => {
                   )}
 
                   {/* Wealth Analysis 子模块 */}
-                  {analysisResult.wealthAnalysis && (
+                  {analysisResult.wealthAnalysis && (analysisResult.wealthAnalysis.wealthLevel || (safeWealthAnalysis.wealthSource && safeWealthAnalysis.wealthSource.length > 0) || (safeWealthAnalysis.investmentAdvice && safeWealthAnalysis.investmentAdvice.length > 0)) && (
                     <div className="h-full flex flex-col">
                       <h5 className="text-lg font-bold text-gray-900 mb-3">{UI_TEXT.numerology.bazi.resultPage.wealthAnalysisTitle}</h5>
                       <div className="bg-red-50 rounded-lg p-6 border border-red-200 flex-1">
                         <div className="space-y-4">
-                          <div>
-                            <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthLevel}</h6>
-                            <p className="text-gray-700 text-sm capitalize">{analysisResult.wealthAnalysis.wealthLevel.replace('_', ' ')}</p>
-                          </div>
-                          <div>
-                            <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthSources}</h6>
-                            <div className="space-y-1">
-                              {(safeWealthAnalysis.wealthSource || []).map((source: any, index: number) => (
-                                <p key={index} className="text-gray-700 text-sm">• {source}</p>
-                              ))}
+                          {analysisResult.wealthAnalysis.wealthLevel && (
+                            <div>
+                              <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthLevel}</h6>
+                              <p className="text-gray-700 text-sm capitalize">{String(analysisResult.wealthAnalysis.wealthLevel).replace('_', ' ')}</p>
                             </div>
-                          </div>
-                          <div>
-                            <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.investmentAdvice}</h6>
-                            <div className="space-y-1">
-                              {(safeWealthAnalysis.investmentAdvice || []).map((advice: any, index: number) => (
-                                <p key={index} className="text-gray-700 text-sm">• {advice}</p>
-                              ))}
+                          )}
+                          {safeWealthAnalysis.wealthSource && safeWealthAnalysis.wealthSource.length > 0 && (
+                            <div>
+                              <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthSources}</h6>
+                              <div className="space-y-1">
+                                {safeWealthAnalysis.wealthSource.map((source: any, index: number) => (
+                                  <p key={index} className="text-gray-700 text-sm">• {source}</p>
+                                ))}
+                              </div>
                             </div>
-                          </div>
+                          )}
+                          {safeWealthAnalysis.investmentAdvice && safeWealthAnalysis.investmentAdvice.length > 0 && (
+                            <div>
+                              <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.investmentAdvice}</h6>
+                              <div className="space-y-1">
+                                {safeWealthAnalysis.investmentAdvice.map((advice: any, index: number) => (
+                                  <p key={index} className="text-gray-700 text-sm">• {advice}</p>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
