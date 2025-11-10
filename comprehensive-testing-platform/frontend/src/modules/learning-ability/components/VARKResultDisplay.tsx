@@ -16,36 +16,8 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
   result,
   onShare
 }) => {
-  // 验证结果是否有效（AI分析失败时不应该到达这里，但作为安全措施）
-  // 参照MBTI：检查必需字段是否存在
-  const dimensionsAnalysis = (result as any).dimensionsAnalysis || result.data?.dimensionsAnalysis;
-  const learningStrategiesImpl = (result as any).learningStrategiesImplementation || result.data?.learningStrategiesImplementation;
-  const hasAnalysis = (result as any).analysis || result.data?.analysis;
-  
-  if (!result || !result.data || 
-      (!(result as any).primaryStyle && !(result as any).dominantStyle && !result.data?.dominantStyle) ||
-      !hasAnalysis ||
-      !dimensionsAnalysis ||
-      !learningStrategiesImpl) {
-    return (
-      <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId}>
-        <div className="max-w-6xl mx-auto">
-          <Card className="p-8 text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">⚠️</span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Analysis Not Available</h2>
-            <p className="text-gray-600 mb-4">
-              Unable to generate AI analysis for your VARK test results. Please try submitting again.
-            </p>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
+  // 如果到达这里，说明AI分析已经成功，直接使用数据（不设置默认值）
   // Extract data from TestResult format
-  // 不设置默认值，如果字段不存在，应该已经在开头验证中捕获
   let primaryStyle = (result as any).primaryStyle || (result as any).dominantStyle || result.data?.dominantStyle || '';
   let secondaryStyle = (result as any).secondaryStyle || result.data?.secondaryStyle || '';
   const rootScores: Record<string, number> = (result as any).scores || (result as any).allScores || result.data?.allScores || {};
@@ -55,10 +27,10 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
   const studyTips = (result as any).studyTips || result.data?.studyTips || [];
   const learningStrategies = (result as any).learningStrategies || result.data?.learningStrategies || [];
   
-  
-  // 核心模块数据提取（已在开头验证，这里直接使用）
+  // 核心模块数据提取
   const learningProfile = (result as any).learningProfile || result.data?.learningProfile || {};
-  const learningStrategiesImplementation = learningStrategiesImpl;
+  const learningStrategiesImplementation = (result as any).learningStrategiesImplementation || result.data?.learningStrategiesImplementation || {};
+  const dimensionsAnalysis = (result as any).dimensionsAnalysis || result.data?.dimensionsAnalysis || {};
   
   // 兼容旧格式数据
   const cognitiveProfile = (result as any).cognitiveProfile || result.data?.cognitiveProfile || {};

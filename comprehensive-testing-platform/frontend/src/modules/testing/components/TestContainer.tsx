@@ -323,7 +323,12 @@ export const TestContainer: React.FC<TestContainerProps> = ({
       error.toLowerCase().includes('failed to parse') ||
       error.toLowerCase().includes('ai analysis is required') ||
       error.toLowerCase().includes('mbti analysis failed') ||
-      error.toLowerCase().includes('test result analysis failed')
+      error.toLowerCase().includes('vark analysis failed') ||
+      error.toLowerCase().includes('test result analysis failed') ||
+      error.toLowerCase().includes('missing required vark field') ||
+      error.toLowerCase().includes('dimensionsanalysis') ||
+      error.toLowerCase().includes('learningstrategiesimplementation') ||
+      error.toLowerCase().includes('ai analysis is incomplete')
     );
     
     // 如果是AI分析错误，无论是否显示结果，都要显示错误弹窗
