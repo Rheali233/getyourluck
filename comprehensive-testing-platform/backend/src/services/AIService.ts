@@ -1557,7 +1557,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 1000; // BaZi/ZiWei分析：简化schema后，1000 tokens足够
+        maxTokens = 800; // BaZi/ZiWei分析：简化schema后，800 tokens足够
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -2013,7 +2013,8 @@ Focus on core: Four Pillars, Five Elements, Day Master, Ten Gods. Keep ALL text 
     const customTimeout = 45000;
     // BaZi分析：使用简化schema，降低max_tokens以确保快速响应
     // 保留了核心字段但简化了内容，确保前端兼容性
-    const maxTokens = 1000; // 简化schema后，1000 tokens足够返回核心分析
+    // 进一步降低到800 tokens，减少响应体大小和读取时间
+    const maxTokens = 800; // 简化schema后，800 tokens足够返回核心分析
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {

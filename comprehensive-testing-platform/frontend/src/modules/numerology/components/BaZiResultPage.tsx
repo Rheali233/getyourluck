@@ -85,6 +85,17 @@ export const BaZiResultPage: React.FC = () => {
     );
   }
 
+  // 防御性检查：确保所有必需的字段存在
+  const safeFiveElements = analysisResult.fiveElements?.elements || {};
+  const safeTenGods = analysisResult.baZi?.tenGods || {};
+  const safeDayMasterStrength = analysisResult.baZi?.dayMasterStrength || { recommendations: [] };
+  const safeFavorableElements = analysisResult.baZi?.favorableElements || { useful: [], harmful: [], neutral: [] };
+  const safePersonalityTraits = analysisResult.personalityTraits || [];
+  const safeCareerGuidance = analysisResult.careerGuidance || [];
+  const safeWealthAnalysis = analysisResult.wealthAnalysis || { wealthSource: [], investmentAdvice: [] };
+  const safeHealthAnalysis = analysisResult.healthAnalysis || { weakAreas: [], beneficialActivities: [] };
+  const safeFortuneAnalysis = analysisResult.fortuneAnalysis || { currentYear: { advice: [] } };
+
   return (
     <NumerologyTestContainer>
       <div id="mainContent" className="max-w-6xl mx-auto space-y-8">
@@ -182,7 +193,7 @@ export const BaZiResultPage: React.FC = () => {
               {UI_TEXT.numerology.bazi.resultPage.fiveElementsIntro}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-              {Object.entries(analysisResult.fiveElements.elements).map(([element, value]) => {
+              {Object.entries(safeFiveElements).map(([element, value]) => {
                 // 将数字转换为程度值
                 const getStrengthLevel = (num: number) => {
                   if (num >= 3) return { text: 'Strong', color: 'text-green-800', bg: 'bg-green-100' };
@@ -254,7 +265,7 @@ export const BaZiResultPage: React.FC = () => {
               {UI_TEXT.numerology.bazi.resultPage.tenGodsIntro}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {Object.entries(analysisResult.baZi.tenGods).map(([key, god]: [string, any]) => {
+              {Object.entries(safeTenGods).map(([key, god]: [string, any]) => {
                 // 去掉名称中的英文翻译
                 const cleanName = god.name.replace(/\s*\([^)]*\)/, '');
                 
@@ -300,7 +311,7 @@ export const BaZiResultPage: React.FC = () => {
 
               <h5 className="text-lg font-bold text-gray-900 mb-3">Personalized Recommendations</h5>
               <div className="space-y-2">
-                {analysisResult.baZi.dayMasterStrength.recommendations.map((rec: any, index: number) => (
+                {(safeDayMasterStrength.recommendations || []).map((rec: any, index: number) => (
                   <div key={index}>
                     <p className="text-gray-800 text-lg leading-relaxed">{rec}</p>
                   </div>
@@ -324,7 +335,7 @@ export const BaZiResultPage: React.FC = () => {
                 </h4>
                 <p className="text-gray-700 text-sm mb-3">These elements bring positive energy and support goals:</p>
                 <div className="space-y-2">
-                  {analysisResult.baZi.favorableElements.useful.map((element: any, index: number) => (
+                  {(safeFavorableElements.useful || []).map((element: any, index: number) => (
                     <div key={index} className="flex items-center space-x-2">
                       <span className="text-red-400">✓</span>
                       <span className="text-gray-800">{element}</span>
@@ -339,7 +350,7 @@ export const BaZiResultPage: React.FC = () => {
                 </h4>
                 <p className="text-gray-700 text-sm mb-3">These elements may create challenges or drain energy:</p>
                 <div className="space-y-2">
-                  {analysisResult.baZi.favorableElements.harmful.map((element: any, index: number) => (
+                  {(safeFavorableElements.harmful || []).map((element: any, index: number) => (
                     <div key={index} className="flex items-center space-x-2">
                       <span className="text-red-400">✗</span>
                       <span className="text-gray-800">{element}</span>
@@ -354,7 +365,7 @@ export const BaZiResultPage: React.FC = () => {
                 </h4>
                 <p className="text-gray-700 text-sm mb-3">These elements neither help nor hinder progress:</p>
                 <div className="space-y-2">
-                  {analysisResult.baZi.favorableElements.neutral.map((element: any, index: number) => (
+                  {(safeFavorableElements.neutral || []).map((element: any, index: number) => (
                     <div key={index} className="flex items-center space-x-2">
                       <span className="text-red-400">○</span>
                       <span className="text-gray-800">{element}</span>
@@ -378,7 +389,7 @@ export const BaZiResultPage: React.FC = () => {
                 <h4 className="text-xl font-bold text-gray-900 mb-4">{UI_TEXT.numerology.bazi.resultPage.personalityTitle}</h4>
                 <div className="bg-red-50 rounded-lg p-6 border border-red-200">
                   <div className="space-y-3">
-                    {analysisResult.personalityTraits.map((trait: any, index: number) => (
+                    {safePersonalityTraits.map((trait: any, index: number) => (
                       <p key={index} className="text-gray-700 text-sm">{trait}</p>
                     ))}
                   </div>
@@ -398,7 +409,7 @@ export const BaZiResultPage: React.FC = () => {
                       <h5 className="text-lg font-bold text-gray-900 mb-3">{UI_TEXT.numerology.bazi.resultPage.careerGuidanceTitle}</h5>
                       <div className="bg-red-50 rounded-lg p-6 border border-red-200 flex-1">
                         <div className="space-y-2">
-                          {analysisResult.careerGuidance.map((guidance: any, index: number) => (
+                          {safeCareerGuidance.map((guidance: any, index: number) => (
                             <p key={index} className="text-gray-700 text-sm">• {guidance}</p>
                           ))}
                         </div>
@@ -419,7 +430,7 @@ export const BaZiResultPage: React.FC = () => {
                           <div>
                             <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthSources}</h6>
                             <div className="space-y-1">
-                              {analysisResult.wealthAnalysis.wealthSource.map((source: any, index: number) => (
+                              {(safeWealthAnalysis.wealthSource || []).map((source: any, index: number) => (
                                 <p key={index} className="text-gray-700 text-sm">• {source}</p>
                               ))}
                             </div>
@@ -427,7 +438,7 @@ export const BaZiResultPage: React.FC = () => {
                           <div>
                             <h6 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.investmentAdvice}</h6>
                             <div className="space-y-1">
-                              {analysisResult.wealthAnalysis.investmentAdvice.map((advice: any, index: number) => (
+                              {(safeWealthAnalysis.investmentAdvice || []).map((advice: any, index: number) => (
                                 <p key={index} className="text-gray-700 text-sm">• {advice}</p>
                               ))}
                             </div>
@@ -476,7 +487,7 @@ export const BaZiResultPage: React.FC = () => {
                     <div className="bg-red-50 rounded-lg p-4 border border-red-200">
                       <h5 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.weakAreas}</h5>
                       <div className="space-y-1">
-                        {analysisResult.healthAnalysis.weakAreas.map((area: any, index: number) => (
+                        {(safeHealthAnalysis.weakAreas || []).map((area: any, index: number) => (
                           <p key={index} className="text-gray-700 text-sm">• {area}</p>
                         ))}
                       </div>
@@ -484,7 +495,7 @@ export const BaZiResultPage: React.FC = () => {
                     <div className="bg-red-50 rounded-lg p-4 border border-red-200">
                       <h5 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.healthAdvice}</h5>
                       <div className="space-y-1">
-                        {analysisResult.healthAnalysis.beneficialActivities.map((activity: any, index: number) => (
+                        {(safeHealthAnalysis.beneficialActivities || []).map((activity: any, index: number) => (
                           <p key={index} className="text-gray-700 text-sm">• {activity}</p>
                         ))}
                       </div>
@@ -545,7 +556,7 @@ export const BaZiResultPage: React.FC = () => {
                   <div>
                     <h5 className="font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.keyAreasOfFocus}</h5>
                     <div className="space-y-1">
-                      {analysisResult?.fortuneAnalysis?.nextYear?.keyTrends.map((trend: any, index: number) => (
+                      {((analysisResult?.fortuneAnalysis?.nextYear?.keyTrends) || []).map((trend: any, index: number) => (
                         <p key={index} className="text-gray-700 text-sm">• {trend}</p>
                       ))}
                     </div>
@@ -562,7 +573,7 @@ export const BaZiResultPage: React.FC = () => {
                   {UI_TEXT.numerology.bazi.resultPage.strategicRecommendationsDesc}
                 </p>
                 <div className="space-y-3">
-                  {analysisResult?.fortuneAnalysis?.currentYear?.advice.map((rec: any, index: number) => (
+                  {((safeFortuneAnalysis.currentYear?.advice) || []).map((rec: any, index: number) => (
                     <div key={index} className="flex items-start space-x-3">
                       <span className="text-gray-600 mt-1 font-bold">💡</span>
                       <p className="text-gray-800 text-sm leading-relaxed">{rec}</p>
