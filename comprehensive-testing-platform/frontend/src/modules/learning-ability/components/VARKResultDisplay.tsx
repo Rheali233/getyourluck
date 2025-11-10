@@ -45,19 +45,20 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
   }
 
   // Extract data from TestResult format
-  let primaryStyle = (result as any).primaryStyle || (result as any).dominantStyle || result.data?.dominantStyle || 'Unknown';
+  // 不设置默认值，如果字段不存在，应该已经在开头验证中捕获
+  let primaryStyle = (result as any).primaryStyle || (result as any).dominantStyle || result.data?.dominantStyle || '';
   let secondaryStyle = (result as any).secondaryStyle || result.data?.secondaryStyle || '';
   const rootScores: Record<string, number> = (result as any).scores || (result as any).allScores || result.data?.allScores || {};
-  const interpretation = (result as any).interpretation || result.data?.interpretation || '';
+  const interpretation = (result as any).interpretation || result.data?.interpretation || (result as any).analysis || result.data?.analysis || '';
   const meta = (result as any).metadata || result.data?.metadata || {};
   const recommendations = (result as any).recommendations || result.data?.recommendations || [];
   const studyTips = (result as any).studyTips || result.data?.studyTips || [];
   const learningStrategies = (result as any).learningStrategies || result.data?.learningStrategies || [];
   
   
-  // 核心模块数据提取
+  // 核心模块数据提取（已在开头验证，这里直接使用）
   const learningProfile = (result as any).learningProfile || result.data?.learningProfile || {};
-  const learningStrategiesImplementation = (result as any).learningStrategiesImplementation || result.data?.learningStrategiesImplementation || {};
+  const learningStrategiesImplementation = learningStrategiesImpl;
   
   // 兼容旧格式数据
   const cognitiveProfile = (result as any).cognitiveProfile || result.data?.cognitiveProfile || {};
