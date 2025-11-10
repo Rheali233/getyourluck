@@ -124,7 +124,6 @@ export class AIService {
       }
 
       // 在 Cloudflare Workers 环境中读取响应体
-      // 添加超时保护，确保在 Worker 超时前完成读取
       // 剩余时间 = 总超时时间 - 已用时间 - 5秒缓冲
       const remainingTime = timeout - fetchTime - 5000;
       if (remainingTime < 10000) {
@@ -132,37 +131,30 @@ export class AIService {
         console.warn(`[AI Debug] Low remaining time for response reading: ${remainingTime}ms`);
       }
 
-      // 创建响应体读取超时控制器
-      const readController = new AbortController();
-      const readTimeoutId = setTimeout(() => {
-        readController.abort();
-      }, Math.max(10000, remainingTime)); // 至少10秒，或使用剩余时间
-
+      // 重要：在读取之前先克隆 response，避免流锁定问题
+      // 这样如果一种方法失败，可以使用克隆的 response 尝试另一种方法
+      const clonedResponseForFallback = response.clone();
+      
       let data: any;
+      let readMethod = 'unknown';
+      const readStartTime = Date.now();
+      
       try {
-        // 方法1: 尝试直接使用 response.json()（最简单的方法）
-        // 如果失败，再尝试其他方法
+        // 方法1: 尝试直接使用 response.json()
+        // 不使用 Promise.race，因为这会干扰流的读取
+        // 如果超时，Worker 本身会终止，我们无法恢复
         try {
           // eslint-disable-next-line no-console
           console.log('[AI Debug] Attempting to read response body using response.json()');
-          const readStartTime = Date.now();
           
-          // 使用 Promise.race 确保在超时前完成读取
-          data = await Promise.race([
-            response.json(),
-            new Promise((_, reject) => {
-              setTimeout(() => {
-                readController.abort();
-                reject(new Error('Response body reading timeout'));
-              }, Math.max(10000, remainingTime));
-            })
-          ]);
+          // 直接读取，不使用超时包装（因为 Worker 本身有超时限制）
+          data = await response.json();
           
           const readTime = Date.now() - readStartTime;
-          clearTimeout(readTimeoutId);
+          readMethod = 'response.json()';
           
           // eslint-disable-next-line no-console
-          console.log(`[AI Debug] Successfully parsed response using response.json() in ${readTime}ms`);
+          console.log(`[AI Debug] Successfully parsed response using ${readMethod} in ${readTime}ms`);
           
           // 验证响应数据
           if (!data) {
@@ -182,58 +174,66 @@ export class AIService {
           }
           
         } catch (jsonError) {
-          clearTimeout(readTimeoutId);
           // eslint-disable-next-line no-console
           console.log('[AI Debug] response.json() failed, trying arrayBuffer() method');
           // eslint-disable-next-line no-console
           console.log('[AI Debug] JSON parse error:', jsonError instanceof Error ? jsonError.message : String(jsonError));
           
-          // 方法2: 使用 arrayBuffer 读取
-          // 注意：需要克隆 response，因为 response 只能读取一次
-          const clonedResponse = response.clone();
+          // 检查是否是流锁定错误
+          if (jsonError instanceof Error && jsonError.message.includes('locked')) {
+            // eslint-disable-next-line no-console
+            console.log('[AI Debug] Stream locked, using cloned response for fallback');
+          }
+          
+          // 方法2: 使用克隆的 response 读取 arrayBuffer
+          // 使用克隆的 response，避免流锁定问题
           const arrayBufferStartTime = Date.now();
           
-          const arrayBuffer = await Promise.race([
-            clonedResponse.arrayBuffer(),
-            new Promise<ArrayBuffer>((_, reject) => {
-              setTimeout(() => {
-                reject(new Error('ArrayBuffer reading timeout'));
-              }, Math.max(10000, remainingTime));
-            })
-          ]);
-          
-          const arrayBufferTime = Date.now() - arrayBufferStartTime;
-          // eslint-disable-next-line no-console
-          console.log(`[AI Debug] Response arrayBuffer read in ${arrayBufferTime}ms, size: ${arrayBuffer.byteLength} bytes`);
-          
-          if (arrayBuffer.byteLength === 0) {
-            throw new Error('Empty response body from AI service');
-          }
-          
-          // 将 ArrayBuffer 转换为文本
-          const decoder = new TextDecoder('utf-8');
-          const responseText = decoder.decode(arrayBuffer);
-          // eslint-disable-next-line no-console
-          console.log(`[AI Debug] Response text length: ${responseText.length} chars`);
-          
-          if (!responseText || responseText.trim().length === 0) {
-            throw new Error('Empty response text after decoding');
-          }
-          
-          // eslint-disable-next-line no-console
-          console.log('[AI Debug] Response text preview (first 200 chars):', responseText.substring(0, 200));
-          
-          data = JSON.parse(responseText);
-          // eslint-disable-next-line no-console
-          console.log('[AI Debug] Successfully parsed response using arrayBuffer() method');
-          
-          // 验证响应数据
-          if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
-            throw new Error('Invalid response structure: missing choices array');
+          try {
+            const arrayBuffer = await clonedResponseForFallback.arrayBuffer();
+            
+            const arrayBufferTime = Date.now() - arrayBufferStartTime;
+            readMethod = 'arrayBuffer()';
+            
+            // eslint-disable-next-line no-console
+            console.log(`[AI Debug] Response arrayBuffer read in ${arrayBufferTime}ms, size: ${arrayBuffer.byteLength} bytes`);
+            
+            if (arrayBuffer.byteLength === 0) {
+              throw new Error('Empty response body from AI service');
+            }
+            
+            // 将 ArrayBuffer 转换为文本
+            const decoder = new TextDecoder('utf-8');
+            const responseText = decoder.decode(arrayBuffer);
+            // eslint-disable-next-line no-console
+            console.log(`[AI Debug] Response text length: ${responseText.length} chars`);
+            
+            if (!responseText || responseText.trim().length === 0) {
+              throw new Error('Empty response text after decoding');
+            }
+            
+            // eslint-disable-next-line no-console
+            console.log('[AI Debug] Response text preview (first 200 chars):', responseText.substring(0, 200));
+            
+            data = JSON.parse(responseText);
+            
+            const totalReadTime = Date.now() - readStartTime;
+            // eslint-disable-next-line no-console
+            console.log(`[AI Debug] Successfully parsed response using ${readMethod} in ${totalReadTime}ms`);
+            
+            // 验证响应数据
+            if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+              throw new Error('Invalid response structure: missing choices array');
+            }
+            
+          } catch (arrayBufferError) {
+            // eslint-disable-next-line no-console
+            console.error('[AI Debug] arrayBuffer() method also failed:', arrayBufferError);
+            throw jsonError; // 抛出原始错误
           }
         }
       } catch (parseError) {
-        clearTimeout(readTimeoutId);
+        const totalReadTime = Date.now() - readStartTime;
         // eslint-disable-next-line no-console
         console.error('[AI Debug] Failed to parse response:', parseError);
         // eslint-disable-next-line no-console
@@ -242,8 +242,15 @@ export class AIService {
           message: parseError instanceof Error ? parseError.message : String(parseError),
           stack: parseError instanceof Error ? parseError.stack?.substring(0, 500) : 'No stack',
           fetchTime: fetchTime,
-          remainingTime: remainingTime
+          readTime: totalReadTime,
+          remainingTime: remainingTime,
+          readMethod: readMethod
         });
+        
+        // 检查是否是流锁定错误
+        if (parseError instanceof Error && parseError.message.includes('locked')) {
+          throw new Error(`Response stream is locked. This may occur if the response body is too large or reading takes too long. Read time: ${totalReadTime}ms, Remaining time: ${remainingTime}ms`);
+        }
         
         // 检查是否是超时错误
         if (parseError instanceof Error && (
@@ -251,7 +258,7 @@ export class AIService {
           parseError.message.includes('aborted') ||
           parseError.name === 'AbortError'
         )) {
-          throw new Error(`Response body reading timeout after ${fetchTime}ms. The AI response is too large or the connection is too slow.`);
+          throw new Error(`Response body reading timeout after ${totalReadTime}ms. The AI response is too large or the connection is too slow. Remaining time: ${remainingTime}ms`);
         }
         
         // 检查是否是网络连接错误
