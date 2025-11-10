@@ -405,7 +405,6 @@ export const BaZiResultPage: React.FC = () => {
                 {/* Career Guidance 子模块 - 全宽显示，与 Personality Analysis 保持一致 */}
                 {analysisResult.careerGuidance && analysisResult.careerGuidance.length > 0 && (
                   <div className="mb-6">
-                    <h5 className="text-lg font-bold text-gray-900 mb-3">{UI_TEXT.numerology.bazi.resultPage.careerGuidanceTitle}</h5>
                     <div className="bg-red-50 rounded-lg p-6 border border-red-200">
                       <div className="space-y-2">
                         {safeCareerGuidance.map((guidance: any, index: number) => (
