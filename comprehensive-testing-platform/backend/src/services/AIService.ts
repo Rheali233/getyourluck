@@ -1256,6 +1256,11 @@ export class AIService {
       
       console.log('[AIService] VARK parsed JSON keys:', Object.keys(parsed || {}));
       
+      // 检查是否有 dimensionsAnalysis 在顶层
+      if (parsed.dimensionsAnalysis && typeof parsed.dimensionsAnalysis === 'object') {
+        console.log('[AIService] VARK found dimensionsAnalysis at top level, keys:', Object.keys(parsed.dimensionsAnalysis));
+      }
+      
       // 现在AI应该直接返回我们期望的格式，不需要复杂的映射
       if (parsed && typeof parsed === 'object') {
         // 情况1：AI已返回统一schema（顶层包含 primaryStyle/scores）
@@ -1646,6 +1651,7 @@ export class AIService {
             
             // 检查 a.dimensionsAnalysis（如果AI返回在analysis对象内）
             if (a.dimensionsAnalysis && typeof a.dimensionsAnalysis === 'object') {
+              console.log('[AIService] VARK found dimensionsAnalysis in analysis object, keys:', Object.keys(a.dimensionsAnalysis));
               styleNames.forEach(styleName => {
                 if (dimensionsAnalysis[styleName]) {
                   return; // 已存在，跳过
@@ -1654,15 +1660,19 @@ export class AIService {
                 if (analysis && String(analysis).trim()) {
                   dimensionsAnalysis[styleName] = String(analysis).trim();
                 } else {
-                  missingDimensions.push(styleName);
+                  if (!missingDimensions.includes(styleName)) {
+                    missingDimensions.push(styleName);
+                  }
                 }
               });
               
               // 如果所有维度都找到了，返回结果
               const stillMissing = styleNames.filter(name => !dimensionsAnalysis[name]);
               if (stillMissing.length === 0) {
+                console.log('[AIService] VARK successfully extracted all dimensionsAnalysis from analysis object');
                 return dimensionsAnalysis;
               }
+              console.log('[AIService] VARK still missing dimensionsAnalysis for:', stillMissing);
               // 否则继续尝试其他来源
             }
             
