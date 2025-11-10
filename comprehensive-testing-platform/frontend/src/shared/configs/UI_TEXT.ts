@@ -462,7 +462,7 @@ export const UI_TEXT = {
         lifeAnalysisDescription: 'Your life analysis reveals the profound insights hidden within your BaZi chart. Understanding these patterns helps you navigate personality development, career choices, wealth building, relationship harmony, and health optimization with wisdom and clarity.',
         personalityTitle: 'Personality Analysis',
         personalityTraitsTitle: 'Personality Traits',
-        careerWealthTitle: 'Career & Wealth Analysis',
+        careerWealthTitle: 'Career Analysis',
         careerTitle: 'Career Guidance',
         careerGuidanceTitle: 'Career Guidance',
         wealthTitle: 'Wealth Analysis',

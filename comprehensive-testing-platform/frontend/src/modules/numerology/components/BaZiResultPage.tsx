@@ -397,63 +397,61 @@ export const BaZiResultPage: React.FC = () => {
               </div>
             )}
 
-            {/* 子模块2: Career & Wealth Analysis */}
+            {/* 子模块2: Career Analysis */}
             {(analysisResult.careerGuidance || analysisResult.wealthAnalysis) && (
               <div className="mb-8">
                 <h4 className="text-xl font-bold text-gray-900 mb-4">{UI_TEXT.numerology.bazi.resultPage.careerWealthTitle}</h4>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Career Guidance 子模块 */}
-                  {analysisResult.careerGuidance && analysisResult.careerGuidance.length > 0 && (
-                    <div className="h-full flex flex-col">
-                      <h5 className="text-lg font-bold text-gray-900 mb-3">{UI_TEXT.numerology.bazi.resultPage.careerGuidanceTitle}</h5>
-                      <div className="bg-red-50 rounded-lg p-6 border border-red-200 flex-1">
-                        <div className="space-y-2">
-                          {safeCareerGuidance.map((guidance: any, index: number) => (
-                            <p key={index} className="text-gray-700 text-base">• {guidance}</p>
-                          ))}
-                        </div>
+                {/* Career Guidance 子模块 - 全宽显示，与 Personality Analysis 保持一致 */}
+                {analysisResult.careerGuidance && analysisResult.careerGuidance.length > 0 && (
+                  <div className="mb-6">
+                    <h5 className="text-lg font-bold text-gray-900 mb-3">{UI_TEXT.numerology.bazi.resultPage.careerGuidanceTitle}</h5>
+                    <div className="bg-red-50 rounded-lg p-6 border border-red-200">
+                      <div className="space-y-2">
+                        {safeCareerGuidance.map((guidance: any, index: number) => (
+                          <p key={index} className="text-gray-700 text-base">• {guidance}</p>
+                        ))}
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {/* Wealth Analysis 子模块 */}
-                  {analysisResult.wealthAnalysis && (analysisResult.wealthAnalysis.wealthLevel || (safeWealthAnalysis.wealthSource && safeWealthAnalysis.wealthSource.length > 0) || (safeWealthAnalysis.investmentAdvice && safeWealthAnalysis.investmentAdvice.length > 0)) && (
-                    <div className="h-full flex flex-col">
-                      <h5 className="text-lg font-bold text-gray-900 mb-3">{UI_TEXT.numerology.bazi.resultPage.wealthAnalysisTitle}</h5>
-                      <div className="bg-red-50 rounded-lg p-6 border border-red-200 flex-1">
-                        <div className="space-y-4">
-                          {analysisResult.wealthAnalysis.wealthLevel && (
-                            <div>
-                              <h6 className="text-base font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthLevel}</h6>
-                              <p className="text-gray-700 text-base capitalize">{String(analysisResult.wealthAnalysis.wealthLevel).replace('_', ' ')}</p>
+                {/* Wealth Analysis 子模块 - 如果存在，单独显示 */}
+                {analysisResult.wealthAnalysis && (analysisResult.wealthAnalysis.wealthLevel || (safeWealthAnalysis.wealthSource && safeWealthAnalysis.wealthSource.length > 0) || (safeWealthAnalysis.investmentAdvice && safeWealthAnalysis.investmentAdvice.length > 0)) && (
+                  <div>
+                    <h5 className="text-lg font-bold text-gray-900 mb-3">{UI_TEXT.numerology.bazi.resultPage.wealthAnalysisTitle}</h5>
+                    <div className="bg-red-50 rounded-lg p-6 border border-red-200">
+                      <div className="space-y-4">
+                        {analysisResult.wealthAnalysis.wealthLevel && (
+                          <div>
+                            <h6 className="text-base font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthLevel}</h6>
+                            <p className="text-gray-700 text-base capitalize">{String(analysisResult.wealthAnalysis.wealthLevel).replace('_', ' ')}</p>
+                          </div>
+                        )}
+                        {safeWealthAnalysis.wealthSource && safeWealthAnalysis.wealthSource.length > 0 && (
+                          <div>
+                            <h6 className="text-base font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthSources}</h6>
+                            <div className="space-y-1">
+                              {safeWealthAnalysis.wealthSource.map((source: any, index: number) => (
+                                <p key={index} className="text-gray-700 text-base">• {source}</p>
+                              ))}
                             </div>
-                          )}
-                          {safeWealthAnalysis.wealthSource && safeWealthAnalysis.wealthSource.length > 0 && (
-                            <div>
-                              <h6 className="text-base font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.wealthSources}</h6>
-                              <div className="space-y-1">
-                                {safeWealthAnalysis.wealthSource.map((source: any, index: number) => (
-                                  <p key={index} className="text-gray-700 text-base">• {source}</p>
-                                ))}
-                              </div>
+                          </div>
+                        )}
+                        {safeWealthAnalysis.investmentAdvice && safeWealthAnalysis.investmentAdvice.length > 0 && (
+                          <div>
+                            <h6 className="text-base font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.investmentAdvice}</h6>
+                            <div className="space-y-1">
+                              {safeWealthAnalysis.investmentAdvice.map((advice: any, index: number) => (
+                                <p key={index} className="text-gray-700 text-base">• {advice}</p>
+                              ))}
                             </div>
-                          )}
-                          {safeWealthAnalysis.investmentAdvice && safeWealthAnalysis.investmentAdvice.length > 0 && (
-                            <div>
-                              <h6 className="text-base font-semibold text-gray-900 mb-2">{UI_TEXT.numerology.bazi.resultPage.investmentAdvice}</h6>
-                              <div className="space-y-1">
-                                {safeWealthAnalysis.investmentAdvice.map((advice: any, index: number) => (
-                                  <p key={index} className="text-gray-700 text-base">• {advice}</p>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             )}
 
