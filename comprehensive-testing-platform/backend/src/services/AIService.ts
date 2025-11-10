@@ -908,7 +908,7 @@ export class AIService {
     }
     
     // 尝试修复常见的JSON格式问题
-    // 1. 移除多余的逗号
+    // 1. 移除多余的逗号（在 } 或 ] 之前）
     text = text.replace(/,(\s*[}\]])/g, '$1');
     
     // 2. 修复数组中的语法错误 - 确保数组元素之间有逗号
@@ -924,6 +924,52 @@ export class AIService {
     // 4. 修复分数表达式 - 将 "48/50" 转换为数字
     text = text.replace(/"score":\s*(\d+)\/(\d+)/g, '"score": $1');
     text = text.replace(/"maxScore":\s*(\d+)\/(\d+)/g, '"maxScore": $2');
+    
+    // 5. 修复未闭合的字符串（如果最后一个字符不是 }，尝试修复）
+    // 检查是否以 } 结尾，如果不是，尝试找到最后一个完整的对象
+    if (!text.trim().endsWith('}')) {
+      const lastBraceIndex = text.lastIndexOf('}');
+      if (lastBraceIndex > 0) {
+        // 检查最后一个 } 之前是否有未闭合的引号或括号
+        const beforeLastBrace = text.substring(0, lastBraceIndex);
+        const openBraces = (beforeLastBrace.match(/{/g) || []).length;
+        const closeBraces = (beforeLastBrace.match(/}/g) || []).length;
+        if (openBraces > closeBraces) {
+          // 有未闭合的 {，尝试修复
+          const missingBraces = openBraces - closeBraces;
+          text = text.substring(0, lastBraceIndex + 1) + '}'.repeat(missingBraces);
+        } else {
+          // 直接截取到最后一个 }
+          text = text.substring(0, lastBraceIndex + 1);
+        }
+      }
+    }
+    
+    // 6. 修复未闭合的引号（如果字符串值没有正确闭合）
+    // 查找所有未闭合的字符串引号
+    let quoteCount = 0;
+    let inString = false;
+    let escapeNext = false;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (escapeNext) {
+        escapeNext = false;
+        continue;
+      }
+      if (char === '\\') {
+        escapeNext = true;
+        continue;
+      }
+      if (char === '"') {
+        inString = !inString;
+        quoteCount++;
+      }
+    }
+    // 如果引号数量是奇数，说明有未闭合的引号，尝试修复
+    if (quoteCount % 2 !== 0 && inString) {
+      // 在末尾添加闭合引号
+      text = text + '"';
+    }
     
     // 添加调试日志
     // eslint-disable-next-line no-console
@@ -2399,7 +2445,57 @@ Keep it concise but meaningful, focusing on the most important insights.`;
       } catch (parseError) {
         console.error('[AIService] Failed to parse numerology response JSON:', parseError);
         console.error('[AIService] Response content (first 500 chars):', content.substring(0, 500));
-        throw new Error(`Failed to parse AI response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+        console.error('[AIService] Sanitized JSON (first 500 chars):', cleaned.substring(0, 500));
+        console.error('[AIService] Sanitized JSON (last 500 chars):', cleaned.substring(Math.max(0, cleaned.length - 500)));
+        
+        // 尝试更激进的修复：如果错误位置已知，尝试在该位置修复
+        if (parseError instanceof SyntaxError && parseError.message.includes('position')) {
+          const positionMatch = parseError.message.match(/position (\d+)/);
+          if (positionMatch) {
+            const errorPosition = parseInt(positionMatch[1], 10);
+            console.error(`[AIService] JSON error at position ${errorPosition}, attempting repair...`);
+            
+            // 尝试在错误位置附近修复
+            let repaired = cleaned;
+            // 如果错误位置接近末尾，可能是缺少闭合括号
+            if (errorPosition > cleaned.length * 0.8) {
+              // 检查括号平衡
+              const openBraces = (cleaned.match(/{/g) || []).length;
+              const closeBraces = (cleaned.match(/}/g) || []).length;
+              if (openBraces > closeBraces) {
+                repaired = cleaned + '}'.repeat(openBraces - closeBraces);
+                console.log(`[AIService] Added ${openBraces - closeBraces} closing braces`);
+                try {
+                  parsed = JSON.parse(repaired);
+                  console.log('[AIService] Successfully repaired JSON');
+                } catch (retryError) {
+                  console.error('[AIService] Repair attempt failed:', retryError);
+                }
+              }
+            }
+            
+            // 如果修复失败，尝试截取到错误位置之前的内容
+            if (!parsed && errorPosition > 100) {
+              // 找到错误位置之前的最后一个完整的对象
+              const beforeError = cleaned.substring(0, errorPosition);
+              const lastCompleteObject = beforeError.lastIndexOf('}');
+              if (lastCompleteObject > 0) {
+                const truncated = cleaned.substring(0, lastCompleteObject + 1);
+                try {
+                  parsed = JSON.parse(truncated);
+                  console.log('[AIService] Successfully parsed truncated JSON');
+                } catch (truncateError) {
+                  console.error('[AIService] Truncation attempt failed:', truncateError);
+                }
+              }
+            }
+          }
+        }
+        
+        // 如果所有修复尝试都失败，抛出错误
+        if (!parsed) {
+          throw new Error(`Failed to parse AI response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
+        }
       }
       
       // 验证必需字段 - 如果缺失则抛出错误，不使用默认值
