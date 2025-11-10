@@ -799,6 +799,12 @@ Rules:
           expectedPerformance: "Performance description",
           improvementAreas: ["Areas for improvement"]
         },
+        dimensionsAnalysis: {
+          "Visual": "Detailed analysis for Visual learning style (2-3 sentences)",
+          "Auditory": "Detailed analysis for Auditory learning style (2-3 sentences)",
+          "Read/Write": "Detailed analysis for Read/Write learning style (2-3 sentences)",
+          "Kinesthetic": "Detailed analysis for Kinesthetic learning style (2-3 sentences)"
+        },
         metadata: { totalQuestions: 16 }
       }
     },

@@ -16,6 +16,25 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
   result,
   onShare
 }) => {
+  // 验证结果是否有效（AI分析失败时不应该到达这里，但作为安全措施）
+  if (!result || !result.data || (!(result as any).primaryStyle && !(result as any).dominantStyle && !result.data?.dominantStyle)) {
+    return (
+      <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId}>
+        <div className="max-w-6xl mx-auto">
+          <Card className="p-8 text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">AI Analysis Not Available</h2>
+            <p className="text-gray-600 mb-4">
+              Unable to generate AI analysis for your VARK test results. Please try submitting again.
+            </p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   // Extract data from TestResult format
   let primaryStyle = (result as any).primaryStyle || (result as any).dominantStyle || result.data?.dominantStyle || 'Unknown';
   let secondaryStyle = (result as any).secondaryStyle || result.data?.secondaryStyle || '';
@@ -255,13 +274,20 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                     Core Strategies
                   </h4>
                   <div className="space-y-3">
-                    {(learningStrategies || learningStrategiesImplementation.coreStrategies || recommendations || [
-                      `Focus on ${primaryStyle.toLowerCase()} learning methods to maximize your learning efficiency`,
-                      `Create structured study environments that support your ${primaryStyle.toLowerCase()} preferences`,
-                      `Use multi-sensory approaches when possible to reinforce learning`,
-                      `Practice active recall techniques aligned with your learning style`,
-                      `Set up dedicated study spaces optimized for your learning preferences`
-                    ]).slice(0, 6).map((strategy: string, index: number) => (
+                    {(() => {
+                      const strategies = learningStrategiesImplementation.coreStrategies || learningStrategies || recommendations || [];
+                      if (strategies.length === 0) {
+                        return [
+                          `Focus on ${primaryStyle.toLowerCase()} learning methods to maximize your learning efficiency`,
+                          `Create structured study environments that support your ${primaryStyle.toLowerCase()} preferences`,
+                          `Use multi-sensory approaches when possible to reinforce learning`,
+                          `Practice active recall techniques aligned with your learning style`,
+                          `Set up dedicated study spaces optimized for your learning preferences`,
+                          `Engage in hands-on activities and practical applications when learning new concepts`
+                        ];
+                      }
+                      return strategies.slice(0, 6);
+                    })().map((strategy: string, index: number) => (
                       <p key={index} className="text-sm text-gray-700 leading-relaxed">
                         {strategy}
                       </p>
@@ -276,13 +302,20 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                     Study Tips
                   </h4>
                   <div className="space-y-3">
-                    {(learningStrategiesImplementation.practicalTips || studyTips || [
-                      `Break down complex information into ${primaryStyle.toLowerCase()} formats for better comprehension`,
-                      `Use ${primaryStyle.toLowerCase()} study aids and tools to enhance retention`,
-                      `Take regular breaks and vary your study methods to maintain engagement`,
-                      `Review material using ${primaryStyle.toLowerCase()}-preferred techniques`,
-                      `Connect new information to existing knowledge using your learning style strengths`
-                    ]).slice(0, 6).map((tip: string, index: number) => (
+                    {(() => {
+                      const tips = learningStrategiesImplementation.practicalTips || studyTips || [];
+                      if (tips.length === 0) {
+                        return [
+                          `Break down complex information into ${primaryStyle.toLowerCase()} formats for better comprehension`,
+                          `Use ${primaryStyle.toLowerCase()} study aids and tools to enhance retention`,
+                          `Take regular breaks and vary your study methods to maintain engagement`,
+                          `Review material using ${primaryStyle.toLowerCase()}-preferred techniques`,
+                          `Connect new information to existing knowledge using your learning style strengths`,
+                          `Practice explaining concepts to others to reinforce your understanding`
+                        ];
+                      }
+                      return tips.slice(0, 6);
+                    })().map((tip: string, index: number) => (
                       <p key={index} className="text-sm text-gray-700 leading-relaxed">
                         {tip}
                       </p>
@@ -294,19 +327,70 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                 <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
                   <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <span className="text-xl mr-2">🏠</span>
-                    Environment
+                    Environment Setup
                   </h4>
-                  <div className="space-y-3">
-                    {(learningProfile.learningPreferences?.environments || learningStrategiesImplementation.environmentSetup || [
-                      `Create a ${primaryStyle.toLowerCase()}-friendly study space with appropriate lighting and materials`,
-                      `Minimize distractions and ensure comfortable seating for extended study sessions`,
-                      `Organize materials in a way that supports your ${primaryStyle.toLowerCase()} learning preferences`,
-                      `Consider background noise levels that work best for your learning style`
-                    ]).map((environment: string, index: number) => (
-                      <p key={index} className="text-sm text-gray-700 leading-relaxed">
-                        {environment}
-                      </p>
-                    ))}
+                  <div className="space-y-4">
+                    {(() => {
+                      const envSetup = learningStrategiesImplementation.environmentSetup || {};
+                      const physical = Array.isArray(envSetup.physical) ? envSetup.physical : [];
+                      const social = Array.isArray(envSetup.social) ? envSetup.social : [];
+                      const technology = Array.isArray(envSetup.technology) ? envSetup.technology : [];
+                      const schedule = Array.isArray(envSetup.schedule) ? envSetup.schedule : [];
+                      
+                      if (physical.length === 0 && social.length === 0 && technology.length === 0 && schedule.length === 0) {
+                        const fallbackEnvs = learningProfile.learningPreferences?.environments || [];
+                        if (fallbackEnvs.length > 0) {
+                          return fallbackEnvs.map((env: string) => (
+                            <p key={env} className="text-sm text-gray-700 leading-relaxed">{env}</p>
+                          ));
+                        }
+                        return [
+                          `Create a ${primaryStyle.toLowerCase()}-friendly study space with appropriate lighting and materials`,
+                          `Minimize distractions and ensure comfortable seating for extended study sessions`,
+                          `Organize materials in a way that supports your ${primaryStyle.toLowerCase()} learning preferences`,
+                          `Consider background noise levels that work best for your learning style`
+                        ].map((env, idx) => (
+                          <p key={idx} className="text-sm text-gray-700 leading-relaxed">{env}</p>
+                        ));
+                      }
+                      
+                      return (
+                        <>
+                          {physical.length > 0 && (
+                            <div>
+                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Physical Environment</h5>
+                              {physical.map((env: string, idx: number) => (
+                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                              ))}
+                            </div>
+                          )}
+                          {social.length > 0 && (
+                            <div>
+                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Social Setup</h5>
+                              {social.map((env: string, idx: number) => (
+                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                              ))}
+                            </div>
+                          )}
+                          {technology.length > 0 && (
+                            <div>
+                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Technology & Tools</h5>
+                              {technology.map((env: string, idx: number) => (
+                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                              ))}
+                            </div>
+                          )}
+                          {schedule.length > 0 && (
+                            <div>
+                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Schedule & Timing</h5>
+                              {schedule.map((env: string, idx: number) => (
+                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>

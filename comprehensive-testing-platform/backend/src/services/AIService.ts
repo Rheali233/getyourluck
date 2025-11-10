@@ -1260,6 +1260,7 @@ export class AIService {
             learningProfile: parsed.learningProfile || {},
             learningStrategiesImplementation: parsed.learningStrategiesImplementation || {},
             learningEffectiveness: parsed.learningEffectiveness || {},
+            dimensionsAnalysis: parsed.dimensionsAnalysis || {},
             encouragement: parsed.encouragement || 'Continue exploring your learning preferences.',
             environmentSuggestions: parsed.environmentSuggestions || 'Set up learning environments that support your style.'
           };
@@ -1564,6 +1565,60 @@ export class AIService {
           resultObject.learningEffectiveness.improvementAreas = sanitizeList(
             resultObject.learningEffectiveness.improvementAreas
           );
+
+          // 构建 dimensionsAnalysis 字段（每个维度的个性化分析）
+          const buildDimensionsAnalysis = (): Record<string, string> => {
+            const dimensionsAnalysis: Record<string, string> = {};
+            const styleNames = ['Visual', 'Auditory', 'Read/Write', 'Kinesthetic'];
+            
+            // 尝试从AI响应中提取维度分析
+            const modalityBreakdown = a.modality_breakdown || {};
+            const detailedInsights = a.detailedInsights || a.detailed_insights || {};
+            
+            styleNames.forEach(styleName => {
+              const key = styleName === 'Read/Write' ? 'read_write' : styleName.toLowerCase();
+              const modality = modalityBreakdown[key] || {};
+              
+              // 优先使用AI生成的维度分析
+              let analysis = modality.analysis || modality.description || modality.interpretation;
+              
+              // 如果没有，尝试从其他字段提取
+              if (!analysis) {
+                if (styleName === 'Visual' && detailedInsights.visualAnalysis) {
+                  analysis = detailedInsights.visualAnalysis;
+                } else if (styleName === 'Auditory' && detailedInsights.auditoryAnalysis) {
+                  analysis = detailedInsights.auditoryAnalysis;
+                } else if (styleName === 'Read/Write' && detailedInsights.readWriteAnalysis) {
+                  analysis = detailedInsights.readWriteAnalysis;
+                } else if (styleName === 'Kinesthetic' && detailedInsights.kinestheticAnalysis) {
+                  analysis = detailedInsights.kinestheticAnalysis;
+                }
+              }
+              
+              // 如果还是没有，生成基于分数的简要分析
+              if (!analysis) {
+                const score = styleName === 'Visual' ? mappedScores.V :
+                             styleName === 'Auditory' ? mappedScores.A :
+                             styleName === 'Read/Write' ? mappedScores.R :
+                             mappedScores.K;
+                const percent = totalCount > 0 ? Math.round((score / totalCount) * 100) : 0;
+                
+                if (percent >= 60) {
+                  analysis = `You have a strong preference for ${styleName.toLowerCase()} learning. This style suits you well and you should leverage ${styleName.toLowerCase()} methods in your studies.`;
+                } else if (percent >= 40) {
+                  analysis = `You have a moderate preference for ${styleName.toLowerCase()} learning. While not your primary style, ${styleName.toLowerCase()} methods can still be effective for you.`;
+                } else {
+                  analysis = `You have a lower preference for ${styleName.toLowerCase()} learning. Consider supplementing with other learning styles to enhance your overall learning effectiveness.`;
+                }
+              }
+              
+              dimensionsAnalysis[styleName] = String(analysis || '').trim();
+            });
+            
+            return dimensionsAnalysis;
+          };
+          
+          resultObject.dimensionsAnalysis = buildDimensionsAnalysis();
 
           // 关键字段强校验
           const hasScores = typeof resultObject.scores?.V === 'number'
