@@ -2020,7 +2020,12 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no extra text. St
       return this.parseZiWeiResponse(content);
     }
 
-    return this.parseNumerologyResponse(response);
+    // BaZi 也先提取 content，与 ZiWei 保持一致的处理方式
+    const content = response?.choices?.[0]?.message?.content || '';
+    if (!content) {
+      throw new Error('Empty AI response content for numerology BaZi analysis');
+    }
+    return this.parseNumerologyResponse(content);
   }
 
   private buildRecommendationsPrompt(data: { testType: string; results: any; userPreferences?: any; context?: any }): string {
@@ -2374,9 +2379,8 @@ Keep it concise but meaningful, focusing on the most important insights.`;
   /**
    * 解析命理分析响应
    */
-  private parseNumerologyResponse(response: any): any {
+  private parseNumerologyResponse(content: string): any {
     try {
-      const content = response?.choices?.[0]?.message?.content || '';
       if (!content) {
         console.error('[AIService] Empty response content from AI for numerology analysis');
         throw new Error('Empty response content from AI');
