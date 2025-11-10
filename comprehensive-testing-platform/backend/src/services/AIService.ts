@@ -131,23 +131,25 @@ export class AIService {
         console.warn(`[AI Debug] Low remaining time for response reading: ${remainingTime}ms`);
       }
 
-      // 由于 content-length=null 可能导致 response.json() 挂起，直接使用 arrayBuffer() 方法
-      // arrayBuffer() 方法更可靠，可以设置超时保护
+      // 由于 content-length=null 表示流式传输，arrayBuffer() 读取可能很慢
+      // 尝试使用 response.text() 方法，它可能比 arrayBuffer() 更快
       let data: any;
       const readStartTime = Date.now();
       
       try {
         // eslint-disable-next-line no-console
-        console.log('[AI Debug] Reading response body using arrayBuffer() method');
+        console.log('[AI Debug] Reading response body using response.text() method');
         
         // 创建超时保护，确保在 Worker 超时前完成读取
-        const readTimeout = Math.max(10000, Math.min(remainingTime - 2000, 35000)); // 至少10秒，最多35秒，留2秒缓冲
+        // 对于流式传输，需要更长的超时时间，但不超过 Worker 限制
+        const readTimeout = Math.max(15000, Math.min(remainingTime - 3000, 40000)); // 至少15秒，最多40秒，留3秒缓冲
         // eslint-disable-next-line no-console
-        console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms`);
+        console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms`);
         
-        const arrayBuffer = await Promise.race([
-          response.arrayBuffer(),
-          new Promise<ArrayBuffer>((_, reject) => {
+        // 使用 response.text() 而不是 arrayBuffer()，可能对流式传输更友好
+        const responseText = await Promise.race([
+          response.text(),
+          new Promise<string>((_, reject) => {
             setTimeout(() => {
               reject(new Error(`Response body reading timeout after ${readTimeout}ms`));
             }, readTimeout);
@@ -156,20 +158,10 @@ export class AIService {
         
         const readTime = Date.now() - readStartTime;
         // eslint-disable-next-line no-console
-        console.log(`[AI Debug] Response arrayBuffer read in ${readTime}ms, size: ${arrayBuffer.byteLength} bytes`);
-        
-        if (arrayBuffer.byteLength === 0) {
-          throw new Error('Empty response body from AI service');
-        }
-        
-        // 将 ArrayBuffer 转换为文本
-        const decoder = new TextDecoder('utf-8');
-        const responseText = decoder.decode(arrayBuffer);
-        // eslint-disable-next-line no-console
-        console.log(`[AI Debug] Response text length: ${responseText.length} chars`);
+        console.log(`[AI Debug] Response text read in ${readTime}ms, length: ${responseText.length} chars`);
         
         if (!responseText || responseText.trim().length === 0) {
-          throw new Error('Empty response text after decoding');
+          throw new Error('Empty response text from AI service');
         }
         
         // eslint-disable-next-line no-console
@@ -183,6 +175,8 @@ export class AIService {
           console.error('[AI Debug] JSON parse error:', parseError);
           // eslint-disable-next-line no-console
           console.error('[AI Debug] Response text (first 500 chars):', responseText.substring(0, 500));
+          // eslint-disable-next-line no-console
+          console.error('[AI Debug] Response text (last 500 chars):', responseText.substring(Math.max(0, responseText.length - 500)));
           throw new Error(`Failed to parse response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
         }
         
@@ -581,9 +575,9 @@ export class AIService {
       ];
       
       const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'birth_chart');
-      // Birth-chart prompt 较长（~4368 chars），降低 max_tokens 以减少响应体大小和读取时间
+      // Birth-chart prompt 较长（~4377 chars），降低 max_tokens 以减少响应体大小和读取时间
       const customTimeout = 45000;
-      const maxTokens = 2500; // 降低到 2500，减少响应体大小
+      const maxTokens = 2000; // 进一步降低到 2000，减少响应体大小和读取时间
       const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
       return this.parseBirthChartResponse(response);
     } catch (error) {
@@ -1558,13 +1552,13 @@ export class AIService {
       // 将超时时间调整为45秒，确保在Worker限制内（留出5-10秒缓冲）
       const customTimeout = complexAnalysisTypes.includes(data.testType) ? 45000 : 30000; // 45秒或30秒
       
-      // 为BaZi分析设置较低的max_tokens以减少响应时间
-      // 其他复杂分析保持4000，简单分析使用3000
+      // 为BaZi和Birth-chart分析设置较低的max_tokens以减少响应时间和响应体大小
+      // 由于流式传输读取很慢，需要进一步降低 max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 2500; // BaZi分析：降低到2500以减少生成时间和响应体大小
+        maxTokens = 2000; // BaZi分析：进一步降低到2000，减少响应体大小和读取时间
       } else if (data.testType === 'birth-chart') {
-        maxTokens = 2500; // Birth-chart prompt较长（~4368 chars），降低到2500
+        maxTokens = 2000; // Birth-chart prompt较长（~4377 chars），降低到2000
       } else if (complexAnalysisTypes.includes(data.testType)) {
         maxTokens = 4000; // 其他复杂分析保持4000
       } else {
@@ -2035,7 +2029,7 @@ Analyze Four Pillars, Five Elements, Ten Gods, Day Master. Provide career, wealt
     const customTimeout = 45000;
     // BaZi分析使用较低的max_tokens以减少响应时间
     // Prompt 长度 ~3476 chars，进一步降低 max_tokens 以确保响应体读取在超时前完成
-    const maxTokens = 2500; // 从 2800 降低到 2500
+    const maxTokens = 2000; // 从 2500 进一步降低到 2000，减少响应体大小
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
