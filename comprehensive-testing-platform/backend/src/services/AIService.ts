@@ -1615,7 +1615,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 500; // BaZi/ZiWei分析：移除非核心字段后，500 tokens足够
+        maxTokens = 1200; // BaZi/ZiWei分析：详细schema需要更多tokens
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -1991,49 +1991,83 @@ Please provide your analysis in JSON format with appropriate structure for the t
 
     return `Analyze BaZi (Four Pillars) for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${calendarType} calendar.
 
-Return JSON (minimal core only):
+Return JSON (detailed analysis):
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "${type}",
-    "overview": "1 sentence",
+    "overview": "Comprehensive overview (3-4 sentences explaining the overall BaZi characteristics)",
     "keyInsights": [{"pillar": "Year", "element": "Metal over Dragon"}, {"pillar": "Month", "element": "Wood over Tiger"}, {"pillar": "Day", "element": "Fire over Horse"}, {"pillar": "Hour", "element": "Earth over Dog"}],
-    "personalityTraits": ["2 items"],
-    "careerGuidance": ["2 items"],
+    "personalityTraits": ["3-4 key personality traits with brief explanations"],
+    "careerGuidance": ["3-4 career suggestions with brief explanations"],
     "baZiAnalysis": {
       "dayMasterStrength": {
         "strength": "weak/balanced/strong",
-        "description": "1 sentence",
-        "recommendations": ["2 items"]
+        "description": "Detailed explanation of day master strength (2-3 sentences)",
+        "recommendations": ["3-4 practical recommendations"]
       },
       "favorableElements": {
-        "useful": ["2 elements"],
-        "harmful": ["2 elements"],
-        "neutral": ["1 element"]
+        "useful": ["2-3 elements with brief explanations"],
+        "harmful": ["2-3 elements with brief explanations"],
+        "neutral": ["1-2 elements with brief explanations"]
       },
       "fiveElements": {
         "elements": {"metal": 2, "wood": 3, "water": 1, "fire": 2, "earth": 2},
         "dominantElement": "Wood",
         "weakElement": "Water",
-        "balance": "balanced/unbalanced"
+        "balance": "balanced/unbalanced",
+        "analysis": "Detailed analysis of five elements balance (2-3 sentences)"
       },
       "tenGods": {
-        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3 words"},
-        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3 words"}
+        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"},
+        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief meaning (5-8 words)"}
       }
+    },
+    "wealthAnalysis": {
+      "wealthLevel": "low/medium/high",
+      "wealthSource": ["2-3 sources with brief explanations"],
+      "investmentAdvice": ["2-3 investment suggestions"]
+    },
+    "relationshipAnalysis": {
+      "marriageTiming": "Detailed timing analysis (2-3 sentences)",
+      "partnerCharacteristics": "Detailed partner characteristics (2-3 sentences)",
+      "marriageAdvice": "Detailed marriage advice (2-3 sentences)"
+    },
+    "healthAnalysis": {
+      "overallHealth": "good/fair/poor",
+      "weakAreas": ["2-3 weak areas with brief explanations"],
+      "beneficialActivities": ["2-3 beneficial activities"]
+    },
+    "fortuneAnalysis": {
+      "currentYear": {
+        "year": 2024,
+        "overall": 7,
+        "career": 7,
+        "wealth": 6,
+        "health": 7,
+        "relationships": 8,
+        "overallDescription": "Detailed year analysis (3-4 sentences)",
+        "keyEvents": ["2-3 key events"],
+        "advice": ["3-4 pieces of advice"]
+      }
+    },
+    "luckyElements": {
+      "colors": ["2-3 colors"],
+      "numbers": [1, 3, 5],
+      "directions": ["2-3 directions"]
     }
   }
 }
 
-CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no extra text. Start with { and end with }. Keep all text very brief. English only.`;
+CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no extra text. Start with { and end with }. Provide detailed and comprehensive analysis. English only.`;
   }
 
   async analyzeNumerology(analysisData: any): Promise<any> {
@@ -2041,10 +2075,9 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no extra text. St
     const analysisType = analysisData?.type || 'bazi';
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
-    // BaZi分析：使用超简化schema，大幅降低max_tokens以确保快速响应
-    // 移除了 wealthAnalysis、relationshipAnalysis、healthAnalysis、fortuneAnalysis 等非核心字段
-    // 只保留最核心的 baZiAnalysis（四柱、五行、日主、十神）
-    const maxTokens = 500; // 移除非核心字段后，500 tokens足够返回核心分析
+    // BaZi分析：使用详细schema，适当增加max_tokens以提供更丰富的内容
+    // 包含完整的分析字段：baZiAnalysis、wealthAnalysis、relationshipAnalysis、healthAnalysis、fortuneAnalysis
+    const maxTokens = 1200; // 详细schema需要更多tokens，但保持在合理范围内
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
