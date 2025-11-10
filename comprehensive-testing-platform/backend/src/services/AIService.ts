@@ -1630,7 +1630,12 @@ export class AIService {
         } else if (analysisData && analysisData.type === 'ziwei') {
           parsedResult = this.parseZiWeiResponse(response.choices[0].message.content);
         } else {
-          parsedResult = this.parseNumerologyResponse(response);
+          // BaZi 也先提取 content，与 ZiWei 保持一致
+          const content = response.choices[0].message.content || '';
+          if (!content) {
+            throw new Error('Empty AI response content for numerology analysis');
+          }
+          parsedResult = this.parseNumerologyResponse(content);
         }
       } else {
         // 其他测试类型使用通用解析
