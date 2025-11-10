@@ -932,7 +932,8 @@ Rules:
         lifeGuidance: {
           career: "Brief career guidance (2-3 sentences)",
           relationships: "Brief relationship guidance (2-3 sentences)",
-          personalGrowth: "Brief personal growth guidance (2-3 sentences)"
+          personalGrowth: "Brief personal growth guidance (2-3 sentences)",
+          challenges: "Brief challenges and how to navigate them (2-3 sentences)"
         },
         createdAt: "2024-01-01T00:00:00.000Z"
       }

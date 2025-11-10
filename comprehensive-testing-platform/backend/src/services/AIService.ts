@@ -1557,7 +1557,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 1500; // BaZi分析：简化schema后，1500 tokens足够
+        maxTokens = 1200; // BaZi分析：简化schema后，1200 tokens足够
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -1966,16 +1966,16 @@ Return JSON (simplified schema for faster response):
     },
     "baZiAnalysis": {
       "tenGods": {
-        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
-        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"}
+        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief"},
+        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief"}
       },
       "dayMasterStrength": {
         "strength": "weak/balanced/strong",
@@ -2001,7 +2001,7 @@ Return JSON (simplified schema for faster response):
   }
 }
 
-Focus on core analysis: Four Pillars, Five Elements, Day Master. Provide concise guidance for career, wealth, relationships, health. Include current year predictions only. English only. Element format: "Stem over Branch" (e.g., "Metal over Dragon"). Return valid JSON only.`;
+Focus on core analysis: Four Pillars, Five Elements, Day Master. Provide concise guidance. Keep tenGods meanings very brief (3-5 words each). English only. Element format: "Stem over Branch" (e.g., "Metal over Dragon"). Return valid JSON only.`;
   }
 
   async analyzeNumerology(analysisData: any): Promise<any> {
@@ -2011,7 +2011,8 @@ Focus on core analysis: Four Pillars, Five Elements, Day Master. Provide concise
     const customTimeout = 45000;
     // BaZi分析：使用简化的schema，降低max_tokens以确保快速响应
     // 简化后的schema减少了嵌套和数组项，响应体更小，读取更快
-    const maxTokens = 1500; // 简化schema后，1500 tokens足够返回核心分析
+    // 进一步降低到1200 tokens，减少生成和读取时间
+    const maxTokens = 1200; // 简化schema后，1200 tokens足够返回核心分析
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
@@ -2272,7 +2273,8 @@ Keep the response concise but informative, suitable for a birth chart analysis.`
         lifeGuidance: {
           career: 'Focus on creative and leadership roles',
           relationships: 'Seek partners who appreciate your depth',
-          personalGrowth: 'Develop emotional balance and trust'
+          personalGrowth: 'Develop emotional balance and trust',
+          challenges: 'Learn to balance idealism with practical reality'
         },
         createdAt: new Date().toISOString()
       };
