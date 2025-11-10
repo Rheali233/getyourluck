@@ -1257,10 +1257,13 @@ export class AIService {
       }
       
       console.log('[AIService] VARK parsed JSON keys:', Object.keys(parsed || {}));
+      console.log('[AIService] VARK parsed JSON preview (first 1000 chars):', JSON.stringify(parsed).substring(0, 1000));
       
       // 检查是否有 dimensionsAnalysis 在顶层
       if (parsed.dimensionsAnalysis && typeof parsed.dimensionsAnalysis === 'object') {
         console.log('[AIService] VARK found dimensionsAnalysis at top level, keys:', Object.keys(parsed.dimensionsAnalysis));
+      } else {
+        console.log('[AIService] VARK NO dimensionsAnalysis at top level');
       }
       
       // 现在AI应该直接返回我们期望的格式，不需要复杂的映射
@@ -1636,6 +1639,11 @@ export class AIService {
             // 尝试从AI响应中提取维度分析
             const modalityBreakdown = a.modality_breakdown || {};
             const detailedInsights = a.detailedInsights || a.detailed_insights || {};
+            const learningStyleProfile = a.learningStyleProfile || a.learning_style_profile || a.learning_profile || {};
+            
+            console.log('[AIService] VARK buildDimensionsAnalysis - checking all possible sources');
+            console.log('[AIService] VARK a object keys:', Object.keys(a || {}));
+            console.log('[AIService] VARK learningStyleProfile keys:', Object.keys(learningStyleProfile));
             
             // 优先检查 parsed.dimensionsAnalysis（如果AI直接返回在顶层）
             if (parsed.dimensionsAnalysis && typeof parsed.dimensionsAnalysis === 'object') {
