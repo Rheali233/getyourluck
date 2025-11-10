@@ -581,7 +581,10 @@ export class AIService {
       ];
       
       const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'birth_chart');
-      const response = await this.callDeepSeek(prompt);
+      // Birth-chart prompt 较长（~4368 chars），降低 max_tokens 以减少响应体大小和读取时间
+      const customTimeout = 45000;
+      const maxTokens = 2500; // 降低到 2500，减少响应体大小
+      const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
       return this.parseBirthChartResponse(response);
     } catch (error) {
       throw new Error(`Birth chart analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -1559,7 +1562,9 @@ export class AIService {
       // 其他复杂分析保持4000，简单分析使用3000
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 2800; // BaZi分析：降低到2800以减少生成时间
+        maxTokens = 2500; // BaZi分析：降低到2500以减少生成时间和响应体大小
+      } else if (data.testType === 'birth-chart') {
+        maxTokens = 2500; // Birth-chart prompt较长（~4368 chars），降低到2500
       } else if (complexAnalysisTypes.includes(data.testType)) {
         maxTokens = 4000; // 其他复杂分析保持4000
       } else {
@@ -2029,7 +2034,8 @@ Analyze Four Pillars, Five Elements, Ten Gods, Day Master. Provide career, wealt
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
     // BaZi分析使用较低的max_tokens以减少响应时间
-    const maxTokens = 2800;
+    // Prompt 长度 ~3476 chars，进一步降低 max_tokens 以确保响应体读取在超时前完成
+    const maxTokens = 2500; // 从 2800 降低到 2500
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
