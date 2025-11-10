@@ -124,27 +124,87 @@ export class AIService {
       }
 
       // 在 Cloudflare Workers 环境中读取响应体
-      // 尝试多种方法以确保兼容性
+      // 添加超时保护，确保在 Worker 超时前完成读取
+      // 剩余时间 = 总超时时间 - 已用时间 - 5秒缓冲
+      const remainingTime = timeout - fetchTime - 5000;
+      if (remainingTime < 10000) {
+        // eslint-disable-next-line no-console
+        console.warn(`[AI Debug] Low remaining time for response reading: ${remainingTime}ms`);
+      }
+
+      // 创建响应体读取超时控制器
+      const readController = new AbortController();
+      const readTimeoutId = setTimeout(() => {
+        readController.abort();
+      }, Math.max(10000, remainingTime)); // 至少10秒，或使用剩余时间
+
       let data: any;
       try {
         // 方法1: 尝试直接使用 response.json()（最简单的方法）
         // 如果失败，再尝试其他方法
         try {
-          data = await response.json();
           // eslint-disable-next-line no-console
-          console.log('[AI Debug] Successfully parsed response using response.json()');
+          console.log('[AI Debug] Attempting to read response body using response.json()');
+          const readStartTime = Date.now();
+          
+          // 使用 Promise.race 确保在超时前完成读取
+          data = await Promise.race([
+            response.json(),
+            new Promise((_, reject) => {
+              setTimeout(() => {
+                readController.abort();
+                reject(new Error('Response body reading timeout'));
+              }, Math.max(10000, remainingTime));
+            })
+          ]);
+          
+          const readTime = Date.now() - readStartTime;
+          clearTimeout(readTimeoutId);
+          
+          // eslint-disable-next-line no-console
+          console.log(`[AI Debug] Successfully parsed response using response.json() in ${readTime}ms`);
+          
+          // 验证响应数据
+          if (!data) {
+            throw new Error('Empty response data after parsing');
+          }
+          
           // eslint-disable-next-line no-console
           console.log('[AI Debug] Response keys:', Object.keys(data));
+          
+          // 检查是否有 choices 字段
+          if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+            // eslint-disable-next-line no-console
+            console.error('[AI Debug] Missing or empty choices array in response');
+            // eslint-disable-next-line no-console
+            console.error('[AI Debug] Response structure:', JSON.stringify(data).substring(0, 500));
+            throw new Error('Invalid response structure: missing choices array');
+          }
+          
         } catch (jsonError) {
+          clearTimeout(readTimeoutId);
           // eslint-disable-next-line no-console
           console.log('[AI Debug] response.json() failed, trying arrayBuffer() method');
+          // eslint-disable-next-line no-console
+          console.log('[AI Debug] JSON parse error:', jsonError instanceof Error ? jsonError.message : String(jsonError));
           
           // 方法2: 使用 arrayBuffer 读取
           // 注意：需要克隆 response，因为 response 只能读取一次
           const clonedResponse = response.clone();
-          const arrayBuffer = await clonedResponse.arrayBuffer();
+          const arrayBufferStartTime = Date.now();
+          
+          const arrayBuffer = await Promise.race([
+            clonedResponse.arrayBuffer(),
+            new Promise<ArrayBuffer>((_, reject) => {
+              setTimeout(() => {
+                reject(new Error('ArrayBuffer reading timeout'));
+              }, Math.max(10000, remainingTime));
+            })
+          ]);
+          
+          const arrayBufferTime = Date.now() - arrayBufferStartTime;
           // eslint-disable-next-line no-console
-          console.log(`[AI Debug] Response arrayBuffer size: ${arrayBuffer.byteLength} bytes`);
+          console.log(`[AI Debug] Response arrayBuffer read in ${arrayBufferTime}ms, size: ${arrayBuffer.byteLength} bytes`);
           
           if (arrayBuffer.byteLength === 0) {
             throw new Error('Empty response body from AI service');
@@ -160,24 +220,45 @@ export class AIService {
             throw new Error('Empty response text after decoding');
           }
           
+          // eslint-disable-next-line no-console
+          console.log('[AI Debug] Response text preview (first 200 chars):', responseText.substring(0, 200));
+          
           data = JSON.parse(responseText);
           // eslint-disable-next-line no-console
           console.log('[AI Debug] Successfully parsed response using arrayBuffer() method');
+          
+          // 验证响应数据
+          if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+            throw new Error('Invalid response structure: missing choices array');
+          }
         }
       } catch (parseError) {
+        clearTimeout(readTimeoutId);
         // eslint-disable-next-line no-console
         console.error('[AI Debug] Failed to parse response:', parseError);
         // eslint-disable-next-line no-console
         console.error('[AI Debug] Parse error details:', {
           name: parseError instanceof Error ? parseError.name : 'Unknown',
           message: parseError instanceof Error ? parseError.message : String(parseError),
-          stack: parseError instanceof Error ? parseError.stack?.substring(0, 500) : 'No stack'
+          stack: parseError instanceof Error ? parseError.stack?.substring(0, 500) : 'No stack',
+          fetchTime: fetchTime,
+          remainingTime: remainingTime
         });
+        
+        // 检查是否是超时错误
+        if (parseError instanceof Error && (
+          parseError.message.includes('timeout') || 
+          parseError.message.includes('aborted') ||
+          parseError.name === 'AbortError'
+        )) {
+          throw new Error(`Response body reading timeout after ${fetchTime}ms. The AI response is too large or the connection is too slow.`);
+        }
         
         // 检查是否是网络连接错误
         if (parseError instanceof Error && parseError.message.includes('Network connection lost')) {
           throw new Error(`Network connection lost while reading response body. This may be a Cloudflare Workers local development environment limitation. Please try deploying to staging/production or check your network connection.`);
         }
+        
         throw new Error(`Failed to parse AI response: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
       }
       
@@ -1865,45 +1946,39 @@ Please provide your analysis in JSON format with appropriate structure for the t
       return this.buildZiWeiPrompt(fullName, birthDate, birthTime, gender, birthPlace, calendarType);
     }
 
-    return `Analyze BaZi (Four Pillars of Destiny) for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${calendarType} calendar.
+    return `Analyze BaZi (Four Pillars) for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${calendarType} calendar.
 
-Return JSON with this structure:
+Return JSON:
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "${type}",
     "overview": "Brief overview",
-    "keyInsights": [
-      { "pillar": "Year Pillar", "element": "Metal over Dragon" }
-    ],
-    "strengths": ["3-5 items"],
-    "potentialChallenges": ["3-5 items"],
-    "careerSuggestions": ["3-5 items"],
-    "relationshipInsights": ["3-5 items"],
-    "personalGrowthRecommendations": ["3-5 items"],
+    "keyInsights": [{"pillar": "Year", "element": "Metal over Dragon"}],
+    "strengths": ["3-4 items"],
+    "potentialChallenges": ["3-4 items"],
+    "careerSuggestions": ["3-4 items"],
+    "relationshipInsights": ["3-4 items"],
+    "personalGrowthRecommendations": ["3-4 items"],
     "wealthAnalysis": {
       "wealthLevel": "low/medium/high",
-      "wealthSource": ["2-4 items"],
-      "investmentAdvice": ["2-4 items"],
-      "wealthRisks": ["2-3 items"],
-      "wealthLuckyPeriods": ["2-3 items"],
-      "wealthPrecautions": ["2-3 items"]
+      "wealthSource": ["2-3 items"],
+      "investmentAdvice": ["2-3 items"],
+      "wealthRisks": ["2 items"],
+      "wealthLuckyPeriods": ["2 items"]
     },
     "relationshipAnalysis": {
-      "marriageTiming": "Brief description",
-      "partnerCharacteristics": ["3-5 items"],
-      "relationshipChallenges": ["2-4 items"],
-      "compatibilityElements": ["2-4 items"],
-      "marriageAdvice": ["2-4 items"],
-      "relationshipLuckyPeriods": ["2-3 items"]
+      "marriageTiming": "Brief",
+      "partnerCharacteristics": ["3-4 items"],
+      "relationshipChallenges": ["2-3 items"],
+      "compatibilityElements": ["2-3 items"],
+      "marriageAdvice": ["2-3 items"]
     },
     "healthAnalysis": {
       "overallHealth": "good/fair/poor",
-      "healthWeakAreas": ["2-4 items"],
-      "healthAdvice": ["2-4 items"],
-      "preventiveMeasures": ["2-4 items"],
-      "beneficialActivities": ["2-4 items"],
-      "healthWarningSigns": ["2-3 items"]
+      "healthWeakAreas": ["2-3 items"],
+      "healthAdvice": ["2-3 items"],
+      "preventiveMeasures": ["2-3 items"]
     },
     "fortuneAnalysis": {
       "currentYear": {
@@ -1913,75 +1988,59 @@ Return JSON with this structure:
         "wealth": 6,
         "health": 7,
         "relationships": 8,
-        "overallDescription": "2-3 sentences",
-        "careerDescription": "2-3 sentences",
-        "wealthDescription": "2-3 sentences",
-        "healthDescription": "2-3 sentences",
-        "relationshipsDescription": "2-3 sentences",
-        "keyEvents": ["3-5 items"],
-        "advice": ["3-5 items"]
+        "overallDescription": "2 sentences",
+        "keyEvents": ["3-4 items"],
+        "advice": ["3-4 items"]
       },
       "nextYear": {
         "year": 2025,
         "overall": 7,
-        "overallDescription": "2-3 sentences",
-        "keyTrends": ["3-5 items"],
-        "opportunities": ["3-5 items"],
-        "challenges": ["2-4 items"]
+        "overallDescription": "2 sentences",
+        "keyTrends": ["3-4 items"]
       }
     },
-    "overallInterpretation": "2-3 paragraphs",
-    "personalityTraits": ["5-8 items"],
-    "careerGuidance": ["3-5 items"],
+    "overallInterpretation": "2 paragraphs",
+    "personalityTraits": ["5-6 items"],
+    "careerGuidance": ["3-4 items"],
     "baZiAnalysis": {
       "tenGods": {
-        "biJian": { "name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "jieCai": { "name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "shiShen": { "name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "shangGuan": { "name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "pianCai": { "name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "zhengCai": { "name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "qiSha": { "name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "zhengGuan": { "name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "pianYin": { "name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief" },
-        "zhengYin": { "name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief" }
+        "biJian": {"element": "Metal", "strength": "weak/balanced/strong"},
+        "jieCai": {"element": "Wood", "strength": "weak/balanced/strong"},
+        "shiShen": {"element": "Fire", "strength": "weak/balanced/strong"},
+        "shangGuan": {"element": "Earth", "strength": "weak/balanced/strong"},
+        "pianCai": {"element": "Water", "strength": "weak/balanced/strong"},
+        "zhengCai": {"element": "Metal", "strength": "weak/balanced/strong"},
+        "qiSha": {"element": "Wood", "strength": "weak/balanced/strong"},
+        "zhengGuan": {"element": "Fire", "strength": "weak/balanced/strong"},
+        "pianYin": {"element": "Earth", "strength": "weak/balanced/strong"},
+        "zhengYin": {"element": "Water", "strength": "weak/balanced/strong"}
       },
       "dayMasterStrength": {
         "strength": "weak/balanced/strong",
-        "description": "2-3 sentences",
-        "recommendations": ["3-5 items"]
+        "description": "2 sentences",
+        "recommendations": ["3-4 items"]
       },
       "favorableElements": {
-        "useful": ["2-4 elements"],
-        "harmful": ["2-4 elements"],
-        "neutral": ["1-3 elements"],
-        "explanation": "2-3 sentences"
+        "useful": ["2-3 elements"],
+        "harmful": ["2-3 elements"],
+        "explanation": "2 sentences"
       },
       "fiveElements": {
-        "elements": { "metal": 2, "wood": 3, "water": 1, "fire": 2, "earth": 2 },
+        "elements": {"metal": 2, "wood": 3, "water": 1, "fire": 2, "earth": 2},
         "dominantElement": "Wood",
         "weakElement": "Water",
         "balance": "balanced/unbalanced"
       }
     },
     "luckyElements": {
-      "colors": ["3-5 colors"],
+      "colors": ["3-4 colors"],
       "numbers": [1, 3, 5],
-      "directions": ["2-4 directions"],
-      "seasons": ["1-3 seasons"]
+      "directions": ["2-3 directions"]
     }
   }
 }
 
-Requirements:
-- Analyze Four Pillars (Year/Month/Day/Hour) with Heavenly Stems and Earthly Branches
-- Assess Five Elements balance
-- Include Ten Gods analysis
-- Evaluate Day Master strength and favorable elements
-- Provide guidance for career, wealth, relationships, health
-- Include current and next year predictions
-
-Format: English only. Element format: "Heavenly Stem over Earthly Branch" (e.g., "Metal over Dragon"). Return valid JSON only.`;
+Analyze Four Pillars, Five Elements, Ten Gods, Day Master. Provide career, wealth, relationships, health guidance. Include current/next year predictions. English only. Element format: "Stem over Branch" (e.g., "Metal over Dragon"). Return valid JSON only.`;
   }
 
   async analyzeNumerology(analysisData: any): Promise<any> {
