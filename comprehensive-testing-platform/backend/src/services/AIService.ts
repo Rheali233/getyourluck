@@ -2363,20 +2363,46 @@ Keep it concise but meaningful, focusing on the most important insights.`;
    * 解析命理分析响应
    */
   private parseNumerologyResponse(response: any): any {
+    try {
       const content = response?.choices?.[0]?.message?.content || '';
       if (!content) {
-      throw new Error('Empty response content from AI');
+        console.error('[AIService] Empty response content from AI for numerology analysis');
+        throw new Error('Empty response content from AI');
       }
       
+      // 处理模型返回中可能包含的 ```json 代码块
       const cleaned = this.sanitizeAIJSON(content);
-      const parsed = JSON.parse(cleaned);
-      
-    // 验证必需字段 - 如果缺失则抛出错误，不使用默认值
-      if (!parsed.analysis) {
-        throw new Error('Missing analysis field in numerology response');
+      let parsed;
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch (parseError) {
+        console.error('[AIService] Failed to parse numerology response JSON:', parseError);
+        console.error('[AIService] Response content (first 500 chars):', content.substring(0, 500));
+        throw new Error(`Failed to parse AI response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`);
       }
       
+      // 验证必需字段 - 如果缺失则抛出错误，不使用默认值
+      if (!parsed.analysis) {
+        console.error('[AIService] Missing analysis field in numerology response');
+        console.error('[AIService] Parsed response keys:', Object.keys(parsed));
+        console.error('[AIService] Parsed response (first 1000 chars):', JSON.stringify(parsed).substring(0, 1000));
+        throw new Error('Missing analysis field in numerology response. The AI response format is incorrect.');
+      }
+      
+      console.log('[AIService] Numerology response parsed successfully');
       return parsed;
+    } catch (error) {
+      // 记录详细错误信息以便调试
+      console.error('[AIService] parseNumerologyResponse error:', error);
+      console.error('[AIService] Error details:', error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.substring(0, 500)
+      } : error);
+      
+      // 重新抛出错误，让上层处理
+      throw error;
+    }
   }
 
   // ==================== 中国生肖运势分析方法 ====================

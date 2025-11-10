@@ -100,15 +100,8 @@ export class TestResultService {
             // 直接调用 AI 服务，超时控制由 AIService 内部的 AbortController 处理
             // 移除 Promise.race，避免双重超时机制冲突导致的 "Network connection lost" 错误
             // AIService 已经根据测试类型设置了合适的超时时间（120秒或45秒）
-            if (testType === 'numerology') {
-              const numerologyAnswer = answers[0]?.answer;
-              if (!numerologyAnswer) {
-                throw new Error('Invalid numerology analysis data');
-              }
-              aiAnalysis = await this.aiService.analyzeNumerology(numerologyAnswer);
-            } else {
-              aiAnalysis = await this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
-            }
+            // 统一使用 analyzeTestResult() 方法，与 Tarot 等其他模块保持一致
+            aiAnalysis = await this.aiService.analyzeTestResult({ testType, answers, userContext: {} });
             
             const aiTime = aiStartTime ? Date.now() - aiStartTime : 0;
             console.log(`[TestResultService] AI analysis completed for ${testType} in ${aiTime}ms`);
