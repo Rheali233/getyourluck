@@ -1815,24 +1815,30 @@ export class AIService {
       // 根据测试类型设置不同的超时时间和max_tokens
       // 注意：Cloudflare Workers执行时间限制约为50-60秒，需要确保超时时间不超过此限制
       const complexAnalysisTypes = ['numerology', 'tarot', 'birth-chart', 'compatibility', 'fortune'];
-      // 将超时时间调整为45秒，确保在Worker限制内（留出5-10秒缓冲）
-      const customTimeout = complexAnalysisTypes.includes(data.testType) ? 45000 : 30000; // 45秒或30秒
       
       // 为BaZi和Birth-chart分析设置较低的max_tokens以减少响应时间和响应体大小
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
+      let customTimeout: number;
+      
       if (data.testType === 'numerology') {
         maxTokens = 800; // BaZi/ZiWei分析：平衡内容详细度和响应时间
+        customTimeout = 45000; // 45秒
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
+        customTimeout = 45000; // 45秒
       } else if (data.testType === 'love_language') {
         maxTokens = 1500; // Love Language Test：降低max_tokens以避免响应体读取超时
+        customTimeout = 30000; // 30秒
       } else if (data.testType === 'vark') {
         maxTokens = 5000; // VARK：增加max_tokens以确保完整响应（包含所有4个维度的分析）
+        customTimeout = 60000; // 60秒超时，给响应体读取更多时间
       } else if (complexAnalysisTypes.includes(data.testType)) {
         maxTokens = 4000; // 其他复杂分析保持4000
+        customTimeout = 45000; // 45秒
       } else {
         maxTokens = 3000; // 简单分析使用3000
+        customTimeout = 30000; // 30秒
       }
       
       const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
