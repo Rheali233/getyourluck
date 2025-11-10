@@ -1236,12 +1236,25 @@ export class AIService {
     try {
       const content = response?.choices?.[0]?.message?.content || '';
       if (!content) {
+        console.error('[AIService] VARK response: Empty content');
         throw new Error('Empty response content');
       }
       
+      console.log(`[AIService] VARK response content length: ${content.length} chars`);
+      console.log(`[AIService] VARK response preview (first 500 chars): ${content.substring(0, 500)}`);
+      
       // 处理模型返回中可能包含的 ```json 代码块
       const cleaned = this.sanitizeAIJSON(content);
-      const parsed = JSON.parse(cleaned);
+      let parsed;
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch (parseError) {
+        console.error('[AIService] VARK JSON parse error:', parseError instanceof Error ? parseError.message : 'Unknown error');
+        console.error('[AIService] VARK cleaned content (first 1000 chars):', cleaned.substring(0, 1000));
+        throw new Error(`Failed to parse VARK response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      }
+      
+      console.log('[AIService] VARK parsed JSON keys:', Object.keys(parsed || {}));
       
       // 现在AI应该直接返回我们期望的格式，不需要复杂的映射
       if (parsed && typeof parsed === 'object') {
@@ -1272,12 +1285,18 @@ export class AIService {
           });
           
           if (missingDimensions.length > 0) {
+            console.error('[AIService] VARK validation failed: missing dimensionsAnalysis for', missingDimensions);
+            console.error('[AIService] VARK dimensionsAnalysis keys:', Object.keys(parsed.dimensionsAnalysis || {}));
             throw new Error(`Missing dimensionsAnalysis for: ${missingDimensions.join(', ')}. AI analysis is incomplete.`);
           }
           
           if (!parsed.learningStrategiesImplementation || typeof parsed.learningStrategiesImplementation !== 'object') {
+            console.error('[AIService] VARK validation failed: missing learningStrategiesImplementation');
+            console.error('[AIService] VARK parsed keys:', Object.keys(parsed || {}));
             throw new Error('Missing required VARK field: learningStrategiesImplementation');
           }
+          
+          console.log('[AIService] VARK validation passed: all required fields present');
           
           return {
             primaryStyle: parsed.primaryStyle,

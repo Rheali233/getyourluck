@@ -96,19 +96,28 @@ export class VARKResultProcessor implements TestResultProcessor {
 
     // 必须有AI分析结果，否则抛出错误
     if (!aiAnalysis) {
+      console.error('[VARKResultProcessor] AI analysis is null or undefined');
       throw new Error('AI analysis is required for VARK test. Please ensure AI service is available and try again.');
     }
 
+    console.log('[VARKResultProcessor] Validating AI analysis result, keys:', Object.keys(aiAnalysis || {}));
+
     // 验证AI分析结果是否包含必需字段
     if (!aiAnalysis.primaryStyle && !aiAnalysis.dominantStyle) {
+      console.error('[VARKResultProcessor] Validation failed: missing primaryStyle or dominantStyle');
+      console.error('[VARKResultProcessor] AI analysis keys:', Object.keys(aiAnalysis || {}));
       throw new Error('AI analysis is incomplete: missing primaryStyle or dominantStyle');
     }
     
     if (!aiAnalysis.analysis || !String(aiAnalysis.analysis).trim()) {
+      console.error('[VARKResultProcessor] Validation failed: missing or empty analysis field');
       throw new Error('AI analysis is incomplete: missing analysis field');
     }
     
     if (!aiAnalysis.dimensionsAnalysis || typeof aiAnalysis.dimensionsAnalysis !== 'object') {
+      console.error('[VARKResultProcessor] Validation failed: missing or invalid dimensionsAnalysis');
+      console.error('[VARKResultProcessor] dimensionsAnalysis type:', typeof aiAnalysis.dimensionsAnalysis);
+      console.error('[VARKResultProcessor] dimensionsAnalysis value:', aiAnalysis.dimensionsAnalysis);
       throw new Error('AI analysis is incomplete: missing dimensionsAnalysis field');
     }
     
@@ -120,12 +129,18 @@ export class VARKResultProcessor implements TestResultProcessor {
     });
     
     if (missingDimensions.length > 0) {
+      console.error('[VARKResultProcessor] Validation failed: missing dimensionsAnalysis for', missingDimensions);
+      console.error('[VARKResultProcessor] Available dimensionsAnalysis keys:', Object.keys(aiAnalysis.dimensionsAnalysis || {}));
       throw new Error(`AI analysis is incomplete: missing dimensionsAnalysis for ${missingDimensions.join(', ')}`);
     }
     
     if (!aiAnalysis.learningStrategiesImplementation || typeof aiAnalysis.learningStrategiesImplementation !== 'object') {
+      console.error('[VARKResultProcessor] Validation failed: missing or invalid learningStrategiesImplementation');
+      console.error('[VARKResultProcessor] learningStrategiesImplementation type:', typeof aiAnalysis.learningStrategiesImplementation);
       throw new Error('AI analysis is incomplete: missing learningStrategiesImplementation field');
     }
+    
+    console.log('[VARKResultProcessor] All validations passed, returning result');
 
     // 使用AI分析结果
     return {

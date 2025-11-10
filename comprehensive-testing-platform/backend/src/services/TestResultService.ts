@@ -120,6 +120,14 @@ export class TestResultService {
               message: aiErrorCaught.message,
               stack: aiErrorCaught.stack?.substring(0, 500)
             } : aiErrorCaught);
+            
+            // 对于 VARK 测试，记录更详细的错误信息
+            if (testType === 'vark') {
+              console.error(`[TestResultService] VARK AI analysis failed - this is a critical error for VARK test`);
+              console.error(`[TestResultService] VARK error type: ${aiErrorCaught instanceof Error ? aiErrorCaught.name : 'Unknown'}`);
+              console.error(`[TestResultService] VARK error message: ${errorMessage}`);
+            }
+            
             // 确保 aiAnalysis 保持为 null，这样处理器会使用基础结果
             aiAnalysis = null;
           }
