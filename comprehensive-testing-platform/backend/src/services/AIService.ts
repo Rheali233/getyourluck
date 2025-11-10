@@ -1324,7 +1324,9 @@ export class AIService {
 
         // 情况2：AI返回 analysis 对象（当前日志所示结构）
         if (parsed.analysis && typeof parsed.analysis === 'object') {
+          console.log('[AIService] VARK processing analysis object format');
           const a = parsed.analysis as any;
+          console.log('[AIService] VARK analysis object keys:', Object.keys(a || {}));
           // 兼容字段提取（两套命名）
           const lspSnake = a.learning_style_profile || a.learning_profile || {};
           const lspCamel = a.learningStyleProfile || {};
