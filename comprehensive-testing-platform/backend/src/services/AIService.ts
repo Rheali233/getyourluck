@@ -1557,7 +1557,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 1200; // BaZi分析：简化schema后，1200 tokens足够
+        maxTokens = 800; // BaZi/ZiWei分析：最小化schema后，800 tokens足够
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -1928,80 +1928,52 @@ Please provide your analysis in JSON format with appropriate structure for the t
 
     return `Analyze BaZi (Four Pillars) for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${calendarType} calendar.
 
-Return JSON (simplified schema for faster response):
+Return JSON (minimal schema for fast response):
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "${type}",
-    "overview": "Brief overview (2-3 sentences)",
-    "keyInsights": [{"pillar": "Year", "element": "Metal over Dragon"}],
-    "personalityTraits": ["3-4 key traits"],
-    "careerGuidance": ["2-3 items"],
-    "wealthAnalysis": {
-      "wealthLevel": "low/medium/high",
-      "wealthSource": ["2 items"],
-      "investmentAdvice": ["2 items"]
-    },
-    "relationshipAnalysis": {
-      "marriageTiming": "Brief (1 sentence)",
-      "partnerCharacteristics": ["2 items"],
-      "marriageAdvice": ["2 items"]
-    },
-    "healthAnalysis": {
-      "overallHealth": "good/fair/poor",
-      "healthAdvice": ["2 items"]
-    },
-    "fortuneAnalysis": {
-      "currentYear": {
-        "year": 2024,
-        "overall": 7,
-        "career": 7,
-        "wealth": 6,
-        "health": 7,
-        "relationships": 8,
-        "overallDescription": "1-2 sentences",
-        "keyEvents": ["2 items"],
-        "advice": ["2 items"]
-      }
-    },
+    "overview": "Brief overview (1-2 sentences)",
+    "keyInsights": [{"pillar": "Year", "element": "Metal over Dragon"}, {"pillar": "Month", "element": "Wood over Tiger"}, {"pillar": "Day", "element": "Fire over Horse"}, {"pillar": "Hour", "element": "Earth over Dog"}],
+    "personalityTraits": ["2-3 key traits"],
+    "careerGuidance": ["2 items"],
     "baZiAnalysis": {
-      "tenGods": {
-        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief"},
-        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief"}
-      },
       "dayMasterStrength": {
         "strength": "weak/balanced/strong",
-        "description": "1-2 sentences"
+        "description": "1 sentence"
       },
       "favorableElements": {
         "useful": ["2 elements"],
-        "harmful": ["2 elements"],
-        "explanation": "1 sentence"
+        "harmful": ["2 elements"]
       },
       "fiveElements": {
         "elements": {"metal": 2, "wood": 3, "water": 1, "fire": 2, "earth": 2},
         "dominantElement": "Wood",
         "weakElement": "Water",
         "balance": "balanced/unbalanced"
+      },
+      "tenGods": {
+        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
+        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3-5 words"}
       }
     },
     "luckyElements": {
-      "colors": ["2-3 colors"],
+      "colors": ["2 colors"],
       "numbers": [1, 3],
       "directions": ["2 directions"]
     }
   }
 }
 
-Focus on core analysis: Four Pillars, Five Elements, Day Master. Provide concise guidance. Keep tenGods meanings very brief (3-5 words each). English only. Element format: "Stem over Branch" (e.g., "Metal over Dragon"). Return valid JSON only.`;
+Focus ONLY on core: Four Pillars, Five Elements, Day Master, Ten Gods. Keep ALL text very brief. tenGods meanings: 3-5 words max. English only. Element format: "Stem over Branch". Return valid JSON only.`;
   }
 
   async analyzeNumerology(analysisData: any): Promise<any> {
@@ -2009,10 +1981,10 @@ Focus on core analysis: Four Pillars, Five Elements, Day Master. Provide concise
     const analysisType = analysisData?.type || 'bazi';
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
-    // BaZi分析：使用简化的schema，降低max_tokens以确保快速响应
-    // 简化后的schema减少了嵌套和数组项，响应体更小，读取更快
-    // 进一步降低到1200 tokens，减少生成和读取时间
-    const maxTokens = 1200; // 简化schema后，1200 tokens足够返回核心分析
+    // BaZi分析：使用最小化schema，大幅降低max_tokens以确保快速响应
+    // 移除了wealthAnalysis、relationshipAnalysis、healthAnalysis、fortuneAnalysis等非核心字段
+    // 只保留核心的baZiAnalysis和基础信息
+    const maxTokens = 800; // 最小化schema后，800 tokens足够返回核心分析
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
@@ -2697,87 +2669,46 @@ Please ensure the analysis is:
    * 构建紫微斗数分析提示词
    */
   private buildZiWeiPrompt(fullName: string, birthDate: string, birthTime: string, gender: string, birthPlace: string, calendarType: string): string {
-    return `You are a professional ZiWei DouShu (Purple Star Astrology) master. Provide a comprehensive ZiWei chart analysis based on:
+    return `Analyze ZiWei DouShu for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${birthPlace}, ${calendarType} calendar.
 
-**Birth Information:**
-- Name: ${fullName}
-- Birth Date: ${birthDate}
-- Birth Time: ${birthTime}
-- Gender: ${gender}
-- Birth Place: ${birthPlace}
-- Calendar Type: ${calendarType}
-
-**Required JSON Structure:**
+Return JSON (minimal schema for fast response):
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "ziwei",
-    "overview": "string - comprehensive overview",
+    "overview": "Brief overview (1-2 sentences)",
     "ziWeiChart": {
       "palaces": {
-        "life|parents|fortune|property|career|friends|travel|health|wealth|children|marriage|siblings": {
-          "mainStars": ["string[] - pinyin names only (e.g., 'Zi Wei', 'Tian Fu')"],
-          "minorStars": ["string[] - pinyin names only"],
-          "element": "string (Metal|Wood|Water|Fire|Earth)",
-          "meaning": "string - brief description"
-        }
+        "life": {"mainStars": ["Zi Wei"], "element": "Metal", "meaning": "Brief"},
+        "parents": {"mainStars": ["Tian Fu"], "element": "Wood", "meaning": "Brief"},
+        "fortune": {"mainStars": ["Tian Ji"], "element": "Water", "meaning": "Brief"},
+        "property": {"mainStars": ["Tai Yang"], "element": "Fire", "meaning": "Brief"},
+        "career": {"mainStars": ["Wu Qu"], "element": "Earth", "meaning": "Brief"},
+        "friends": {"mainStars": ["Tian Tong"], "element": "Metal", "meaning": "Brief"},
+        "travel": {"mainStars": ["Lian Zhen"], "element": "Wood", "meaning": "Brief"},
+        "health": {"mainStars": ["Tian Liang"], "element": "Water", "meaning": "Brief"},
+        "wealth": {"mainStars": ["Tai Yin"], "element": "Fire", "meaning": "Brief"},
+        "children": {"mainStars": ["Tan Lang"], "element": "Earth", "meaning": "Brief"},
+        "marriage": {"mainStars": ["Ju Men"], "element": "Metal", "meaning": "Brief"},
+        "siblings": {"mainStars": ["Po Jun"], "element": "Wood", "meaning": "Brief"}
       },
-      "lifePalace": "string - detailed multi-sentence analysis (~30 words) with star influences, personality traits, and practical guidance",
-      "parentsPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "fortunePalace": "string - detailed multi-sentence analysis (~30 words)",
-      "propertyPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "careerPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "friendsPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "travelPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "healthPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "wealthPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "childrenPalace": "string - detailed multi-sentence analysis (~30 words)",
-      "marriagePalace": "string - detailed multi-sentence analysis (~30 words)",
-      "siblingsPalace": "string - detailed multi-sentence analysis (~30 words)"
+      "lifePalace": "Brief (1-2 sentences)",
+      "careerPalace": "Brief (1-2 sentences)",
+      "wealthPalace": "Brief (1-2 sentences)",
+      "marriagePalace": "Brief (1-2 sentences)"
     },
-    "overallInterpretation": "string - comprehensive life guidance (~200 words) covering personality, career, relationships, wealth, health, life themes, and practical advice",
-    "personalityTraits": ["string[]"],
-    "careerGuidance": ["string[]"],
-    "relationshipAdvice": ["string[]"],
-        "luckyElements": {
-      "colors": ["string[]"],
-      "numbers": ["number[]"],
-      "directions": ["string[]"],
-      "seasons": ["string[]"]
-    },
-    "improvementSuggestions": ["string[]"],
-        "starAnalysis": {
-          "mainStars": {
-        "life|wealth|career|marriage": ["string[] - pinyin names only"]
-          },
-      "starMeanings": "string - detailed analysis using pinyin names only"
-        },
-        "fourTransformations": {
-      "huaLu": { "strength": "string (Strong|Balanced|Weak|Moderate)", "analysis": "string - detailed analysis" },
-      "huaQuan": { "strength": "string", "analysis": "string" },
-      "huaKe": { "strength": "string", "analysis": "string" },
-      "huaJi": { "strength": "string", "analysis": "string" }
-    },
-        "patterns": {
-      "mainPattern": "string",
-      "specialPatterns": ["string[]"]
+    "personalityTraits": ["2-3 items"],
+    "careerGuidance": ["2 items"],
+    "relationshipAdvice": ["2 items"],
+    "luckyElements": {
+      "colors": ["2 colors"],
+      "numbers": [1, 3],
+      "directions": ["2 directions"]
     }
   }
 }
 
-**Analysis Requirements:**
-1. Calculate ZiWei chart based on birth information (time and location sensitive)
-2. Analyze ALL 12 palaces with main and minor stars
-3. Provide detailed multi-sentence interpretations (~30 words) for ALL palaces with: star names, elemental influences, personality traits/abilities, practical guidance
-4. Give comprehensive life guidance (~200 words) covering personality, career, relationships, wealth, health, life themes
-5. Include lucky elements and improvement suggestions
-6. Ensure all interpretations are positive and constructive
-
-**Format & Style Requirements:**
-- Use pinyin names ONLY for Chinese star names (e.g., "Zi Wei" not "紫微", "Tian Fu" not "天府") - NO Chinese characters
-- Use English element names: Metal, Wood, Water, Fire, Earth
-- Use rich descriptive language, encouraging professional tone, specific actionable advice
-- Focus on practical life guidance rather than fatalistic predictions`;
+Focus on core: 12 palaces with main stars, life/career/wealth/marriage palaces. Keep ALL text very brief (1-2 sentences max). Use pinyin names only. English only. Return valid JSON only.`;
   }
 
   /**
