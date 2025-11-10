@@ -99,6 +99,34 @@ export class VARKResultProcessor implements TestResultProcessor {
       throw new Error('AI analysis is required for VARK test. Please ensure AI service is available and try again.');
     }
 
+    // 验证AI分析结果是否包含必需字段
+    if (!aiAnalysis.primaryStyle && !aiAnalysis.dominantStyle) {
+      throw new Error('AI analysis is incomplete: missing primaryStyle or dominantStyle');
+    }
+    
+    if (!aiAnalysis.analysis || !String(aiAnalysis.analysis).trim()) {
+      throw new Error('AI analysis is incomplete: missing analysis field');
+    }
+    
+    if (!aiAnalysis.dimensionsAnalysis || typeof aiAnalysis.dimensionsAnalysis !== 'object') {
+      throw new Error('AI analysis is incomplete: missing dimensionsAnalysis field');
+    }
+    
+    // 验证所有4个维度的分析都存在
+    const requiredDimensions = ['Visual', 'Auditory', 'Read/Write', 'Kinesthetic'];
+    const missingDimensions = requiredDimensions.filter(dim => {
+      const analysis = aiAnalysis.dimensionsAnalysis[dim];
+      return !analysis || !String(analysis).trim();
+    });
+    
+    if (missingDimensions.length > 0) {
+      throw new Error(`AI analysis is incomplete: missing dimensionsAnalysis for ${missingDimensions.join(', ')}`);
+    }
+    
+    if (!aiAnalysis.learningStrategiesImplementation || typeof aiAnalysis.learningStrategiesImplementation !== 'object') {
+      throw new Error('AI analysis is incomplete: missing learningStrategiesImplementation field');
+    }
+
     // 使用AI分析结果
     return {
       ...baseResult,

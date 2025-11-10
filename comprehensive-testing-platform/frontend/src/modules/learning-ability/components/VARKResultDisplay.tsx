@@ -17,7 +17,16 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
   onShare
 }) => {
   // 验证结果是否有效（AI分析失败时不应该到达这里，但作为安全措施）
-  if (!result || !result.data || (!(result as any).primaryStyle && !(result as any).dominantStyle && !result.data?.dominantStyle)) {
+  // 参照MBTI：检查必需字段是否存在
+  const dimensionsAnalysis = (result as any).dimensionsAnalysis || result.data?.dimensionsAnalysis;
+  const learningStrategiesImpl = (result as any).learningStrategiesImplementation || result.data?.learningStrategiesImplementation;
+  const hasAnalysis = (result as any).analysis || result.data?.analysis;
+  
+  if (!result || !result.data || 
+      (!(result as any).primaryStyle && !(result as any).dominantStyle && !result.data?.dominantStyle) ||
+      !hasAnalysis ||
+      !dimensionsAnalysis ||
+      !learningStrategiesImpl) {
     return (
       <div className={cn("min-h-screen py-8 px-4", className)} data-testid={testId}>
         <div className="max-w-6xl mx-auto">
@@ -150,13 +159,14 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
           </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {styles.map((style) => {
-              // 使用AI生成的个性化分析
-              const dimensionsAnalysis = (result as any).dimensionsAnalysis;
-              let analysis = null;
+              // 使用AI生成的个性化分析（必须存在，否则不会到达这里）
+              const analysis = dimensionsAnalysis && typeof dimensionsAnalysis === 'object' 
+                ? dimensionsAnalysis[style.name] 
+                : null;
               
-              if (dimensionsAnalysis && typeof dimensionsAnalysis === 'object') {
-                // 直接通过键获取AI生成的分析
-                analysis = dimensionsAnalysis[style.name];
+              // 如果某个维度的分析缺失，不显示该卡片（理论上不应该发生，因为后端已验证）
+              if (!analysis) {
+                return null;
               }
               
               return (
@@ -184,7 +194,7 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
                   </div>
                   <div className="mt-2">
                     <p className="text-sm text-gray-700">
-                      {analysis || 'AI analysis not available for this learning style dimension.'}
+                      {analysis}
                     </p>
                   </div>
                 </div>
@@ -260,7 +270,12 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
           )}
 
           {/* 模块4: Learning Strategies (学习策略) */}
-          {(Object.keys(learningStrategiesImplementation).length > 0 || recommendations.length > 0 || studyTips.length > 0) && (
+          {/* 只有当 learningStrategiesImplementation 存在且包含数据时才显示 */}
+          {learningStrategiesImplementation && 
+           typeof learningStrategiesImplementation === 'object' &&
+           (learningStrategiesImplementation.coreStrategies?.length > 0 || 
+            learningStrategiesImplementation.practicalTips?.length > 0 ||
+            learningStrategiesImplementation.environmentSetup) && (
             <Card className="p-6 bg-transparent border-0">
               <h3 className="text-xl font-semibold mb-6 text-gray-900 flex items-center">
                 <span className="text-2xl mr-2">🎯</span>
@@ -268,131 +283,104 @@ export const VARKResultDisplay: React.FC<VARKResultDisplayProps> = ({
               </h3>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* 核心策略 */}
-                <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <span className="text-xl mr-2">💡</span>
-                    Core Strategies
-                  </h4>
-                  <div className="space-y-3">
-                    {(() => {
-                      const strategies = learningStrategiesImplementation.coreStrategies || learningStrategies || recommendations || [];
-                      if (strategies.length === 0) {
-                        return [
-                          `Focus on ${primaryStyle.toLowerCase()} learning methods to maximize your learning efficiency`,
-                          `Create structured study environments that support your ${primaryStyle.toLowerCase()} preferences`,
-                          `Use multi-sensory approaches when possible to reinforce learning`,
-                          `Practice active recall techniques aligned with your learning style`,
-                          `Set up dedicated study spaces optimized for your learning preferences`,
-                          `Engage in hands-on activities and practical applications when learning new concepts`
-                        ];
-                      }
-                      return strategies.slice(0, 6);
-                    })().map((strategy: string, index: number) => (
-                      <p key={index} className="text-sm text-gray-700 leading-relaxed">
-                        {strategy}
-                      </p>
-                    ))}
+                {learningStrategiesImplementation.coreStrategies && 
+                 Array.isArray(learningStrategiesImplementation.coreStrategies) &&
+                 learningStrategiesImplementation.coreStrategies.length > 0 && (
+                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <span className="text-xl mr-2">💡</span>
+                      Core Strategies
+                    </h4>
+                    <div className="space-y-3">
+                      {learningStrategiesImplementation.coreStrategies.slice(0, 6).map((strategy: string, index: number) => (
+                        <p key={index} className="text-sm text-gray-700 leading-relaxed">
+                          {strategy}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* 实用技巧 */}
-                <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <span className="text-xl mr-2">📝</span>
-                    Study Tips
-                  </h4>
-                  <div className="space-y-3">
-                    {(() => {
-                      const tips = learningStrategiesImplementation.practicalTips || studyTips || [];
-                      if (tips.length === 0) {
-                        return [
-                          `Break down complex information into ${primaryStyle.toLowerCase()} formats for better comprehension`,
-                          `Use ${primaryStyle.toLowerCase()} study aids and tools to enhance retention`,
-                          `Take regular breaks and vary your study methods to maintain engagement`,
-                          `Review material using ${primaryStyle.toLowerCase()}-preferred techniques`,
-                          `Connect new information to existing knowledge using your learning style strengths`,
-                          `Practice explaining concepts to others to reinforce your understanding`
-                        ];
-                      }
-                      return tips.slice(0, 6);
-                    })().map((tip: string, index: number) => (
-                      <p key={index} className="text-sm text-gray-700 leading-relaxed">
-                        {tip}
-                      </p>
-                    ))}
+                {learningStrategiesImplementation.practicalTips && 
+                 Array.isArray(learningStrategiesImplementation.practicalTips) &&
+                 learningStrategiesImplementation.practicalTips.length > 0 && (
+                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <span className="text-xl mr-2">📝</span>
+                      Study Tips
+                    </h4>
+                    <div className="space-y-3">
+                      {learningStrategiesImplementation.practicalTips.slice(0, 6).map((tip: string, index: number) => (
+                        <p key={index} className="text-sm text-gray-700 leading-relaxed">
+                          {tip}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* 环境设置 */}
-                <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <span className="text-xl mr-2">🏠</span>
-                    Environment Setup
-                  </h4>
-                  <div className="space-y-4">
-                    {(() => {
-                      const envSetup = learningStrategiesImplementation.environmentSetup || {};
-                      const physical = Array.isArray(envSetup.physical) ? envSetup.physical : [];
-                      const social = Array.isArray(envSetup.social) ? envSetup.social : [];
-                      const technology = Array.isArray(envSetup.technology) ? envSetup.technology : [];
-                      const schedule = Array.isArray(envSetup.schedule) ? envSetup.schedule : [];
-                      
-                      if (physical.length === 0 && social.length === 0 && technology.length === 0 && schedule.length === 0) {
-                        const fallbackEnvs = learningProfile.learningPreferences?.environments || [];
-                        if (fallbackEnvs.length > 0) {
-                          return fallbackEnvs.map((env: string) => (
-                            <p key={env} className="text-sm text-gray-700 leading-relaxed">{env}</p>
-                          ));
+                {learningStrategiesImplementation.environmentSetup && 
+                 typeof learningStrategiesImplementation.environmentSetup === 'object' && (
+                  <div className="p-6 rounded-lg bg-cyan-50 border border-cyan-200">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <span className="text-xl mr-2">🏠</span>
+                      Environment Setup
+                    </h4>
+                    <div className="space-y-4">
+                      {(() => {
+                        const envSetup = learningStrategiesImplementation.environmentSetup;
+                        const physical = Array.isArray(envSetup.physical) ? envSetup.physical : [];
+                        const social = Array.isArray(envSetup.social) ? envSetup.social : [];
+                        const technology = Array.isArray(envSetup.technology) ? envSetup.technology : [];
+                        const schedule = Array.isArray(envSetup.schedule) ? envSetup.schedule : [];
+                        
+                        // 如果所有环境设置都为空，不显示该卡片
+                        if (physical.length === 0 && social.length === 0 && technology.length === 0 && schedule.length === 0) {
+                          return null;
                         }
-                        return [
-                          `Create a ${primaryStyle.toLowerCase()}-friendly study space with appropriate lighting and materials`,
-                          `Minimize distractions and ensure comfortable seating for extended study sessions`,
-                          `Organize materials in a way that supports your ${primaryStyle.toLowerCase()} learning preferences`,
-                          `Consider background noise levels that work best for your learning style`
-                        ].map((env, idx) => (
-                          <p key={idx} className="text-sm text-gray-700 leading-relaxed">{env}</p>
-                        ));
-                      }
-                      
-                      return (
-                        <>
-                          {physical.length > 0 && (
-                            <div>
-                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Physical Environment</h5>
-                              {physical.map((env: string, idx: number) => (
-                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
-                              ))}
-                            </div>
-                          )}
-                          {social.length > 0 && (
-                            <div>
-                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Social Setup</h5>
-                              {social.map((env: string, idx: number) => (
-                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
-                              ))}
-                            </div>
-                          )}
-                          {technology.length > 0 && (
-                            <div>
-                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Technology & Tools</h5>
-                              {technology.map((env: string, idx: number) => (
-                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
-                              ))}
-                            </div>
-                          )}
-                          {schedule.length > 0 && (
-                            <div>
-                              <h5 className="font-semibold text-gray-900 mb-2 text-sm">Schedule & Timing</h5>
-                              {schedule.map((env: string, idx: number) => (
-                                <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
+                        
+                        return (
+                          <>
+                            {physical.length > 0 && (
+                              <div>
+                                <h5 className="font-semibold text-gray-900 mb-2 text-sm">Physical Environment</h5>
+                                {physical.map((env: string, idx: number) => (
+                                  <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                                ))}
+                              </div>
+                            )}
+                            {social.length > 0 && (
+                              <div>
+                                <h5 className="font-semibold text-gray-900 mb-2 text-sm">Social Setup</h5>
+                                {social.map((env: string, idx: number) => (
+                                  <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                                ))}
+                              </div>
+                            )}
+                            {technology.length > 0 && (
+                              <div>
+                                <h5 className="font-semibold text-gray-900 mb-2 text-sm">Technology & Tools</h5>
+                                {technology.map((env: string, idx: number) => (
+                                  <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                                ))}
+                              </div>
+                            )}
+                            {schedule.length > 0 && (
+                              <div>
+                                <h5 className="font-semibold text-gray-900 mb-2 text-sm">Schedule & Timing</h5>
+                                {schedule.map((env: string, idx: number) => (
+                                  <p key={idx} className="text-sm text-gray-700 leading-relaxed ml-2">• {env}</p>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </Card>
           )}

@@ -1247,22 +1247,54 @@ export class AIService {
       if (parsed && typeof parsed === 'object') {
         // 情况1：AI已返回统一schema（顶层包含 primaryStyle/scores）
         if (parsed.primaryStyle || parsed.scores) {
+          // 验证必需字段是否存在，不允许使用默认值
+          if (!parsed.primaryStyle) {
+            throw new Error('Missing required VARK field: primaryStyle');
+          }
+          
+          if (!parsed.scores || typeof parsed.scores !== 'object') {
+            throw new Error('Missing required VARK field: scores');
+          }
+          
+          if (!parsed.analysis || !String(parsed.analysis).trim()) {
+            throw new Error('Missing required VARK field: analysis');
+          }
+          
+          if (!parsed.dimensionsAnalysis || typeof parsed.dimensionsAnalysis !== 'object') {
+            throw new Error('Missing required VARK field: dimensionsAnalysis');
+          }
+          
+          // 验证所有4个维度的分析都存在
+          const requiredDimensions = ['Visual', 'Auditory', 'Read/Write', 'Kinesthetic'];
+          const missingDimensions = requiredDimensions.filter(dim => {
+            const analysis = parsed.dimensionsAnalysis[dim];
+            return !analysis || !String(analysis).trim();
+          });
+          
+          if (missingDimensions.length > 0) {
+            throw new Error(`Missing dimensionsAnalysis for: ${missingDimensions.join(', ')}. AI analysis is incomplete.`);
+          }
+          
+          if (!parsed.learningStrategiesImplementation || typeof parsed.learningStrategiesImplementation !== 'object') {
+            throw new Error('Missing required VARK field: learningStrategiesImplementation');
+          }
+          
           return {
-            primaryStyle: parsed.primaryStyle || 'Unknown',
+            primaryStyle: parsed.primaryStyle,
             secondaryStyle: parsed.secondaryStyle || '',
-            dominantStyle: parsed.primaryStyle || 'Unknown',
-            scores: parsed.scores || { V: 0, A: 0, R: 0, K: 0 },
-            allScores: parsed.scores || { V: 0, A: 0, R: 0, K: 0 },
-            analysis: typeof parsed.analysis === 'string' ? parsed.analysis : 'Learning style analysis completed.',
+            dominantStyle: parsed.primaryStyle,
+            scores: parsed.scores,
+            allScores: parsed.scores,
+            analysis: parsed.analysis,
             recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
             studyTips: Array.isArray(parsed.studyTips) ? parsed.studyTips : [],
             learningStrategies: Array.isArray(parsed.learningStrategies) ? parsed.learningStrategies : [],
             learningProfile: parsed.learningProfile || {},
-            learningStrategiesImplementation: parsed.learningStrategiesImplementation || {},
+            learningStrategiesImplementation: parsed.learningStrategiesImplementation,
             learningEffectiveness: parsed.learningEffectiveness || {},
-            dimensionsAnalysis: parsed.dimensionsAnalysis || {},
-            encouragement: parsed.encouragement || 'Continue exploring your learning preferences.',
-            environmentSuggestions: parsed.environmentSuggestions || 'Set up learning environments that support your style.'
+            dimensionsAnalysis: parsed.dimensionsAnalysis,
+            encouragement: parsed.encouragement,
+            environmentSuggestions: parsed.environmentSuggestions
           };
         }
 
@@ -1567,66 +1599,105 @@ export class AIService {
           );
 
           // 构建 dimensionsAnalysis 字段（每个维度的个性化分析）
+          // 必须从AI响应中提取，不允许使用默认值
           const buildDimensionsAnalysis = (): Record<string, string> => {
             const dimensionsAnalysis: Record<string, string> = {};
             const styleNames = ['Visual', 'Auditory', 'Read/Write', 'Kinesthetic'];
+            const missingDimensions: string[] = [];
             
             // 尝试从AI响应中提取维度分析
             const modalityBreakdown = a.modality_breakdown || {};
             const detailedInsights = a.detailedInsights || a.detailed_insights || {};
             
+            // 优先检查 parsed.dimensionsAnalysis（如果AI直接返回）
+            if (parsed.dimensionsAnalysis && typeof parsed.dimensionsAnalysis === 'object') {
+              styleNames.forEach(styleName => {
+                const analysis = parsed.dimensionsAnalysis[styleName];
+                if (analysis && String(analysis).trim()) {
+                  dimensionsAnalysis[styleName] = String(analysis).trim();
+                } else {
+                  missingDimensions.push(styleName);
+                }
+              });
+              
+              if (missingDimensions.length === 0) {
+                return dimensionsAnalysis;
+              }
+            }
+            
+            // 尝试从 modality_breakdown 提取
             styleNames.forEach(styleName => {
+              if (dimensionsAnalysis[styleName]) {
+                return; // 已存在，跳过
+              }
+              
               const key = styleName === 'Read/Write' ? 'read_write' : styleName.toLowerCase();
               const modality = modalityBreakdown[key] || {};
               
               // 优先使用AI生成的维度分析
-              let analysis = modality.analysis || modality.description || modality.interpretation;
+              const analysis = modality.analysis || modality.description || modality.interpretation;
               
               // 如果没有，尝试从其他字段提取
               if (!analysis) {
                 if (styleName === 'Visual' && detailedInsights.visualAnalysis) {
-                  analysis = detailedInsights.visualAnalysis;
+                  dimensionsAnalysis[styleName] = String(detailedInsights.visualAnalysis).trim();
                 } else if (styleName === 'Auditory' && detailedInsights.auditoryAnalysis) {
-                  analysis = detailedInsights.auditoryAnalysis;
+                  dimensionsAnalysis[styleName] = String(detailedInsights.auditoryAnalysis).trim();
                 } else if (styleName === 'Read/Write' && detailedInsights.readWriteAnalysis) {
-                  analysis = detailedInsights.readWriteAnalysis;
+                  dimensionsAnalysis[styleName] = String(detailedInsights.readWriteAnalysis).trim();
                 } else if (styleName === 'Kinesthetic' && detailedInsights.kinestheticAnalysis) {
-                  analysis = detailedInsights.kinestheticAnalysis;
-                }
-              }
-              
-              // 如果还是没有，生成基于分数的简要分析
-              if (!analysis) {
-                const score = styleName === 'Visual' ? mappedScores.V :
-                             styleName === 'Auditory' ? mappedScores.A :
-                             styleName === 'Read/Write' ? mappedScores.R :
-                             mappedScores.K;
-                const percent = totalCount > 0 ? Math.round((score / totalCount) * 100) : 0;
-                
-                if (percent >= 60) {
-                  analysis = `You have a strong preference for ${styleName.toLowerCase()} learning. This style suits you well and you should leverage ${styleName.toLowerCase()} methods in your studies.`;
-                } else if (percent >= 40) {
-                  analysis = `You have a moderate preference for ${styleName.toLowerCase()} learning. While not your primary style, ${styleName.toLowerCase()} methods can still be effective for you.`;
+                  dimensionsAnalysis[styleName] = String(detailedInsights.kinestheticAnalysis).trim();
                 } else {
-                  analysis = `You have a lower preference for ${styleName.toLowerCase()} learning. Consider supplementing with other learning styles to enhance your overall learning effectiveness.`;
+                  missingDimensions.push(styleName);
                 }
+              } else {
+                dimensionsAnalysis[styleName] = String(analysis).trim();
               }
-              
-              dimensionsAnalysis[styleName] = String(analysis || '').trim();
             });
+            
+            // 如果缺少任何维度的分析，抛出错误
+            if (missingDimensions.length > 0) {
+              throw new Error(`Missing dimensionsAnalysis for: ${missingDimensions.join(', ')}. AI analysis is incomplete.`);
+            }
             
             return dimensionsAnalysis;
           };
           
           resultObject.dimensionsAnalysis = buildDimensionsAnalysis();
 
-          // 关键字段强校验
+          // 关键字段强校验 - 不允许使用默认值
           const hasScores = typeof resultObject.scores?.V === 'number'
             && typeof resultObject.scores?.A === 'number'
             && typeof resultObject.scores?.R === 'number'
             && typeof resultObject.scores?.K === 'number';
-          if (!resultObject.primaryStyle || !hasScores || !String(resultObject.analysis || '').trim()) {
-            throw new Error('Missing required VARK fields after normalization');
+          
+          // 验证必需字段是否存在且非空
+          if (!resultObject.primaryStyle || !hasScores) {
+            throw new Error('Missing required VARK fields: primaryStyle or scores');
+          }
+          
+          if (!String(resultObject.analysis || '').trim()) {
+            throw new Error('Missing required VARK field: analysis');
+          }
+          
+          // 验证 dimensionsAnalysis 是否完整（所有4个维度都必须有分析）
+          if (!resultObject.dimensionsAnalysis || typeof resultObject.dimensionsAnalysis !== 'object') {
+            throw new Error('Missing required VARK field: dimensionsAnalysis');
+          }
+          
+          const requiredDimensions = ['Visual', 'Auditory', 'Read/Write', 'Kinesthetic'];
+          const missingDimensions = requiredDimensions.filter(dim => {
+            const analysis = resultObject.dimensionsAnalysis[dim];
+            return !analysis || !String(analysis).trim();
+          });
+          
+          if (missingDimensions.length > 0) {
+            throw new Error(`Missing dimensionsAnalysis for: ${missingDimensions.join(', ')}. AI analysis is incomplete.`);
+          }
+          
+          // 验证 learningStrategiesImplementation 是否存在
+          if (!resultObject.learningStrategiesImplementation || typeof resultObject.learningStrategiesImplementation !== 'object') {
+            throw new Error('Missing required VARK field: learningStrategiesImplementation');
           }
 
           return resultObject;
