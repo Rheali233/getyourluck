@@ -2490,33 +2490,101 @@ Keep it concise but meaningful, focusing on the most important insights.`;
             
             // 尝试在错误位置附近修复
             let repaired = cleaned;
-            // 如果错误位置接近末尾，可能是缺少闭合括号
-            if (errorPosition > cleaned.length * 0.8) {
-              // 检查括号平衡
-              const openBraces = (cleaned.match(/{/g) || []).length;
-              const closeBraces = (cleaned.match(/}/g) || []).length;
-              if (openBraces > closeBraces) {
-                repaired = cleaned + '}'.repeat(openBraces - closeBraces);
-                console.log(`[AIService] Added ${openBraces - closeBraces} closing braces`);
-                try {
-                  parsed = JSON.parse(repaired);
-                  console.log('[AIService] Successfully repaired JSON');
-                } catch (retryError) {
-                  console.error('[AIService] Repair attempt failed:', retryError);
-                }
+            
+            // 策略1: 检查括号平衡并修复
+            const openBraces = (cleaned.match(/{/g) || []).length;
+            const closeBraces = (cleaned.match(/}/g) || []).length;
+            const openBrackets = (cleaned.match(/\[/g) || []).length;
+            const closeBrackets = (cleaned.match(/\]/g) || []).length;
+            
+            if (openBraces > closeBraces) {
+              repaired = cleaned + '}'.repeat(openBraces - closeBraces);
+              console.log(`[AIService] Added ${openBraces - closeBraces} closing braces`);
+            }
+            if (openBrackets > closeBrackets) {
+              repaired = repaired + ']'.repeat(openBrackets - closeBrackets);
+              console.log(`[AIService] Added ${openBrackets - closeBrackets} closing brackets`);
+            }
+            
+            // 策略2: 如果错误位置在中间，尝试在该位置插入缺失的逗号或闭合括号
+            if (errorPosition < cleaned.length * 0.9 && errorPosition > 100) {
+              const beforeError = cleaned.substring(0, errorPosition);
+              const afterError = cleaned.substring(errorPosition);
+              
+              // 检查错误位置前后的字符
+              const charBefore = beforeError[beforeError.length - 1];
+              const charAfter = afterError[0];
+              
+              // 如果错误位置前是值，后面是键，可能需要添加逗号和闭合括号
+              if (charBefore === '"' && charAfter === '"') {
+                // 可能是缺少逗号
+                repaired = beforeError + ',' + afterError;
+                console.log('[AIService] Attempted to add missing comma');
+              } else if (charBefore === '}' && charAfter === '"') {
+                // 可能是对象后缺少逗号
+                repaired = beforeError + ',' + afterError;
+                console.log('[AIService] Attempted to add comma after object');
+              } else if (charBefore === ']' && charAfter === '"') {
+                // 可能是数组后缺少逗号
+                repaired = beforeError + ',' + afterError;
+                console.log('[AIService] Attempted to add comma after array');
               }
             }
             
-            // 如果修复失败，尝试截取到错误位置之前的内容
+            // 尝试解析修复后的 JSON
+            if (repaired !== cleaned) {
+              try {
+                parsed = JSON.parse(repaired);
+                console.log('[AIService] Successfully repaired JSON');
+              } catch (retryError) {
+                console.error('[AIService] Repair attempt failed:', retryError);
+              }
+            }
+            
+            // 策略3: 如果修复失败，尝试截取到错误位置之前的内容
             if (!parsed && errorPosition > 100) {
               // 找到错误位置之前的最后一个完整的对象
               const beforeError = cleaned.substring(0, errorPosition);
-              const lastCompleteObject = beforeError.lastIndexOf('}');
-              if (lastCompleteObject > 0) {
-                const truncated = cleaned.substring(0, lastCompleteObject + 1);
+              
+              // 尝试找到最后一个完整的键值对
+              let lastValidPosition = errorPosition;
+              
+              // 向后查找，找到最后一个完整的对象或数组
+              for (let i = errorPosition - 1; i >= 0; i--) {
+                const char = cleaned[i];
+                if (char === '}') {
+                  // 检查这个 } 是否完整
+                  const testStr = cleaned.substring(0, i + 1);
+                  try {
+                    JSON.parse(testStr);
+                    lastValidPosition = i + 1;
+                    break;
+                  } catch (e) {
+                    // 继续查找
+                  }
+                } else if (char === ']') {
+                  // 检查这个 ] 是否完整
+                  const testStr = cleaned.substring(0, i + 1);
+                  try {
+                    JSON.parse(testStr);
+                    lastValidPosition = i + 1;
+                    break;
+                  } catch (e) {
+                    // 继续查找
+                  }
+                }
+              }
+              
+              if (lastValidPosition < errorPosition && lastValidPosition > 100) {
+                const truncated = cleaned.substring(0, lastValidPosition);
+                // 确保截取后的 JSON 是完整的
+                const openBracesInTruncated = (truncated.match(/{/g) || []).length;
+                const closeBracesInTruncated = (truncated.match(/}/g) || []).length;
+                const finalTruncated = truncated + '}'.repeat(openBracesInTruncated - closeBracesInTruncated);
+                
                 try {
-                  parsed = JSON.parse(truncated);
-                  console.log('[AIService] Successfully parsed truncated JSON');
+                  parsed = JSON.parse(finalTruncated);
+                  console.log(`[AIService] Successfully parsed truncated JSON at position ${lastValidPosition}`);
                 } catch (truncateError) {
                   console.error('[AIService] Truncation attempt failed:', truncateError);
                 }
