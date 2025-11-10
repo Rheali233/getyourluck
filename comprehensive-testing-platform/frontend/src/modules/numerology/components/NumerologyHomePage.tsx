@@ -125,7 +125,7 @@ export const NumerologyHomePage: React.FC<NumerologyHomePageProps> = ({ classNam
       icon: '🎯',
       color: 'from-green-500 to-emerald-500',
       features: ['Personalized Names', 'Cultural Significance', 'Usage Advice', 'Multiple Options'],
-      tags: ['Name Numerology', 'Character Harmony', 'Life Path']
+      tags: ['Name Numerology']
     },
     {
       id: 'ziwei' as NumerologyAnalysisType,

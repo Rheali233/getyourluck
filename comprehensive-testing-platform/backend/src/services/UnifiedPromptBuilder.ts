@@ -340,12 +340,11 @@ Rules:
       instructions: [
         "Analyze based on Chapman's Five Love Languages theory",
         "Provide practical relationship applications",
-        "Include specific communication and gift suggestions",
-        "For each of the five dimensions, write one concise interpretation paragraph in loveLanguageDetails[dimension].description (3–5 sentences, concrete, no generic phrases)"
+        "For each of the five dimensions, write one concise interpretation paragraph in loveLanguageDetails[dimension].description (2–3 sentences, concrete, no generic phrases)"
       ],
       specialRequirements: [
         "Return loveLanguageDetails for ALL five dimensions: Words of Affirmation, Quality Time, Receiving Gifts, Acts of Service, Physical Touch",
-        "Each loveLanguageDetails[dimension].description must be 3–5 sentences (~80–150 words), specific and contextual; avoid placeholders like 'Basic guidance...' or vague lines like 'Feeling loved...'",
+        "Each loveLanguageDetails[dimension].description must be 2–3 sentences (~50–80 words), specific and contextual; avoid placeholders like 'Basic guidance...' or vague lines like 'Feeling loved...'",
         "Descriptions must be consistent with allScores; do not contradict the score ordering",
         "Do NOT use rank labels or phrases like 'highest scores', 'your secondary love language', 'top two'; write neutral, dimension-focused interpretations",
         "Output valid JSON only, no extra commentary"
@@ -353,7 +352,7 @@ Rules:
       schema: {
         primaryLanguage: "Words of Affirmation",
         secondaryLanguage: "Quality Time",
-        analysis: "Comprehensive analysis of love language preferences based on Chapman's theory",
+        analysis: "Brief analysis of love language preferences (2-3 sentences)",
         primaryScore: 25,
         secondaryScore: 20,
         allScores: {
@@ -365,18 +364,24 @@ Rules:
         },
         loveLanguageDetails: {
           "Words of Affirmation": {
-            description: "Verbal expressions of love, appreciation, and encouragement",
-            characteristics: ["Specific characteristics of this love language"],
-            needs: ["Specific emotional needs related to this love language"],
-            expressions: ["Specific ways to express this love language"]
+            description: "Brief interpretation (2-3 sentences)"
+          },
+          "Quality Time": {
+            description: "Brief interpretation (2-3 sentences)"
+          },
+          "Receiving Gifts": {
+            description: "Brief interpretation (2-3 sentences)"
+          },
+          "Acts of Service": {
+            description: "Brief interpretation (2-3 sentences)"
+          },
+          "Physical Touch": {
+            description: "Brief interpretation (2-3 sentences)"
           }
         },
-        communicationTips: ["Specific communication strategies for expressing and receiving love"],
-        giftSuggestions: ["Specific gift ideas tailored to the primary love language"],
-        dateIdeas: ["Specific date ideas that align with the primary love language"],
-        growthAreas: ["Specific areas for developing other love languages"],
-        partnerGuidance: ["Specific guidance for partners on how to love this person effectively"],
-        selfCareTips: ["Specific self-care strategies based on love language needs"]
+        communicationTips: ["2-3 specific communication strategies"],
+        giftSuggestions: ["2-3 specific gift ideas"],
+        partnerGuidance: ["2-3 specific guidance items"]
       }
     },
     loveStyle: {
