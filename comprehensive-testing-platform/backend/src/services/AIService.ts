@@ -885,8 +885,20 @@ export class AIService {
   private sanitizeAIJSON(raw: string): string {
     let text = (raw || '').trim();
     
+    // 处理 ""json { 这种格式（移除开头的引号和 "json"）
+    text = text.replace(/^["']*json\s*/i, '').trim();
+    
     // 去掉 ```json ``` 或 ``` 包裹
     text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    
+    // 移除开头的引号（如果存在）
+    if (text.startsWith('"') || text.startsWith("'")) {
+      text = text.substring(1);
+    }
+    if (text.endsWith('"') || text.endsWith("'")) {
+      text = text.substring(0, text.length - 1);
+    }
+    text = text.trim();
     
     // 截取第一个 { 到最后一个 } 之间内容
     const start = text.indexOf('{');
@@ -1557,7 +1569,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 800; // BaZi/ZiWei分析：简化schema后，800 tokens足够
+        maxTokens = 600; // BaZi/ZiWei分析：超简化schema后，600 tokens足够
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -1928,14 +1940,14 @@ Please provide your analysis in JSON format with appropriate structure for the t
 
     return `Analyze BaZi (Four Pillars) for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${calendarType} calendar.
 
-Return JSON (minimal schema for fast response):
+Return JSON (core only):
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "${type}",
-    "overview": "Brief overview (1-2 sentences)",
+    "overview": "1 sentence",
     "keyInsights": [{"pillar": "Year", "element": "Metal over Dragon"}, {"pillar": "Month", "element": "Wood over Tiger"}, {"pillar": "Day", "element": "Fire over Horse"}, {"pillar": "Hour", "element": "Earth over Dog"}],
-    "personalityTraits": ["2-3 key traits"],
+    "personalityTraits": ["2 items"],
     "careerGuidance": ["2 items"],
     "baZiAnalysis": {
       "dayMasterStrength": {
@@ -1946,7 +1958,7 @@ Return JSON (minimal schema for fast response):
       "favorableElements": {
         "useful": ["2 elements"],
         "harmful": ["2 elements"],
-        "neutral": ["1-2 elements"]
+        "neutral": ["1 element"]
       },
       "fiveElements": {
         "elements": {"metal": 2, "wood": 3, "water": 1, "fire": 2, "earth": 2},
@@ -1955,16 +1967,16 @@ Return JSON (minimal schema for fast response):
         "balance": "balanced/unbalanced"
       },
       "tenGods": {
-        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3-5 words"},
-        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3-5 words"}
+        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3 words"},
+        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3 words"}
       }
     },
     "wealthAnalysis": {
@@ -1973,9 +1985,9 @@ Return JSON (minimal schema for fast response):
       "investmentAdvice": ["2 items"]
     },
     "relationshipAnalysis": {
-      "marriageTiming": "Brief (1 sentence)",
-      "partnerCharacteristics": "Brief description (1-2 sentences)",
-      "marriageAdvice": "Brief advice (1-2 sentences)"
+      "marriageTiming": "1 sentence",
+      "partnerCharacteristics": "1 sentence",
+      "marriageAdvice": "1 sentence"
     },
     "healthAnalysis": {
       "overallHealth": "good/fair/poor",
@@ -1990,7 +2002,7 @@ Return JSON (minimal schema for fast response):
         "wealth": 6,
         "health": 7,
         "relationships": 8,
-        "overallDescription": "1-2 sentences",
+        "overallDescription": "1 sentence",
         "keyEvents": ["2 items"],
         "advice": ["2 items"]
       }
@@ -2003,7 +2015,7 @@ Return JSON (minimal schema for fast response):
   }
 }
 
-Focus on core: Four Pillars, Five Elements, Day Master, Ten Gods. Keep ALL text brief. tenGods meanings: 3-5 words max. English only. Element format: "Stem over Branch". Return valid JSON only.`;
+CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no extra text. Start with { and end with }. Keep all text very brief. English only.`;
   }
 
   async analyzeNumerology(analysisData: any): Promise<any> {
@@ -2011,10 +2023,9 @@ Focus on core: Four Pillars, Five Elements, Day Master, Ten Gods. Keep ALL text 
     const analysisType = analysisData?.type || 'bazi';
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
-    // BaZi分析：使用简化schema，降低max_tokens以确保快速响应
-    // 保留了核心字段但简化了内容，确保前端兼容性
-    // 进一步降低到800 tokens，减少响应体大小和读取时间
-    const maxTokens = 800; // 简化schema后，800 tokens足够返回核心分析
+    // BaZi分析：使用超简化schema，大幅降低max_tokens以确保快速响应
+    // 移除了大量非核心字段，只保留最核心的分析内容
+    const maxTokens = 600; // 超简化schema后，600 tokens足够返回核心分析
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
