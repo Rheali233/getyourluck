@@ -109,7 +109,7 @@ export function handleError(error: unknown, c: Context) {
   logError(error, c);
 
   // 格式化错误响应
-  const { body, status } = formatErrorResponse(moduleError);
+  const { body, status } = formatErrorResponse(moduleError, c);
   c.status(status as any);
   c.header('Content-Type', 'application/json');
 
@@ -156,7 +156,9 @@ function logError(error: unknown, c: Context) {
 }
 
 // 格式化错误响应
-function formatErrorResponse(error: unknown): { body: APIResponse; status: number } {
+function formatErrorResponse(error: unknown, c?: Context): { body: APIResponse; status: number } {
+  const requestId = c?.get('requestId') || 'unknown';
+  
   if (error instanceof ModuleError) {
     return {
       status: error.statusCode,
@@ -164,7 +166,7 @@ function formatErrorResponse(error: unknown): { body: APIResponse; status: numbe
         success: false,
         error: error.message,
         timestamp: new Date().toISOString(),
-        requestId: 'unknown'
+        requestId
       }
     };
   }
@@ -176,7 +178,7 @@ function formatErrorResponse(error: unknown): { body: APIResponse; status: numbe
         success: false,
         error: error.message,
         timestamp: new Date().toISOString(),
-        requestId: 'unknown'
+        requestId
       }
     };
   }
@@ -188,7 +190,7 @@ function formatErrorResponse(error: unknown): { body: APIResponse; status: numbe
         success: false,
         error: error.message,
         timestamp: new Date().toISOString(),
-        requestId: 'unknown'
+        requestId
       }
     };
   }
@@ -200,7 +202,7 @@ function formatErrorResponse(error: unknown): { body: APIResponse; status: numbe
       success: false,
       error: 'An unexpected error occurred',
       timestamp: new Date().toISOString(),
-      requestId: 'unknown'
+      requestId
     }
   };
 }
