@@ -1628,7 +1628,7 @@ export class AIService {
             const modalityBreakdown = a.modality_breakdown || {};
             const detailedInsights = a.detailedInsights || a.detailed_insights || {};
             
-            // 优先检查 parsed.dimensionsAnalysis（如果AI直接返回）
+            // 优先检查 parsed.dimensionsAnalysis（如果AI直接返回在顶层）
             if (parsed.dimensionsAnalysis && typeof parsed.dimensionsAnalysis === 'object') {
               styleNames.forEach(styleName => {
                 const analysis = parsed.dimensionsAnalysis[styleName];
@@ -1642,6 +1642,28 @@ export class AIService {
               if (missingDimensions.length === 0) {
                 return dimensionsAnalysis;
               }
+            }
+            
+            // 检查 a.dimensionsAnalysis（如果AI返回在analysis对象内）
+            if (a.dimensionsAnalysis && typeof a.dimensionsAnalysis === 'object') {
+              styleNames.forEach(styleName => {
+                if (dimensionsAnalysis[styleName]) {
+                  return; // 已存在，跳过
+                }
+                const analysis = a.dimensionsAnalysis[styleName];
+                if (analysis && String(analysis).trim()) {
+                  dimensionsAnalysis[styleName] = String(analysis).trim();
+                } else {
+                  missingDimensions.push(styleName);
+                }
+              });
+              
+              // 如果所有维度都找到了，返回结果
+              const stillMissing = styleNames.filter(name => !dimensionsAnalysis[name]);
+              if (stillMissing.length === 0) {
+                return dimensionsAnalysis;
+              }
+              // 否则继续尝试其他来源
             }
             
             // 尝试从 modality_breakdown 提取
