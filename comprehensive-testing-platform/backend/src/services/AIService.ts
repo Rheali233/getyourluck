@@ -491,9 +491,9 @@ export class AIService {
     try {
     const context: TestContext = { testType: 'vark' };
     const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'vark');
-    // VARK分析：增加max_tokens以提供更详细的分析内容
+    // VARK分析：增加max_tokens以确保完整响应（包含所有4个维度的分析）
     const customTimeout = 30000;
-    const maxTokens = 4000; // 增加max_tokens以提供更详细的分析
+    const maxTokens = 5000; // 增加max_tokens以确保完整响应
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
     return this.parseVARKResponse(response);
     } catch (error) {
@@ -1771,7 +1771,7 @@ export class AIService {
       } else if (data.testType === 'love_language') {
         maxTokens = 1500; // Love Language Test：降低max_tokens以避免响应体读取超时
       } else if (data.testType === 'vark') {
-        maxTokens = 4000; // VARK：增加max_tokens以提供更详细的分析内容
+        maxTokens = 5000; // VARK：增加max_tokens以确保完整响应（包含所有4个维度的分析）
       } else if (complexAnalysisTypes.includes(data.testType)) {
         maxTokens = 4000; // 其他复杂分析保持4000
       } else {

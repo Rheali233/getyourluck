@@ -757,12 +757,15 @@ Rules:
         "Analyze preferences across Visual, Auditory, Read/Write, and Kinesthetic dimensions",
         "Compute scores for V, A, R, K",
         "Determine primaryStyle and secondaryStyle from the scores",
+        "CRITICAL: dimensionsAnalysis field is REQUIRED and must contain analysis for ALL FOUR dimensions: Visual, Auditory, Read/Write, and Kinesthetic. Each dimension must have 2-3 sentences of detailed analysis.",
+        "CRITICAL: learningStrategiesImplementation field is REQUIRED and must contain coreStrategies, practicalTips, and environmentSetup with physical, social, technology, and schedule sub-fields.",
         "Provide comprehensive learning profile (strengths, preferences, adaptability)",
         "Provide concrete strategies and environment setup",
         "Provide learning effectiveness (conditions, performance, improvement)",
         "STRICT: Return a single JSON object that matches the schema exactly (field names and casing must match)",
         "STRICT: Do NOT wrap under analysis/result/data; no aliases such as learningStyleProfile/scoreBreakdown/modality_breakdown",
         "STRICT: All fields are required and must be non-empty; arrays: 2–6 concise English items",
+        "STRICT: dimensionsAnalysis must have exactly 4 keys: Visual, Auditory, Read/Write, Kinesthetic",
         "STRICT: Output JSON only (no markdown, no prose)"
       ],
       schema: {
