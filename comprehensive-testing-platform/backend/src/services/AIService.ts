@@ -1569,7 +1569,7 @@ export class AIService {
       // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 600; // BaZi/ZiWei分析：超简化schema后，600 tokens足够
+        maxTokens = 500; // BaZi/ZiWei分析：移除非核心字段后，500 tokens足够
       } else if (data.testType === 'birth-chart') {
         maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
@@ -1940,7 +1940,7 @@ Please provide your analysis in JSON format with appropriate structure for the t
 
     return `Analyze BaZi (Four Pillars) for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${calendarType} calendar.
 
-Return JSON (core only):
+Return JSON (minimal core only):
 {
   "analysis": {
     "testType": "numerology",
@@ -1978,39 +1978,6 @@ Return JSON (core only):
         "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "3 words"},
         "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "3 words"}
       }
-    },
-    "wealthAnalysis": {
-      "wealthLevel": "low/medium/high",
-      "wealthSource": ["2 items"],
-      "investmentAdvice": ["2 items"]
-    },
-    "relationshipAnalysis": {
-      "marriageTiming": "1 sentence",
-      "partnerCharacteristics": "1 sentence",
-      "marriageAdvice": "1 sentence"
-    },
-    "healthAnalysis": {
-      "overallHealth": "good/fair/poor",
-      "weakAreas": ["2 items"],
-      "beneficialActivities": ["2 items"]
-    },
-    "fortuneAnalysis": {
-      "currentYear": {
-        "year": 2024,
-        "overall": 7,
-        "career": 7,
-        "wealth": 6,
-        "health": 7,
-        "relationships": 8,
-        "overallDescription": "1 sentence",
-        "keyEvents": ["2 items"],
-        "advice": ["2 items"]
-      }
-    },
-    "luckyElements": {
-      "colors": ["2 colors"],
-      "numbers": [1, 3],
-      "directions": ["2 directions"]
     }
   }
 }
@@ -2024,8 +1991,9 @@ CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no extra text. St
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
     // BaZi分析：使用超简化schema，大幅降低max_tokens以确保快速响应
-    // 移除了大量非核心字段，只保留最核心的分析内容
-    const maxTokens = 600; // 超简化schema后，600 tokens足够返回核心分析
+    // 移除了 wealthAnalysis、relationshipAnalysis、healthAnalysis、fortuneAnalysis 等非核心字段
+    // 只保留最核心的 baZiAnalysis（四柱、五行、日主、十神）
+    const maxTokens = 500; // 移除非核心字段后，500 tokens足够返回核心分析
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
