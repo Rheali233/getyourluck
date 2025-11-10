@@ -1677,6 +1677,9 @@ export class AIService {
             }
             
             // 尝试从 modality_breakdown 提取
+            console.log('[AIService] VARK attempting to extract from modality_breakdown, keys:', Object.keys(modalityBreakdown));
+            console.log('[AIService] VARK detailedInsights keys:', Object.keys(detailedInsights));
+            
             styleNames.forEach(styleName => {
               if (dimensionsAnalysis[styleName]) {
                 return; // 已存在，跳过
@@ -1685,32 +1688,50 @@ export class AIService {
               const key = styleName === 'Read/Write' ? 'read_write' : styleName.toLowerCase();
               const modality = modalityBreakdown[key] || {};
               
+              console.log(`[AIService] VARK checking ${styleName} (key: ${key}), modality keys:`, Object.keys(modality));
+              
               // 优先使用AI生成的维度分析
-              const analysis = modality.analysis || modality.description || modality.interpretation;
+              const analysis = modality.analysis || modality.description || modality.interpretation || modality.summary;
               
               // 如果没有，尝试从其他字段提取
               if (!analysis) {
                 if (styleName === 'Visual' && detailedInsights.visualAnalysis) {
                   dimensionsAnalysis[styleName] = String(detailedInsights.visualAnalysis).trim();
+                  console.log(`[AIService] VARK extracted ${styleName} from detailedInsights.visualAnalysis`);
                 } else if (styleName === 'Auditory' && detailedInsights.auditoryAnalysis) {
                   dimensionsAnalysis[styleName] = String(detailedInsights.auditoryAnalysis).trim();
+                  console.log(`[AIService] VARK extracted ${styleName} from detailedInsights.auditoryAnalysis`);
                 } else if (styleName === 'Read/Write' && detailedInsights.readWriteAnalysis) {
                   dimensionsAnalysis[styleName] = String(detailedInsights.readWriteAnalysis).trim();
+                  console.log(`[AIService] VARK extracted ${styleName} from detailedInsights.readWriteAnalysis`);
                 } else if (styleName === 'Kinesthetic' && detailedInsights.kinestheticAnalysis) {
                   dimensionsAnalysis[styleName] = String(detailedInsights.kinestheticAnalysis).trim();
+                  console.log(`[AIService] VARK extracted ${styleName} from detailedInsights.kinestheticAnalysis`);
                 } else {
-                  missingDimensions.push(styleName);
+                  if (!missingDimensions.includes(styleName)) {
+                    missingDimensions.push(styleName);
+                  }
+                  console.log(`[AIService] VARK could not find analysis for ${styleName}`);
                 }
               } else {
                 dimensionsAnalysis[styleName] = String(analysis).trim();
+                console.log(`[AIService] VARK extracted ${styleName} from modality_breakdown`);
               }
             });
             
+            console.log('[AIService] VARK dimensionsAnalysis after extraction:', Object.keys(dimensionsAnalysis));
+            console.log('[AIService] VARK missingDimensions:', missingDimensions);
+            
             // 如果缺少任何维度的分析，抛出错误
             if (missingDimensions.length > 0) {
+              console.error('[AIService] VARK buildDimensionsAnalysis failed - missing dimensions:', missingDimensions);
+              console.error('[AIService] VARK extracted dimensionsAnalysis keys:', Object.keys(dimensionsAnalysis));
+              console.error('[AIService] VARK modality_breakdown keys:', Object.keys(modalityBreakdown));
+              console.error('[AIService] VARK detailedInsights keys:', Object.keys(detailedInsights));
               throw new Error(`Missing dimensionsAnalysis for: ${missingDimensions.join(', ')}. AI analysis is incomplete.`);
             }
             
+            console.log('[AIService] VARK buildDimensionsAnalysis succeeded, all dimensions found');
             return dimensionsAnalysis;
           };
           
