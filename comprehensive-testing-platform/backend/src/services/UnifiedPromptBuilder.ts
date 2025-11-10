@@ -903,9 +903,9 @@ Rules:
       description: "comprehensive birth chart analysis based on birth data",
       instructions: [
         "Analyze based on traditional natal astrology principles",
-        "Consider planetary positions, aspects, and house placements",
-        "Provide deep insights into personality and life path",
-        "Include guidance for personal growth and development"
+        "Focus on core planetary influences (Sun, Moon, Rising)",
+        "Provide concise insights into personality and life path",
+        "Include practical guidance for personal growth"
       ],
       schema: {
         sunSign: "aries",
@@ -918,41 +918,21 @@ Rules:
           venus: "Taurus",
           mars: "Gemini"
         },
-        housePositions: {
-          first: "Leo",
-          second: "Virgo",
-          third: "Libra"
-        },
-        aspects: {
-          sun_moon: "trine",
-          sun_mercury: "conjunction"
-        },
         personalityProfile: {
-          coreTraits: ["Trait 1", "Trait 2", "Trait 3"],
-          strengths: ["Strength 1", "Strength 2", "Strength 3"],
-          challenges: ["Challenge 1", "Challenge 2", "Challenge 3"],
-          lifePurpose: "Personal life purpose based on astrological analysis"
+          coreTraits: ["Trait 1", "Trait 2"],
+          strengths: ["Strength 1", "Strength 2"],
+          challenges: ["Challenge 1", "Challenge 2"],
+          lifePurpose: "Brief life purpose (2-3 sentences)"
         },
-        corePlanetaryPositions: {
-          sunInterpretation: "Detailed personalized interpretation of Sun sign placement and its influence on core identity, ego expression, and life purpose",
-          moonInterpretation: "Detailed personalized interpretation of Moon sign placement and its influence on emotional nature, inner needs, and intuitive responses",
-          risingInterpretation: "Detailed personalized interpretation of Rising sign placement and its influence on outward personality, first impressions, and how others perceive the individual"
-        },
-        planetaryInterpretations: {
-          mercury: "Detailed personalized interpretation of Mercury placement and its influence on communication style, thought processes, and learning patterns",
-          venus: "Detailed personalized interpretation of Venus placement and its influence on love, relationships, values, and aesthetic preferences",
-          mars: "Detailed personalized interpretation of Mars placement and its influence on energy, drive, assertiveness, and approach to challenges",
-          jupiter: "Detailed personalized interpretation of Jupiter placement and its influence on growth opportunities, beliefs, philosophy, and areas of natural expansion",
-          saturn: "Detailed personalized interpretation of Saturn placement and its influence on lessons, discipline, structure, and areas requiring hard work for mastery",
-          uranus: "Detailed personalized interpretation of Uranus placement and its influence on innovation, sudden changes, unique perspectives, and areas of breaking tradition",
-          neptune: "Detailed personalized interpretation of Neptune placement and its influence on intuition, spirituality, creativity, dreams, and mystical connections",
-          pluto: "Detailed personalized interpretation of Pluto placement and its influence on transformation, power, regeneration, and areas of deep change"
+        corePlanetaryInterpretations: {
+          sunInterpretation: "Concise interpretation of Sun sign influence (2-3 sentences)",
+          moonInterpretation: "Concise interpretation of Moon sign influence (2-3 sentences)",
+          risingInterpretation: "Concise interpretation of Rising sign influence (2-3 sentences)"
         },
         lifeGuidance: {
-          career: "Career guidance based on astrological profile",
-          relationships: "Relationship guidance based on astrological compatibility",
-          personalGrowth: "Personal development guidance based on planetary aspects",
-          challenges: "Life challenges and how to navigate them"
+          career: "Brief career guidance (2-3 sentences)",
+          relationships: "Brief relationship guidance (2-3 sentences)",
+          personalGrowth: "Brief personal growth guidance (2-3 sentences)"
         },
         createdAt: "2024-01-01T00:00:00.000Z"
       }

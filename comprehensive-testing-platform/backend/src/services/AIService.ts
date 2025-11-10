@@ -575,9 +575,10 @@ export class AIService {
       ];
       
       const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'birth_chart');
-      // Birth-chart prompt 较长（~4377 chars），降低 max_tokens 以减少响应体大小和读取时间
+      // Birth-chart分析：使用简化的schema，降低max_tokens以确保快速响应
+      // 简化后的schema只包含核心行星解释，响应体更小，读取更快
       const customTimeout = 45000;
-      const maxTokens = 2000; // 进一步降低到 2000，减少响应体大小和读取时间
+      const maxTokens = 1500; // 简化schema后，1500 tokens足够返回核心分析
       const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
       return this.parseBirthChartResponse(response);
     } catch (error) {
@@ -1553,12 +1554,12 @@ export class AIService {
       const customTimeout = complexAnalysisTypes.includes(data.testType) ? 45000 : 30000; // 45秒或30秒
       
       // 为BaZi和Birth-chart分析设置较低的max_tokens以减少响应时间和响应体大小
-      // 由于流式传输读取很慢，需要进一步降低 max_tokens
+      // 使用简化的schema后，可以进一步降低max_tokens
       let maxTokens: number;
       if (data.testType === 'numerology') {
-        maxTokens = 2000; // BaZi分析：进一步降低到2000，减少响应体大小和读取时间
+        maxTokens = 1500; // BaZi分析：简化schema后，1500 tokens足够
       } else if (data.testType === 'birth-chart') {
-        maxTokens = 2000; // Birth-chart prompt较长（~4377 chars），降低到2000
+        maxTokens = 1500; // Birth-chart：简化schema后，1500 tokens足够
       } else if (complexAnalysisTypes.includes(data.testType)) {
         maxTokens = 4000; // 其他复杂分析保持4000
       } else {
@@ -1927,37 +1928,28 @@ Please provide your analysis in JSON format with appropriate structure for the t
 
     return `Analyze BaZi (Four Pillars) for: ${fullName}, born ${birthDate} ${birthTime}, ${gender}, ${calendarType} calendar.
 
-Return JSON:
+Return JSON (simplified schema for faster response):
 {
   "analysis": {
     "testType": "numerology",
     "subtype": "${type}",
-    "overview": "Brief overview",
+    "overview": "Brief overview (2-3 sentences)",
     "keyInsights": [{"pillar": "Year", "element": "Metal over Dragon"}],
-    "strengths": ["3-4 items"],
-    "potentialChallenges": ["3-4 items"],
-    "careerSuggestions": ["3-4 items"],
-    "relationshipInsights": ["3-4 items"],
-    "personalGrowthRecommendations": ["3-4 items"],
+    "personalityTraits": ["3-4 key traits"],
+    "careerGuidance": ["2-3 items"],
     "wealthAnalysis": {
       "wealthLevel": "low/medium/high",
-      "wealthSource": ["2-3 items"],
-      "investmentAdvice": ["2-3 items"],
-      "wealthRisks": ["2 items"],
-      "wealthLuckyPeriods": ["2 items"]
+      "wealthSource": ["2 items"],
+      "investmentAdvice": ["2 items"]
     },
     "relationshipAnalysis": {
-      "marriageTiming": "Brief",
-      "partnerCharacteristics": ["3-4 items"],
-      "relationshipChallenges": ["2-3 items"],
-      "compatibilityElements": ["2-3 items"],
-      "marriageAdvice": ["2-3 items"]
+      "marriageTiming": "Brief (1 sentence)",
+      "partnerCharacteristics": ["2 items"],
+      "marriageAdvice": ["2 items"]
     },
     "healthAnalysis": {
       "overallHealth": "good/fair/poor",
-      "healthWeakAreas": ["2-3 items"],
-      "healthAdvice": ["2-3 items"],
-      "preventiveMeasures": ["2-3 items"]
+      "healthAdvice": ["2 items"]
     },
     "fortuneAnalysis": {
       "currentYear": {
@@ -1967,42 +1959,32 @@ Return JSON:
         "wealth": 6,
         "health": 7,
         "relationships": 8,
-        "overallDescription": "2 sentences",
-        "keyEvents": ["3-4 items"],
-        "advice": ["3-4 items"]
-      },
-      "nextYear": {
-        "year": 2025,
-        "overall": 7,
-        "overallDescription": "2 sentences",
-        "keyTrends": ["3-4 items"]
+        "overallDescription": "1-2 sentences",
+        "keyEvents": ["2 items"],
+        "advice": ["2 items"]
       }
     },
-    "overallInterpretation": "2 paragraphs",
-    "personalityTraits": ["5-6 items"],
-    "careerGuidance": ["3-4 items"],
     "baZiAnalysis": {
       "tenGods": {
-        "biJian": {"element": "Metal", "strength": "weak/balanced/strong"},
-        "jieCai": {"element": "Wood", "strength": "weak/balanced/strong"},
-        "shiShen": {"element": "Fire", "strength": "weak/balanced/strong"},
-        "shangGuan": {"element": "Earth", "strength": "weak/balanced/strong"},
-        "pianCai": {"element": "Water", "strength": "weak/balanced/strong"},
-        "zhengCai": {"element": "Metal", "strength": "weak/balanced/strong"},
-        "qiSha": {"element": "Wood", "strength": "weak/balanced/strong"},
-        "zhengGuan": {"element": "Fire", "strength": "weak/balanced/strong"},
-        "pianYin": {"element": "Earth", "strength": "weak/balanced/strong"},
-        "zhengYin": {"element": "Water", "strength": "weak/balanced/strong"}
+        "biJian": {"name": "Bi Jian", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "jieCai": {"name": "Jie Cai", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "shiShen": {"name": "Shi Shen", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "shangGuan": {"name": "Shang Guan", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "pianCai": {"name": "Pian Cai", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "zhengCai": {"name": "Zheng Cai", "element": "Metal", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "qiSha": {"name": "Qi Sha", "element": "Wood", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "zhengGuan": {"name": "Zheng Guan", "element": "Fire", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "pianYin": {"name": "Pian Yin", "element": "Earth", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"},
+        "zhengYin": {"name": "Zheng Yin", "element": "Water", "strength": "weak/balanced/strong", "meaning": "Brief meaning (1 sentence)"}
       },
       "dayMasterStrength": {
         "strength": "weak/balanced/strong",
-        "description": "2 sentences",
-        "recommendations": ["3-4 items"]
+        "description": "1-2 sentences"
       },
       "favorableElements": {
-        "useful": ["2-3 elements"],
-        "harmful": ["2-3 elements"],
-        "explanation": "2 sentences"
+        "useful": ["2 elements"],
+        "harmful": ["2 elements"],
+        "explanation": "1 sentence"
       },
       "fiveElements": {
         "elements": {"metal": 2, "wood": 3, "water": 1, "fire": 2, "earth": 2},
@@ -2012,14 +1994,14 @@ Return JSON:
       }
     },
     "luckyElements": {
-      "colors": ["3-4 colors"],
-      "numbers": [1, 3, 5],
-      "directions": ["2-3 directions"]
+      "colors": ["2-3 colors"],
+      "numbers": [1, 3],
+      "directions": ["2 directions"]
     }
   }
 }
 
-Analyze Four Pillars, Five Elements, Ten Gods, Day Master. Provide career, wealth, relationships, health guidance. Include current/next year predictions. English only. Element format: "Stem over Branch" (e.g., "Metal over Dragon"). Return valid JSON only.`;
+Focus on core analysis: Four Pillars, Five Elements, Day Master. Provide concise guidance for career, wealth, relationships, health. Include current year predictions only. English only. Element format: "Stem over Branch" (e.g., "Metal over Dragon"). Return valid JSON only.`;
   }
 
   async analyzeNumerology(analysisData: any): Promise<any> {
@@ -2027,9 +2009,9 @@ Analyze Four Pillars, Five Elements, Ten Gods, Day Master. Provide career, wealt
     const analysisType = analysisData?.type || 'bazi';
     // 将超时时间调整为45秒，确保在Cloudflare Workers执行时间限制内
     const customTimeout = 45000;
-    // BaZi分析使用较低的max_tokens以减少响应时间
-    // Prompt 长度 ~3476 chars，进一步降低 max_tokens 以确保响应体读取在超时前完成
-    const maxTokens = 2000; // 从 2500 进一步降低到 2000，减少响应体大小
+    // BaZi分析：使用简化的schema，降低max_tokens以确保快速响应
+    // 简化后的schema减少了嵌套和数组项，响应体更小，读取更快
+    const maxTokens = 1500; // 简化schema后，1500 tokens足够返回核心分析
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
 
     if (analysisType === 'zodiac') {
@@ -2270,25 +2252,27 @@ Keep the response concise but informative, suitable for a birth chart analysis.`
       return parsed;
     } catch (error) {
       // console.error('Error parsing birth chart response:', error);
-      // 返回默认星盘结构
+      // 返回默认星盘结构（与简化后的schema兼容）
       return {
         sunSign: 'unknown',
         moonSign: 'unknown',
         risingSign: 'unknown',
         planetaryPositions: {},
-        housePositions: {},
-        aspects: {},
         personalityProfile: {
-          coreTraits: ['Intuitive', 'Adaptable', 'Creative'],
-          strengths: ['Natural leadership', 'Emotional intelligence', 'Creative problem-solving'],
-          challenges: ['Perfectionism', 'Overthinking', 'Need for validation'],
+          coreTraits: ['Intuitive', 'Adaptable'],
+          strengths: ['Natural leadership', 'Emotional intelligence'],
+          challenges: ['Perfectionism', 'Overthinking'],
           lifePurpose: 'To inspire and guide others through your unique perspective'
         },
+        corePlanetaryInterpretations: {
+          sunInterpretation: 'Sun sign influence on core identity',
+          moonInterpretation: 'Moon sign influence on emotional nature',
+          risingInterpretation: 'Rising sign influence on outward personality'
+        },
         lifeGuidance: {
-          career: 'Focus on creative and leadership roles that allow self-expression',
-          relationships: 'Seek partners who appreciate your depth and complexity',
-          personalGrowth: 'Develop emotional balance and trust in your intuition',
-          challenges: 'Learn to balance idealism with practical reality'
+          career: 'Focus on creative and leadership roles',
+          relationships: 'Seek partners who appreciate your depth',
+          personalGrowth: 'Develop emotional balance and trust'
         },
         createdAt: new Date().toISOString()
       };
