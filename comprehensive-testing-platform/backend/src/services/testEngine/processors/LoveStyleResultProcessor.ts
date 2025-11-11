@@ -12,22 +12,58 @@ export class LoveStyleResultProcessor implements TestResultProcessor {
   
   validateAnswers(answers: any[]): boolean {
     if (!Array.isArray(answers) || answers.length === 0) {
+      console.error('[LoveStyleResultProcessor] Invalid answers: not an array or empty', {
+        isArray: Array.isArray(answers),
+        length: answers?.length,
+        type: typeof answers
+      })
       return false
     }
     
     // 验证答案格式 (1-5 Likert量表)
     const validValues = ['1', '2', '3', '4', '5', 1, 2, 3, 4, 5]
-    return answers.every(answer => 
-      answer && 
-      answer.value !== undefined && 
-      answer.value !== null &&
-      validValues.includes(answer.value)
+    const invalidAnswers = answers.filter(answer => 
+      !answer || 
+      answer.value === undefined || 
+      answer.value === null ||
+      !validValues.includes(answer.value)
     )
+    
+    if (invalidAnswers.length > 0) {
+      console.error('[LoveStyleResultProcessor] Invalid answers found:', {
+        totalAnswers: answers.length,
+        invalidCount: invalidAnswers.length,
+        invalidAnswers: invalidAnswers.slice(0, 3).map(a => ({
+          questionId: a?.questionId,
+          value: a?.value,
+          valueType: typeof a?.value
+        }))
+      })
+      return false
+    }
+    
+    return true
   }
   
   async process(answers: any[], aiAnalysis?: any): Promise<any> {
+    // 添加详细的日志，帮助定位问题
+    console.log(`[LoveStyleResultProcessor] Processing ${answers?.length || 0} answers, aiAnalysis: ${aiAnalysis ? 'present' : 'null'}`)
+    
     if (!this.validateAnswers(answers)) {
-      throw new Error('Invalid Love Style answers format')
+      // 提供更详细的错误信息
+      const errorDetails = {
+        answersLength: answers?.length,
+        answersType: typeof answers,
+        isArray: Array.isArray(answers),
+        sampleAnswer: answers?.[0] ? {
+          questionId: answers[0].questionId,
+          value: answers[0].value,
+          valueType: typeof answers[0].value,
+          keys: Object.keys(answers[0] || {})
+        } : null
+      }
+      console.error('[LoveStyleResultProcessor] Validation failed:', errorDetails)
+      throw new Error(`Invalid Love Style answers format: ${JSON.stringify(errorDetails)}`)
     }
     
     // 初始化各维度分数和计数

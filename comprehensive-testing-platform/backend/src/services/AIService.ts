@@ -127,9 +127,9 @@ export class AIService {
 
       // 在 Cloudflare Workers 环境中读取响应体
       // 剩余时间 = 总超时时间 - 已用时间 - 缓冲时间
-      // 对于大响应体（maxTokens >= 3500），减少缓冲时间以最大化读取时间
-      const isLargeResponse = timeout >= 60000 && responseMaxTokens >= 3500;
-      const initialBuffer = isLargeResponse ? 1500 : 5000; // 大响应体进一步减少初始缓冲（从2000ms降到1500ms）
+      // 对于大响应体（maxTokens >= 3000），减少缓冲时间以最大化读取时间
+      const isLargeResponse = timeout >= 60000 && responseMaxTokens >= 3000;
+      const initialBuffer = isLargeResponse ? 1000 : 5000; // 大响应体进一步减少初始缓冲（从1500ms降到1000ms）
       const remainingTime = timeout - fetchTime - initialBuffer;
       if (remainingTime < 10000) {
         // eslint-disable-next-line no-console
@@ -152,10 +152,10 @@ export class AIService {
         // - 如果 customTimeout >= 60000ms 且 maxTokens >= 4000，最大化读取时间（最多 timeout - 1000ms）
         // - 否则，使用默认的最大值 45000ms
         // 优化：对于大响应体，最小化缓冲时间，最大化读取时间
-        const isLargeResponseForRead = timeout >= 60000 && responseMaxTokens >= 3500;
-        const readBufferTime = isLargeResponseForRead ? 500 : 2000; // 大响应体只留0.5秒缓冲（从1000ms降到500ms）
+        const isLargeResponseForRead = timeout >= 60000 && responseMaxTokens >= 3000;
+        const readBufferTime = isLargeResponseForRead ? 300 : 2000; // 大响应体只留0.3秒缓冲（从500ms降到300ms）
         const maxReadTimeout = timeout >= 60000 ? timeout - readBufferTime : 45000;
-        const readTimeout = Math.max(30000, Math.min(remainingTime - 500, maxReadTimeout)); // 减少剩余时间计算中的缓冲（从1000ms降到500ms）
+        const readTimeout = Math.max(30000, Math.min(remainingTime - 300, maxReadTimeout)); // 减少剩余时间计算中的缓冲（从500ms降到300ms）
           // eslint-disable-next-line no-console
         console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms, max read timeout: ${maxReadTimeout}ms, total timeout: ${timeout}ms`);
         
@@ -434,10 +434,10 @@ export class AIService {
     const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'loveStyle');
     // Love Style分析：降低max_tokens以减少响应体大小，确保在60秒内完成读取
     // 由于需要详细分析6个维度、心理分析、关系动态等，响应体可能较大
-    // 降低 maxTokens 从 5000 到 3500，减少约30%的响应体大小，有助于在60秒内完成
+    // 降低 maxTokens 从 3500 到 3000，减少约14%的响应体大小，有助于在60秒内完成
     // 禁用重试机制，避免在60秒硬限制下浪费时间
     const customTimeout = 60000; // 60秒超时，readTimeout 将通过优化计算获得更长的时间
-    const maxTokens = 3500; // 降低max_tokens以减少响应体大小
+    const maxTokens = 3000; // 降低max_tokens以减少响应体大小
     const disableRetry = true; // 禁用重试，避免浪费60秒限制
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens, disableRetry);
     return this.parseLoveStyleResponse(response);
@@ -1882,9 +1882,9 @@ export class AIService {
         maxTokens = 1500; // Love Language Test：降低max_tokens以避免响应体读取超时
         customTimeout = 30000; // 30秒
       } else if (data.testType === 'love_style') {
-        maxTokens = 3500; // Love Style：进一步降低max_tokens以减少响应体大小，确保在60秒内完成读取
+        maxTokens = 3000; // Love Style：进一步降低max_tokens以减少响应体大小，确保在60秒内完成读取
         // Love Style 的 prompt 更复杂（14984 chars vs interpersonal 6877 chars），响应体较大
-        // 降低 maxTokens 从 4000 到 3500，减少约12.5%的响应体大小，有助于在60秒内完成
+        // 降低 maxTokens 从 3500 到 3000，减少约14%的响应体大小，有助于在60秒内完成
         // 禁用重试机制，避免在60秒硬限制下浪费时间
         customTimeout = 60000; // 60秒超时，readTimeout 将通过优化计算获得更长的时间
       } else if (data.testType === 'interpersonal') {
