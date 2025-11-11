@@ -2172,6 +2172,40 @@ export class AIService {
       return UnifiedPromptBuilder.buildPrompt(tarotAnswers, context, 'tarot');
     }
     
+    if (data.testType === 'vark') {
+      // 转换answers格式以匹配VARK方法期望的格式
+      // VARK是多选题，answer.value可能是数组（如['V', 'A', 'R']）或单个值
+      const varkAnswers: UserAnswer[] = data.answers.map((answer: any) => {
+        // 处理数组值：将数组转换为逗号分隔的字符串
+        let answerValue: string | number;
+        if (Array.isArray(answer.value)) {
+          // 如果是数组，转换为逗号分隔的字符串，如 "V,A,R"
+          answerValue = answer.value.join(',');
+        } else if (answer.value !== undefined && answer.value !== null) {
+          // 单个值直接使用
+          answerValue = answer.value;
+        } else {
+          // 如果没有value，尝试使用selectedOptions（兼容旧格式）
+          answerValue = Array.isArray(answer.selectedOptions) 
+            ? answer.selectedOptions.join(',') 
+            : '';
+        }
+        
+        return {
+          questionId: answer.questionId,
+          answer: answerValue,
+          score: 0 // VARK不需要分数，由AI根据答案分析
+        };
+      });
+      
+      const context: TestContext = {
+        testType: data.testType,
+        language: 'en'
+      };
+      
+      return UnifiedPromptBuilder.buildPrompt(varkAnswers, context, 'vark');
+    }
+    
     if (data.testType === 'numerology') {
       return this.buildNumerologyPrompt(data.answers[0]?.answer);
     }
