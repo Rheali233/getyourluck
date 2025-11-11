@@ -389,36 +389,33 @@ Rules:
       theory: "John Alan Lee's six love styles theory",
       description: "comprehensive love style assessment with psychological profiling",
       instructions: [
-        "Analyze based on John Alan Lee's six love styles theory with deep psychological insights",
-        "Provide comprehensive psychological profile including attachment patterns and emotional expression",
-        "Include developmental background influences and cultural factors affecting love style",
+        "Analyze based on John Alan Lee's six love styles theory with psychological insights",
+        "Provide psychological profile including attachment patterns and emotional expression",
+        "Include developmental background influences and cultural factors",
         "Analyze relationship dynamics including power balance, boundary setting, and conflict patterns",
         "Provide predictive insights for different relationship scenarios and compatibility analysis",
-        "Include specific intervention strategies and growth pathways for relationship improvement",
-        "For each of the six love styles (Eros, Ludus, Storge, Pragma, Mania, Agape), write interpretation in loveStyleDetails[style].description (≤100 words, focused on current alignment level)",
+        "Include specific intervention strategies and growth pathways",
+        "For each of the six love styles (Eros, Ludus, Storge, Pragma, Mania, Agape), write interpretation in loveStyleDetails[style].description (≤80 words, focused on current alignment level)",
         "Map percentage to fixed preference intensity labels: 0–39% = Low preference, 40–59% = Moderate preference, 60–79% = High preference, 80–100% = Very high preference",
         "Use 'Style alignment level' wording instead of 'preference'; labels: Low/Moderate/High/Very high",
         "Use the above labels consistently across all sections; do not invent alternative wording",
-        "Avoid boilerplate or templated openings in the overall analysis. Do NOT start with phrases like 'Your love style reflects a beautiful balance', 'You demonstrate remarkable ...', or similar clichés",
-        "Overall analysis must be 120–180 words, written in warm, conversational language that describes the user's comprehensive relationship characteristics",
-        "Base the analysis on the six dimensions' actual scores, describing how the user behaves in romantic relationships: how they express love, handle conflicts, build intimacy, dating preferences, communication styles, etc",
-        "Use specific, vivid details and scenarios that help users visualize themselves in romantic contexts",
-        "Avoid academic terminology and template phrases. Write as if describing a friend's relationship patterns",
-        "Use varied sentence structures and natural language flow. Avoid repetitive phrasing patterns",
+        "Overall analysis must be 120–180 words, written in warm, conversational language describing relationship characteristics",
+        "Base analysis on the six dimensions' actual scores, describing how the user behaves in romantic relationships",
+        "Avoid academic terminology and template phrases. Use varied sentence structures and natural language flow",
         "You MUST NOT recalculate or reorder styles. Mirror the provided computed results. Base analysis on all six dimensions' alignment levels"
       ],
       specialRequirements: [
         "Return loveStyleDetails for ALL six love styles: Eros, Ludus, Storge, Pragma, Mania, Agape",
-        "Each loveStyleDetails[style].description must be ≤100 words, written in warm, specific language that describes how this love style manifests in the user's actual relationship behaviors",
-        "Focus on concrete relationship scenarios: how they date, communicate, handle conflicts, express affection, build trust, etc. Use varied, natural language patterns",
-        "Avoid generic definitions and repetitive phrasing. Describe specific behaviors through diverse, engaging language that feels conversational",
+        "Each loveStyleDetails[style].description must be ≤80 words, written in warm, specific language that describes how this love style manifests in the user's actual relationship behaviors",
+        "Focus on concrete relationship scenarios: how they date, communicate, handle conflicts, express affection, build trust",
+        "Avoid generic definitions and repetitive phrasing. Describe specific behaviors through diverse, engaging language",
         "Descriptions must be consistent with allScores; do not contradict the score ordering",
         "Do NOT use rank labels or phrases like 'highest scores', 'your secondary love style', 'top two'; write neutral, dimension-focused interpretations",
         "Overall analysis must avoid promotional or sentimental language; prohibited examples: 'beautiful balance', 'remarkable consistency', 'strong capacity', 'genuine connection'. Prefer precise, observational wording",
-        "Psychological Profile: Use vivid, specific examples of how emotions are expressed in real relationship scenarios. Instead of 'You express emotions openly', describe 'When your partner forgets an anniversary, you feel hurt but calmly explain why it matters to you, then suggest a way to make it special together'",
-        "Developmental Insights: Share concrete stories and examples. Instead of 'Your upbringing shaped your approach', describe 'Growing up watching your parents argue about money taught you to discuss finances openly with partners before they become problems'",
-        "Relationship Dynamics: Use specific scenarios and examples. Instead of 'You establish boundaries', describe 'When a partner tries to read your messages, you explain that privacy builds trust and suggest checking in about concerns instead'",
-        "Predictive Insights: Provide specific, actionable strategies with concrete examples. Instead of 'Practice communication', describe 'Try the 5-minute daily check-in: share one thing that made you feel loved today and one thing you need from your partner tomorrow'",
+        "Psychological Profile: Use specific examples of how emotions are expressed in real relationship scenarios",
+        "Developmental Insights: Share concrete stories and examples from upbringing or experiences",
+        "Relationship Dynamics: Use specific scenarios and examples of power balance, boundaries, and conflict patterns",
+        "Predictive Insights: Provide specific, actionable strategies with concrete examples",
         "Output valid JSON only, no extra commentary",
         "STRICT CONSISTENCY: Overall analysis must reference all six dimensions based on their alignment levels, not just primary/secondary",
         "STRICT CONSISTENCY: Per-dimension interpretations must align with provided alignment levels and must not use conflicting terms"
@@ -491,33 +488,33 @@ Rules:
           }
         },
         psychologicalProfile: {
-          emotionalExpression: "Specific examples of how emotions are expressed in real relationship scenarios (e.g., 'When your partner forgets an anniversary, you feel hurt but calmly explain why it matters, then suggest making it special together')",
-          attachmentStyle: "Concrete relationship patterns with real scenarios (e.g., 'You prefer to text good morning every day because it makes you feel connected, but you're comfortable if your partner needs space for a few hours')",
-          selfAwareness: "Specific examples of understanding relationship needs (e.g., 'You know you need alone time after work, so you ask your partner to give you 30 minutes before discussing the day')",
-          emotionalRegulation: "Concrete examples of handling emotions and conflicts (e.g., 'When you're angry, you take a 10-minute walk before discussing the issue, then use 'I feel' statements')"
+          emotionalExpression: "How emotions are expressed in relationship scenarios",
+          attachmentStyle: "Relationship attachment patterns and behaviors",
+          selfAwareness: "Understanding of relationship needs and patterns",
+          emotionalRegulation: "How emotions and conflicts are handled"
         },
         developmentalInsights: {
-          backgroundInfluence: "Specific stories from upbringing that shaped relationship patterns (e.g., 'Growing up watching your parents argue about money taught you to discuss finances openly with partners before they become problems')",
-          culturalFactors: "Concrete cultural influences with examples (e.g., 'Your family's emphasis on respect means you always ask before making plans that affect your partner, even small ones')",
-          growthPotential: "Specific, actionable steps for developing other love styles (e.g., 'Try surprising your partner with a spontaneous date night once a month to develop more playful tendencies')",
-          lifeStageConsiderations: "Age-appropriate relationship examples (e.g., 'In your 20s, you might prioritize adventure and exploration; in your 30s, you focus more on building a stable foundation together')"
+          backgroundInfluence: "Upbringing or experiences that shaped relationship patterns",
+          culturalFactors: "Cultural influences on relationship behaviors",
+          growthPotential: "Actionable steps for developing other love styles",
+          lifeStageConsiderations: "Age-appropriate relationship patterns and considerations"
         },
         relationshipDynamics: {
-          powerBalance: "Specific examples of power dynamics (e.g., 'You naturally take charge of planning vacations because you enjoy research, while your partner handles daily household decisions')",
-          boundarySetting: "Concrete boundary scenarios (e.g., 'When a partner tries to read your messages, you explain that privacy builds trust and suggest checking in about concerns instead')",
-          conflictPatterns: "Real conflict examples (e.g., 'During arguments, you prefer to step away for 15 minutes to cool down, then return to discuss the issue calmly')",
-          intimacyNeeds: "Specific intimacy scenarios (e.g., 'You need physical touch daily to feel connected, so you make sure to hug your partner before leaving for work each morning')"
+          powerBalance: "Power dynamics in relationships",
+          boundarySetting: "Boundary preferences and enforcement style",
+          conflictPatterns: "Typical conflict triggers and resolution approaches",
+          intimacyNeeds: "Intimacy preferences and needs"
         },
         predictiveInsights: {
-          relationshipForecasting: "Specific predictions with examples (e.g., 'In new relationships, you'll likely suggest coffee dates first to build comfort, then progress to more adventurous activities')",
-          compatibilityMatrix: "Concrete compatibility examples (e.g., 'You'll work well with partners who appreciate your planning nature but may need to communicate clearly with those who prefer spontaneity')",
-          growthRoadmap: "Specific, actionable strategies (e.g., 'Try the 5-minute daily check-in: share one thing that made you feel loved today and one thing you need from your partner tomorrow')",
-          interventionStrategies: "Concrete improvement strategies (e.g., 'When feeling disconnected, suggest cooking together while sharing stories from your day, as shared activities help you reconnect')"
+          relationshipForecasting: "Predictions for relationship scenarios and outcomes",
+          compatibilityMatrix: "Compatibility with different love styles",
+          growthRoadmap: "Stepwise, actionable roadmap for relationship growth",
+          interventionStrategies: "Concrete strategies and exercises to improve relationships"
         },
-        communicationPatterns: ["Specific communication patterns and preferences in relationships, with concrete examples"],
-        compatibilityInsights: ["Specific compatibility insights with other love styles, explained through relationship scenarios"],
-        growthAreas: ["Specific areas for developing other love styles, with practical examples and actionable steps"],
-        relationshipAdvice: ["Specific advice for maintaining healthy relationships, with concrete examples and scenarios"]
+        communicationPatterns: ["Communication patterns and preferences in relationships"],
+        compatibilityInsights: ["Compatibility insights with other love styles"],
+        growthAreas: ["Areas for developing other love styles with actionable steps"],
+        relationshipAdvice: ["Advice for maintaining healthy relationships"]
       }
     },
     interpersonal: {
