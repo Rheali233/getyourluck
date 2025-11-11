@@ -1870,6 +1870,12 @@ export class AIService {
       } else if (data.testType === 'love_language') {
         maxTokens = 1500; // Love Language Test：降低max_tokens以避免响应体读取超时
         customTimeout = 30000; // 30秒
+      } else if (data.testType === 'love_style') {
+        maxTokens = 5000; // Love Style：增加max_tokens以确保完整响应（包含6个维度的详细分析）
+        customTimeout = 60000; // 60秒超时，给响应体读取更多时间
+      } else if (data.testType === 'interpersonal') {
+        maxTokens = 5000; // Interpersonal Skills：增加max_tokens以确保完整响应（包含4个维度的详细分析和专业洞察）
+        customTimeout = 60000; // 60秒超时，给响应体读取更多时间
       } else if (data.testType === 'vark') {
         maxTokens = 5000; // VARK：增加max_tokens以确保完整响应（包含所有4个维度的分析）
         customTimeout = 60000; // 60秒超时，给响应体读取更多时间
