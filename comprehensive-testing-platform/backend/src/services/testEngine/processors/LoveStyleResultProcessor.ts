@@ -58,10 +58,48 @@ export class LoveStyleResultProcessor implements TestResultProcessor {
       throw new Error(`Invalid Love Style answers format: answers must be an array, got ${typeof answers}`)
     }
     
-    // 验证answers格式
-    if (!this.validateAnswers(answers)) {
+    // 过滤掉不属于Love Style测试的答案（防止数据混淆）
+    // Love Style的questionId格式应该是: love-style-category-qX, love_style_qX, 或包含数字的格式
+    // 排除其他测试类型的questionId: vark_, ll_, disc_, holland_, etc.
+    const filteredAnswers = answers.filter(answer => {
+      if (!answer || !answer.questionId) return false
+      const questionId = String(answer.questionId).toLowerCase()
+      
+      // 排除其他测试类型的questionId
+      const excludedPrefixes = ['vark_', 'll_', 'disc_', 'holland_', 'mbti_', 'phq9_', 'eq_', 'happiness_', 'leadership_', 'tarot_', 'numerology_', 'birth-chart_']
+      if (excludedPrefixes.some(prefix => questionId.startsWith(prefix))) {
+        return false
+      }
+      
+      // 只接受Love Style格式的questionId
+      // 格式: love-style-category-qX, love_style_qX, 或包含数字的格式（用于推断维度）
+      return questionId.includes('love-style') || 
+             questionId.includes('love_style') || 
+             /q\d+/i.test(questionId) || // 包含 q+数字
+             /\d+/.test(questionId) // 包含数字（用于推断维度）
+    })
+    
+    if (filteredAnswers.length !== answers.length) {
+      const removedCount = answers.length - filteredAnswers.length
+      console.warn(`[LoveStyleResultProcessor] Filtered out ${removedCount} answers that don't belong to Love Style test. Original: ${answers.length}, Filtered: ${filteredAnswers.length}`)
+      const removedAnswers = answers.filter(answer => {
+        if (!answer || !answer.questionId) return true
+        const questionId = String(answer.questionId).toLowerCase()
+        const excludedPrefixes = ['vark_', 'll_', 'disc_', 'holland_', 'mbti_', 'phq9_', 'eq_', 'happiness_', 'leadership_', 'tarot_', 'numerology_', 'birth-chart_']
+        return excludedPrefixes.some(prefix => questionId.startsWith(prefix))
+      })
+      console.warn(`[LoveStyleResultProcessor] Removed answers:`, removedAnswers.slice(0, 3).map(a => ({ questionId: a?.questionId })))
+    }
+    
+    // 如果过滤后没有答案，抛出错误
+    if (filteredAnswers.length === 0) {
+      throw new Error(`Invalid Love Style answers format: No valid Love Style answers found after filtering. Original count: ${answers.length}`)
+    }
+    
+    // 验证过滤后的answers格式
+    if (!this.validateAnswers(filteredAnswers)) {
       // 提供更详细的错误信息，包括前几个无效答案的详细信息
-      const invalidAnswers = answers.filter(answer => {
+      const invalidAnswers = filteredAnswers.filter(answer => {
         if (!answer) return true
         const validValues = ['1', '2', '3', '4', '5', 1, 2, 3, 4, 5]
         return answer.value === undefined || 
@@ -70,7 +108,8 @@ export class LoveStyleResultProcessor implements TestResultProcessor {
       })
       
       const errorDetails = {
-        answersLength: answers.length,
+        originalAnswersLength: answers.length,
+        filteredAnswersLength: filteredAnswers.length,
         answersType: typeof answers,
         isArray: Array.isArray(answers),
         invalidCount: invalidAnswers.length,
@@ -80,14 +119,17 @@ export class LoveStyleResultProcessor implements TestResultProcessor {
           valueType: typeof a?.value,
           keys: a ? Object.keys(a) : []
         })),
-        sampleValidAnswer: answers.find(a => {
+        sampleValidAnswer: filteredAnswers.find(a => {
           const validValues = ['1', '2', '3', '4', '5', 1, 2, 3, 4, 5]
           return a && a.value !== undefined && a.value !== null && validValues.includes(a.value)
         }) || null
       }
       console.error('[LoveStyleResultProcessor] Validation failed with details:', JSON.stringify(errorDetails, null, 2))
-      throw new Error(`Invalid Love Style answers format: ${invalidAnswers.length} invalid answers found. First invalid: ${JSON.stringify(invalidAnswers[0])}`)
+      throw new Error(`Invalid Love Style answers format: ${invalidAnswers.length} invalid answers found after filtering. Original: ${answers.length}, Filtered: ${filteredAnswers.length}. First invalid: ${JSON.stringify(invalidAnswers[0])}`)
     }
+    
+    // 使用过滤后的answers
+    const validAnswers = filteredAnswers
     
     // 初始化各维度分数和计数
     const scores: Record<string, number> = {
@@ -109,7 +151,7 @@ export class LoveStyleResultProcessor implements TestResultProcessor {
     }
     
     // 计算每个维度的分数（基于Likert量表1-5分）
-    answers.forEach(answer => {
+    validAnswers.forEach(answer => {
       let value = answer.value
       if (typeof value === 'string') {
         const parsed = parseInt(value, 10)
@@ -152,7 +194,7 @@ export class LoveStyleResultProcessor implements TestResultProcessor {
     })
 
     // 计算平均分和百分比
-    const totalQuestions = answers.length
+    const totalQuestions = validAnswers.length
     const questionsPerDimension = Math.max(1, Math.round(totalQuestions / 6)) // 6个维度
     const maxPerDimension = questionsPerDimension * 5 // 每维度最高5分
     
