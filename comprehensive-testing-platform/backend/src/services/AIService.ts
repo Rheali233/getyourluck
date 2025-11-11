@@ -65,6 +65,8 @@ export class AIService {
       const timeout = customTimeout || this.timeout;
       // 使用自定义max_tokens或默认值
       const tokens = maxTokens || 4000;
+      // 保存 maxTokens 供后续 readTimeout 计算使用
+      const responseMaxTokens = tokens;
       
       // eslint-disable-next-line no-console
       console.log(`[AI Debug] Calling DeepSeek API (attempt ${retryCount + 1})`, {
@@ -144,10 +146,14 @@ export class AIService {
         // 对于流式传输，需要更长的超时时间，但不超过 Worker 限制
         // 对于 VARK、Love Style 等类型，响应体可能较大，需要更长的读取时间
         // readTimeout 应该根据 customTimeout 动态调整：
-        // - 如果 customTimeout >= 60000ms，允许更长的读取时间（最多 timeout - 5000ms）
+        // - 如果 customTimeout >= 60000ms，允许更长的读取时间（最多 timeout - 3000ms，减少缓冲）
+        // - 对于 Love Style，响应体特别大，需要更长的读取时间（最多 timeout - 2000ms）
         // - 否则，使用默认的最大值 45000ms
-        const maxReadTimeout = timeout >= 60000 ? timeout - 5000 : 45000;
-        const readTimeout = Math.max(30000, Math.min(remainingTime - 5000, maxReadTimeout));
+        // 优化：减少安全缓冲，让 readTimeout 更长，同时确保 Worker 不会超时
+        const isLargeResponse = timeout >= 60000 && responseMaxTokens >= 5000;
+        const bufferTime = isLargeResponse ? 2000 : 5000; // Love Style/VARK 等大响应体减少缓冲
+        const maxReadTimeout = timeout >= 60000 ? timeout - bufferTime : 45000;
+        const readTimeout = Math.max(30000, Math.min(remainingTime - 2000, maxReadTimeout));
           // eslint-disable-next-line no-console
         console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms, max read timeout: ${maxReadTimeout}ms, total timeout: ${timeout}ms`);
         
@@ -1873,8 +1879,8 @@ export class AIService {
       } else if (data.testType === 'love_style') {
         maxTokens = 5000; // Love Style：增加max_tokens以确保完整响应（包含6个维度的详细分析）
         // Love Style 的 prompt 更复杂（14984 chars vs interpersonal 6877 chars），响应体更大
-        // 需要更长的总超时时间，以确保 readTimeout 足够长（至少 60 秒）
-        customTimeout = 90000; // 90秒超时，给响应体读取更多时间（readTimeout 约为 85 秒）
+        // 使用 60 秒超时，但通过优化 readTimeout 计算来获得更长的读取时间
+        customTimeout = 60000; // 60秒超时，readTimeout 将通过优化计算获得更长的时间
       } else if (data.testType === 'interpersonal') {
         maxTokens = 5000; // Interpersonal Skills：增加max_tokens以确保完整响应（包含4个维度的详细分析和专业洞察）
         customTimeout = 60000; // 60秒超时，给响应体读取更多时间
