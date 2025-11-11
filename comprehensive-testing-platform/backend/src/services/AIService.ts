@@ -59,7 +59,7 @@ export class AIService {
   /**
    * 调用DeepSeek API，包含重试逻辑
    */
-  private async callDeepSeek(prompt: string, retryCount = 0, customTimeout?: number, maxTokens?: number): Promise<any> {
+  private async callDeepSeek(prompt: string, retryCount = 0, customTimeout?: number, maxTokens?: number, disableRetry = false): Promise<any> {
     try {
       // 使用自定义超时或默认超时
       const timeout = customTimeout || this.timeout;
@@ -127,9 +127,9 @@ export class AIService {
 
       // 在 Cloudflare Workers 环境中读取响应体
       // 剩余时间 = 总超时时间 - 已用时间 - 缓冲时间
-      // 对于大响应体（maxTokens >= 4000），减少缓冲时间以最大化读取时间
-      const isLargeResponse = timeout >= 60000 && responseMaxTokens >= 4000;
-      const initialBuffer = isLargeResponse ? 2000 : 5000; // 大响应体减少初始缓冲
+      // 对于大响应体（maxTokens >= 3500），减少缓冲时间以最大化读取时间
+      const isLargeResponse = timeout >= 60000 && responseMaxTokens >= 3500;
+      const initialBuffer = isLargeResponse ? 1500 : 5000; // 大响应体进一步减少初始缓冲（从2000ms降到1500ms）
       const remainingTime = timeout - fetchTime - initialBuffer;
       if (remainingTime < 10000) {
         // eslint-disable-next-line no-console
@@ -152,10 +152,10 @@ export class AIService {
         // - 如果 customTimeout >= 60000ms 且 maxTokens >= 4000，最大化读取时间（最多 timeout - 1000ms）
         // - 否则，使用默认的最大值 45000ms
         // 优化：对于大响应体，最小化缓冲时间，最大化读取时间
-        const isLargeResponseForRead = timeout >= 60000 && responseMaxTokens >= 4000;
-        const readBufferTime = isLargeResponseForRead ? 1000 : 2000; // 大响应体只留1秒缓冲
+        const isLargeResponseForRead = timeout >= 60000 && responseMaxTokens >= 3500;
+        const readBufferTime = isLargeResponseForRead ? 500 : 2000; // 大响应体只留0.5秒缓冲（从1000ms降到500ms）
         const maxReadTimeout = timeout >= 60000 ? timeout - readBufferTime : 45000;
-        const readTimeout = Math.max(30000, Math.min(remainingTime - 1000, maxReadTimeout));
+        const readTimeout = Math.max(30000, Math.min(remainingTime - 500, maxReadTimeout)); // 减少剩余时间计算中的缓冲（从1000ms降到500ms）
           // eslint-disable-next-line no-console
         console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms, max read timeout: ${maxReadTimeout}ms, total timeout: ${timeout}ms`);
         
@@ -269,12 +269,12 @@ export class AIService {
       // eslint-disable-next-line no-console
       console.error(`[AI Debug] Error stack:`, error instanceof Error ? error.stack?.substring(0, 500) : 'No stack trace');
 
-      if (retryCount < this.maxRetries && this.isRetryableError(error)) {
+      if (retryCount < this.maxRetries && this.isRetryableError(error) && !disableRetry) {
         const delayMs = 1000 * Math.pow(2, retryCount);
         // eslint-disable-next-line no-console
         console.log(`[AI Debug] Retrying DeepSeek API call (attempt ${retryCount + 1}/${this.maxRetries}) after ${delayMs}ms delay`);
         await this.delay(delayMs);
-        return this.callDeepSeek(prompt, retryCount + 1, customTimeout, maxTokens);
+        return this.callDeepSeek(prompt, retryCount + 1, customTimeout, maxTokens, disableRetry);
       }
 
       // eslint-disable-next-line no-console
@@ -432,11 +432,14 @@ export class AIService {
   async analyzeLoveStyle(answers: UserAnswer[], context: TestContext): Promise<any> {
     try {
     const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'loveStyle');
-    // Love Style分析：增加超时时间和max_tokens以确保完整响应
+    // Love Style分析：降低max_tokens以减少响应体大小，确保在60秒内完成读取
     // 由于需要详细分析6个维度、心理分析、关系动态等，响应体可能较大
-    const customTimeout = 60000; // 60秒超时，给响应体读取更多时间
-    const maxTokens = 5000; // 增加max_tokens以确保完整响应
-    const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
+    // 降低 maxTokens 从 5000 到 3500，减少约30%的响应体大小，有助于在60秒内完成
+    // 禁用重试机制，避免在60秒硬限制下浪费时间
+    const customTimeout = 60000; // 60秒超时，readTimeout 将通过优化计算获得更长的时间
+    const maxTokens = 3500; // 降低max_tokens以减少响应体大小
+    const disableRetry = true; // 禁用重试，避免浪费60秒限制
+    const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens, disableRetry);
     return this.parseLoveStyleResponse(response);
     } catch (error) {
       throw new Error(`Love Style analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -1879,9 +1882,10 @@ export class AIService {
         maxTokens = 1500; // Love Language Test：降低max_tokens以避免响应体读取超时
         customTimeout = 30000; // 30秒
       } else if (data.testType === 'love_style') {
-        maxTokens = 4000; // Love Style：降低max_tokens以减少响应体大小，确保在60秒内完成读取
+        maxTokens = 3500; // Love Style：进一步降低max_tokens以减少响应体大小，确保在60秒内完成读取
         // Love Style 的 prompt 更复杂（14984 chars vs interpersonal 6877 chars），响应体较大
-        // 降低 maxTokens 从 5000 到 4000，减少约20%的响应体大小，有助于在60秒内完成
+        // 降低 maxTokens 从 4000 到 3500，减少约12.5%的响应体大小，有助于在60秒内完成
+        // 禁用重试机制，避免在60秒硬限制下浪费时间
         customTimeout = 60000; // 60秒超时，readTimeout 将通过优化计算获得更长的时间
       } else if (data.testType === 'interpersonal') {
         maxTokens = 5000; // Interpersonal Skills：增加max_tokens以确保完整响应（包含4个维度的详细分析和专业洞察）
@@ -1897,7 +1901,9 @@ export class AIService {
         customTimeout = 30000; // 30秒
       }
       
-      const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
+      // 对于 love_style，禁用重试机制以避免在60秒硬限制下浪费时间
+      const disableRetry = data.testType === 'love_style';
+      const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens, disableRetry);
       // eslint-disable-next-line no-console
       console.log(`[AIService] DeepSeek API call successful, parsing response for ${data.testType}`);
       
