@@ -1872,7 +1872,9 @@ export class AIService {
         customTimeout = 30000; // 30秒
       } else if (data.testType === 'love_style') {
         maxTokens = 5000; // Love Style：增加max_tokens以确保完整响应（包含6个维度的详细分析）
-        customTimeout = 60000; // 60秒超时，给响应体读取更多时间
+        // Love Style 的 prompt 更复杂（14984 chars vs interpersonal 6877 chars），响应体更大
+        // 需要更长的总超时时间，以确保 readTimeout 足够长（至少 60 秒）
+        customTimeout = 90000; // 90秒超时，给响应体读取更多时间（readTimeout 约为 85 秒）
       } else if (data.testType === 'interpersonal') {
         maxTokens = 5000; // Interpersonal Skills：增加max_tokens以确保完整响应（包含4个维度的详细分析和专业洞察）
         customTimeout = 60000; // 60秒超时，给响应体读取更多时间
