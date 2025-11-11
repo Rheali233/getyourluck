@@ -422,7 +422,11 @@ export class AIService {
   async analyzeLoveStyle(answers: UserAnswer[], context: TestContext): Promise<any> {
     try {
     const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'loveStyle');
-    const response = await this.callDeepSeek(prompt);
+    // Love Style分析：增加超时时间和max_tokens以确保完整响应
+    // 由于需要详细分析6个维度、心理分析、关系动态等，响应体可能较大
+    const customTimeout = 60000; // 60秒超时，给响应体读取更多时间
+    const maxTokens = 5000; // 增加max_tokens以确保完整响应
+    const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens);
     return this.parseLoveStyleResponse(response);
     } catch (error) {
       throw new Error(`Love Style analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -1116,15 +1120,41 @@ export class AIService {
       const content = response?.choices?.[0]?.message?.content || '';
       
       if (!content) {
+        // eslint-disable-next-line no-console
+        console.error('[AIService] Love Style response content is empty');
         throw new Error('Empty response content');
       }
       
-      // 处理模型返回中可能包含的 ```json 代码块
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Style raw response length: ${content.length}`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Style raw response preview (first 500 chars):`, content.substring(0, 500));
+      
+      // 处理模型返回中可能包含的 ```json 代码块，并使用健壮解析
       const cleaned = this.sanitizeAIJSON(content);
-      const parsed = JSON.parse(cleaned);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Style cleaned response length: ${cleaned.length}`);
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Style cleaned response preview (first 500 chars):`, cleaned.substring(0, 500));
+      
+      // 使用健壮的JSON解析方法，与Love Language保持一致
+      const parsed = this.parseJSONRobust(cleaned, 'Love Style');
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Style JSON parsed successfully, parsed keys:`, Object.keys(parsed));
+      
+      // eslint-disable-next-line no-console
+      console.log(`[AIService] Love Style parse successful`);
       
       return parsed;
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[AIService] Love Style parse error:', error);
+      // eslint-disable-next-line no-console
+      console.error('[AIService] Love Style parse error details:', error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.substring(0, 1000)
+      } : error);
       throw new Error(`Failed to parse Love Style response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

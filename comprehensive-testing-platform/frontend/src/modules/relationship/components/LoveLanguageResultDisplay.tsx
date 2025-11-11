@@ -237,7 +237,7 @@ export const LoveLanguageResultDisplay: React.FC<LoveLanguageResultDisplayProps>
               <span className="text-2xl mr-2">🧭</span>
               Guidance & Ideas
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {communicationTips.length > 0 && (
                 <div className="p-6 rounded-lg bg-pink-50 border border-pink-200">
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">Communication Tips</h4>
@@ -246,19 +246,19 @@ export const LoveLanguageResultDisplay: React.FC<LoveLanguageResultDisplayProps>
                   </ul>
                 </div>
               )}
-              {growthAreas.length > 0 && (
-                <div className="p-6 rounded-lg bg-pink-50 border border-pink-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Growth Plan</h4>
-                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                    {growthAreas.map((t, i) => (<li key={i}>{t}</li>))}
-                  </ul>
-                </div>
-              )}
               {giftSuggestions.length > 0 && (
                 <div className="p-6 rounded-lg bg-pink-50 border border-pink-200">
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">Gift Suggestions</h4>
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
                     {giftSuggestions.map((t, i) => (<li key={i}>{t}</li>))}
+                  </ul>
+                </div>
+              )}
+              {growthAreas.length > 0 && (
+                <div className="p-6 rounded-lg bg-pink-50 border border-pink-200">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Growth Plan</h4>
+                  <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                    {growthAreas.map((t, i) => (<li key={i}>{t}</li>))}
                   </ul>
                 </div>
               )}
