@@ -142,12 +142,14 @@ export class AIService {
         
         // 创建超时保护，确保在 Worker 超时前完成读取
         // 对于流式传输，需要更长的超时时间，但不超过 Worker 限制
-        // 对于 VARK 和 numerology 类型，响应体可能较大，需要更长的读取时间
-        // 但也要确保不超过 Worker 的总体超时限制
-        // 对于 VARK，由于 max_tokens=5000，响应可能很大，需要更长的读取时间
-        const readTimeout = Math.max(30000, Math.min(remainingTime - 5000, 45000)); // 至少30秒，最多45秒，留5秒缓冲（VARK需要更长时间）
+        // 对于 VARK、Love Style 等类型，响应体可能较大，需要更长的读取时间
+        // readTimeout 应该根据 customTimeout 动态调整：
+        // - 如果 customTimeout >= 60000ms，允许更长的读取时间（最多 timeout - 5000ms）
+        // - 否则，使用默认的最大值 45000ms
+        const maxReadTimeout = timeout >= 60000 ? timeout - 5000 : 45000;
+        const readTimeout = Math.max(30000, Math.min(remainingTime - 5000, maxReadTimeout));
           // eslint-disable-next-line no-console
-        console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms`);
+        console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms, max read timeout: ${maxReadTimeout}ms, total timeout: ${timeout}ms`);
         
         // 使用 response.text() 而不是 arrayBuffer()，可能对流式传输更友好
         const responseText = await Promise.race([
