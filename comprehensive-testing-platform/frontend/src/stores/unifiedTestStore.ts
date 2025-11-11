@@ -371,6 +371,12 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
         try {
           set({ isLoading: true, error: null });
           
+          // 先清理之前的会话状态，确保不会混入其他测试类型的答案
+          const previousSession = get().currentSession;
+          if (previousSession && previousSession.testType !== testType) {
+            console.log(`[UnifiedTestStore] Clearing previous session (${previousSession.testType}) before starting new test (${testType})`);
+          }
+          
           // 如果问题未加载，先从API加载
           if (!get().questionsLoaded[testType] || !get().questions[testType]?.length) {
             await get().loadQuestions(testType);
@@ -381,14 +387,14 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
             throw new Error(`Failed to load ${testType} test questions`);
           }
           
-          // 创建新的测试会话
+          // 创建新的测试会话，确保 answers 数组是全新的
           const session: TestSession = {
-            id: `session_${Date.now()}`,
+            id: `session_${Date.now()}_${testType}`,
             testType,
             status: TestStatus.IN_PROGRESS,
             startTime: new Date(),
             currentQuestionIndex: 0,
-            answers: [],
+            answers: [], // 确保是全新的空数组
             totalQuestions: currentQuestions.length,
             progress: 0
           };
@@ -402,7 +408,9 @@ export const useUnifiedTestStore = create<UnifiedTestModuleState>()(
             isTestPaused: false,
             isTestCompleted: false,
             progress: 0,
-            showResults: false
+            showResults: false,
+            currentTestResult: null, // 确保清理之前的结果
+            error: null // 确保清理之前的错误
           });
           
         } catch (error) {
