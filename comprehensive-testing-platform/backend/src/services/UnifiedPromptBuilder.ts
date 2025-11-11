@@ -395,27 +395,30 @@ Rules:
         "Analyze relationship dynamics including power balance, boundary setting, and conflict patterns",
         "Provide predictive insights for different relationship scenarios and compatibility analysis",
         "Include specific intervention strategies and growth pathways",
-        "For each of the six love styles (Eros, Ludus, Storge, Pragma, Mania, Agape), write interpretation in loveStyleDetails[style].description (≤80 words, focused on current alignment level)",
+        "For each of the six love styles (Eros, Ludus, Storge, Pragma, Mania, Agape), write interpretation in loveStyleDetails[style].description (≤50 words, focused on current alignment level)",
         "Map percentage to fixed preference intensity labels: 0–39% = Low preference, 40–59% = Moderate preference, 60–79% = High preference, 80–100% = Very high preference",
         "Use 'Style alignment level' wording instead of 'preference'; labels: Low/Moderate/High/Very high",
         "Use the above labels consistently across all sections; do not invent alternative wording",
-        "Overall analysis must be 120–180 words, written in warm, conversational language describing relationship characteristics",
+        "Overall analysis must be 80–120 words, written in warm, conversational language describing relationship characteristics",
         "Base analysis on the six dimensions' actual scores, describing how the user behaves in romantic relationships",
         "Avoid academic terminology and template phrases. Use varied sentence structures and natural language flow",
         "You MUST NOT recalculate or reorder styles. Mirror the provided computed results. Base analysis on all six dimensions' alignment levels"
       ],
       specialRequirements: [
         "Return loveStyleDetails for ALL six love styles: Eros, Ludus, Storge, Pragma, Mania, Agape",
-        "Each loveStyleDetails[style].description must be ≤80 words, written in warm, specific language that describes how this love style manifests in the user's actual relationship behaviors",
+        "Each loveStyleDetails[style].description must be ≤50 words, written in warm, specific language that describes how this love style manifests in the user's actual relationship behaviors",
         "Focus on concrete relationship scenarios: how they date, communicate, handle conflicts, express affection, build trust",
         "Avoid generic definitions and repetitive phrasing. Describe specific behaviors through diverse, engaging language",
         "Descriptions must be consistent with allScores; do not contradict the score ordering",
         "Do NOT use rank labels or phrases like 'highest scores', 'your secondary love style', 'top two'; write neutral, dimension-focused interpretations",
         "Overall analysis must avoid promotional or sentimental language; prohibited examples: 'beautiful balance', 'remarkable consistency', 'strong capacity', 'genuine connection'. Prefer precise, observational wording",
-        "Psychological Profile: Use specific examples of how emotions are expressed in real relationship scenarios",
-        "Developmental Insights: Share concrete stories and examples from upbringing or experiences",
-        "Relationship Dynamics: Use specific scenarios and examples of power balance, boundaries, and conflict patterns",
-        "Predictive Insights: Provide specific, actionable strategies with concrete examples",
+        "Psychological Profile: Use concise examples (1-2 sentences each) of how emotions are expressed in real relationship scenarios",
+        "Developmental Insights: Provide brief insights (1-2 sentences each) from upbringing or experiences",
+        "Relationship Dynamics: Use concise scenarios (1-2 sentences each) of power balance, boundaries, and conflict patterns",
+        "Predictive Insights: Provide concise, actionable strategies (1-2 sentences each) with brief examples",
+        "CRITICAL: Keep all text fields concise. Maximum lengths: descriptions ≤50 words, analysis ≤120 words, all other fields ≤2 sentences each",
+        "CRITICAL: Limit arrays to 2-3 items maximum. Do not exceed this limit",
+        "CRITICAL: Focus on essential insights only. Avoid verbose explanations or repetitive content",
         "Output valid JSON only, no extra commentary",
         "STRICT CONSISTENCY: Overall analysis must reference all six dimensions based on their alignment levels, not just primary/secondary",
         "STRICT CONSISTENCY: Per-dimension interpretations must align with provided alignment levels and must not use conflicting terms"
@@ -423,7 +426,7 @@ Rules:
       schema: {
         primaryStyle: "Eros",
         secondaryStyle: "Storge",
-        analysis: "Comprehensive analysis of love style based on Lee's theory",
+        analysis: "Brief analysis of love style (80-120 words)",
         computed: {
           primaryStyle: "Eros",
           secondaryStyle: "Storge",
@@ -451,70 +454,70 @@ Rules:
         },
         loveStyleDetails: {
           "Eros": {
-            description: "Passionate, romantic love characterized by intense emotions and physical attraction",
-            characteristics: ["Specific characteristics of Eros love style"],
-            strengths: ["Specific strengths of this love style"],
-            challenges: ["Specific challenges of this love style"]
+            description: "Brief description (≤50 words) of Eros love style",
+            characteristics: ["Characteristic 1", "Characteristic 2"],
+            strengths: ["Strength 1", "Strength 2"],
+            challenges: ["Challenge 1", "Challenge 2"]
           },
           "Ludus": {
-            description: "Playful, game-like love that enjoys the thrill of dating and flirting",
-            characteristics: ["Specific characteristics of Ludus love style"],
-            strengths: ["Specific strengths of this love style"],
-            challenges: ["Specific challenges of this love style"]
+            description: "Brief description (≤50 words) of Ludus love style",
+            characteristics: ["Characteristic 1", "Characteristic 2"],
+            strengths: ["Strength 1", "Strength 2"],
+            challenges: ["Challenge 1", "Challenge 2"]
           },
           "Storge": {
-            description: "Friendship-based love that develops gradually from shared experiences",
-            characteristics: ["Specific characteristics of Storge love style"],
-            strengths: ["Specific strengths of this love style"],
-            challenges: ["Specific challenges of this love style"]
+            description: "Brief description (≤50 words) of Storge love style",
+            characteristics: ["Characteristic 1", "Characteristic 2"],
+            strengths: ["Strength 1", "Strength 2"],
+            challenges: ["Challenge 1", "Challenge 2"]
           },
           "Pragma": {
-            description: "Practical, logical love that seeks compatibility and shared life goals",
-            characteristics: ["Specific characteristics of Pragma love style"],
-            strengths: ["Specific strengths of this love style"],
-            challenges: ["Specific challenges of this love style"]
+            description: "Brief description (≤50 words) of Pragma love style",
+            characteristics: ["Characteristic 1", "Characteristic 2"],
+            strengths: ["Strength 1", "Strength 2"],
+            challenges: ["Challenge 1", "Challenge 2"]
           },
           "Mania": {
-            description: "Obsessive, intense love with strong emotional attachment and dependency",
-            characteristics: ["Specific characteristics of Mania love style"],
-            strengths: ["Specific strengths of this love style"],
-            challenges: ["Specific challenges of this love style"]
+            description: "Brief description (≤50 words) of Mania love style",
+            characteristics: ["Characteristic 1", "Characteristic 2"],
+            strengths: ["Strength 1", "Strength 2"],
+            challenges: ["Challenge 1", "Challenge 2"]
           },
           "Agape": {
-            description: "Selfless, unconditional love expressed through giving and care",
-            characteristics: ["Specific characteristics of Agape love style"],
-            strengths: ["Specific strengths of this love style"],
-            challenges: ["Specific challenges of this love style"]
+            description: "Brief description (≤50 words) of Agape love style",
+            characteristics: ["Characteristic 1", "Characteristic 2"],
+            strengths: ["Strength 1", "Strength 2"],
+            challenges: ["Challenge 1", "Challenge 2"]
           }
         },
         psychologicalProfile: {
-          emotionalExpression: "How emotions are expressed in relationship scenarios",
-          attachmentStyle: "Relationship attachment patterns and behaviors",
-          selfAwareness: "Understanding of relationship needs and patterns",
-          emotionalRegulation: "How emotions and conflicts are handled"
+          emotionalExpression: "Brief description (1-2 sentences)",
+          attachmentStyle: "Brief description (1-2 sentences)",
+          selfAwareness: "Brief description (1-2 sentences)",
+          emotionalRegulation: "Brief description (1-2 sentences)"
         },
         developmentalInsights: {
-          backgroundInfluence: "Upbringing or experiences that shaped relationship patterns",
-          culturalFactors: "Cultural influences on relationship behaviors",
-          growthPotential: "Actionable steps for developing other love styles",
-          lifeStageConsiderations: "Age-appropriate relationship patterns and considerations"
+          backgroundInfluence: "Brief description (1-2 sentences)",
+          culturalFactors: "Brief description (1-2 sentences)",
+          growthPotential: "Brief actionable steps (1-2 sentences)",
+          lifeStageConsiderations: "Brief description (1-2 sentences)"
         },
         relationshipDynamics: {
-          powerBalance: "Power dynamics in relationships",
-          boundarySetting: "Boundary preferences and enforcement style",
-          conflictPatterns: "Typical conflict triggers and resolution approaches",
-          intimacyNeeds: "Intimacy preferences and needs"
+          powerBalance: "Brief description (1-2 sentences)",
+          boundarySetting: "Brief description (1-2 sentences)",
+          conflictPatterns: "Brief description (1-2 sentences)",
+          intimacyNeeds: "Brief description (1-2 sentences)"
         },
         predictiveInsights: {
-          relationshipForecasting: "Predictions for relationship scenarios and outcomes",
-          compatibilityMatrix: "Compatibility with different love styles",
-          growthRoadmap: "Stepwise, actionable roadmap for relationship growth",
-          interventionStrategies: "Concrete strategies and exercises to improve relationships"
+          relationshipForecasting: "Brief predictions (1-2 sentences)",
+          compatibilityMatrix: "Brief compatibility analysis (1-2 sentences)",
+          growthRoadmap: "Brief actionable roadmap (2-3 steps)",
+          interventionStrategies: "Brief strategies (1-2 sentences)"
         },
-        communicationPatterns: ["Communication patterns and preferences in relationships"],
-        compatibilityInsights: ["Compatibility insights with other love styles"],
-        growthAreas: ["Areas for developing other love styles with actionable steps"],
-        relationshipAdvice: ["Advice for maintaining healthy relationships"]
+        communicationPatterns: ["Pattern 1", "Pattern 2"],
+        compatibilityInsights: ["Insight 1", "Insight 2"],
+        growthAreas: ["Area 1", "Area 2"],
+        relationshipAdvice: ["Advice 1", "Advice 2"]
       }
     },
     interpersonal: {

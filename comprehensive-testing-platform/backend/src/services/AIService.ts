@@ -127,9 +127,9 @@ export class AIService {
 
       // 在 Cloudflare Workers 环境中读取响应体
       // 剩余时间 = 总超时时间 - 已用时间 - 缓冲时间
-      // 对于大响应体（maxTokens >= 2500），减少缓冲时间以最大化读取时间
-      const isLargeResponse = timeout >= 60000 && responseMaxTokens >= 2500;
-      const initialBuffer = isLargeResponse ? 800 : 5000; // 大响应体进一步减少初始缓冲（从1000ms降到800ms）
+      // 对于大响应体（maxTokens >= 2000），适当增加缓冲时间以确保有足够时间读取
+      const isLargeResponse = timeout >= 60000 && responseMaxTokens >= 2000;
+      const initialBuffer = isLargeResponse ? 1500 : 5000; // 大响应体增加初始缓冲（从800ms增加到1500ms）
       const remainingTime = timeout - fetchTime - initialBuffer;
       if (remainingTime < 10000) {
         // eslint-disable-next-line no-console
@@ -149,13 +149,24 @@ export class AIService {
         // 对于流式传输，需要更长的超时时间，但不超过 Worker 限制
         // 对于 VARK、Love Style 等类型，响应体可能较大，需要更长的读取时间
         // readTimeout 应该根据 customTimeout 动态调整：
-        // - 如果 customTimeout >= 60000ms 且 maxTokens >= 4000，最大化读取时间（最多 timeout - 1000ms）
+        // - 如果 customTimeout >= 60000ms 且 maxTokens >= 2000，最大化读取时间（最多 timeout - 1000ms）
         // - 否则，使用默认的最大值 45000ms
-        // 优化：对于大响应体，最小化缓冲时间，最大化读取时间
-        const isLargeResponseForRead = timeout >= 60000 && responseMaxTokens >= 2500;
-        const readBufferTime = isLargeResponseForRead ? 200 : 2000; // 大响应体只留0.2秒缓冲（从300ms降到200ms）
+        // 优化：对于大响应体，增加缓冲时间，确保有足够时间读取响应体
+        const isLargeResponseForRead = timeout >= 60000 && responseMaxTokens >= 2000;
+        const readBufferTime = isLargeResponseForRead ? 1000 : 2000; // 大响应体增加缓冲时间（从200ms增加到1000ms）
         const maxReadTimeout = timeout >= 60000 ? timeout - readBufferTime : 45000;
-        const readTimeout = Math.max(30000, Math.min(remainingTime - 200, maxReadTimeout)); // 减少剩余时间计算中的缓冲（从300ms降到200ms）
+        
+        // 关键优化：不依赖 remainingTime，而是基于总 timeout 和 fetchTime
+        // 确保即使 fetchTime 很大，也有足够时间读取响应体
+        const estimatedReadTime = timeout - fetchTime - readBufferTime;
+        let readTimeout = Math.max(35000, Math.min(estimatedReadTime, maxReadTimeout));
+        
+        // 如果计算出的 readTimeout 太小，使用更保守的策略
+        if (readTimeout < 35000 && timeout >= 60000) {
+          // 对于60秒超时，至少保证35秒读取时间
+          const fallbackReadTimeout = Math.min(timeout - fetchTime - 1000, maxReadTimeout);
+          readTimeout = Math.max(35000, fallbackReadTimeout);
+        }
           // eslint-disable-next-line no-console
         console.log(`[AI Debug] Response reading timeout set to ${readTimeout}ms, remaining time: ${remainingTime}ms, max read timeout: ${maxReadTimeout}ms, total timeout: ${timeout}ms`);
         
@@ -432,12 +443,12 @@ export class AIService {
   async analyzeLoveStyle(answers: UserAnswer[], context: TestContext): Promise<any> {
     try {
     const prompt = UnifiedPromptBuilder.buildPrompt(answers, context, 'loveStyle');
-    // Love Style分析：降低max_tokens以减少响应体大小，确保在60秒内完成读取
-    // 由于需要详细分析6个维度、心理分析、关系动态等，响应体可能较大
-    // 降低 maxTokens 从 3000 到 2500，减少约17%的响应体大小，有助于在60秒内完成
+    // Love Style分析：优化prompt减少响应体大小，降低max_tokens以确保在60秒内完成读取
+    // 通过优化prompt（减少字数限制、简化字段），响应体预计减少30-40%
+    // 降低 maxTokens 从 2500 到 2000，进一步减少响应体大小
     // 禁用重试机制，避免在60秒硬限制下浪费时间
     const customTimeout = 60000; // 60秒超时，readTimeout 将通过优化计算获得更长的时间
-    const maxTokens = 2500; // 降低max_tokens以减少响应体大小
+    const maxTokens = 2000; // 降低max_tokens以减少响应体大小（配合prompt优化）
     const disableRetry = true; // 禁用重试，避免浪费60秒限制
     const response = await this.callDeepSeek(prompt, 0, customTimeout, maxTokens, disableRetry);
     return this.parseLoveStyleResponse(response);
@@ -1882,9 +1893,9 @@ export class AIService {
         maxTokens = 1500; // Love Language Test：降低max_tokens以避免响应体读取超时
         customTimeout = 30000; // 30秒
       } else if (data.testType === 'love_style') {
-        maxTokens = 2500; // Love Style：进一步降低max_tokens以减少响应体大小，确保在60秒内完成读取
-        // Love Style 的 prompt 更复杂（14984 chars vs interpersonal 6877 chars），响应体较大
-        // 降低 maxTokens 从 3000 到 2500，减少约17%的响应体大小，有助于在60秒内完成
+        maxTokens = 2000; // Love Style：优化prompt后降低max_tokens以减少响应体大小，确保在60秒内完成读取
+        // 通过优化prompt（减少字数限制、简化字段），响应体预计减少30-40%
+        // 降低 maxTokens 从 2500 到 2000，进一步减少响应体大小
         // 禁用重试机制，避免在60秒硬限制下浪费时间
         customTimeout = 60000; // 60秒超时，readTimeout 将通过优化计算获得更长的时间
       } else if (data.testType === 'interpersonal') {
